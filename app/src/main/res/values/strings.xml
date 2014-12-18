@@ -19,5 +19,6 @@
     <string name="billiard_post">发帖</string>
     <string name="billiard_back">返回</string>
     <string name="title_activity_my">MyActivity</string>
+    <string name="title_activity_billiard_search">BilliardSearchActivity</string>
 
 </resources>
