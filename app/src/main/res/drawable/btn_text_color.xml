@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- This is for the button text color we when pressed on the button -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true"
+          android:color="#eeffddee">
+
+    </item>
+
+    <!-- this is the default untouched statte of the button -->
+    <item android:color="#ff000000"></item>
+
+
+</selector>
