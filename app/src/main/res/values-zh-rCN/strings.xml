@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--台球圈 -->
+    <string name="billiard_group">台球圈</string>
+    <string name="billiard_all">全部</string>
+    <string name="billiard_get_master">拜师</string>
+    <string name="billiard_be_master">收徒</string>
+    <string name="billiard_find_friend">交友</string>
+    <string name="billiard_equipment">装备</string>
+    <string name="billiard_time">时间</string>
+    <string name="billiard_poplarity">人气</string>
+    <string name="billiard_search">搜索</string>
+    <string name="billiard_key_serach">关键字搜索</string>
+    <string name="billiard_post">发帖</string>
+</resources>
