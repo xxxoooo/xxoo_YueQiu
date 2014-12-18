@@ -21,4 +21,29 @@
     <string name="title_activity_my">MyActivity</string>
     <string name="title_activity_billiard_search">BilliardSearchActivity</string>
 
+
+    <!-- 搜索 -->
+    <!-- 定义SearchActivity当中的Actionbar当中的menuItem -->
+    <string name="search_account_name_str">账户:</string>
+    <string name="search_my_gold_coin_num_str">我的金币:</string>
+    <string name="search_login_str">登录</string>
+    <string name="search_personal_info_str">个人信息</string>
+    <string name="search_mentioned_me_str">提到我的</string>
+    <string name="search_my_favor_collection_str">我的收藏</string>
+    <string name="search_my_published_info_str">我发布的</string>
+    <string name="search_publishing_dating_billiards_info_str">发布约球信息</string>
+    <string name="search_feed_back_str">反馈信息</string>
+    <string name="search_logou_str">退出账户</string>
+
+    <!--定义反馈Activity当中的string资源-->
+    <string name="search_feedback_acti_title_indi_str">标题:</string>
+    <string name="search_feedback_acti_content_indi_str">内容:</string>
+    <string name="search_feedback_acti_leave_contact_indi_str">请留下联系方式:</string>
+    <string name="search_feedback_acti_btn_submit_str">提交</string>
+    <string name="search_feedback_acti_et_leave_contact_hint">手机号/邮箱/QQ</string>
+    <string name="search_feedback_acti_et_leave_content_hint">具体建议...</string>
+
+
+
+
 </resources>

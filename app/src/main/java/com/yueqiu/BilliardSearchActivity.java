@@ -1,12 +1,11 @@
 package com.yueqiu;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.yueqiu.R;
 
-public class BilliardSearchActivity extends Activity
+public class BilliardSearchActivity extends FragmentActivity
 {
 
     @Override
