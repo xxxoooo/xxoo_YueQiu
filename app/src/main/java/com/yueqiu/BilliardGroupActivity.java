@@ -68,10 +68,10 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         @Override
         public Fragment getItem(int i) {
 
-            Fragment mFragment = new BilliardGroupChildFragment();
-            Bundle mArgs = new Bundle();
-            mArgs.putString(BilliardGroupBasicFragment.BILLIARD_TAB_NAME,mTitles[i]);
-            mFragment.setArguments(mArgs);
+            Fragment mFragment = new BilliardGroupBasicFragment();
+//            Bundle mArgs = new Bundle();
+//            mArgs.putString(BilliardGroupBasicFragment.BILLIARD_TAB_NAME,mTitles[i]);
+//            mFragment.setArguments(mArgs);
             return mFragment;
         }
 

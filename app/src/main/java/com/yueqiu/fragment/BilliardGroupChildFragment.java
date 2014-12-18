@@ -2,6 +2,7 @@ package com.yueqiu.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,9 +18,13 @@ public class BilliardGroupChildFragment extends Fragment {
     private View mView;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_billard_group_basic,null);
-        Bundle args = getArguments();
-        ((TextView)mView.findViewById(R.id.text)).setText(args.getString(BILLIARD_TAB_NAME));
+        if(mView==null) {
+            mView = inflater.inflate(R.layout.fragment_billard_group_basic, null);
+        }
+        ViewGroup parent = (ViewGroup) mView.getParent();
+        if(parent != null){
+            parent.removeView(mView);
+        }
         return mView;
     }
 }

@@ -5,12 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-
     <FrameLayout
         android:id="@+id/group_main_content"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
+
     <android.support.v4.app.FragmentTabHost
         android:id="@android:id/tabhost"
         android:layout_width="match_parent"
@@ -22,5 +22,6 @@
             android:layout_height="0dp"
             android:layout_weight="0"/>
      </android.support.v4.app.FragmentTabHost>
+
 
 </LinearLayout>
