@@ -11,8 +11,6 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.yueqiu.activity.searchmenu.ActivitiesActivity;
-
 import java.util.ArrayList;
 
 

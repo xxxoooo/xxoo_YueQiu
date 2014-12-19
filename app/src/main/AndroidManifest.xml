@@ -33,7 +33,7 @@
         <!--聊吧 END-->
         <activity android:name=".activity.searchmenu.RegisterActivity"/>
         <activity android:name=".activity.searchmenu.LoginActivity"/>
-        <activity android:name=".activity.searchmenu.ActivitiesActivity"/>
+        <activity android:name=".ActivitiesActivity"/>
 
     </application>
 
