@@ -16,6 +16,11 @@ import com.yueqiu.R;
 public class BilliardGroupChildFragment extends Fragment {
     public static final String BILLIARD_TAB_NAME = "billiard_tab_name";
     private View mView;
+
+    public BilliardGroupChildFragment() {
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         if(mView==null) {
