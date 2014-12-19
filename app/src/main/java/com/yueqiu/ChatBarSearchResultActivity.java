@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.yueqiu.adapter.ChatBarSearchResultAdapter;
 
@@ -14,24 +16,30 @@ import com.yueqiu.adapter.ChatBarSearchResultAdapter;
  */
 public class ChatBarSearchResultActivity extends Activity {
     private static final String TAG = "SearchResultActivity";
+    private TextView mBack;
+    private ListView mListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chatbar_searchresult);
+        init();
 
-        ListView listView = (ListView) findViewById(R.id.chatbar_searchresult_lv_account);
         ChatBarSearchResultAdapter adapter = new ChatBarSearchResultAdapter(this);
-        Log.e(TAG, "listview = " + listView + "   adapter" + adapter);
-        listView.setAdapter(adapter);
+        Log.e(TAG, "listview = " + mListView + "   adapter" + adapter);
+        mListView.setAdapter(adapter);
+
     }
 
-    private void createDialog() {
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("消息验证")
-
-                .create();
+    private void init(){
+        mListView = (ListView) findViewById(R.id.chatbar_searchresult_lv_account);
+        mBack = (TextView)findViewById(R.id.btn_back);
+        mBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
-
 
 }

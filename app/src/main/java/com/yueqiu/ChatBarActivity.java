@@ -79,7 +79,7 @@ public class ChatBarActivity extends FragmentActivity {
             @Override
             public void onClick(View v) {
                 //返回按钮
-
+                finish();
             }
         });
         mTitle = (TextView) findViewById(R.id.tv_title);

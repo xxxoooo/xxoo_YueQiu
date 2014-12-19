@@ -13,14 +13,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:listSelector="@drawable/list_myprofile"
-        android:scrollbarSize="10dp"></ListView>
+        android:scrollbarSize="10dp">
+
+        </ListView>
 
     <ListView
         android:id="@+id/myprofile2"
         android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:listSelector="@drawable/list_myprofile"></ListView>
+        android:listSelector="@drawable/list_myprofile">
+
+        </ListView>
 
 
 </RelativeLayout>
