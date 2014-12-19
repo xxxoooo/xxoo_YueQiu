@@ -49,7 +49,7 @@ public class ChatBarSearchResultAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         Log.e(TAG, "getView " + position + " " + convertView);
         if (convertView == null) {
-            convertView = mLayoutInflater.inflate(R.layout.item_search_result, null);
+            convertView = mLayoutInflater.inflate(R.layout.item_chatbar_search_result, null);
             viewHolder = new ViewHolder();
             viewHolder.mImageView = (ImageView) convertView.findViewById(R.id.chatbar_item_account_iv);
             viewHolder.mAccount = (TextView) convertView.findViewById(R.id.chatbar_item_account_tv);
@@ -91,7 +91,7 @@ public class ChatBarSearchResultAdapter extends BaseAdapter {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.dialog_add_friends);
+            setContentView(R.layout.dialog_chatbar_add_friends);
         }
     }
 }

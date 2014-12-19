@@ -31,7 +31,7 @@ public class ChatBarActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_chatbar_main);
         initView();
 		fragmentManager = getSupportFragmentManager();
         radioGroup = (RadioGroup)findViewById(R.id.radioGroup1);
