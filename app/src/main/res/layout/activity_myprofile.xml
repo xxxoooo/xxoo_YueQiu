@@ -1,30 +1,74 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:paddingLeft="@dimen/activity_horizontal_margin"
-              android:paddingRight="@dimen/activity_horizontal_margin"
-              android:paddingTop="@dimen/activity_vertical_margin"
-              android:paddingBottom="@dimen/activity_vertical_margin"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-    <ListView
-        android:id="@+id/myprofile1"
-        android:layout_marginTop="10dp"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:id="@+id/title_bar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:listSelector="@drawable/list_myprofile"
-        android:scrollbarSize="10dp">
+        android:layout_height="50dp"
+        >
 
-        </ListView>
+        <TextView
+            android:id="@+id/btn_back"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:text="@string/btn_back"/>
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="24sp"
+            android:textColor="@color/light_blue"
+            android:text="我的资料"/>
+        <View
+            android:layout_below="@id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="1dip"
+            android:background="#696969" />
+    </RelativeLayout>
 
-    <ListView
-        android:id="@+id/myprofile2"
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:listSelector="@drawable/list_myprofile">
+    <LinearLayout
+        android:layout_below="@id/title_bar"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-        </ListView>
+        <com.yueqiu.view.CornerListView
+            android:id="@+id/local_listView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/list_corner_round_bg"
+            android:cacheColorHint="#00000000"
+            android:divider="#000000"
+            android:dividerHeight="0.5px"
+            android:scrollbars="none"
+            android:fadingEdge="none"
+            />
+
+        <com.yueqiu.view.CornerListView
+            android:id="@+id/local_listView2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginEnd="10dp"
+            android:background="@drawable/list_corner_round_bg"
+            android:cacheColorHint="#00000000"
+            android:divider="#000000"
+            android:dividerHeight="0.5px"
+            android:scrollbars="none"
+            android:fadingEdge="none"/>
+
+    </LinearLayout>
+
 
 
 </RelativeLayout>
