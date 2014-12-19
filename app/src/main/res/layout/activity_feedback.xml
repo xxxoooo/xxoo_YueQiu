@@ -1,0 +1,96 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/activity_horizontal_margin"
+                android:paddingRight="@dimen/activity_horizontal_margin"
+                android:paddingTop="@dimen/activity_vertical_margin"
+                android:paddingBottom="@dimen/activity_vertical_margin"
+                tools:context="com.scguo.fragment.app2.action_activity.FeedbackActivity">
+
+    <TextView
+        android:id="@+id/tv_feedback_title_indi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:text="@string/search_feedback_acti_title_indi_str"
+        />
+
+    <EditText
+        android:id="@+id/et_feedback_title"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_alignBottom="@id/tv_feedback_title_indi"
+        android:layout_toRightOf="@id/tv_feedback_title_indi"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:singleLine="true"
+
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_feedback_title_indi"
+        android:text="@string/search_feedback_acti_content_indi_str"
+        android:textStyle="bold"
+        android:textSize="24sp"
+        android:id="@+id/tv_feedback_content_indi"
+        />
+
+    <EditText
+        android:layout_marginLeft="6dp"
+        android:id="@+id/et_feedback_content"
+        android:lines="7"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_alignTop="@id/tv_feedback_content_indi"
+        android:layout_toRightOf="@id/tv_feedback_content_indi"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        />
+
+    <ImageView
+        android:layout_marginTop="10dp"
+        android:src="@drawable/line_separator"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/et_feedback_content"
+        android:id="@+id/img_separator"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_feedback_leave_contact_indi"
+        android:textSize="20sp"
+        android:layout_below="@id/img_separator"
+        android:text="@string/search_feedback_acti_leave_contact_indi_str"
+        android:layout_marginTop="17dp"
+        />
+
+    <EditText
+        android:id="@+id/et_feedback_contact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/tv_feedback_leave_contact_indi"
+        android:layout_alignTop="@id/tv_feedback_leave_contact_indi"
+        android:singleLine="true"
+        android:hint="@string/search_feedback_acti_et_leave_contact_hint"
+        android:gravity="center_vertical"/>
+
+    <Button
+        android:layout_marginTop="40dp"
+        android:id="@+id/btn_feedback_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_feedback_leave_contact_indi"
+        android:layout_centerHorizontal="true"
+        android:text="@string/search_feedback_acti_btn_submit_str">
+
+    </Button>
+
+
+</RelativeLayout>
