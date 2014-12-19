@@ -68,4 +68,33 @@
     <string name="tv_add_persion_nearby">附近的人</string>
     <string name="ed_add_persion_by_phone_or_account">以手机/账户添加好友</string>
 
+
+    <string name="xlistview_header_hint_normal">下拉刷新</string>
+    <string name="xlistview_header_hint_ready">松开刷新数据</string>
+    <string name="xlistview_header_hint_loading">正在加载...</string>
+    <string name="xlistview_header_last_time">上次更新时间：</string>
+    <string name="xlistview_footer_hint_normal">查看更多</string>
+    <string name="xlistview_footer_hint_ready">松开载入更多</string>
+    <string name="time">时间</string>
+    <string name="distance">距离</string>
+    <string name="back">返回</string>
+    <string name="issueactivities">发布活动</string>
+    <string name="activities_title">活动主题</string>
+    <string name="activities_site">活动地点</string>
+    <string name="activities_time">活动时间</string>
+    <string name="activities_charge_module">收费模式</string>
+    <string name="activities_contacts">联系人:</string>
+    <string name="username">昵称</string>
+    <string name="activities_phone">电话</string>
+    <string name="activities_send">发布</string>
+    <string name="activities_sendinfo">发布约球信息</string>
+    <string name="activities">活动</string>
+    <string name="search">搜索</string>
+    <string name="login">登录</string>
+    <string name="commit">提交</string>
+    <string name="forgetpwd">忘记密码</string>
+    <string name="register">注册</string>
+    <string name="man">男</string>
+    <string name="woman">女</string>
+
 </resources>

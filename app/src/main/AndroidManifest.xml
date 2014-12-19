@@ -31,7 +31,9 @@
             android:theme="@android:style/Theme.Light.NoTitleBar"/>
         <activity android:name=".ChatBarSearchResultActivity"/>
         <!--聊吧 END-->
-
+        <activity android:name=".activity.searchmenu.RegisterActivity"/>
+        <activity android:name=".activity.searchmenu.LoginActivity"/>
+        <activity android:name=".activity.searchmenu.ActivitiesActivity"/>
 
     </application>
 
