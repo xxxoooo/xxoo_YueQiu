@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_gravity="center_horizontal"
+                android:minHeight="?android:attr/listPreferredItemHeight">
+
+
+    <ImageView
+        android:id="@+id/chatbar_item_account_iv"
+        android:layout_marginLeft="15dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@drawable/ic_launcher"/>
+
+    <LinearLayout
+        android:layout_toRightOf="@id/chatbar_item_account_iv"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <TextView
+            android:id="@+id/chatbar_item_account_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="帐户"/>
+
+        <TextView
+            android:id="@+id/chatbar_item_base_info_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="基本信息基本信息"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/chatbar_item_add_friend_btn"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="加为好友"/>
+
+</RelativeLayout>
