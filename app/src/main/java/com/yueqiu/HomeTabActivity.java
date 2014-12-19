@@ -54,9 +54,9 @@ public class HomeTabActivity extends TabActivity implements TabHost.OnTabChangeL
 
         // add the tab in
         mTabHost.addTab(mTabList.get(0).setContent(new Intent(HomeTabActivity.this, BilliardSearchActivity.class)));
-        mTabHost.addTab(mTabList.get(1).setContent(new Intent(HomeTabActivity.this, BilliardSearchActivity.class)));
+        mTabHost.addTab(mTabList.get(1).setContent(new Intent(HomeTabActivity.this, ChatBarActivity.class)));
         mTabHost.addTab(mTabList.get(2).setContent(new Intent(HomeTabActivity.this, BilliardSearchActivity.class)));
-        mTabHost.addTab(mTabList.get(3).setContent(new Intent(HomeTabActivity.this, BilliardSearchActivity.class)));
+        mTabHost.addTab(mTabList.get(3).setContent(new Intent(HomeTabActivity.this, BilliardGroupActivity.class)));
 
         mTabHost.setOnTabChangedListener(this);
     }

@@ -58,4 +58,14 @@
     <string name="tab_title_billiards_circle">台球圈</string>
     <string name="title_activity_home_tab">HomeTabActivity</string>
 
+    <!--聊吧-->
+    <string name="btn_liaoba_message">消息</string>
+    <string name="btn_liaoba_contact">联系人</string>
+    <string name="btn_liaoba_add_friend">添加好友</string>
+    <string name="btn_back">返回</string>
+    <string name="btn_message_search">搜索</string>
+    <string name="tv_contact_my_friends">我的好友:</string>
+    <string name="tv_add_persion_nearby">附近的人</string>
+    <string name="ed_add_persion_by_phone_or_account">以手机/账户添加好友</string>
+
 </resources>

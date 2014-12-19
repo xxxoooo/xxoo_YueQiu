@@ -30,12 +30,14 @@ public class BilliardSearchActivity extends FragmentActivity
     private BilliardsRoomFragment mRoomFragment;
     private BilliardsDatingFragment mDatingFragment;
     private BilliardsCoachFragment mCoachFragment;
-    
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_billiard_search);
+
+
     }
 
     @Override

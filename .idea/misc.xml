@@ -3,14 +3,18 @@
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="JDK" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="1.7" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="masterDetails">
     <states>
       <state key="ProjectJDKs.UI">
         <settings>
+<<<<<<< HEAD
+          <last-edited>1.7</last-edited>
+=======
           <last-edited>Android API 10 Platform</last-edited>
+>>>>>>> dc02ee71d4c1c3404a21be65bd7b489a6369c88d
           <splitter-proportions>
             <option name="proportions">
               <list>
