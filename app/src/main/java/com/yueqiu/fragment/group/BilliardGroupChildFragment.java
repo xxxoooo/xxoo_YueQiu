@@ -1,4 +1,4 @@
-package com.yueqiu.fragment;
+package com.yueqiu.fragment.group;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
