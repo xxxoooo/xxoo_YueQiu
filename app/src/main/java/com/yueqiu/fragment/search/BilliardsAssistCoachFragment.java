@@ -20,6 +20,10 @@ public class BilliardsAssistCoachFragment extends Fragment
     {
         return super.onCreateView(inflater, container, savedInstanceState);
     }
+
+    // this Fragment contains four sub fragments here
+
+
 }
 
 

@@ -14,7 +14,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 
-public class HomeTabActivity extends TabActivity
+public class HomeTabActivity extends TabActivity implements TabHost.OnTabChangeListener
 {
     private static final String TAG = "HomeTabActivity";
 
@@ -57,6 +57,8 @@ public class HomeTabActivity extends TabActivity
         mTabHost.addTab(mTabList.get(1).setContent(new Intent(HomeTabActivity.this, BilliardSearchActivity.class)));
         mTabHost.addTab(mTabList.get(2).setContent(new Intent(HomeTabActivity.this, BilliardSearchActivity.class)));
         mTabHost.addTab(mTabList.get(3).setContent(new Intent(HomeTabActivity.this, BilliardSearchActivity.class)));
+
+        mTabHost.setOnTabChangedListener(this);
     }
 
     @Override
@@ -78,6 +80,12 @@ public class HomeTabActivity extends TabActivity
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onTabChanged(String tabId)
+    {
+        Toast.makeText(this, "changing tab", Toast.LENGTH_LONG).show();
     }
 }
 
