@@ -12,7 +12,7 @@ import com.yueqiu.adapter.ChatBarSearchResultAdapter;
  * Created by doushuqi on 14/12/18.
  * 聊吧添加好友搜索结果Activity
  */
-public class SearchResultActivity extends Activity {
+public class ChatBarSearchResultActivity extends Activity {
     private static final String TAG = "SearchResultActivity";
 
     @Override

@@ -1,4 +1,4 @@
-package com.yueqiu.fragment;
+package com.yueqiu.fragment.chatbar;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,8 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.yueqiu.ChatBarSearchResultActivity;
 import com.yueqiu.R;
-import com.yueqiu.SearchResultActivity;
 
 /**
  * Created by doushuqi on 14/12/17.
@@ -28,7 +28,7 @@ public class AddPersonFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 //TODO:result of search，new Activity or fragment
-                Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                Intent intent = new Intent(getActivity(), ChatBarSearchResultActivity.class);
                 startActivity(intent);
             }
         });

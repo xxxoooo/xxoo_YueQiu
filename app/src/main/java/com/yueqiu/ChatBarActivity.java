@@ -11,9 +11,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.yueqiu.fragment.AddPersonFragment;
-import com.yueqiu.fragment.ContactFragment;
-import com.yueqiu.fragment.MessageFragment;
+import com.yueqiu.fragment.chatbar.AddPersonFragment;
+import com.yueqiu.fragment.chatbar.ContactFragment;
+import com.yueqiu.fragment.chatbar.MessageFragment;
 
 /**
  * Created by doushuqi on 14/12/17.
