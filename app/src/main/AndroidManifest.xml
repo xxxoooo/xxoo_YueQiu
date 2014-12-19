@@ -8,7 +8,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".BilliardSearchActivity"
+            android:name=".HomeTabActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -18,7 +18,11 @@
         </activity>
         <activity
             android:name=".BilliardGroupActivity"
-            android:label="@string/app_name" >
+            android:label="@string/title_activity_billiard_group" >
+        </activity>
+        <activity
+            android:name=".BilliardSearchActivity"
+            android:label="@string/title_activity_billiard_search" >
         </activity>
     </application>
 

@@ -1,5 +1,7 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@android:id/tabcontent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
@@ -8,9 +10,127 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.yueqiu.BilliardSearchActivity">
 
-    <TextView
-        android:text="@string/hello_world"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <RadioGroup
+        android:id="@+id/radiogroup_search_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentTop="true">
+
+        <RadioButton
+            android:id="@+id/radiobtn_search_billiards_mate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_launcher"
+            android:button="@null"
+            android:gravity="center"
+            android:text="@string/search_billiard_mate_str"
+            android:layout_weight="1"
+            />
+
+        <RadioButton
+            android:id="@+id/radiobtn_search_billiard_assit_coauch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_launcher"
+            android:button="@null"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="@string/search_billiard_assist_coauch_str"/>
+
+        <RadioButton
+            android:id="@+id/radiobtn_search_billiard_coauch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_launcher"
+            android:button="@null"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="@string/search_billiard_coauch_str"/>
+
+        <RadioButton
+            android:id="@+id/radiobtn_search_billiard_room"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_launcher"
+            android:button="@null"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="@string/search_billiard_room_str"/>
+
+        <RadioButton
+            android:id="@+id/radiobtn_search_billiard_dating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/ic_launcher"
+            android:button="@null"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:text="@string/search_billiard_dating_str"/>
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/search_frame"
+        android:layout_below="@id/radiogroup_search_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="10"
+        android:layout_marginTop="5dp">
+
+        <EditText
+            android:id="@+id/search_search_et"
+            android:layout_weight="8"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/search_hint_str"
+            android:imeOptions="actionSearch"/>
+
+        <Button
+            android:padding="5dp"
+            android:background="@drawable/btn_bg"
+            android:id="@+id/search_search_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:text="@string/search_search_btn_str"
+            />
+    </LinearLayout>
+
+    <!-- the following FrameLayout use to inflate the Fragment we need to add on -->
+    <FrameLayout
+        android:id="@+id/search_sub_fragment_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+    </FrameLayout>
 
 </RelativeLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
