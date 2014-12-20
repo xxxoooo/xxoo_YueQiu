@@ -14,7 +14,7 @@
     <string name="billiard_equipment">装备</string>
     <string name="billiard_time">时间</string>
     <string name="billiard_poplarity">人气</string>
-    <string name="billiard_search">搜索</string>
+    <string name="billiard_search">附近</string>
     <string name="billiard_key_serach">关键字搜索</string>
     <string name="billiard_post">发帖</string>
     <string name="billiard_back">返回</string>
@@ -41,6 +41,16 @@
     <string name="search_billiard_room_str">球厅</string>
     <string name="search_billiard_dating_str">约球</string>
 
+    <!-- 球友子Fragment中的title -->
+    <string name="search_mate_subfragment_title_distance">距离</string>
+    <string name="search_mate_subfragment_title_gender">性别</string>
+
+    <!-- 用于球友子Fragment当中定义的字段值 -->
+    <string name="search_subfragment_listitem_gender_indi_str">性别:</string>
+    <string name="search_subfragment_listitem_account_indi_str">账户:</string>
+    <string name="search_subfragment_listitem_distan_default_str">米以内</string>
+    <string name="search_subfragment_listitem_gender_default_str">女</string>
+
     <!-- 定义反馈Activity当中的string资源 -->
     <string name="search_feedback_acti_title_indi_str">标题:</string>
     <string name="search_feedback_acti_content_indi_str">内容:</string>
@@ -58,7 +68,7 @@
     <string name="tab_title_billiards_circle">台球圈</string>
     <string name="title_activity_home_tab">HomeTabActivity</string>
 
-    <!--聊吧-->
+    <!-- 聊吧 -->
     <string name="btn_liaoba_message">消息</string>
     <string name="btn_liaoba_contact">联系人</string>
     <string name="btn_liaoba_add_friend">添加好友</string>
@@ -67,5 +77,6 @@
     <string name="tv_contact_my_friends">我的好友:</string>
     <string name="tv_add_persion_nearby">附近的人</string>
     <string name="ed_add_persion_by_phone_or_account">以手机/账户添加好友</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
