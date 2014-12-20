@@ -5,7 +5,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yueqiu.R;
@@ -22,25 +27,27 @@ public class MentionedMeActivity extends FragmentActivity implements View.OnClic
     private List<Fragment> mFragments;
     private TextView mReply, mFriendRequest, mBack;
     FragmentPagerAdapter adapter;
-    int current;
+    private int currIndex = 0;
+    private int bottomLineWidth;
+    private int offset = 0;
+    private int position_one;
+    public final static int num = 2;
+    private ImageView ivBottomLine;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_mentioned_me);
         init();
+        initWidth();
+        TranslateAnimation animation = new TranslateAnimation(position_one, offset, 0, 0);
+        animation.setFillAfter(true);
+        animation.setDuration(300);
+        ivBottomLine.startAnimation(animation);
         mFragments = new ArrayList<Fragment>();
         mFragments.add(new ReplyMentionMeFragment());
         mFragments.add(new FriendRequestFragment());
-    }
-
-    private void init() {
-        mReply = (TextView) findViewById(R.id.mention_me_tv_reply);
-        mFriendRequest = (TextView) findViewById(R.id.mention_me_tv_friend_request);
-        mBack = (TextView) findViewById(R.id.mention_me_btn_back);
-        mReply.setOnClickListener(this);
-        mBack.setOnClickListener(this);
-        mFriendRequest.setOnClickListener(this);
         mViewPager = (ViewPager) findViewById(R.id.mention_me_container);
         adapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
@@ -55,22 +62,28 @@ public class MentionedMeActivity extends FragmentActivity implements View.OnClic
         };
         mViewPager.setAdapter(adapter);
 
-        mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        mViewPager.setOnPageChangeListener(new MyOnPageChangeListener());
+    }
 
-            }
+    private void init() {
+        mReply = (TextView) findViewById(R.id.mention_me_tv_reply);
+        mReply.setTextColor(getResources().getColor(R.color.red));
+        mFriendRequest = (TextView) findViewById(R.id.mention_me_tv_friend_request);
+        mBack = (TextView) findViewById(R.id.mention_me_btn_back);
+        mReply.setOnClickListener(this);
+        mBack.setOnClickListener(this);
+        mFriendRequest.setOnClickListener(this);
+    }
 
-            @Override
-            public void onPageSelected(int position) {
-                current = position;
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+    private void initWidth() {
+        ivBottomLine = (ImageView) findViewById(R.id.iv_bottom_line);
+        bottomLineWidth = ivBottomLine.getLayoutParams().width;
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int screenW = dm.widthPixels;
+        offset = (int) ((screenW / num - bottomLineWidth) / 2);
+        int avg = (int) (screenW / num);
+        position_one = avg + offset;
     }
 
     @Override
@@ -80,17 +93,53 @@ public class MentionedMeActivity extends FragmentActivity implements View.OnClic
                 finish();
                 break;
             case R.id.mention_me_tv_reply:
-                switchFragment(0);
+                mViewPager.setCurrentItem(0);
                 break;
             case R.id.mention_me_tv_friend_request:
-                switchFragment(1);
+                mViewPager.setCurrentItem(1);
                 break;
         }
     }
 
-    private void switchFragment(int pos) {
-        if (pos == current)
-            return;
-        mViewPager.setCurrentItem(pos);
+//    private void switchFragment(int pos) {
+//        if (pos == current)
+//            return;
+//        mViewPager.setCurrentItem(pos);
+//    }
+
+    public class MyOnPageChangeListener implements ViewPager.OnPageChangeListener {
+
+        @Override
+        public void onPageSelected(int arg0) {
+            Animation animation = null;
+            switch (arg0) {
+                case 0:
+                    if (currIndex == 1) {
+                        animation = new TranslateAnimation(position_one, offset, 0, 0);
+                        mFriendRequest.setTextColor(getResources().getColor(R.color.black));
+                    }
+                    mReply.setTextColor(getResources().getColor(R.color.red));
+                    break;
+                case 1:
+                    if (currIndex == 0) {
+                        animation = new TranslateAnimation(offset, position_one, 0, 0);
+                        mReply.setTextColor(getResources().getColor(R.color.black));
+                    }
+                    mFriendRequest.setTextColor(getResources().getColor(R.color.red));
+                    break;
+            }
+            currIndex = arg0;
+            animation.setFillAfter(true);
+            animation.setDuration(300);
+            ivBottomLine.startAnimation(animation);
+        }
+
+        @Override
+        public void onPageScrolled(int arg0, float arg1, int arg2) {
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int arg0) {
+        }
     }
 }

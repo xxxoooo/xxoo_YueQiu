@@ -1,5 +1,6 @@
 package com.yueqiu;
 
+import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -34,6 +35,13 @@ public class ActivitiesActivity extends FragmentActivity implements View.OnClick
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_activites);
         initView();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ActionBar actionBar = getParent().getActionBar();
+        actionBar.setTitle(getString(R.string.activities));
     }
 
     private void initView()

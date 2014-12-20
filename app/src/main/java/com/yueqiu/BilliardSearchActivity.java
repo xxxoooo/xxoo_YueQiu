@@ -1,11 +1,19 @@
 package com.yueqiu;
 
+import android.app.ActionBar;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.RadioGroup;
 
 import com.yueqiu.fragment.search.BilliardsAssistCoachFragment;
@@ -13,6 +21,8 @@ import com.yueqiu.fragment.search.BilliardsCoachFragment;
 import com.yueqiu.fragment.search.BilliardsDatingFragment;
 import com.yueqiu.fragment.search.BilliardsMateFragment;
 import com.yueqiu.fragment.search.BilliardsRoomFragment;
+import com.yueqiu.view.ActionBarDrawToggle;
+import com.yueqiu.view.DrawerArrowDrawable;
 
 public class BilliardSearchActivity extends FragmentActivity
 {
@@ -31,12 +41,22 @@ public class BilliardSearchActivity extends FragmentActivity
     private BilliardsDatingFragment mDatingFragment;
     private BilliardsCoachFragment mCoachFragment;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_billiard_search);
 
+        //
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ActionBar actionBar = getParent().getActionBar();
+        actionBar.setTitle(getString(R.string.search_search_btn_str));
 
     }
 
@@ -58,6 +78,7 @@ public class BilliardSearchActivity extends FragmentActivity
 
         return super.onOptionsItemSelected(item);
     }
+
 }
 
 

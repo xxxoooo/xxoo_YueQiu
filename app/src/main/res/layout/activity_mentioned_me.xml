@@ -1,6 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
     <RelativeLayout
         android:id="@+id/title_bar"
@@ -15,6 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:text="@string/btn_back"/>
+
         <TextView
             android:id="@+id/tv_title"
             android:layout_centerInParent="true"
@@ -24,33 +25,67 @@
             android:textSize="24sp"
             android:textColor="@color/light_blue"
             android:text="@string/mentioned_me"/>
+
         <View
             android:layout_below="@id/tv_title"
             android:layout_width="match_parent"
             android:layout_height="1dip"
-            android:background="#696969" />
+            android:background="#696969"/>
     </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/mention_me_tab"
         android:layout_below="@id/title_bar"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/mention_me_tv_reply"
-            android:layout_width="wrap_content"
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:text="@string/mentioned_me_reply"/>
-        <TextView
-            android:id="@+id/mention_me_tv_friend_request"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:text="@string/mentioned_me_friend_request"/>
+            android:paddingBottom="5dp">
+
+            <TextView
+                android:id="@+id/mention_me_tv_reply"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:textColor="@color/font_selector"
+                android:text="@string/mentioned_me_reply"/>
+
+            <TextView
+                android:id="@+id/mention_me_tv_friend_request"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:textColor="@color/font_selector"
+                android:text="@string/mentioned_me_friend_request"/>
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:orientation="vertical"
+            android:paddingBottom="3dip">
+
+            <ImageView
+                android:id="@+id/iv_bottom_line"
+                android:layout_width="40dip"
+                android:layout_height="2dip"
+                android:scaleType="matrix"
+                android:src="@color/red"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
     <android.support.v4.view.ViewPager
         android:id="@+id/mention_me_container"
         android:layout_below="@id/mention_me_tab"
