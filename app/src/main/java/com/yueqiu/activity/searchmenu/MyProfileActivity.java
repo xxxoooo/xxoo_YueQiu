@@ -15,6 +15,7 @@ import com.yueqiu.view.CornerListView;
 
 /**
  * Created by doushuqi on 14/12/19.
+ * 我的资料主Activity
  */
 public class MyProfileActivity extends Activity {
 
@@ -34,6 +35,13 @@ public class MyProfileActivity extends Activity {
         mCornerListView2 = (CornerListView) findViewById(R.id.local_listView2);
         MyAdapter2 adapter2 = new MyAdapter2();
         mCornerListView2.setAdapter(adapter2);
+
+        findViewById(R.id.myprofile_btn_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     class MyAdapter extends BaseAdapter {

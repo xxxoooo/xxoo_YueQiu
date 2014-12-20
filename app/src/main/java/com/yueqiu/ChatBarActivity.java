@@ -1,6 +1,7 @@
 package com.yueqiu;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -74,12 +75,13 @@ public class ChatBarActivity extends FragmentActivity {
 	}
 
     private void initView() {
-        mBack = (TextView) findViewById(R.id.btn_back);
+        mBack = (TextView) findViewById(R.id.chatbar_main_btn_back);
         mBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //返回按钮
-                finish();
+                startActivity(new Intent(getApplication(), HomeTabActivity.class));
+                ChatBarActivity.this.finish();
             }
         });
         mTitle = (TextView) findViewById(R.id.tv_title);
