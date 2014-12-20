@@ -9,50 +9,38 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 
 import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
-import com.yueqiu.fragment.group.BilliardGroupChildFragment;
 
 /**
  * Created by wangyun on 14/12/17.
  * 台球圈Activity
  */
 public class BilliardGroupActivity extends FragmentActivity implements ActionBar.TabListener{
-
+    public static final String BILLIARD_TAB_NAME = "billiard_tab_name";
     private ViewPager mViewPager;
     private String[] mTitles;
     private SectionPagerAdapter mPagerAdapter;
-
+    private ActionBar mActionBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_billiard_group);
 
+
+
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
 
-        mTitles = new String[]{getString(R.string.billiard_all),getString(R.string.billiard_get_master),
-                getString(R.string.billiard_be_master),getString(R.string.billiard_find_friend),getString(R.string.billiard_equipment)};
-        final ActionBar actionBar = getActionBar();
+        mTitles = new String[]{getString(R.string.billiard_all),
+                getString(R.string.billiard_get_master),
+                getString(R.string.billiard_be_master),
+                getString(R.string.billiard_find_friend),
+                getString(R.string.billiard_equipment)
+        };
 
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setTitle(getString(R.string.billiard_group));
-        actionBar.setDisplayHomeAsUpEnabled(true);
-
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
-            @Override
-            public void onPageSelected(int position) {
-                actionBar.setSelectedNavigationItem(position);
-            }
-        });
-
-        Tab tab;
-        for(int i=0; i<mPagerAdapter.getCount();i++){
-            tab = actionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
-            actionBar.addTab(tab);
-        }
 
     }
 
@@ -66,9 +54,9 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         public Fragment getItem(int i) {
 
             Fragment mFragment = new BilliardGroupBasicFragment();
-//            Bundle mArgs = new Bundle();
-//            mArgs.putString(BilliardGroupBasicFragment.BILLIARD_TAB_NAME,mTitles[i]);
-//            mFragment.setArguments(mArgs);
+            Bundle mArgs = new Bundle();
+            mArgs.putString(BILLIARD_TAB_NAME,mTitles[i]);
+            mFragment.setArguments(mArgs);
             return mFragment;
         }
 
@@ -104,4 +92,49 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         getMenuInflater().inflate(R.menu.billiard_group, menu);
         return true;
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch(item.getItemId()){
+//            case android.R.id.home:
+//                this.finish();
+//                break;
+//        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mActionBar = getParent().getActionBar();
+
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar.setTitle(getString(R.string.billiard_group));
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setTitle(getString(R.string.billiard_group));
+
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+            @Override
+            public void onPageSelected(int position) {
+                mActionBar.setSelectedNavigationItem(position);
+            }
+        });
+
+        Tab tab;
+        for(int i=0; i<mPagerAdapter.getCount();i++){
+            tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
+            mActionBar.addTab(tab);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mActionBar.removeAllTabs();
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+    }
+
 }

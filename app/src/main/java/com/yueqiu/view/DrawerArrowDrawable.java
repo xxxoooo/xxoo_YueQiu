@@ -14,7 +14,7 @@ import com.yueqiu.R;
 /**
  * Created by wangyun on 14/12/19.
  */
-public abstract class DrawerArrowDrawble extends Drawable{
+public abstract class DrawerArrowDrawable extends Drawable{
 
     private static final float ARROW_HEAD_ANGLE = (float) Math.toRadians(45.0D);
     protected float mBarGap;
@@ -27,10 +27,10 @@ public abstract class DrawerArrowDrawble extends Drawable{
     protected int mSize;
     protected float mVerticalMirror = 1f;
     protected float mTopBottomArrowSize;
-    protected Context mContext;
+    protected Context context;
 
-    public DrawerArrowDrawble(Context context){
-        this.mContext = context;
+    public DrawerArrowDrawable(Context context) {
+        this.context = context;
         this.mPaint.setAntiAlias(true);
         this.mPaint.setColor(context.getResources().getColor(R.color.ldrawer_color));
         this.mSize = context.getResources().getDimensionPixelSize(R.dimen.ldrawer_drawableSize);
@@ -41,75 +41,78 @@ public abstract class DrawerArrowDrawble extends Drawable{
         this.mMiddleArrowSize = context.getResources().getDimensionPixelSize(R.dimen.ldrawer_middleBarArrowSize);
         this.mPaint.setStyle(Paint.Style.STROKE);
         this.mPaint.setStrokeJoin(Paint.Join.ROUND);
+        this.mPaint.setStrokeCap(Paint.Cap.SQUARE);
         this.mPaint.setStrokeWidth(this.mBarThickness);
     }
-    protected float lerp(float paramFloat1,float paramFloat2,float paramFloat3){
+
+    protected float lerp(float paramFloat1, float paramFloat2, float paramFloat3) {
         return paramFloat1 + paramFloat3 * (paramFloat2 - paramFloat1);
     }
 
-    @Override
     public void draw(Canvas canvas) {
         Rect localRect = getBounds();
-        float f1 = lerp(this.mBarSize,this.mTopBottomArrowSize,this.mProgress);
-        float f2 = lerp(this.mBarSize,this.mMiddleArrowSize,this.mProgress);
-        float f3 = lerp(0.0F,this.mBarThickness / 2.0F,this.mProgress);
-        float f4 = lerp(0.0F,ARROW_HEAD_ANGLE,this.mProgress);
+        float f1 = lerp(this.mBarSize, this.mTopBottomArrowSize, this.mProgress);
+        float f2 = lerp(this.mBarSize, this.mMiddleArrowSize, this.mProgress);
+        float f3 = lerp(0.0F, this.mBarThickness / 2.0F, this.mProgress);
+        float f4 = lerp(0.0F, ARROW_HEAD_ANGLE, this.mProgress);
         float f5 = 0.0F;
         float f6 = 180.0F;
-        float f7 = lerp(f5,f6,this.mProgress);
-        float f8 = lerp(this.mBarGap+this.mBarThickness,0.0F,this.mProgress);
+        float f7 = lerp(f5, f6, this.mProgress);
+        float f8 = lerp(this.mBarGap + this.mBarThickness, 0.0F, this.mProgress);
         this.mPath.rewind();
         float f9 = -f2 / 2.0F;
-        this.mPath.moveTo(f9+f3,0.0F);
-        this.mPath.rLineTo(f2-f3,0.0F);
-        float f10 = (float)Math.round(f1 * Math.cos(f4));
-        float f11 = (float)Math.round(f1 * Math.sin(f4));
-        this.mPath.moveTo(f9,f8);
-        this.mPath.rLineTo(f10,f11);
-        this.mPath.moveTo(f9,-f8);
-        this.mPath.rLineTo(f10,-f11);
-        this.mPath.moveTo(0.0F,0.0F);
+        this.mPath.moveTo(f9 + f3, 0.0F);
+        this.mPath.rLineTo(f2 - f3, 0.0F);
+        float f10 = (float) Math.round(f1 * Math.cos(f4));
+        float f11 = (float) Math.round(f1 * Math.sin(f4));
+        this.mPath.moveTo(f9, f8);
+        this.mPath.rLineTo(f10, f11);
+        this.mPath.moveTo(f9, -f8);
+        this.mPath.rLineTo(f10, -f11);
+        this.mPath.moveTo(0.0F, 0.0F);
         this.mPath.close();
         canvas.save();
-        if(!isLayoutRtl())
-            canvas.rotate(180.0F,localRect.centerX(),localRect.centerY());
-        canvas.rotate(7 * mVerticalMirror,localRect.centerX(),localRect.centerY());
-        canvas.translate(localRect.centerX(),localRect.centerY());
-        canvas.drawPath(this.mPath,this.mPaint);
+        if (!isLayoutRtl())
+            canvas.rotate(180.0F, localRect.centerX(), localRect.centerY());
+        canvas.rotate(f7 * mVerticalMirror, localRect.centerX(), localRect.centerY());
+        canvas.translate(localRect.centerX(), localRect.centerY());
+        canvas.drawPath(this.mPath, this.mPaint);
         canvas.restore();
     }
 
-    public int getIntrinsicHeight(){
+    public int getIntrinsicHeight() {
         return this.mSize;
     }
 
-    public int getIntrinsicWidth(){
+    public int getIntrinsicWidth() {
         return this.mSize;
     }
 
-    @Override
-    public void setAlpha(int i) {
-        this.mPaint.setAlpha(i);
-    }
-
-    @Override
-    public void setColorFilter(ColorFilter colorFilter) {
-        this.mPaint.setColorFilter(colorFilter);
+    public void setAlpha(int alpha) {
+        this.mPaint.setAlpha(alpha);
     }
 
     @Override
     public int getOpacity() {
         return PixelFormat.TRANSLUCENT;
     }
-    public void setVertivalMirror(boolean mVerticalMirror){
+
+    public abstract boolean isLayoutRtl();
+
+    public void setColorFilter(ColorFilter colorFilter) {
+        this.mPaint.setColorFilter(colorFilter);
+    }
+
+    public void setVerticalMirror(boolean mVerticalMirror) {
         this.mVerticalMirror = mVerticalMirror ? 1 : -1;
     }
-    public void setProgress(float paramFloat){
+
+    public void setProgress(float paramFloat) {
         this.mProgress = paramFloat;
         invalidateSelf();
     }
-    public  void setColor(int resourceId){
-        this.mPaint.setColor(mContext.getResources().getColor(resourceId));
+
+    public void setColor(int resourceId) {
+        this.mPaint.setColor(context.getResources().getColor(resourceId));
     }
-    public abstract boolean isLayoutRtl();
 }

@@ -1,14 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/text"
+    <RelativeLayout
+        android:id="@+id/billiard_group_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/billiard_radio_group">
+        <TextView
+            android:id="@+id/biiliard_child_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
+    <RadioGroup
+        android:id="@+id/billiard_radio_group"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_centerInParent="true"
-        android:gravity="center"
-        android:text="sss"
-        />
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="2">
+        <RadioButton
+            android:id="@+id/billiard_time_sort"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:text="@string/billiard_time"
+            android:textSize="24sp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/font_selector"/>
+        <RadioButton
+            android:id="@+id/billiard_popularity_sort"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:button="@null"
+            android:gravity="center"
+            android:text="@string/billiard_poplarity"
+            android:textSize="24sp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/font_selector"/>
+
+    </RadioGroup>
+
 </RelativeLayout>

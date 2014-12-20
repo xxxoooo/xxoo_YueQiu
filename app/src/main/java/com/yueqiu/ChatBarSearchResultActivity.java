@@ -18,7 +18,7 @@ public class ChatBarSearchResultActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_searchresult);
+        setContentView(R.layout.activity_chatbar_searchresult);
 
         ListView listView = (ListView) findViewById(R.id.chatbar_searchresult_lv_account);
         ChatBarSearchResultAdapter adapter = new ChatBarSearchResultAdapter(this);

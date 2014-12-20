@@ -20,7 +20,7 @@ public class ContactFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-		View view = inflater.inflate(R.layout.fragment_contact, null);
+		View view = inflater.inflate(R.layout.fragment_chatbar_contact, null);
         ListView listView = (ListView) view.findViewById(R.id.chatbar_contact_lv_account);
         ChatBarItemAdapter adapter = new ChatBarItemAdapter(getActivity());
         listView.setAdapter(adapter);

@@ -9,6 +9,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -22,40 +23,39 @@ import java.lang.reflect.Method;
  */
 public class ActionBarDrawToggle extends android.support.v4.app.ActionBarDrawerToggle {
 
-    private static final String TAG = ActionBarDrawToggle.class.getName();
+    private static final String TAG = ActionBarDrawerToggle.class.getName();
 
     protected Activity mActivity;
-    protected DrawerLayout mDrawLayout;
+    protected DrawerLayout mDrawerLayout;
 
     protected int mOpenDrawerContentDescRes;
     protected int mCloseDrawerContentDescRes;
-    protected DrawerArrowDrawble mDrawerImage;
-    protected boolean mAnimateEnabled;
+    protected DrawerArrowDrawable mDrawerImage;
+    protected boolean animateEnabled;
 
     public ActionBarDrawToggle(Activity activity, DrawerLayout drawerLayout, int drawerImageRes, int openDrawerContentDescRes, int closeDrawerContentDescRes) {
         super(activity, drawerLayout, drawerImageRes, openDrawerContentDescRes, closeDrawerContentDescRes);
     }
 
-    public ActionBarDrawToggle(Activity activity,DrawerLayout drawerLayout,DrawerArrowDrawble drawerImage,
-                               int openDrawerContentDescRes,int closeDrawerContentDescRes){
-        super(activity,drawerLayout, R.drawable.ic_drawer,openDrawerContentDescRes,closeDrawerContentDescRes);
+    public ActionBarDrawToggle(Activity activity, DrawerLayout drawerLayout, DrawerArrowDrawable drawerImage, int openDrawerContentDescRes, int closeDrawerContentDescRes) {
+        super(activity, drawerLayout, R.drawable.ic_drawer, openDrawerContentDescRes, closeDrawerContentDescRes);
         mActivity = activity;
-        mDrawLayout = drawerLayout;
+        mDrawerLayout = drawerLayout;
         mOpenDrawerContentDescRes = openDrawerContentDescRes;
         mCloseDrawerContentDescRes = closeDrawerContentDescRes;
         mDrawerImage = drawerImage;
-        mAnimateEnabled = true;
+        animateEnabled = true;
     }
 
-    public void syncState(){
-        if(mDrawerImage == null){
-            super.syncState();;
+    public void syncState() {
+        if (mDrawerImage == null) {
+            super.syncState();
             return;
         }
-        if(mAnimateEnabled){
-            if(mDrawLayout.isDrawerOpen(GravityCompat.START)){
+        if (animateEnabled) {
+            if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
                 mDrawerImage.setProgress(1.f);
-            }else{
+            } else {
                 mDrawerImage.setProgress(0.f);
             }
         }
@@ -63,37 +63,42 @@ public class ActionBarDrawToggle extends android.support.v4.app.ActionBarDrawerT
         setActionBarDescription();
     }
 
-
-    public void setDrawerIndicatorEnabled(boolean enable){
-        if(mDrawerImage == null){
+    public void setDrawerIndicatorEnabled(boolean enable) {
+        if (mDrawerImage == null) {
             super.setDrawerIndicatorEnabled(enable);
             return;
         }
         setActionBarUpIndicator();
         setActionBarDescription();
     }
-    public boolean isDrawerIndicatorEnabled(){
-        if(mDrawerImage == null){
+
+    public boolean isDrawerIndicatorEnabled() {
+        if (mDrawerImage == null) {
             return super.isDrawerIndicatorEnabled();
         }
         return true;
     }
-    public void onConfigurationChanged(Configuration newConfig){
-        if(mDrawerImage == null){
+
+    public void onConfigurationChanged(Configuration newConfig) {
+        if (mDrawerImage == null) {
             super.onConfigurationChanged(newConfig);
             return;
         }
         syncState();
     }
 
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     public void onDrawerSlide(View drawerView, float slideOffset) {
-        if(mDrawerImage == null) {
+        if (mDrawerImage == null) {
             super.onDrawerSlide(drawerView, slideOffset);
             return;
         }
-        if(mAnimateEnabled){
-            mDrawerImage.setVertivalMirror(!mDrawLayout.isDrawerOpen(GravityCompat.START));
+        if (animateEnabled) {
+            mDrawerImage.setVerticalMirror(!mDrawerLayout.isDrawerOpen(GravityCompat.START));
             mDrawerImage.setProgress(slideOffset);
         }
     }
@@ -104,7 +109,7 @@ public class ActionBarDrawToggle extends android.support.v4.app.ActionBarDrawerT
             super.onDrawerOpened(drawerView);
             return;
         }
-        if (mAnimateEnabled) {
+        if (animateEnabled) {
             mDrawerImage.setProgress(1.f);
         }
         setActionBarDescription();
@@ -116,7 +121,7 @@ public class ActionBarDrawToggle extends android.support.v4.app.ActionBarDrawerT
             super.onDrawerClosed(drawerView);
             return;
         }
-        if (mAnimateEnabled) {
+        if (animateEnabled) {
             mDrawerImage.setProgress(0.f);
         }
         setActionBarDescription();
@@ -161,7 +166,7 @@ public class ActionBarDrawToggle extends android.support.v4.app.ActionBarDrawerT
                 Method setHomeActionContentDescription = ActionBar.class.getDeclaredMethod(
                         "setHomeActionContentDescription", Integer.TYPE);
                 setHomeActionContentDescription.invoke(mActivity.getActionBar(),
-                        mDrawLayout.isDrawerOpen(GravityCompat.START) ? mOpenDrawerContentDescRes : mCloseDrawerContentDescRes);
+                        mDrawerLayout.isDrawerOpen(GravityCompat.START) ? mOpenDrawerContentDescRes : mCloseDrawerContentDescRes);
                 if (Build.VERSION.SDK_INT <= 19) {
                     mActivity.getActionBar().setSubtitle(mActivity.getActionBar().getSubtitle());
                 }
@@ -170,10 +175,12 @@ public class ActionBarDrawToggle extends android.support.v4.app.ActionBarDrawerT
             }
         }
     }
-    public void setAnimateEnabled(boolean enabled){
-        this.mAnimateEnabled = enabled;
+
+    public void setAnimateEnabled(boolean enabled) {
+        this.animateEnabled = enabled;
     }
-    public boolean isAnimateEnabled(){
-        return this.mAnimateEnabled;
+
+    public boolean isAnimateEnabled() {
+        return this.animateEnabled;
     }
 }
