@@ -34,7 +34,7 @@
         <activity android:name=".activity.searchmenu.RegisterActivity"/>
         <activity android:name=".activity.searchmenu.LoginActivity"/>
         <activity android:name=".ActivitiesActivity"/>
-
+        <activity android:name=".activity.searchmenu.ActivitiesIssueActivity"/>
     </application>
 
 </manifest>
