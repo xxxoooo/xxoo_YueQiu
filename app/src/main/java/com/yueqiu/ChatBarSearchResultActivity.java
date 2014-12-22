@@ -33,7 +33,7 @@ public class ChatBarSearchResultActivity extends Activity {
 
     private void init(){
         mListView = (ListView) findViewById(R.id.chatbar_searchresult_lv_account);
-        mBack = (TextView)findViewById(R.id.btn_back);
+        mBack = (TextView)findViewById(R.id.chatbar_searchresult_btn_back);
         mBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

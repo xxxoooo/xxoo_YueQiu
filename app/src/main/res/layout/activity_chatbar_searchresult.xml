@@ -9,7 +9,7 @@
         >
 
         <TextView
-            android:id="@+id/btn_back"
+            android:id="@+id/chatbar_searchresult_btn_back"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"

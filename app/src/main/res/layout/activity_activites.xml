@@ -55,7 +55,6 @@
        android:id="@+id/activities_fl"
        android:layout_below="@+id/linearLayout"
        android:layout_width="match_parent"
-
        android:layout_height="wrap_content">
        </FrameLayout>
 

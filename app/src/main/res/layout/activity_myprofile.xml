@@ -7,11 +7,10 @@
     <RelativeLayout
         android:id="@+id/title_bar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        >
+        android:layout_height="50dp">
 
         <TextView
-            android:id="@+id/btn_back"
+            android:id="@+id/myprofile_btn_back"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"

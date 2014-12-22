@@ -1,6 +1,6 @@
 package com.yueqiu;
 
-
+import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -21,7 +21,6 @@ import com.yueqiu.fragment.chatbar.MessageFragment;
  */
 public class ChatBarActivity extends FragmentActivity {
 
-    public final static int num = 3;
 
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
@@ -68,18 +67,25 @@ public class ChatBarActivity extends FragmentActivity {
                     mTitle.setText(R.string.btn_liaoba_add_friend);
 					break;
             	}
-                
             }
         });
 	}
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ActionBar actionBar = getParent().getActionBar();
+        actionBar.setTitle(getString(R.string.tab_title_chat_bar));
+    }
+
     private void initView() {
-        mBack = (TextView) findViewById(R.id.btn_back);
+        mBack = (TextView) findViewById(R.id.chatbar_main_btn_back);
         mBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //返回按钮
-                finish();
+//                startActivity(new Intent(getApplication(), HomeTabActivity.class));
+                ChatBarActivity.this.finish();
             }
         });
         mTitle = (TextView) findViewById(R.id.tv_title);
