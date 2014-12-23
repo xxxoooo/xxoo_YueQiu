@@ -6,11 +6,13 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.yueqiu.R;
@@ -20,7 +22,9 @@ import com.yueqiu.fragment.ReplyMentionMeFragment;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * created by doushuqi on 14/12/19.
+ */
 public class MentionedMeActivity extends FragmentActivity implements View.OnClickListener {
     private static final String TAG = "MentionedMeActivity";
     private ViewPager mViewPager;
@@ -33,6 +37,8 @@ public class MentionedMeActivity extends FragmentActivity implements View.OnClic
     private int position_one;
     public final static int num = 2;
     private ImageView ivBottomLine;
+    private LinearLayout.LayoutParams mRequestBottomLine = new LinearLayout.LayoutParams(160, 4);
+    private LinearLayout.LayoutParams mReplyBottomLine = new LinearLayout.LayoutParams(80, 4);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,11 +107,6 @@ public class MentionedMeActivity extends FragmentActivity implements View.OnClic
         }
     }
 
-//    private void switchFragment(int pos) {
-//        if (pos == current)
-//            return;
-//        mViewPager.setCurrentItem(pos);
-//    }
 
     public class MyOnPageChangeListener implements ViewPager.OnPageChangeListener {
 
@@ -118,13 +119,15 @@ public class MentionedMeActivity extends FragmentActivity implements View.OnClic
                         animation = new TranslateAnimation(position_one, offset, 0, 0);
                         mFriendRequest.setTextColor(getResources().getColor(R.color.black));
                     }
+                    ivBottomLine.setLayoutParams(mReplyBottomLine);
                     mReply.setTextColor(getResources().getColor(R.color.red));
                     break;
                 case 1:
                     if (currIndex == 0) {
-                        animation = new TranslateAnimation(offset, position_one, 0, 0);
+                        animation = new TranslateAnimation(offset, position_one - 40, 0, 0);
                         mReply.setTextColor(getResources().getColor(R.color.black));
                     }
+                    ivBottomLine.setLayoutParams(mRequestBottomLine);
                     mFriendRequest.setTextColor(getResources().getColor(R.color.red));
                     break;
             }
