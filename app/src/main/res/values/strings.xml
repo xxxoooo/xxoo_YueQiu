@@ -122,4 +122,6 @@
     <string name="sign">签名</string>
     <string name="the_new_post">最新照片</string>
     <string name="unset">未设定</string>
+
+    <string name="tv_search">搜索</string>
 </resources>
