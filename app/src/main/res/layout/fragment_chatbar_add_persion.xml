@@ -1,40 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/ed_search"
-            android:hint="@string/ed_add_persion_by_phone_or_account"
-            android:layout_width="240dp"
-            android:layout_height="match_parent"/>
-        <Button
-            android:id="@+id/chatbar_btn_add_persion_search"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_message_search"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_gravity="center"
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_launcher"/>
-        <TextView
-            android:layout_marginLeft="10dp"
-            android:layout_gravity="center"
-            android:text="@string/tv_add_persion_nearby"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:background="@color/bg_container">
+
+
+        <LinearLayout
+            android:id="@+id/chatbar_add_persion_search"
+            android:layout_height="35dp"
+            android:layout_width="match_parent"
+            android:layout_margin="10dp"
+            android:background="@drawable/acm_inputbox"
+            android:orientation="horizontal"
+            android:layout_centerVertical="true">
+
+            <ImageView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:scaleType="fitXY"
+                android:contentDescription="@string/app_name"
+                android:src="@android:drawable/ic_search_category_default"/>
+
+            <EditText
+
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_vertical"
+                android:hint="@string/ed_add_persion_by_phone_or_account"
+                android:background="@null"
+                android:textSize="14sp"
+                android:textColor="@color/gray_font"/>
         </LinearLayout>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_marginLeft="10dp"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/star_on"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:text="@string/tv_add_persion_nearby"/>
+
+        </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.3dip"
+        android:layout_marginTop="10dp"
+        android:background="#696969" />
 </LinearLayout>

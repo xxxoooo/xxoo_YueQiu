@@ -41,32 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <com.yueqiu.view.CornerListView
-            android:id="@+id/local_listView"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/list_corner_round_bg"
-            android:cacheColorHint="#00000000"
-            android:divider="#000000"
-            android:dividerHeight="0.5px"
-            android:scrollbars="none"
-            android:fadingEdge="none"
-            />
 
-        <com.yueqiu.view.CornerListView
-            android:id="@+id/local_listView2"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginEnd="10dp"
-            android:background="@drawable/list_corner_round_bg"
-            android:cacheColorHint="#00000000"
-            android:divider="#000000"
-            android:dividerHeight="0.5px"
-            android:scrollbars="none"
-            android:fadingEdge="none"/>
 
         <com.yueqiu.view.CustomerScrollView
             android:id="@+id/customer_view"
