@@ -20,18 +20,19 @@
             android:name=".BilliardGroupActivity"
             android:label="@string/app_name"
             android:parentActivityName=".HomeTabActivity">
-
         </activity>
         <activity
             android:name=".BilliardSearchActivity"
             android:label="@string/title_activity_billiard_search">
         </activity>
 
-        <!--聊吧Activity-->
+        <!-- 聊吧Activity -->
         <activity
             android:name=".ChatBarActivity"
             android:theme="@android:style/Theme.Light.NoTitleBar"/>
         <activity android:name=".ChatBarSearchResultActivity"/>
+        <!-- 聊吧 END -->
+
         <activity android:name=".ChatBarSearchActivity"/>
         <!--聊吧 END-->
 
@@ -40,19 +41,25 @@
         <!-- 侧滑Menu -->
         <activity android:name=".activity.searchmenu.RegisterActivity"/>
         <activity android:name=".activity.searchmenu.LoginActivity"/>
-
-
         <activity android:name=".activity.searchmenu.ActivitiesIssueActivity"/>
-
         <activity android:name=".activity.searchmenu.FeedbackActivity"/>
         <activity android:name=".activity.searchmenu.MentionedMeActivity"/>
         <activity android:name=".activity.searchmenu.MyProfileActivity"/>
         <activity android:name=".activity.searchmenu.MyfavorCollActivity"/>
         <activity android:name=".activity.searchmenu.PublishedInfoActivity"/>
+        <activity
+            android:name=".activity.searchmenu.search.SearchBilliardsDatingActivity"
+            android:label="@string/title_activity_billiards_dating">
+        </activity>
+        <activity
+            android:name=".activity.searchmenu.search.SearchBilliardRoomActivity"
+            android:label="@string/title_activity_search_billiard_room">
+        </activity>
+        <activity android:name=".activity.searchmenu.RegisterActivity"/>
+        <activity android:name=".activity.searchmenu.LoginActivity"/>
+
 
 
     </application>
 
 </manifest>
-
-
