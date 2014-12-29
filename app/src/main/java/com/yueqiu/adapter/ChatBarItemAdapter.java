@@ -46,7 +46,7 @@ public class ChatBarItemAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         Log.e(TAG, "getView " + position + " " + convertView);
         if (convertView == null) {
-            convertView = mLayoutInflater.inflate(R.layout.item_account, null);
+            convertView = mLayoutInflater.inflate(R.layout.item_chatbar_account, null);
             viewHolder = new ViewHolder();
             viewHolder.mImageView = (ImageView) convertView.findViewById(R.id.chatbar_item_account_iv);
             viewHolder.mAccount = (TextView) convertView.findViewById(R.id.chatbar_item_account_tv);

@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+    android:padding="3dp"
+    android:layout_margin="3dp">
+
 
     <!--这是球友Fragment下面的子Fragment当中的ListView的item的布局文件-->
+    <!-- 用于显示用户当前的头像，这里我们可以用一个BitmapUtil来实现，
+         即每次显示用户的头像的时候会有本地缓存，而不是每次都进行网络请求，
+         同时还要进行一些缓存，ListView滑动过程当中顺便缓存和清理 -->
     <ImageView
         android:layout_marginTop="4dp"
         android:layout_width="wrap_content"
@@ -11,59 +17,97 @@
         android:id="@+id/img_mate_subfragment_listitem_photo"
         android:layout_alignParentLeft="true"
         android:src="@drawable/ic_launcher"
+        android:layout_centerVertical="true"
+        android:padding="4dp"
+        android:layout_margin="4dp"
         />
 
+    <!-- 用于显示用户的nickName，即花名-->
     <TextView
-        android:id="@+id/tv_mate_subfragment_listitem_account_indi"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/search_account_name_str"
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_mate_subfragment_listitem_nickname"
+        android:text="@string/search_mate_sub_fragment_listitem_testname"
         android:layout_toRightOf="@id/img_mate_subfragment_listitem_photo"
         android:layout_marginTop="4dp"
         android:layout_marginLeft="4dp"
-        android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:padding="4dp"
+        android:textSize="23sp"
         />
 
+    <!-- 用于显示用户的性别 -->
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/tv_mate_subfragment_listitem_account"
-        android:layout_toRightOf="@id/tv_mate_subfragment_listitem_account_indi"
-        android:layout_alignBottom="@id/tv_mate_subfragment_listitem_account_indi"
-        android:layout_marginLeft="4dp"
-        android:textSize="18sp"
-        />
-
-    <TextView
-        android:id="@+id/tv_mate_subfragment_listitem_gender_indi"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/search_subfragment_listitem_gender_indi_str"
-        android:layout_toRightOf="@id/img_mate_subfragment_listitem_photo"
-        android:layout_below="@id/tv_mate_subfragment_listitem_account_indi"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="5dp"
-        android:textSize="18sp"/>
-    <TextView
+        style="@style/ListItemTvStyle"
         android:id="@+id/tv_mate_subfragment_listitem_gender"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:background="@drawable/textview_withdrawable_bg"
+        android:layout_below="@id/tv_mate_subfragment_listitem_nickname"
+        android:text="@string/search_mate_popupmenu_item_male_str"
+        android:layout_toRightOf="@id/img_mate_subfragment_listitem_photo"
+        android:drawableRight="@drawable/male"
+        android:drawablePadding="3dp"
+        android:paddingLeft="4dp"
+        android:padding="4dp"
         android:layout_marginLeft="4dp"
-        android:textSize="18sp"
-        android:layout_marginTop="5dp"
-        android:layout_below="@id/tv_mate_subfragment_listitem_account"
-        android:layout_toRightOf="@id/tv_mate_subfragment_listitem_gender_indi"/>
+        android:layout_marginTop="4dp"
+        android:textStyle="bold"/>
 
-    <!--下面的TextView会根据子Fragment的不同而发生改变,而以上的内容是不会随着Fragment的切换而发生改变-->
+    <!-- 用于显示用户当前所在的区域 -->
     <TextView
-        android:id="@+id/tv_mate_subfragment_listitem_detailedinfo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:text="@string/search_subfragment_listitem_gender_default_str"
-        android:layout_alignParentRight="true"
-        android:textSize="20sp"
-        android:textStyle="bold|italic"
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_mate_subfragment_listitem_district"
+        android:background="@drawable/textview_withdrawable_bg"
+        android:layout_alignBottom="@id/tv_mate_subfragment_listitem_gender"
+        android:layout_toRightOf="@id/tv_mate_subfragment_listitem_gender"
+        android:text="@string/search_mate_sub_fragment_listitem_user_zone"
+        android:padding="6dp"
+        android:layout_marginLeft="7dp"
+        android:textStyle="bold"
+        android:layout_alignTop="@id/tv_mate_subfragment_listitem_gender"
         />
-
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_mate_subfragment_listitem_distance_meter"
+        android:padding="4dp"
+        android:layout_alignTop="@id/tv_mate_subfragment_listitem_nickname"
+        android:layout_alignParentRight="true"
+        android:text="@string/search_mate_popupmenu_item_500_str"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="7dp"
+        />
 </RelativeLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

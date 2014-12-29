@@ -12,4 +12,5 @@
     <string name="billiard_search">搜索</string>
     <string name="billiard_key_serach">关键字搜索</string>
     <string name="billiard_post">发帖</string>
+    <string name="time">时间</string>
 </resources>

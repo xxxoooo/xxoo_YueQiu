@@ -7,17 +7,10 @@ import android.view.MenuItem;
 
 import com.yueqiu.R;
 
-
 /**
- * The activity for the actionMenuItem My Personal Info activity,
- * This activity is implemented in the way of UITableView, and
- * the implementation of this activity's layout is based on the UITableView.
- *
+ * Created by doushuqi on 14/12/19.
  */
-public class PersonalInfoActivity extends Activity
-{
-    private static final String TAG = "PersonalInfoActivity";
-
+public class MyProfileActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -47,21 +40,3 @@ public class PersonalInfoActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

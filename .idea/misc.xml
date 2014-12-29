@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="CppTools.Loader" reportImplicitCastToBool="false" reportNameReferencedOnce="false" version="3" compilerSelect="AUTO" />
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
@@ -10,11 +11,8 @@
     <states>
       <state key="ProjectJDKs.UI">
         <settings>
-<<<<<<< HEAD
           <last-edited>1.7</last-edited>
-=======
           <last-edited>Android API 10 Platform</last-edited>
->>>>>>> dc02ee71d4c1c3404a21be65bd7b489a6369c88d
           <splitter-proportions>
             <option name="proportions">
               <list>

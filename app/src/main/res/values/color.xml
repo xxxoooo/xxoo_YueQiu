@@ -5,5 +5,10 @@
     <color name="white">#f00</color>
     <color name="red">#f00</color>
     <color name="light_blue">#09c</color>
+    <color name="gray">#DBDBDB</color>
+
+    <!--侧滑-->
+    <color name="ldrawer_color">#FFFFFF</color>
+    <color name="actionbar_color">#09c</color>
 
 </resources>

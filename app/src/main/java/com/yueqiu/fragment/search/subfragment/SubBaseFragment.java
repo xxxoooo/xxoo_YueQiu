@@ -12,6 +12,8 @@ import com.yueqiu.R;
 
 /**
  * Created by scguo on 14/12/18.
+ *
+ * 这是针对球友当中的所有的子Fragment的父类
  */
 @SuppressLint("ValidFragment")
 public class SubBaseFragment extends Fragment

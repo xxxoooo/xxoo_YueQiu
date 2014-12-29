@@ -22,7 +22,7 @@ public class AddPersonFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_add_persion, null);
+        View view = inflater.inflate(R.layout.fragment_chatbar_add_persion, null);
         mSearch = (Button) view.findViewById(R.id.chatbar_btn_add_persion_search);
         mSearch.setOnClickListener(new View.OnClickListener() {
             @Override

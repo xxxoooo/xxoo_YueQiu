@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_margin="5dp"
+    android:padding="4dp">
+
+    <TextView
+        style="@style/PopupWindowTvStyle"
+        android:id="@+id/search_mate_popupwindow_male"
+        android:text="@string/search_mate_popupmenu_item_male_str"
+        android:layout_margin="2dp"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@android:color/darker_gray">
+    </View>
+
+    <TextView
+        style="@style/PopupWindowTvStyle"
+        android:id="@+id/search_mate_popupwindow_female"
+        android:text="@string/search_mate_popupmenu_item_female_str"
+        android:layout_margin="2dp"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@android:color/darker_gray">
+    </View>
+
+
+</LinearLayout>

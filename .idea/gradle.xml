@@ -3,9 +3,16 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
+<<<<<<< HEAD
+        <option name="createEmptyContentRootDirectories" value="true" />
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="$USER_HOME$/scguo_tools/gradle-2.2.1" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../gradle-2.2.1" />
+=======
+        <option name="distributionType" value="LOCAL" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="$APPLICATION_HOME_DIR$/gradle/gradle-2.2.1" />
+>>>>>>> fa2f0d730b363f634bf4a68dddfa306e855aedd1
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />

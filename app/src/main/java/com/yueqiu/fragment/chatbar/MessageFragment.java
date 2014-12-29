@@ -23,7 +23,7 @@ public class MessageFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_message, null);
+		View view = inflater.inflate(R.layout.fragment_chatbar_message, null);
 		resources = getResources();
         mListView = (ListView) view.findViewById(R.id.chatbar_message_lv_account);
         ChatBarItemAdapter adapter = new ChatBarItemAdapter(getActivity());
