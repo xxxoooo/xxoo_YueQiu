@@ -51,14 +51,14 @@ public class ActivitiesListViewAdapter extends BaseAdapter {
 
             holder = new Holder();
             view = LayoutInflater.from(mContext).inflate(R.layout.activities_listview_item,null);
-            Holder.tv = (TextView)view.findViewById(R.id.activities_lv_item_title);
+//            Holder.tv = (TextView)view.findViewById(R.id.activities_lv_item_title);
             view.setTag(holder);
         }
         else
         {
             holder = (Holder) view.getTag();
         }
-        holder.tv.setText(mList.get(i).toString());
+//        holder.tv.setText(mList.get(i).toString());
         return view;
     }
 

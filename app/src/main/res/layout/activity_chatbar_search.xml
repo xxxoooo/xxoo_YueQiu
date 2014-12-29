@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:background="@color/bg_container">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="@color/bg_container">
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <LinearLayout
-            android:id="@+id/chatbar_add_persion_search"
+            android:id="@+id/search_box"
+            android:layout_weight="3"
             android:layout_height="35dp"
             android:layout_width="match_parent"
             android:layout_margin="10dp"
@@ -23,39 +28,39 @@
                 android:src="@android:drawable/ic_search_category_default"/>
 
             <EditText
-
                 android:layout_height="match_parent"
                 android:layout_width="match_parent"
                 android:layout_gravity="center_vertical"
-                android:hint="@string/ed_add_persion_by_phone_or_account"
+                android:hint="@string/tv_search"
                 android:background="@null"
                 android:textSize="14sp"
                 android:textColor="@color/gray_font"/>
         </LinearLayout>
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_marginLeft="10dp"
-        android:gravity="center_vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        
-        <ImageView
+        <LinearLayout
+            android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/star_on"/>
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="10dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:text="@string/tv_add_persion_nearby"/>
+            <ImageButton
+                android:id="@+id/search_box_cancel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@android:drawable/sym_call_incoming"/>
 
         </LinearLayout>
-
-    <View
+    </LinearLayout>
+    <ListView
+        android:id="@+id/search_box_list_result"
         android:layout_width="match_parent"
-        android:layout_height="0.3dip"
-        android:layout_marginTop="10dp"
-        android:background="#696969" />
+        android:layout_height="match_parent"
+        android:dividerHeight="1dp"
+        android:cacheColorHint="@android:color/transparent"
+
+        android:listSelector="@android:color/transparent"
+        android:paddingTop="16dp"
+        >
+    </ListView>
 </LinearLayout>
