@@ -1,13 +1,33 @@
 package com.yueqiu.adapter;
 
+import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.yueqiu.R;
+import com.yueqiu.bean.ListItem;
+import com.yueqiu.bean.SlideAccountItem;
+import com.yueqiu.bean.SlideOtherItem;
+
+import java.util.List;
 
 /**
  * Created by wangyun on 14/12/29.
  */
 public class SlideViewAdapter extends BaseAdapter {
+    private Context mContext;
+    private List<ListItem> mList;
+    private LayoutInflater mInflater;
+
+    public SlideViewAdapter(Context context,List<ListItem> list){
+        this.mContext = context;
+        this.mList = list;
+        this.mInflater = LayoutInflater.from(context);
+    }
     /**
      * How many items are in the data set represented by this Adapter.
      *
@@ -15,7 +35,7 @@ public class SlideViewAdapter extends BaseAdapter {
      */
     @Override
     public int getCount() {
-        return 0;
+        return mList.size();
     }
 
     /**
@@ -27,7 +47,7 @@ public class SlideViewAdapter extends BaseAdapter {
      */
     @Override
     public Object getItem(int position) {
-        return null;
+        return mList.get(position);
     }
 
     /**
@@ -38,8 +58,21 @@ public class SlideViewAdapter extends BaseAdapter {
      */
     @Override
     public long getItemId(int position) {
-        return 0;
+        return position;
     }
+
+    @Override
+    public int getItemViewType(int position) {
+        ListItem item = (ListItem) getItem(position);
+        int type = item.getType();
+        return type;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
+    }
+
 
     /**
      * Get a View that displays the data at the specified position in the data set. You can either
@@ -61,6 +94,63 @@ public class SlideViewAdapter extends BaseAdapter {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        return null;
+        ListItem item = (ListItem) getItem(position);
+        int type = item.getType();
+        ViewAccountHolder accountHolder;
+        ViewHolder holder;
+        switch (type) {
+           case ListItem.ITEM_ACCOUNT:
+               if(convertView == null) {
+                   convertView = mInflater.inflate(R.layout.more_account_layout, null);
+                   accountHolder = new ViewAccountHolder();
+                   accountHolder.image = (ImageView) convertView.findViewById(R.id.account_image);
+                   accountHolder.name = (TextView) convertView.findViewById(R.id.account_name);
+                   accountHolder.golden = (TextView) convertView.findViewById(R.id.account_golden);
+                   convertView.setTag(accountHolder);
+               }else{
+                   accountHolder = (ViewAccountHolder) convertView.getTag();
+               }
+               SlideAccountItem accoutItem = (SlideAccountItem) item;
+               accountHolder.image.setImageResource(accoutItem.getImgId());
+               accountHolder.name.setText(accoutItem.getName());
+               accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accoutItem.getGolden());
+               break;
+            case ListItem.ITEM_BASIC:
+                if(convertView == null){
+                    convertView = mInflater.inflate(R.layout.more_other_layout,null);
+                    holder = new ViewHolder();
+                    holder.image = (ImageView) convertView.findViewById(R.id.other_image);
+                    holder.name = (TextView) convertView.findViewById(R.id.other_name);
+                    holder.hasMsg = (ImageView) convertView.findViewById(R.id.other_has_msg);
+                    holder.bottom = (ImageView) convertView.findViewById(R.id.other_bottom);
+                    convertView.setTag(holder);
+                }else{
+                    holder = (ViewHolder) convertView.getTag();
+                }
+                SlideOtherItem otherItem = (SlideOtherItem) item;
+                holder.image.setImageResource(otherItem.getImgId());
+                holder.name.setText(otherItem.getName());
+                if(otherItem.hasMsg()){
+                    holder.hasMsg.setVisibility(View.VISIBLE);
+                }else{
+                    holder.hasMsg.setVisibility(View.INVISIBLE);
+                }
+            break;
+        }
+        return convertView;
     }
+
+    private class ViewAccountHolder{
+        ImageView image;
+        TextView  name;
+        TextView  golden;
+    }
+
+    private class ViewHolder{
+        ImageView image;
+        TextView  name;
+        ImageView hasMsg;
+        ImageView bottom;
+    }
+
 }

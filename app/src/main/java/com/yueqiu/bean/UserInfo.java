@@ -1,4 +1,4 @@
-package com.yueqiu.entity;
+package com.yueqiu.bean;
 
 /**
  * 用户基本信息实体类

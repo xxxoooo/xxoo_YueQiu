@@ -10,7 +10,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.yueqiu.R;
-import com.yueqiu.adapter.bean.SearchRoomSubFragmentRoomBean;
+import com.yueqiu.bean.SearchRoomSubFragmentRoomBean;
 
 import org.w3c.dom.Text;
 

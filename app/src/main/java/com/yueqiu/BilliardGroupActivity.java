@@ -104,7 +104,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
     @Override
     protected void onResume() {
         super.onResume();
-        mActionBar = getParent().getActionBar();
+        mActionBar = getActionBar();
 
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setTitle(getString(R.string.billiard_group));

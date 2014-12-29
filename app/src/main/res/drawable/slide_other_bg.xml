@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/slide_account_bg_pressed_color" android:state_pressed="true"/>
+    <item android:state_focused="true" android:drawable="@color/slide_account_bg_pressed_color"/>
+    <item android:drawable="@color/slide_other_bg_normal_color"/>
+
+</selector>

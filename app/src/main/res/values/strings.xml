@@ -123,6 +123,9 @@
     <!-- 侧滑菜单 -->
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>
+    <string name="slide_account_golden">金币:</string>
+    <string name="md__drawerOpenIndicatorDesc">Close drawer</string>
+    <string name="md__drawerClosedIndicatorDesc">Open drawer</string>
 
     <!-- 聊吧 -->
     <string name="btn_liaoba_message">消息</string>
