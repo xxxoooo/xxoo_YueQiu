@@ -1,4 +1,4 @@
-package com.yueqiu.pojo;
+package com.yueqiu.entity;
 
 /**
  * 用户基本信息实体类
