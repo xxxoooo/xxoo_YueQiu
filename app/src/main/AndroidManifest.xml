@@ -32,6 +32,7 @@
             android:name=".ChatBarActivity"
             android:theme="@android:style/Theme.Light.NoTitleBar"/>
         <activity android:name=".ChatBarSearchResultActivity"/>
+        <activity android:name=".ChatBarSearchActivity"/>
         <!--聊吧 END-->
 
         <activity android:name=".ActivitiesActivity"/>
@@ -39,7 +40,10 @@
         <!-- 侧滑Menu -->
         <activity android:name=".activity.searchmenu.RegisterActivity"/>
         <activity android:name=".activity.searchmenu.LoginActivity"/>
+
+
         <activity android:name=".activity.searchmenu.ActivitiesIssueActivity"/>
+
         <activity android:name=".activity.searchmenu.FeedbackActivity"/>
         <activity android:name=".activity.searchmenu.MentionedMeActivity"/>
         <activity android:name=".activity.searchmenu.MyProfileActivity"/>

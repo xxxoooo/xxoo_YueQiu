@@ -3,14 +3,10 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-    <include
-        android:id="@+id/chatbar_message_serach"
-        layout="@layout/common_search_l" />
 
     <ListView
-        android:id="@+id/chatbar_message_lv_account"
+        android:id="@+id/mention_me_friend_request_lv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"></ListView>
-
 
 </LinearLayout>

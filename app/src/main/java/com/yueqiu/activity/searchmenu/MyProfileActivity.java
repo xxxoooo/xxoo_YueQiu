@@ -2,41 +2,41 @@ package com.yueqiu.activity.searchmenu;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
 import com.yueqiu.R;
+import com.yueqiu.view.CornerListView;
 
 /**
  * Created by doushuqi on 14/12/19.
+ * 我的资料主Activity
  */
 public class MyProfileActivity extends Activity {
+
+    private CornerListView mCornerListView, mCornerListView2;
+    private static final String ITEM_CATEGORY1[] = {"头像：", "账户：", "性别："};
+    private static final String ITEM_CATEGORY2[] = {"昵称：", "区域：", "水平：", "球种：", "玩法：", "消费方式：", "约球时间："};
+
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_personal_info);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        setContentView(R.layout.activity_myprofile);
+
+
+        findViewById(R.id.myprofile_btn_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.personal_info, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }

@@ -74,6 +74,9 @@
     <string name="tv_contact_my_friends">我的好友:</string>
     <string name="tv_add_persion_nearby">附近的人</string>
     <string name="ed_add_persion_by_phone_or_account">以手机/账户添加好友</string>
+    <string name="mentioned_me">提到我的</string>
+    <string name="mentioned_me_reply">回复</string>
+    <string name="mentioned_me_friend_request">好友请求</string>
 
     <!--活动-->
     <string name="xlistview_header_hint_normal">下拉刷新</string>
@@ -104,4 +107,21 @@
     <string name="man">男</string>
     <string name="woman">女</string>
 
+    <!--我的资料-->
+    <string name="photo">头像</string>
+    <string name="account">账户</string>
+    <string name="gender">性别</string>
+    <string name="nick_name">昵称</string>
+    <string name="region">区域</string>
+    <string name="level">水平</string>
+    <string name="ball_type">球种</string>
+    <string name="billiards_cue">使用球杆</string>
+    <string name="cue_habits">持杆习惯</string>
+    <string name="play_age">球龄</string>
+    <string name="idol">偶像</string>
+    <string name="sign">签名</string>
+    <string name="the_new_post">最新照片</string>
+    <string name="unset">未设定</string>
+
+    <string name="tv_search">搜索</string>
 </resources>
