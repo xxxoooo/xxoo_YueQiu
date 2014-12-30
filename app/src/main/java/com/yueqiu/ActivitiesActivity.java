@@ -40,7 +40,7 @@ public class ActivitiesActivity extends FragmentActivity implements View.OnClick
     @Override
     protected void onResume() {
         super.onResume();
-        ActionBar actionBar = getParent().getActionBar();
+        ActionBar actionBar = getActionBar();
         actionBar.setTitle(getString(R.string.activities));
     }
 

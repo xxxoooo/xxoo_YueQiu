@@ -47,7 +47,6 @@ public class BilliardGroupBasicFragment extends Fragment {
                         break;
                 }
                 ((TextView)mView.findViewById(R.id.biiliard_child_text)).setText(mValue);
-
             }
         });
 

@@ -74,7 +74,7 @@ public class ChatBarActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ActionBar actionBar = getParent().getActionBar();
+        ActionBar actionBar = getActionBar();
         actionBar.setTitle(getString(R.string.tab_title_chat_bar));
     }
 

@@ -30,8 +30,6 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_billiard_group);
 
-
-
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
 
         mTitles = new String[]{getString(R.string.billiard_all),
@@ -106,7 +104,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
     @Override
     protected void onResume() {
         super.onResume();
-        mActionBar = getParent().getActionBar();
+        mActionBar = getActionBar();
 
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setTitle(getString(R.string.billiard_group));
