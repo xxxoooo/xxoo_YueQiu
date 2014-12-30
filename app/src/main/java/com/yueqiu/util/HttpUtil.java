@@ -1,5 +1,8 @@
 package com.yueqiu.util;
 
+import android.util.Log;
+
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -11,11 +14,16 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
+ * Http请求帮助类
  * Created by yinfeng on 14/12/18.
  */
 public class HttpUtil {
 
+    private static final String TAG = "HttpUtil";
+
     private static final int READLENGTH = 1024;
+
+    private static final String HTTP = "http://hxu0480201.my3w.com/index.php/v1";
 
     private static final String CHARSET = "utf-8";
     /**
@@ -32,7 +40,7 @@ public class HttpUtil {
             throw new NullPointerException("url is null!");
         }
         StringBuffer sb = new StringBuffer();
-        sb.append(url);
+        sb.append(HTTP).append(url);
         boolean flag = (null == map || 0 == map.size()) ? false : true;
         if(flag)
         {
@@ -51,6 +59,7 @@ public class HttpUtil {
             }
             sb.deleteCharAt(sb.length() - 1);
         }
+        log(sb.toString());
         try {
             URL urls = new URL(sb.toString());
             HttpURLConnection conn = (HttpURLConnection)urls.openConnection();
@@ -59,21 +68,19 @@ public class HttpUtil {
             conn.setDoInput(true);
             conn.setDoOutput(true);
             conn.connect();
-            int code = conn.getResponseCode();
-            if(code != 200)
+            StringBuilder result = new StringBuilder();
+            if(conn.getResponseCode() == 200)
             {
-                return null;
+                InputStream in = conn.getInputStream();
+                BufferedInputStream bis = new BufferedInputStream(in);
+                byte [] data = new byte[1024];
+                while(bis.read(data) > 0)
+                {
+                    result.append(new String(data));
+                }
             }
-
-            InputStream in = conn.getInputStream();
-            byte [] data = new byte[READLENGTH];
-            StringBuffer result = new StringBuffer();
-            while(in.read(data) > 0)
-            {
-                result.append(new String(data));
-            }
-            in.close();
-            return result.toString();
+            conn.disconnect();
+            return result.toString().trim();
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -82,5 +89,8 @@ public class HttpUtil {
         return null;
     }
 
-
+    private static void log(String msg)
+    {
+        Log.i(TAG, msg);
+    }
 }

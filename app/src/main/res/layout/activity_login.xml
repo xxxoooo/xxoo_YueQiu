@@ -26,6 +26,7 @@
             <EditText
                 android:id="@+id/login_et_userid"
                 android:layout_width="200dp"
+                android:hint="@string/userid"
                 android:layout_height="wrap_content" />
         </LinearLayout>
 
@@ -43,6 +44,8 @@
             <EditText
                 android:id="@+id/login_et_pwd"
                 android:layout_width="200dp"
+                android:password="true"
+                android:hint="@string/password"
                 android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>

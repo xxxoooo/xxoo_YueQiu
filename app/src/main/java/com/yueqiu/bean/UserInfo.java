@@ -46,7 +46,7 @@ public class UserInfo {
 
     private String token;
     private int user_id;
-    private String login_time;
+    private String login_time;//登录时间
 
     public String getImg_url() {
         return img_url;
@@ -176,6 +176,62 @@ public class UserInfo {
         this.login_time = login_time;
     }
 
+
+    public String getBallArm() {
+        return ballArm;
+    }
+
+    public void setBallArm(String ballArm) {
+        this.ballArm = ballArm;
+    }
+
+    public String getUsedType() {
+        return usedType;
+    }
+
+    public void setUsedType(String usedType) {
+        this.usedType = usedType;
+    }
+
+    public int getBallAge() {
+        return ballAge;
+    }
+
+    public void setBallAge(int ballAge) {
+        this.ballAge = ballAge;
+    }
+
+    public String getIdol() {
+        return idol;
+    }
+
+    public void setIdol(String idol) {
+        this.idol = idol;
+    }
+
+    public String getIdol_name() {
+        return idol_name;
+    }
+
+    public void setIdol_name(String idol_name) {
+        this.idol_name = idol_name;
+    }
+
+    public String getNew_img() {
+        return new_img;
+    }
+
+    public void setNew_img(String new_img) {
+        this.new_img = new_img;
+    }
+
+    public String getNew_img_real() {
+        return new_img_real;
+    }
+
+    public void setNew_img_real(String new_img_real) {
+        this.new_img_real = new_img_real;
+    }
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
         json.put(JSON_IMGREAL, img_real);
