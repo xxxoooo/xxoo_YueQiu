@@ -41,8 +41,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-
-
         <com.yueqiu.view.CustomerScrollView
             android:id="@+id/customer_view"
             android:layout_width="match_parent"
@@ -146,7 +144,6 @@
                     android:background="@drawable/list_corner_round_bg">
 
 
-
                     <RelativeLayout
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
@@ -195,6 +192,7 @@
                             android:layout_alignParentRight="true"
                             android:text="@string/unset"/>
                     </RelativeLayout>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="0.5dp"
@@ -248,6 +246,7 @@
                             android:layout_alignParentRight="true"
                             android:text="@string/unset"/>
                     </RelativeLayout>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="0.5dp"
@@ -301,6 +300,7 @@
                             android:layout_alignParentRight="true"
                             android:text="@string/unset"/>
                     </RelativeLayout>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="0.5dp"
@@ -354,6 +354,7 @@
                             android:layout_alignParentRight="true"
                             android:text="@string/unset"/>
                     </RelativeLayout>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="0.5dp"
