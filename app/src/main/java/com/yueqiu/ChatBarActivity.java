@@ -32,7 +32,6 @@ public class ChatBarActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chatbar_main);
-//        setHasOptionMenu(true);
         initView();
 		fragmentManager = getSupportFragmentManager();
         radioGroup = (RadioGroup)findViewById(R.id.radioGroup1);
@@ -86,7 +85,7 @@ public class ChatBarActivity extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                //TODO:
+                this.finish();
                return true;
             default:
                 return super.onOptionsItemSelected(item);
