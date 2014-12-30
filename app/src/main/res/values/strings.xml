@@ -106,5 +106,7 @@
     <string name="register">注册</string>
     <string name="man">男</string>
     <string name="woman">女</string>
+    <string name="userid">手机号或账号</string>
+    <string name="password">密码</string>
 
 </resources>

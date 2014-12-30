@@ -193,7 +193,9 @@ public class HomeTabActivity extends TabActivity implements TabHost.OnTabChangeL
                         break;
 
                 }
+
                 startActivity(intent);
+                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
                 if(mDrawerLayout.isDrawerOpen(mDrawList)){
                     mDrawerLayout.closeDrawer(mDrawList);
                 }
