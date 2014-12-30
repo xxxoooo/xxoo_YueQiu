@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <string name="app_name">YueQiu</string>
     <string name="hello_world">Hello world!</string>
@@ -56,6 +56,10 @@
     <string name="search_assistcaouch_subfragment_title_kinds">球种</string>
     <string name="search_assistcaouch_subfragment_title_level">水平</string>
 
+    <!--这个是用于显示助教的价格，这里我们将用到<=这个符号，为了将这个符号完整的拼接到TextView当中，我们最好使用
+        Xliff，而不是通过复杂的StringBuilder来实现，因为我们的TextView是有背景图片的，所以我们只能使用这个技巧-->
+    <string name="search_assistcaouch_subfragment_listitem_price">大约<xliff:g id="price"></xliff:g> 元/时</string>
+
     <!-- 4.教练子Fragment的title -->
     <string name="search_caouch_subfragment_title_ability">资质</string>
     <string name="search_caouch_subfragment_title_kinds">球种</string>
@@ -76,6 +80,12 @@
     <string name="search_room_sub_fragment_listitem_roomdistrict">昌平区</string>
     <string name="search_room_sub_fragment_listitem_roomaddress">昌平区 沙河城铁站(B1口出)南拐再右拐然后向西100米学院国际大厦(Z座1001)</string>
     <string name="search_room_sub_fragment_listitem_roomdistance">0.77km</string>
+    <string name="search_coauch_sub_fragment_listitem_username">温柔的语</string>
+    <string name="search_coauch_sub_fragment_listitem_userlevel">国家队队员</string>
+    <string name="search_coauch_sub_fragment_listitem_userkinds">斯诺克</string>
+    <string name="search_coauch_sub_fragment_listitem_userdistan">100米以内</string>
+    <string name="search_dating_sub_fragment_listitem_user_declar">我最喜爱的台球杯开始报名啦</string>
+
 
     <!--用于球厅Fragment当中的一些字符串-->
     <string name="search_room_sub_fragment_price_indi">人均 ￥</string>

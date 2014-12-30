@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <!-- 用于SearchActivity当中的教练Fragment当中的listView每一个item的布局文件-->
+    <ImageView
+        android:layout_marginTop="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/img_coauch_subfragment_listitem_photo"
+        android:src="@drawable/ic_launcher"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:padding="4dp"
+        android:layout_margin="4dp"
+        />
+
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_coauch_subfragment_listitem_name"
+        android:textSize="23sp"
+        android:padding="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_toRightOf="@id/img_coauch_subfragment_listitem_photo"
+        android:text="@string/search_coauch_sub_fragment_listitem_username"
+        android:textColor="@android:color/black"
+        android:layout_marginLeft="4dp"
+        />
+
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_coauch_subfragment_listitem_gender"
+        android:text="@string/search_mate_subfragment_title_gender"
+        android:drawableRight="@drawable/male"
+        android:drawablePadding="3dp"
+        android:paddingLeft="4dp"
+        android:padding="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="4dp"
+        android:textStyle="bold"
+        android:layout_below="@id/tv_coauch_subfragment_listitem_name"
+        android:layout_toRightOf="@id/img_coauch_subfragment_listitem_photo"
+        android:background="@drawable/textview_withdrawable_bg"
+        />
+
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_coauch_subfragment_listitem_level"
+        android:text="@string/search_coauch_sub_fragment_listitem_userlevel"
+        android:background="@drawable/textview_withdrawable_bg"
+        android:layout_toRightOf="@id/tv_coauch_subfragment_listitem_gender"
+        android:layout_alignBottom="@id/tv_coauch_subfragment_listitem_gender"
+        android:textStyle="bold"
+        android:paddingLeft="4dp"
+        android:padding="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="4dp"
+        />
+
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_coauch_subfragment_listitem_kinds"
+        android:text="@string/search_coauch_sub_fragment_listitem_userkinds"
+        android:layout_toRightOf="@id/tv_coauch_subfragment_listitem_level"
+        android:layout_alignBottom="@id/tv_coauch_subfragment_listitem_level"
+        android:textStyle="bold"
+        android:paddingLeft="4dp"
+        android:padding="4dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/textview_withdrawable_bg"
+        />
+
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:text="@string/search_coauch_sub_fragment_listitem_userdistan"
+        android:layout_marginTop="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="4dp"
+        android:padding="4dp"
+        android:textSize="14sp"
+        android:id="@+id/tv_coauch_subfragment_listitem_distance"
+        />
+</RelativeLayout>
