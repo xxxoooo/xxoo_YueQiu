@@ -4,5 +4,6 @@
         android:id="@+id/chatbar_menu_search"
         android:icon="@android:drawable/ic_menu_search"
         android:title="@string/search"
-        android:showAsAction="ifRoom|withText"/>
+        android:showAsAction="ifRoom|collapseActionView"
+        android:actionLayout="@layout/search_layout"/>
 </menu>

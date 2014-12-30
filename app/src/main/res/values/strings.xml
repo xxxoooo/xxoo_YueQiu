@@ -135,7 +135,7 @@
     <string name="btn_message_cancel">取消</string>
     <string name="tv_contact_my_friends">分组</string>
     <string name="tv_add_persion_nearby">附近的人</string>
-    <string name="ed_add_persion_by_phone_or_account">以手机/账户添加好友</string>
+    <string name="ed_add_persion_by_phone_or_account">请输入手机号/账号</string>
     <string name="mentioned_me">提到我的</string>
     <string name="mentioned_me_reply">回复</string>
     <string name="mentioned_me_friend_request">好友请求</string>

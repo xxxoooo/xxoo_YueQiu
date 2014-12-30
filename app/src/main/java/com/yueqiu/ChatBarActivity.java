@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +25,7 @@ import com.yueqiu.fragment.chatbar.MessageFragment;
  * 聊吧Activity
  */
 public class ChatBarActivity extends FragmentActivity {
-
+    private static final String TAG = "ChatBarActivity";
     private ActionBar mActionBar;
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
@@ -97,27 +98,21 @@ public class ChatBarActivity extends FragmentActivity {
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.chatbar_search, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.chatbar_fragment_container);
-        switch (item.getItemId()) {
-            case R.id.chatbar_menu_search:
-                if (fragment instanceof MessageFragment) {
-                    Intent intent = new Intent(this, ChatBarSearchActivity.class);
-                    startActivity(intent);
-                }
-                break;
-        }
-
-        return super.onMenuItemSelected(featureId, item);
-    }
+//
+//    @Override
+//    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+//        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.chatbar_fragment_container);
+//        switch (item.getItemId()) {
+//            case R.id.chatbar_menu_search:
+//                if (fragment instanceof MessageFragment) {
+//                    Intent intent = new Intent(this, ChatBarSearchActivity.class);
+//                    startActivity(intent);
+//                }
+//                break;
+//        }
+//
+//        return super.onMenuItemSelected(featureId, item);
+//    }
 
     private void initView() {
 
