@@ -29,9 +29,9 @@
     <string name="search_my_profile_str">我的资料</string>
     <string name="search_mentioned_me_str">提到我的</string>
     <string name="search_my_favor_collection_str">我的收藏</string>
-    <string name="search_my_published_info_str">我发布的</string>
-    <string name="search_publishing_dating_billiards_info_str">发布约球信息</string>
-    <string name="search_feed_back_str">反馈信息</string>
+    <string name="search_my_published_info_str">我的发布</string>
+    <string name="search_publishing_dating_billiards_info_str">发布约球</string>
+    <string name="search_feed_back_str">意见反馈</string>
     <string name="search_logout_str">退出账户</string>
 
     <!-- 位于顶部的标题栏的Title -->
@@ -133,6 +133,9 @@
     <!-- 侧滑菜单 -->
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>
+    <string name="slide_account_golden">金币:</string>
+    <string name="md__drawerOpenIndicatorDesc">Close drawer</string>
+    <string name="md__drawerClosedIndicatorDesc">Open drawer</string>
 
     <!-- 聊吧 -->
     <string name="btn_liaoba_message">消息</string>

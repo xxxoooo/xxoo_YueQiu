@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/actionbar_color" android:state_pressed="true"/>
+    <item android:state_checked="true" android:drawable="@color/actionbar_color"/>
+    <item android:drawable="@color/search_radio_normal_bg"/>
+</selector>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:id="@+id/save_menu_item"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:divider="?android:attr/dividerVertical"
+        android:dividerPadding="5dip"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:duplicateParentState="true"
+            style="?android:attr/actionButtonStyle">
+
+            <ImageView
+                android:id="@+id/action_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="8dip"
+                android:src="@drawable/ic_menu_done_holo_dark"
+                android:description="@string/billiard_back" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/action_bar_title"
+        android:layout_centerInParent="true"
+        android:textColor="@android:color/white"
+        android:textSize="22sp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        style="@android:style/Widget.Holo.ActionBar.TabText"/>
+
+</RelativeLayout>

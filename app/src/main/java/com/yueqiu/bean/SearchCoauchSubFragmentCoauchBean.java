@@ -1,4 +1,4 @@
-package com.yueqiu.adapter.bean;
+package com.yueqiu.bean;
 
 /**
  * Created by scguo on 14/12/25.

@@ -11,6 +11,13 @@
     <color name="bg_container">#eaeaea</color>
     <!--侧滑-->
     <color name="ldrawer_color">#FFFFFF</color>
-    <color name="actionbar_color">#09c</color>
+    <color name="actionbar_color">#2ad0b9</color>
+    <color name="slide_account_golden">#ee94a9</color>
+    <color name="slide_account_bg_normal_color">#708090</color>
+    <color name="slide_account_bg_pressed_color">#778899</color>
+    <color name="slide_other_bg_pressed_color">#00e5ee</color>
+    <color name="slide_other_bg_normal_color">#4a708b</color>
+    <color name="md__defaultBackground">#FF555555</color>
+    <color name="search_radio_normal_bg">#323a45</color>
 
 </resources>
