@@ -93,11 +93,11 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-//        switch(item.getItemId()){
-//            case android.R.id.home:
-//                this.finish();
-//                break;
-//        }
+        switch(item.getItemId()){
+            case android.R.id.home:
+                this.finish();
+                break;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -130,9 +130,6 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
     @Override
     protected void onPause() {
         super.onPause();
-
-        mActionBar.removeAllTabs();
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
     }
 
 }
