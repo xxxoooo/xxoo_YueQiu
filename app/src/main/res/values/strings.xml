@@ -119,7 +119,6 @@
     <string name="tab_title_billiards_circle">台球圈</string>
     <string name="title_activity_home_tab">HomeTabActivity</string>
 
-    <!-- 聊吧 -->
     <!-- 侧滑菜单 -->
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>

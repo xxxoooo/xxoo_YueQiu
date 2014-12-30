@@ -1,5 +1,8 @@
 package com.yueqiu.bean;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * 用户基本信息实体类
  * Created by yinfeng on 14/12/23.
@@ -25,6 +28,21 @@ public class UserInfo {
     private String idol_name;//签名
     private String new_img;//最新照片在网络中的位置
     private String new_img_real;//最新照片在本地的位置
+
+    private static final String JSON_IMGREAL = "img_real";
+    private static final String JSON_ACCOUNT = "account";
+    private static final String JSON_SEX = "sex";
+    private static final String JSON_USERNAME = "username";
+    private static final String JSON_DISTRICT= "district";
+    private static final String JSON_LEVEL= "level";
+    private static final String JSON_BALL_TYPE= "ball_type";
+    private static final String JSON_BALL_ARM= "ball_arm";
+    private static final String JSON_USED_TYPE= "used_type";
+    private static final String JSON_BALL_AGE= "ball_age";
+    private static final String JSON_IDOL= "idol";
+    private static final String JSON_SIGN= "sign";
+    private static final String JSON_NEW_IMG = "new_img_real";
+
 
     private String token;
     private int user_id;
@@ -158,6 +176,7 @@ public class UserInfo {
         this.login_time = login_time;
     }
 
+
     public String getBallArm() {
         return ballArm;
     }
@@ -212,5 +231,22 @@ public class UserInfo {
 
     public void setNew_img_real(String new_img_real) {
         this.new_img_real = new_img_real;
+    }
+    public JSONObject toJSON() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put(JSON_IMGREAL, img_real);
+        json.put(JSON_ACCOUNT, account);
+        json.put(JSON_SEX, String.valueOf(sex));
+        json.put(JSON_USERNAME, username);
+        json.put(JSON_DISTRICT, district);
+        json.put(JSON_LEVEL, level);
+        json.put(JSON_BALL_TYPE, ball_type);
+        json.put(JSON_BALL_ARM, ballArm);
+        json.put(JSON_USED_TYPE, usedType);
+        json.put(JSON_BALL_AGE, String.valueOf(ballAge));
+        json.put(JSON_IDOL, idol);
+        json.put(JSON_SIGN, idol_name);
+        json.put(JSON_NEW_IMG, new_img_real);
+        return json;
     }
 }

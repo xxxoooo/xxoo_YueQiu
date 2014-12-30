@@ -1,8 +1,10 @@
 package com.yueqiu.fragment.chatbar;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -15,8 +17,13 @@ import com.yueqiu.adapter.ChatBarItemAdapter;
  * 聊吧联系人fragment
  */
 public class ContactFragment extends Fragment {
-	
-	@Override
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -26,5 +33,6 @@ public class ContactFragment extends Fragment {
         listView.setAdapter(adapter);
 		return view;
 	}
+
 
 }
