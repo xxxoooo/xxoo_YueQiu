@@ -14,7 +14,7 @@
     <string name="billiard_equipment">装备</string>
     <string name="billiard_time">时间</string>
     <string name="billiard_poplarity">人气</string>
-    <string name="billiard_search">搜索</string>
+    <string name="billiard_search">附近</string>
     <string name="billiard_key_serach">关键字搜索</string>
     <string name="billiard_post">发帖</string>
     <string name="billiard_back">返回</string>
@@ -23,15 +23,15 @@
     <string name="title_activity_billiard_group">BilliardGroupActivity</string>
     <!-- 搜索 -->
     <!-- 定义SearchActivity当中的Actionbar当中的menuItem -->
-    <string name="search_account_name_str">账户:</string>``
-    <string name="search_my_gold_coin_num_str">我的金币:</string>
+    <string name="search_account_name_str">账户:</string>
+``        <string name="search_my_gold_coin_num_str">我的金币:</string>
     <string name="search_login_str">登录</string>
     <string name="search_my_profile_str">我的资料</string>
     <string name="search_mentioned_me_str">提到我的</string>
     <string name="search_my_favor_collection_str">我的收藏</string>
-    <string name="search_my_published_info_str">我发布的</string>
-    <string name="search_publishing_dating_billiards_info_str">发布约球信息</string>
-    <string name="search_feed_back_str">反馈信息</string>
+    <string name="search_my_published_info_str">我的发布</string>
+    <string name="search_publishing_dating_billiards_info_str">发布约球</string>
+    <string name="search_feed_back_str">意见反馈</string>
     <string name="search_logout_str">退出账户</string>
 
     <!-- 位于顶部的标题栏的Title -->
@@ -41,6 +41,66 @@
     <string name="search_billiard_room_str">球厅</string>
     <string name="search_billiard_dating_str">约球</string>
 
+    <!-- 以下是位于SearchActivity当中的各个子Fragment当中的不同的listView展示的title -->
+    <!-- 1.球友子Fragment中的title -->
+    <string name="search_mate_subfragment_title_distance">距离</string>
+    <string name="search_mate_subfragment_title_gender">性别</string>
+
+    <!-- 2.约球子Fragment的title -->
+    <string name="search_dating_subfragment_title_distance">距离</string>
+    <string name="search_dating_subfragment_title_publishdata">发布时间</string>
+
+    <!-- 3.助教子Fragment的title -->
+    <string name="search_assistcaouch_subfragment_title_distance">距离</string>
+    <string name="search_assistcaouch_subfragment_title_cost">花费</string>
+    <string name="search_assistcaouch_subfragment_title_kinds">球种</string>
+    <string name="search_assistcaouch_subfragment_title_level">水平</string>
+
+    <!-- 4.教练子Fragment的title -->
+    <string name="search_caouch_subfragment_title_ability">资质</string>
+    <string name="search_caouch_subfragment_title_kinds">球种</string>
+
+    <!-- 5.球厅子Fragment的title -->
+    <string name="search_room_subfragment_title_zone">区域</string>
+    <string name="search_room_subfragment_title_distance">距离</string>
+    <string name="search_room_subfragment_title_price">价格</string>
+    <string name="search_room_subfragment_title_review">好评</string>
+
+    <!-- TOOD: 以下的测试字符串都是需要在正式发布时删掉的 -->
+    <!-- 用于测试的默认字符串 -->
+    <!-- 这是用于显示在ViewPager下面的一行广告语 -->
+    <string name="search_gallery_pager_test_str">暂时还未获取到信息...</string>
+    <string name="search_mate_sub_fragment_listitem_user_zone">海淀区</string>
+    <string name="search_mate_sub_fragment_listitem_testname">温柔的雨</string>
+    <string name="search_room_sub_fragment_listitem_roomname">夜时尚台球(沙河镇店)</string>
+    <string name="search_room_sub_fragment_listitem_roomdistrict">昌平区</string>
+    <string name="search_room_sub_fragment_listitem_roomaddress">昌平区 沙河城铁站(B1口出)南拐再右拐然后向西100米学院国际大厦(Z座1001)</string>
+    <string name="search_room_sub_fragment_listitem_roomdistance">0.77km</string>
+
+    <!--用于球厅Fragment当中的一些字符串-->
+    <string name="search_room_sub_fragment_price_indi">人均 ￥</string>
+    <!--用于球厅Fragment当中的筛选button的字符串-->
+    <string name="search_room_sub_fragment_filterbtn_district_str">区域</string>
+    <string name="search_room_sub_fragment_filterbtn_distance_str">距离</string>
+    <string name="search_room_sub_fragment_filterbtn_price_str">价格</string>
+    <string name="search_room_sub_fragment_filterbtn_appraisal_str">好评</string>
+
+
+    <!-- popupMenu用于筛选的字符串 -->
+    <string name="search_mate_popupmenu_item_male_str">男</string>
+    <string name="search_mate_popupmenu_item_female_str">女</string>
+    <string name="search_mate_popupmenu_item_filter_str">距离(智能范围)</string>
+    <string name="search_mate_popupmenu_item_500_str">500米以内</string>
+    <string name="search_mate_popupmenu_item_1000_str">1000米以内</string>
+    <string name="search_mate_popupmenu_item_2000_str">2000米以内</string>
+    <string name="search_mate_popupmenu_item_5000_str">5000米以内</string>
+
+    <!-- 用于球友子Fragment当中定义的字段值 -->
+    <string name="search_subfragment_listitem_gender_indi_str">性别:</string>
+    <string name="search_subfragment_listitem_account_indi_str">账户:</string>
+    <string name="search_subfragment_listitem_distan_default_str">米以内</string>
+    <string name="search_subfragment_listitem_gender_default_str">女</string>
+
     <!-- 定义反馈Activity当中的string资源 -->
     <string name="search_feedback_acti_title_indi_str">标题:</string>
     <string name="search_feedback_acti_content_indi_str">内容:</string>
@@ -48,24 +108,26 @@
     <string name="search_feedback_acti_btn_submit_str">提交</string>
     <string name="search_feedback_acti_et_leave_contact_hint">手机号/邮箱/QQ</string>
     <string name="search_feedback_acti_et_leave_content_hint">具体建议...</string>
-
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <string name="search_hint_str">请输入关键词</string>
     <string name="search_search_btn_str">搜索</string>
 
     <!-- 用于在Tab当中显示的4个Tab当中显示的地步栏当中显示的字符串 -->
-    <string name="tab_title_search">搜索</string>
+    <string name="tab_title_search">附近</string>
     <string name="tab_title_chat_bar">聊吧</string>
     <string name="tab_title_activity">活动</string>
     <string name="tab_title_billiards_circle">台球圈</string>
     <string name="title_activity_home_tab">HomeTabActivity</string>
 
-    <!--侧滑菜单-->
+    <!-- 聊吧 -->
+    <!-- 侧滑菜单 -->
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>
+    <string name="slide_account_golden">金币:</string>
+    <string name="md__drawerOpenIndicatorDesc">Close drawer</string>
+    <string name="md__drawerClosedIndicatorDesc">Open drawer</string>
 
-    <!--聊吧-->
+    <!-- 聊吧 -->
     <string name="btn_liaoba_message">消息</string>
     <string name="btn_liaoba_contact">联系人</string>
     <string name="btn_liaoba_add_friend">添加好友</string>
@@ -78,7 +140,7 @@
     <string name="mentioned_me_reply">回复</string>
     <string name="mentioned_me_friend_request">好友请求</string>
 
-    <!--活动-->
+    <!-- 活动 -->
     <string name="xlistview_header_hint_normal">下拉刷新</string>
     <string name="xlistview_header_hint_ready">松开刷新数据</string>
     <string name="xlistview_header_hint_loading">正在加载...</string>
@@ -109,4 +171,24 @@
     <string name="userid">手机号或账号</string>
     <string name="password">密码</string>
 
+    <string name="title_activity_billiards_dating">BilliardsDatingActivity</string>
+    <string name="title_activity_search_billiard_room">SearchBilliardRoomActivity</string>
+
+    <!--我的资料-->
+    <string name="photo">头像</string>
+    <string name="account">账户</string>
+    <string name="gender">性别</string>
+    <string name="nick_name">昵称</string>
+    <string name="region">区域</string>
+    <string name="level">水平</string>
+    <string name="ball_type">球种</string>
+    <string name="billiards_cue">使用球杆</string>
+    <string name="cue_habits">持杆习惯</string>
+    <string name="play_age">球龄</string>
+    <string name="idol">偶像</string>
+    <string name="sign">签名</string>
+    <string name="the_new_post">最新照片</string>
+    <string name="unset">未设定</string>
+
+    <string name="tv_search">搜索</string>
 </resources>

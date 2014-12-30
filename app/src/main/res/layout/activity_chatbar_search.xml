@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="@color/bg_container">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/search_box"
+            android:layout_weight="3"
+            android:layout_height="35dp"
+            android:layout_width="match_parent"
+            android:layout_margin="10dp"
+            android:background="@drawable/acm_inputbox"
+            android:orientation="horizontal"
+            android:layout_centerVertical="true">
+
+            <ImageView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:scaleType="fitXY"
+                android:contentDescription="@string/app_name"
+                android:src="@android:drawable/ic_search_category_default"/>
+
+            <EditText
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_gravity="center_vertical"
+                android:hint="@string/tv_search"
+                android:background="@null"
+                android:textSize="14sp"
+                android:textColor="@color/gray_font"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="10dp">
+
+            <ImageButton
+                android:id="@+id/search_box_cancel"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@android:drawable/sym_call_incoming"/>
+
+        </LinearLayout>
+    </LinearLayout>
+    <ListView
+        android:id="@+id/search_box_list_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dividerHeight="1dp"
+        android:cacheColorHint="@android:color/transparent"
+
+        android:listSelector="@android:color/transparent"
+        android:paddingTop="16dp"
+        >
+    </ListView>
+</LinearLayout>
