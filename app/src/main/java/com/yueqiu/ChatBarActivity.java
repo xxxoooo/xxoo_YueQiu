@@ -1,11 +1,13 @@
 package com.yueqiu;
 
 import android.app.ActionBar;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -21,16 +23,16 @@ import com.yueqiu.fragment.chatbar.MessageFragment;
  */
 public class ChatBarActivity extends FragmentActivity {
 
-
+    private ActionBar mActionBar;
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
     private RadioGroup radioGroup;
-    private TextView mBack,mTitle;
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_chatbar_main);
+//        setHasOptionMenu(true);
         initView();
 		fragmentManager = getSupportFragmentManager();
         radioGroup = (RadioGroup)findViewById(R.id.radioGroup1);
@@ -50,21 +52,20 @@ public class ChatBarActivity extends FragmentActivity {
 	                Fragment messageFragment = new MessageFragment();
 	                transaction.replace(R.id.content, messageFragment);
 	                transaction.commit();
-                    mTitle.setText(R.string.btn_liaoba_message);
 					break;
 				case R.id.radio1:
 					transaction = fragmentManager.beginTransaction();
 	                Fragment contactFragment = new ContactFragment();
 	                transaction.replace(R.id.content, contactFragment);
 	                transaction.commit();
-                    mTitle.setText(R.string.btn_liaoba_contact);
+                    mActionBar.setTitle(R.string.btn_liaoba_contact);
 					break;
 				case R.id.radio2:
 					transaction = fragmentManager.beginTransaction();
 	                Fragment addPersonFragment = new AddPersonFragment();
 	                transaction.replace(R.id.content, addPersonFragment);
 	                transaction.commit();
-                    mTitle.setText(R.string.btn_liaoba_add_friend);
+                    mActionBar.setTitle(R.string.btn_liaoba_add_friend);
 					break;
             	}
             }
@@ -74,21 +75,27 @@ public class ChatBarActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ActionBar actionBar = getActionBar();
-        actionBar.setTitle(getString(R.string.tab_title_chat_bar));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            mActionBar = getActionBar();
+            mActionBar.setTitle(getString(R.string.btn_liaoba_message));
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                //TODO:
+               return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
     }
 
     private void initView() {
-        mBack = (TextView) findViewById(R.id.chatbar_main_btn_back);
-        mBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //返回按钮
-//                startActivity(new Intent(getApplication(), HomeTabActivity.class));
-                ChatBarActivity.this.finish();
-            }
-        });
-        mTitle = (TextView) findViewById(R.id.tv_title);
+
     }
 
 }

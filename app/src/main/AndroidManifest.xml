@@ -23,11 +23,8 @@
 
         <!-- 聊吧Activity -->
         <activity
-            android:name=".ChatBarActivity"
-            android:theme="@android:style/Theme.Light.NoTitleBar"/>
+            android:name=".ChatBarActivity"/>
         <activity android:name=".ChatBarSearchResultActivity"/>
-        <!-- 聊吧 END -->
-
         <activity android:name=".ChatBarSearchActivity"/>
         <!--聊吧 END-->
 

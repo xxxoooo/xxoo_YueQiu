@@ -1,7 +1,7 @@
 package com.yueqiu.util;
 
 import android.content.Context;
-import com.yueqiu.pojo.UserInfo;
+import com.yueqiu.bean.UserInfo;
 import org.json.JSONArray;
 import org.json.JSONException;
 
