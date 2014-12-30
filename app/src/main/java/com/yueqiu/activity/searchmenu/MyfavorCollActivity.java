@@ -115,10 +115,10 @@ public class MyfavorCollActivity extends FragmentActivity implements ActionBar.T
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.myfavor_coll, menu);
+        getMenuInflater().inflate(R.menu.billiard_search, menu);
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =(SearchView) menu.findItem(R.id.favor_menu_search).getActionView();
+        SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }

@@ -9,12 +9,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/billiard_radio_group">
-        <TextView
-            android:id="@+id/biiliard_child_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            />
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/billiard_group_listview"/>
     </RelativeLayout>
     <RadioGroup
 

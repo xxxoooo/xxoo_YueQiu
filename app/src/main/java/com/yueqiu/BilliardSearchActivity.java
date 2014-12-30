@@ -171,6 +171,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     @Override
     public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
     {
+        mViewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override
@@ -182,7 +183,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     @Override
     public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
     {
-        mViewPager.setCurrentItem(tab.getPosition());
+
     }
 
     private class SectionPagerAdapter extends FragmentPagerAdapter

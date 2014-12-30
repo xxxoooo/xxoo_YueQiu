@@ -57,9 +57,6 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         public Fragment getItem(int i) {
 
             Fragment mFragment = new BilliardGroupBasicFragment();
-            Bundle mArgs = new Bundle();
-            mArgs.putString(BILLIARD_TAB_NAME,mTitles[i]);
-            mFragment.setArguments(mArgs);
             return mFragment;
         }
 
@@ -92,10 +89,10 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.billiard_group, menu);
+        getMenuInflater().inflate(R.menu.billiard_search, menu);
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =(SearchView) menu.findItem(R.id.group_menu_search).getActionView();
+        SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
