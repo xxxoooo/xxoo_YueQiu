@@ -21,7 +21,7 @@
         android:id="@+id/tv_dating_subfragment_listitem_nickname"
         android:layout_toRightOf="@id/img_dating_subfragment_listitem_photo"
         android:text="@string/search_coauch_sub_fragment_listitem_username"
-        android:textSize="23sp"
+        android:textSize="19sp"
         android:textColor="@android:color/black"
         android:layout_marginLeft="4dp"
         android:layout_marginTop="4dp"
@@ -50,6 +50,7 @@
         android:text="@string/search_mate_popupmenu_item_500_str"
         android:layout_marginTop="10dp"
         android:layout_marginRight="7dp"
+        android:textSize="12sp"
         />
 
 </RelativeLayout>

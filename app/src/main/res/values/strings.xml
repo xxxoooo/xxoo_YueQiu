@@ -49,6 +49,8 @@
     <!-- 2.约球子Fragment的title -->
     <string name="search_dating_subfragment_title_distance">距离</string>
     <string name="search_dating_subfragment_title_publishdata">发布时间</string>
+    <string name="search_dating_detailed_btn_i_want_in">我要参加</string>
+    <string name="search_dating_detailed_tv_already_in">已参加人员</string>
 
     <!-- 3.助教子Fragment的title -->
     <string name="search_assistcaouch_subfragment_title_distance">距离</string>
@@ -85,6 +87,8 @@
     <string name="search_coauch_sub_fragment_listitem_userkinds">斯诺克</string>
     <string name="search_coauch_sub_fragment_listitem_userdistan">100米以内</string>
     <string name="search_dating_sub_fragment_listitem_user_declar">我最喜爱的台球杯开始报名啦</string>
+    <string name="search_dating_detailed_activity_time">12:20</string>
+    <string name="search_dating_detailed_activity_time_1">21:20</string>
 
 
     <!--用于球厅Fragment当中的一些字符串-->

@@ -12,8 +12,6 @@ import android.widget.TextView;
 import com.yueqiu.R;
 import com.yueqiu.bean.SearchRoomSubFragmentRoomBean;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
 

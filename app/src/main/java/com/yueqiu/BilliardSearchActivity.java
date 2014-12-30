@@ -42,6 +42,7 @@ import java.util.List;
 public class BilliardSearchActivity extends FragmentActivity implements ActionBar.TabListener
 {
     private static final String TAG = "BilliardSearchActivity";
+
     private static final String STATE_MENUDRAWER = "com.yueqiu.menuDrawer";
     private static final int NUM_OF_FRAGMENTS = 5;
 

@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yueqiu.R;
-import com.yueqiu.adapter.bean.SearchCoauchSubFragmentCoauchBean;
+import com.yueqiu.bean.SearchCoauchSubFragmentCoauchBean;
 
 import java.util.ArrayList;
 import java.util.List;

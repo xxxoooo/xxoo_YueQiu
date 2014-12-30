@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yueqiu.R;
-import com.yueqiu.adapter.bean.SearchDatingSubFragmentDatingBean;
+import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
 
 import java.util.ArrayList;
 import java.util.List;

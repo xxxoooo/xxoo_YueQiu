@@ -50,7 +50,7 @@
         android:text="@string/search_gallery_pager_test_str"
         android:textStyle="normal"
         android:textColor="@android:color/darker_gray"
-        android:padding="3dp"
+        android:padding="2dp"
         android:textSize="13sp"
         />
 
@@ -59,35 +59,20 @@
          展示不同的ListView的，每一个Fragment都只是单独的对应于同一个ListView，
          当我们点击了不同的button之后，添加的只是额外的筛选条件 -->
     <LinearLayout
-        android:layout_marginRight="2dp"
-        android:layout_marginLeft="2dp"
-        android:layout_marginTop="1dp"
         android:layout_below="@id/tv_gallery_view_pager_indication"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
         android:orientation="horizontal"
-        android:padding="3dp"
         android:id="@+id/filter_group"
         android:background="@drawable/btn_bg"
         >
 
         <Button
-            android:layout_gravity="center"
-            android:textStyle="bold"
-            android:padding="3dp"
-            android:textSize="19sp"
-            android:background="@drawable/btn_bg"
-            android:button="@null"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"
+            style="@style/SearchSubFragmentFilterBtnStyle"
             android:id="@+id/btn_mate_distance"
             android:text="@string/search_mate_subfragment_title_distance"
-            android:drawableRight="@drawable/search_sub_fragment_btn_filter_img"
-            android:drawablePadding="5dp"
             />
 
         <View
@@ -98,36 +83,21 @@
             android:padding="5dp"
             android:layout_width="3dp"
             android:layout_height="match_parent"
-            android:background="@android:color/holo_blue_light"
+            android:background="@android:color/white"
             >
         </View>
 
         <Button
-            android:padding="3dp"
-            android:textSize="19sp"
-            android:button="@null"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"
+            style="@style/SearchSubFragmentFilterBtnStyle"
             android:id="@+id/btn_mate_gender"
             android:text="@string/search_mate_subfragment_title_gender"
-            android:background="@drawable/btn_bg"
-            android:checked="true"
-            android:drawableRight="@drawable/search_sub_fragment_btn_filter_img"
-            android:drawablePadding="5dp"
             />
     </LinearLayout>
 
     <ListView
+        style="@style/SearchSubActivityListViewStyle"
         android:layout_below="@id/filter_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/search_sub_fragment_list"
-        android:divider="@android:color/darker_gray"
-        android:dividerHeight="2.5dp"
-        android:padding="2dp"
         >
 
     </ListView>
