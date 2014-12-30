@@ -1,11 +1,15 @@
 package com.yueqiu;
 
 import android.app.ActionBar;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -21,11 +25,10 @@ import com.yueqiu.fragment.chatbar.MessageFragment;
  */
 public class ChatBarActivity extends FragmentActivity {
 
-
+    private ActionBar mActionBar;
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
     private RadioGroup radioGroup;
-    private TextView mBack,mTitle;
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +41,7 @@ public class ChatBarActivity extends FragmentActivity {
         
         transaction = fragmentManager.beginTransaction();
         Fragment fragment = new MessageFragment();
-        transaction.replace(R.id.content, fragment);
+        transaction.replace(R.id.chatbar_fragment_container, fragment);
         transaction.commit();
        
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -48,23 +51,23 @@ public class ChatBarActivity extends FragmentActivity {
 				case R.id.radio0:
 					transaction = fragmentManager.beginTransaction();
 	                Fragment messageFragment = new MessageFragment();
-	                transaction.replace(R.id.content, messageFragment);
+	                transaction.replace(R.id.chatbar_fragment_container, messageFragment);
 	                transaction.commit();
-                    mTitle.setText(R.string.btn_liaoba_message);
+                    mActionBar.setTitle(R.string.btn_liaoba_message);
 					break;
 				case R.id.radio1:
 					transaction = fragmentManager.beginTransaction();
 	                Fragment contactFragment = new ContactFragment();
-	                transaction.replace(R.id.content, contactFragment);
+	                transaction.replace(R.id.chatbar_fragment_container, contactFragment);
 	                transaction.commit();
-                    mTitle.setText(R.string.btn_liaoba_contact);
+                    mActionBar.setTitle(R.string.btn_liaoba_contact);
 					break;
 				case R.id.radio2:
 					transaction = fragmentManager.beginTransaction();
 	                Fragment addPersonFragment = new AddPersonFragment();
-	                transaction.replace(R.id.content, addPersonFragment);
+	                transaction.replace(R.id.chatbar_fragment_container, addPersonFragment);
 	                transaction.commit();
-                    mTitle.setText(R.string.btn_liaoba_add_friend);
+                    mActionBar.setTitle(R.string.btn_liaoba_add_friend);
 					break;
             	}
             }
@@ -74,21 +77,50 @@ public class ChatBarActivity extends FragmentActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        ActionBar actionBar = getActionBar();
-        actionBar.setTitle(getString(R.string.tab_title_chat_bar));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            mActionBar = getActionBar();
+            mActionBar.setTitle(getString(R.string.btn_liaoba_message));
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+               return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.chatbar_search, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.chatbar_fragment_container);
+        switch (item.getItemId()) {
+            case R.id.chatbar_menu_search:
+                if (fragment instanceof MessageFragment) {
+                    Intent intent = new Intent(this, ChatBarSearchActivity.class);
+                    startActivity(intent);
+                }
+                break;
+        }
+
+        return super.onMenuItemSelected(featureId, item);
     }
 
     private void initView() {
-        mBack = (TextView) findViewById(R.id.chatbar_main_btn_back);
-        mBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //返回按钮
-//                startActivity(new Intent(getApplication(), HomeTabActivity.class));
-                ChatBarActivity.this.finish();
-            }
-        });
-        mTitle = (TextView) findViewById(R.id.tv_title);
+
     }
 
 }

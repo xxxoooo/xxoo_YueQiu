@@ -47,9 +47,21 @@
 
 
     <TextView
+        android:id="@+id/tv_search_dating_detailed_time_1"
+        android:padding="4dp"
+        android:layout_alignTop="@id/tv_search_dating_detail_nickname"
+        android:layout_alignParentRight="true"
+        style="@style/ListItemTvStyle"
+        android:textSize="12sp"
+        android:text="@string/search_dating_detailed_activity_time_1"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="7dp"
+        />
+
+    <TextView
         android:id="@+id/tv_search_dating_detailed_time"
         android:padding="4dp"
-        android:layout_alignTop="@id/tv_mate_subfragment_listitem_nickname"
+        android:layout_alignTop="@id/tv_search_dating_detail_nickname"
         android:layout_toLeftOf="@id/tv_search_dating_detailed_time_1"
         style="@style/ListItemTvStyle"
         android:textSize="12sp"
@@ -58,17 +70,7 @@
         android:layout_marginRight="7dp"
         />
 
-    <TextView
-        android:id="@+id/tv_search_dating_detailed_time_1"
-        android:padding="4dp"
-        android:layout_alignTop="@id/tv_mate_subfragment_listitem_nickname"
-        android:layout_alignParentRight="true"
-        style="@style/ListItemTvStyle"
-        android:textSize="12sp"
-        android:text="@string/search_dating_detailed_activity_time_1"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="7dp"
-        />
+
 
     <View
         android:id="@+id/search_dating_separator"

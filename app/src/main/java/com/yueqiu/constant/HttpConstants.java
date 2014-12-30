@@ -6,6 +6,37 @@ package com.yueqiu.constant;
  */
 public class HttpConstants {
 
+    public static final String URL = "http://hxu0480201.my3w.com/index.php/v1";
+
+    /**
+     * 请求方式
+     */
+    public static final class RequestMethod
+    {
+        public static final String GET = "GET";
+
+        public static final String POST = "POST";
+    }
+
+    /*
+    请求公共参数
+     */
+    public static final class PublicConstant
+    {
+        /*
+         * 应用类型
+         * 1、WebApp
+         * 2、Android
+         * 3、IOS
+         */
+        public static final String APP_TYPE = "app_type";
+
+        /*
+         *
+         */
+        public static final String TOKEN = "token";
+    }
+
     /**
      * 用户注册请求参数
      * 发送Post请求

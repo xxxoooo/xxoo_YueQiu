@@ -24,7 +24,7 @@
     <!-- 搜索 -->
     <!-- 定义SearchActivity当中的Actionbar当中的menuItem -->
     <string name="search_account_name_str">账户:</string>
-``        <string name="search_my_gold_coin_num_str">我的金币:</string>
+    <string name="search_my_gold_coin_num_str">我的金币:</string>
     <string name="search_login_str">登录</string>
     <string name="search_my_profile_str">我的资料</string>
     <string name="search_mentioned_me_str">提到我的</string>
@@ -133,7 +133,6 @@
     <string name="tab_title_billiards_circle">台球圈</string>
     <string name="title_activity_home_tab">HomeTabActivity</string>
 
-    <!-- 聊吧 -->
     <!-- 侧滑菜单 -->
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>
@@ -147,7 +146,8 @@
     <string name="btn_liaoba_add_friend">添加好友</string>
     <string name="btn_back">返回</string>
     <string name="btn_message_search">搜索</string>
-    <string name="tv_contact_my_friends">我的好友:</string>
+    <string name="btn_message_cancel">取消</string>
+    <string name="tv_contact_my_friends">分组</string>
     <string name="tv_add_persion_nearby">附近的人</string>
     <string name="ed_add_persion_by_phone_or_account">以手机/账户添加好友</string>
     <string name="mentioned_me">提到我的</string>
@@ -182,6 +182,9 @@
     <string name="register">注册</string>
     <string name="man">男</string>
     <string name="woman">女</string>
+    <string name="userid">手机号或账号</string>
+    <string name="password">密码</string>
+
     <string name="title_activity_billiards_dating">BilliardsDatingActivity</string>
     <string name="title_activity_search_billiard_room">SearchBilliardRoomActivity</string>
 

@@ -1,10 +1,13 @@
 package com.yueqiu.fragment.chatbar;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -19,27 +22,28 @@ import com.yueqiu.adapter.ChatBarItemAdapter;
  * 聊吧消息Fragment
  */
 public class MessageFragment extends Fragment {
-	private static final String TAG = "MessageFragment";
-	Resources resources;
+    private static final String TAG = "MessageFragment";
+    Resources resources;
     private ListView mListView;
     private LinearLayout mSearch;
-    
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_chatbar_message, null);
-		resources = getResources();
+    private ActionBar mActionBar;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_chatbar_message, null);
+        resources = getResources();
         mListView = (ListView) view.findViewById(R.id.chatbar_message_lv_account);
         ChatBarItemAdapter adapter = new ChatBarItemAdapter(getActivity());
         mListView.setAdapter(adapter);
-        view.findViewById(R.id.search).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), ChatBarSearchActivity.class);
-                startActivity(intent);
-            }
-        });
-		return view;
-	}
+
+        return view;
+    }
+
 
 }

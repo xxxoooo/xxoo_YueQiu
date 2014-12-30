@@ -11,8 +11,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-
-
         <com.yueqiu.view.CustomerScrollView
             android:id="@+id/customer_view"
             android:layout_width="match_parent"
@@ -32,6 +30,8 @@
 
                     <RelativeLayout
                         android:layout_width="match_parent"
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_height="60dp">
 
                         <TextView
@@ -56,6 +56,8 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
 
@@ -74,7 +76,6 @@
                             android:layout_alignParentRight="true"
                             android:text="dkijeoijiode"/>
                     </RelativeLayout>
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="0.5dp"
@@ -82,7 +83,9 @@
 
                     <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="50dp"
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -111,8 +114,9 @@
                     android:background="@drawable/list_corner_round_bg">
 
 
-
                     <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
 
@@ -138,6 +142,8 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
 
@@ -156,12 +162,15 @@
                             android:layout_alignParentRight="true"
                             android:text="@string/unset"/>
                     </RelativeLayout>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="0.5dp"
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
 
@@ -187,6 +196,8 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
 
@@ -205,12 +216,15 @@
                             android:layout_alignParentRight="true"
                             android:text="@string/unset"/>
                     </RelativeLayout>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="0.5dp"
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
 
@@ -236,6 +250,8 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
 
@@ -254,12 +270,15 @@
                             android:layout_alignParentRight="true"
                             android:text="@string/unset"/>
                     </RelativeLayout>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="0.5dp"
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
 
@@ -285,6 +304,8 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
 
@@ -303,12 +324,15 @@
                             android:layout_alignParentRight="true"
                             android:text="@string/unset"/>
                     </RelativeLayout>
+
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="0.5dp"
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
 
@@ -334,6 +358,8 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
                         android:layout_height="50dp">
 
