@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <!--用于SearchActivity当中的球厅的子Fragment的布局文件-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:id="@+id/room_filter_group"
+        android:background="@drawable/btn_bg">
+
+        <Button
+            android:layout_weight="0.25"
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:text="@string/search_room_subfragment_title_zone"/>
+
+        <View
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:padding="5dp"
+            android:layout_width="3dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            >
+        </View>
+
+        <Button
+            android:layout_weight="0.25"
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:text="@string/search_room_subfragment_title_distance"/>
+
+        <View
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:padding="5dp"
+            android:layout_width="3dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            >
+        </View>
+
+        <Button
+            android:layout_weight="0.25"
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:text="@string/search_room_subfragment_title_price"/>
+
+        <View
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:padding="5dp"
+            android:layout_width="3dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            >
+        </View>
+
+        <Button
+            android:layout_weight="0.25"
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:text="@string/search_room_subfragment_title_review"/>
+
+    </LinearLayout>
+
+    <ListView
+        style="@style/SearchSubActivityListViewStyle"
+        android:layout_below="@id/room_filter_group"
+        android:id="@+id/search_room_subfragment_listview">
+
+    </ListView>
+
+</RelativeLayout>

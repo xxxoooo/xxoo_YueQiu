@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="@string/back"
+        android:id="@+id/menu_back"
+        android:icon="@drawable/tab_chat_bar"
+        android:showAsAction="withText"
+        />
+</menu>

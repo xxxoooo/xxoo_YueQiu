@@ -1,20 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android" >
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true" android:drawable="@color/gray_font"/>
+    <item android:state_focused="true" android:drawable="@color/gray_font"/>
+    <item android:state_focused="false" android:state_pressed="false" >
+        <shape android:shape="rectangle">
+            <!-- 渐变 -->
+            <gradient android:angle="180" android:endColor="#FFCCCCCC"
+                      android:startColor="@android:color/white" />
+            <!-- 描边 -->
+            <stroke android:width="1dp" android:color="@color/gray" />
 
-    <!--
-    渐变
-    <gradient android:startColor="#B5E7B8"
-        android:endColor="#76D37B"
-        android:angle="270"/>
+            <!-- 实心填充 -->
+            <solid android:color="@color/white" />
+            <!-- 圆角 -->
+            <corners android:bottomLeftRadius="8dip"
+                     android:bottomRightRadius="8dip" />
+        </shape>
 
-    -->
-    <gradient
-        android:angle="270"
-        android:endColor="#40B9FF"
-        android:startColor="#BFEEFF" />
+    </item>
+    <item android:state_pressed="false" >
+        <shape android:shape="rectangle">
+            <!-- 渐变 -->
+            <gradient android:angle="180" android:endColor="#FFCCCCCC"
+                      android:startColor="@android:color/white" />
+            <!-- 描边 -->
+            <stroke android:width="1dp" android:color="@color/gray" />
 
-    <corners
-        android:bottomLeftRadius="8dip"
-        android:bottomRightRadius="8dip" />
+            <!-- 实心填充 -->
+            <solid android:color="@color/white" />
+            <!-- 圆角 -->
+            <corners android:bottomLeftRadius="8dp"
+                     android:bottomRightRadius="8dip" />
+        </shape>
 
-</shape>
+    </item>
+</selector>

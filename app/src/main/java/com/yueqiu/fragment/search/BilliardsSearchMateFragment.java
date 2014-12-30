@@ -69,7 +69,7 @@ public class BilliardsSearchMateFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        mView = inflater.inflate(R.layout.mate_fragment_layout, null);
+        mView = inflater.inflate(R.layout.search_mate_fragment_layout, null);
         mSubFragmentList = (ListView) mView.findViewById(R.id.search_sub_fragment_list);
 
         (sBtnDistanceFilter = (Button) mView.findViewById(R.id.btn_mate_distance)).setOnClickListener(new BtnFilterClickListener());

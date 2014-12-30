@@ -4,16 +4,25 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.yueqiu.R;
 
 /**
  * @author scguo
  *
- * 用于实现约球详细的Activity
+ * 用于实现约球详细的Activity,即点击约球Fragment当中的ListView当中的任何一个item的时候跳转到的
+ * 一个页面，就是约球详情Activity
+ *
  */
 public class SearchBilliardsDatingActivity extends Activity
 {
+    private GridView mGridAlreadyFlow;
+    private ImageView mUserPhoto;
+    private TextView mUserName, mUserGender, mTvTime1, mTvTime2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

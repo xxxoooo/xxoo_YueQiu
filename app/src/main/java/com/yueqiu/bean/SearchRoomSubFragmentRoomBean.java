@@ -15,8 +15,6 @@ public class SearchRoomSubFragmentRoomBean
     private String mDetailedAddress;
     private String mDistance;
 
-    public SearchRoomSubFragmentRoomBean(){}
-
     public SearchRoomSubFragmentRoomBean(String roomPhoto, String roomName, float level, double price, String address, String distance)
     {
         this.mDetailedAddress = address;

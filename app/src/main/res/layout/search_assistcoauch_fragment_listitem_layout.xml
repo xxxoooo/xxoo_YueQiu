@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_launcher"
+        android:layout_alignParentLeft="true"
+        android:padding="4dp"
+        android:layout_margin="4dp"
+        android:id="@+id/img_assistcoauch_subfragment_listitem_photo"/>
+
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_assistcoauch_subfragment_listitem_name"
+        android:text="@string/search_coauch_sub_fragment_listitem_username"
+        android:layout_toRightOf="@id/img_assistcoauch_subfragment_listitem_photo"
+        android:layout_marginTop="4dp"
+        android:layout_marginLeft="4dp"
+        android:textColor="@android:color/black"
+        android:padding="4dp"
+        android:textSize="19sp"
+        />
+
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_assistcoauch_subfragment_listitem_gender"
+        android:background="@drawable/textview_withdrawable_bg"
+        android:drawableRight="@drawable/male"
+        android:text="@string/search_mate_popupmenu_item_male_str"
+        android:layout_below="@id/tv_assistcoauch_subfragment_listitem_name"
+        android:layout_toRightOf="@id/img_assistcoauch_subfragment_listitem_photo"
+        android:padding="6dp"
+        android:layout_marginLeft="7dp"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_assistcoauch_subfragment_listitem_kinds"
+        android:background="@drawable/textview_withdrawable_bg"
+        android:text="@string/search_coauch_sub_fragment_listitem_userkinds"
+        android:layout_toRightOf="@id/tv_assistcoauch_subfragment_listitem_gender"
+        android:layout_alignBottom="@id/tv_assistcoauch_subfragment_listitem_gender"
+        android:padding="6dp"
+        android:layout_marginLeft="7dp"
+        android:textStyle="bold"
+        />
+
+
+    <!--注意这里的price价格TextView当中，我们使用到的是String当中的PlaceHolder，
+        也就是我们没有给出具体的价格，而是通过在具体的Java代码当中动态指定的，这一点是我们
+        在实际开发当中需要注意的。如果忘了，以下是关于StringPlaceHolder的具体指导博客
+        http://www.piwai.info/android-string-placeholders/-->
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_assistcoauch_subfragment_listitem_price"
+        android:background="@drawable/textview_withdrawable_bg"
+        android:text="@string/search_assistcaouch_subfragment_listitem_price"
+        android:layout_toRightOf="@id/tv_assistcoauch_subfragment_listitem_kinds"
+        android:layout_alignBottom="@id/tv_assistcoauch_subfragment_listitem_kinds"
+        android:padding="6dp"
+        android:layout_marginLeft="7dp"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_assistcoauch_subfragment_listitem_distance"
+        android:textSize="12sp"
+        android:text="@string/search_coauch_sub_fragment_listitem_userdistan"
+        android:layout_marginTop="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="3dp"
+        />
+
+
+
+
+</RelativeLayout>

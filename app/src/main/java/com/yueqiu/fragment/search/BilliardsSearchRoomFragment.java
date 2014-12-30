@@ -1,6 +1,7 @@
 package com.yueqiu.fragment.search;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.Fragment;
@@ -9,6 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yueqiu.R;
+import com.yueqiu.bean.SearchRoomSubFragmentRoomBean;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author scguo
@@ -116,5 +121,24 @@ public class BilliardsSearchRoomFragment extends Fragment
         // TODO: Update argument type and name
         public void onFragmentInteraction(Uri uri);
     }
+
+    private List<SearchRoomSubFragmentRoomBean> mRoomList = new ArrayList<SearchRoomSubFragmentRoomBean>();
+    private Resources mRes = getResources();
+    // use the static data to init the BilliardsSearchRoomFragment
+    private void initListStaticTestData()
+    {
+        String roomName = mRes.getString(R.string.search_room_sub_fragment_listitem_roomname);
+        float level = 3.5f;
+        double price = 36;
+        String distance = mRes.getString(R.string.search_room_sub_fragment_listitem_roomdistance);
+        String address = mRes.getString(R.string.search_room_sub_fragment_listitem_roomaddress);
+
+        int i;
+        for (i = 0; i < 100; ++i)
+        {
+            mRoomList.add(new SearchRoomSubFragmentRoomBean("", roomName, level, price, address, distance));
+        }
+    }
+
 
 }
