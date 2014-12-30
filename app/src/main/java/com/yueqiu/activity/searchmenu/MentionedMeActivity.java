@@ -12,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -114,24 +115,21 @@ public class MentionedMeActivity extends FragmentActivity implements ActionBar.T
 //    }
     private void initActionBar(){
         mActionBar = getActionBar();
-        if (mActionBar != null) {
-            LayoutInflater inflater = (LayoutInflater) getSystemService
-                    (Context.LAYOUT_INFLATER_SERVICE);
-            View customActionBarView = inflater.inflate(R.layout.custom_actionbar_layout, null);
-            View saveMenuItem = customActionBarView.findViewById(R.id.save_menu_item);
-            saveMenuItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MentionedMeActivity.this.finish();
-                }
-            });
-            TextView title = (TextView) customActionBarView.findViewById(R.id.action_bar_title);
-            title.setText(getString(R.string.search_mentioned_me_str));
-            mActionBar.setDisplayShowCustomEnabled(true);
-            ActionBar.LayoutParams params = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            mActionBar.setCustomView(customActionBarView,params);
-            mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar.setTitle(getString(R.string.search_mentioned_me_str));
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id){
+            case android.R.id.home:
+                finish();
+                break;
         }
+        return true;
     }
 
     @Override

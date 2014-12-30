@@ -10,4 +10,6 @@
     <dimen name="ldrawer_thickness">2dp</dimen>
     <dimen name="ldrawer_gapBetweenBars">3dp</dimen>
     <dimen name="ldrawer_middleBarArrowSize">16dp</dimen>
+
+    <dimen name="search_view_width">0dip</dimen>
 </resources>

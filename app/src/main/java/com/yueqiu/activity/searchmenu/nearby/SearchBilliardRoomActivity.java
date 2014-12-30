@@ -1,4 +1,4 @@
-package com.yueqiu.activity.searchmenu.search;
+package com.yueqiu.activity.searchmenu.nearby;
 
 import android.app.Activity;
 import android.os.Bundle;

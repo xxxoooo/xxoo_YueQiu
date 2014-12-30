@@ -17,6 +17,7 @@
             />
     </RelativeLayout>
     <RadioGroup
+
         android:id="@+id/billiard_radio_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -24,6 +25,7 @@
         android:orientation="horizontal"
         android:weightSum="2">
         <RadioButton
+            android:padding="10dp"
             android:id="@+id/billiard_time_sort"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -32,9 +34,12 @@
             android:gravity="center"
             android:text="@string/billiard_time"
             android:textSize="24sp"
+            android:checked="true"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/font_selector"/>
+            android:textColor="@android:color/white"
+            android:background="@drawable/billiard_search_radio_bg"/>
         <RadioButton
+            android:padding="10dp"
             android:id="@+id/billiard_popularity_sort"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -43,8 +48,9 @@
             android:gravity="center"
             android:text="@string/billiard_poplarity"
             android:textSize="24sp"
+            android:textColor="@android:color/white"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/font_selector"/>
+            android:background="@drawable/billiard_search_radio_bg"/>
 
     </RadioGroup>
 
