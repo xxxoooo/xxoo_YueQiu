@@ -38,14 +38,15 @@ public class AddPersonFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             mActionBar = getActivity().getActionBar();
         }
-        view.findViewById(R.id.chatbar_add_persion_search).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO:result of search，new Activity or fragment
-                Intent intent = new Intent(getActivity(), ChatBarSearchResultActivity.class);
-                startActivity(intent);
-            }
-        });
+//        view.findViewById(R.id.chatbar_add_persion_search).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                //TODO:result of search，new Activity or fragment
+//                Intent intent = new Intent(getActivity(), ChatBarSearchResultActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+
         return view;
     }
 

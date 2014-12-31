@@ -4,12 +4,13 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.app.ActionBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +26,6 @@ import java.util.Map;
  */
 public class RegisterActivity extends Activity  implements View.OnClickListener, RadioGroup.OnCheckedChangeListener{
     private static final String TAG = "RegisterActivity";
-    private TextView mTvBack;
     private EditText mEtUserName,mEtPwd,mEtNumber;
     private RadioGroup mRGroup;
     private Button mBtnRegister;
@@ -35,6 +35,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        initActionBar();
         initView();
     }
 
@@ -42,10 +43,15 @@ public class RegisterActivity extends Activity  implements View.OnClickListener,
     {
         Log.i(TAG,"------------"+msg+"-------------");
     }
-
+    private void initActionBar(){
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(getString(R.string.register));
+    }
     private void initView()
     {
-        mTvBack = (TextView) findViewById(R.id.register_tv_back);
+
+        mEtNumber = (EditText) findViewById(R.id.register_et_username);
         mEtUserName = (EditText) findViewById(R.id.register_et_username);
         mEtPwd = (EditText) findViewById(R.id.register_et_pwd);
         mEtNumber = (EditText) findViewById(R.id.register_et_phonenumber);
@@ -56,7 +62,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener,
         mActionBar.setHomeButtonEnabled(true);
         mActionBar.setTitle(getString(R.string.register));
         mRGroup.setOnCheckedChangeListener(this);
-        mTvBack.setOnClickListener(this);
+
         mBtnRegister.setOnClickListener(this);
     }
 
@@ -64,9 +70,6 @@ public class RegisterActivity extends Activity  implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId())
         {
-            case R.id.register_tv_back:
-                finish();
-                break;
             case R.id.register_btn_register:
                 account = mEtUserName.getText().toString().trim();
                 if("".equals(account))
@@ -115,9 +118,20 @@ public class RegisterActivity extends Activity  implements View.OnClickListener,
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id) {
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return true;
+    }
+
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         int radioButtonId = group.getCheckedRadioButtonId();
         RadioButton radioButton = (RadioButton)RegisterActivity.this.findViewById(radioButtonId);
         sex = radioButton.getText().toString().trim();
+
     }
 }

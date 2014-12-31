@@ -1,7 +1,6 @@
 package com.yueqiu.fragment.chatbar;
 
 import android.app.ActionBar;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,8 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-
-import com.yueqiu.ChatBarSearchActivity;
 import com.yueqiu.R;
 import com.yueqiu.adapter.ChatBarItemAdapter;
 
@@ -53,7 +50,6 @@ public class MessageFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        getActivity().getMenuInflater().inflate(R.menu.chatbar_search, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

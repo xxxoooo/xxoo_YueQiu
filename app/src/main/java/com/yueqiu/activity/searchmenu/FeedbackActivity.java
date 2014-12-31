@@ -48,23 +48,8 @@ public class FeedbackActivity extends Activity
 
     private void initActionBar(){
         ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            LayoutInflater inflater = (LayoutInflater) getSystemService
-                    (Context.LAYOUT_INFLATER_SERVICE);
-            View customActionBarView = inflater.inflate(R.layout.custom_actionbar_layout, null);
-            View saveMenuItem = customActionBarView.findViewById(R.id.save_menu_item);
-            saveMenuItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FeedbackActivity.this.finish();
-                }
-            });
-            TextView title = (TextView) customActionBarView.findViewById(R.id.action_bar_title);
-            title.setText(getString(R.string.search_feed_back_str));
-            actionBar.setDisplayShowCustomEnabled(true);
-            ActionBar.LayoutParams params = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            actionBar.setCustomView(customActionBarView,params);
-        }
+        actionBar.setTitle(getString(R.string.search_feed_back_str));
+        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
 
@@ -90,16 +75,15 @@ public class FeedbackActivity extends Activity
 //        return true;
 //    }
 //
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item)
-//    {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id){
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return true;
+    }
 }

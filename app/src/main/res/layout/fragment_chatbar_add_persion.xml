@@ -6,7 +6,7 @@
               android:background="@color/bg_container">
 
 
-        <LinearLayout
+        <!--<LinearLayout
             android:id="@+id/chatbar_add_persion_search"
             android:layout_height="40dp"
             android:layout_width="match_parent"
@@ -31,11 +31,11 @@
                 android:background="@null"
                 android:textSize="17sp"
                 android:textColor="@color/gray_font"/>
-        </LinearLayout>
+        </LinearLayout>-->
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_marginLeft="10dp"
+        android:layout_margin="10dp"
         android:gravity="center_vertical"
         android:layout_width="match_parent"
         android:layout_height="40dp">

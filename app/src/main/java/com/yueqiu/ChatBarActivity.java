@@ -1,6 +1,9 @@
 package com.yueqiu;
 
 import android.app.ActionBar;
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,8 +17,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.yueqiu.activity.searchmenu.nearby.SearchResultActivity;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.chatbar.ContactFragment;
 import com.yueqiu.fragment.chatbar.MessageFragment;
@@ -98,7 +103,16 @@ public class ChatBarActivity extends FragmentActivity {
     }
 
 
-//
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.billiard_search, menu);
+        SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        return true;
+    }
+
 //    @Override
 //    public boolean onMenuItemSelected(int featureId, MenuItem item) {
 //        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.chatbar_fragment_container);

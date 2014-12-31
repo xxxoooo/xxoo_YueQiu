@@ -18,12 +18,26 @@
         </activity>
         <activity
             android:name=".BilliardSearchActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
+
             </intent-filter>
+
+        </activity>
+        <activity
+            android:name=".activity.searchmenu.nearby.SearchResultActivity"
+            android:launchMode="singleTop">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
 
         <!-- 聊吧Activity -->
@@ -40,16 +54,16 @@
         <activity android:name=".activity.searchmenu.LoginActivity"/>
         <activity android:name=".activity.searchmenu.ActivitiesIssueActivity"/>
         <activity android:name=".activity.searchmenu.FeedbackActivity"/>
-        <activity android:name=".activity.searchmenu.MentionedMeActivity"/>
+        <activity android:name=".activity.searchmenu.MyParticipationActivity"/>
         <activity android:name=".activity.searchmenu.MyProfileActivity"/>
         <activity android:name=".activity.searchmenu.MyfavorCollActivity"/>
         <activity android:name=".activity.searchmenu.PublishedInfoActivity"/>
         <activity
-            android:name=".activity.searchmenu.search.SearchBilliardsDatingActivity"
+            android:name=".activity.searchmenu.nearby.SearchBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating">
         </activity>
         <activity
-            android:name=".activity.searchmenu.search.SearchBilliardRoomActivity"
+            android:name=".activity.searchmenu.nearby.SearchBilliardRoomActivity"
             android:label="@string/title_activity_search_billiard_room">
         </activity>
         <activity android:name=".activity.searchmenu.RegisterActivity"/>

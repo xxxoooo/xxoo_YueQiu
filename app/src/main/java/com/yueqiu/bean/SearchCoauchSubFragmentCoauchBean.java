@@ -14,47 +14,53 @@ public class SearchCoauchSubFragmentCoauchBean
 
     public SearchCoauchSubFragmentCoauchBean(String photo, String name, String gender, String distance, String level, String kind)
     {
+        this.mUserPhoto = photo;
+        this.mUserName = name;
+        this.mUserGender = gender;
+        this.mUserDistance = distance;
+        this.mUserLevel = level;
+        this.mBilliardKind = kind;
 
     }
 
-    public String getmUserPhoto()
+    public String getUserPhoto()
     {
         return mUserPhoto;
     }
 
-    public void setmUserPhoto(String mUserPhoto)
+    public void setUserPhoto(String photo)
     {
-        this.mUserPhoto = mUserPhoto;
+        this.mUserPhoto = photo;
     }
 
-    public String getmUserGender()
+    public String getUserGender()
     {
         return mUserGender;
     }
 
-    public void setmUserGender(String mUserGender)
+    public void setUserGender(String gender)
     {
-        this.mUserGender = mUserGender;
+        this.mUserGender = gender;
     }
 
-    public String getmUserDistance()
+    public String getUserDistance()
     {
         return mUserDistance;
     }
 
-    public void setmUserDistance(String mUserDistance)
+    public void setUserDistance(String distance)
     {
-        this.mUserDistance = mUserDistance;
+        this.mUserDistance = distance;
     }
 
-    public String getmUserLevel()
+    public String getUserLevel()
     {
         return mUserLevel;
     }
 
-    public void setmUserLevel(String mUserLevel)
+    public void setUserLevel(String level)
     {
-        this.mUserLevel = mUserLevel;
+        this.mUserLevel = level;
     }
 
     public String getmBilliardKind()
@@ -62,8 +68,18 @@ public class SearchCoauchSubFragmentCoauchBean
         return mBilliardKind;
     }
 
-    public void setmBilliardKind(String mBilliardKind)
+    public void setBilliardKind(String billiardKind)
     {
-        this.mBilliardKind = mBilliardKind;
+        this.mBilliardKind = billiardKind;
+    }
+
+    public String getUserName()
+    {
+        return mUserName;
+    }
+
+    public void setUserName(String userName)
+    {
+        this.mUserName = userName;
     }
 }
