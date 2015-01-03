@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <string name="app_name">YueQiu</string>
     <string name="hello_world">Hello world!</string>
@@ -24,13 +24,13 @@
     <!-- 搜索 -->
     <!-- 定义SearchActivity当中的Actionbar当中的menuItem -->
     <string name="search_account_name_str">账户:</string>
-``        <string name="search_my_gold_coin_num_str">我的金币:</string>
+    <string name="search_my_gold_coin_num_str">我的金币:</string>
     <string name="search_login_str">登录</string>
     <string name="search_my_profile_str">我的资料</string>
-    <string name="search_mentioned_me_str">提到我的</string>
+    <string name="search_my_participation_str">我的参与</string>
     <string name="search_my_favor_collection_str">我的收藏</string>
     <string name="search_my_published_info_str">我的发布</string>
-    <string name="search_publishing_dating_billiards_info_str">发布约球</string>
+    <string name="search_publishing_dating_billiards_info_str">发布活动</string>
     <string name="search_feed_back_str">意见反馈</string>
     <string name="search_logout_str">退出账户</string>
 
@@ -49,12 +49,18 @@
     <!-- 2.约球子Fragment的title -->
     <string name="search_dating_subfragment_title_distance">距离</string>
     <string name="search_dating_subfragment_title_publishdata">发布时间</string>
+    <string name="search_dating_detailed_btn_i_want_in">我要参加</string>
+    <string name="search_dating_detailed_tv_already_in">已参加人员</string>
 
     <!-- 3.助教子Fragment的title -->
     <string name="search_assistcaouch_subfragment_title_distance">距离</string>
     <string name="search_assistcaouch_subfragment_title_cost">花费</string>
     <string name="search_assistcaouch_subfragment_title_kinds">球种</string>
     <string name="search_assistcaouch_subfragment_title_level">水平</string>
+
+    <!--这个是用于显示助教的价格，这里我们将用到<=这个符号，为了将这个符号完整的拼接到TextView当中，我们最好使用
+        Xliff，而不是通过复杂的StringBuilder来实现，因为我们的TextView是有背景图片的，所以我们只能使用这个技巧-->
+    <string name="search_assistcaouch_subfragment_listitem_price">大约<xliff:g id="price"></xliff:g> 元/时</string>
 
     <!-- 4.教练子Fragment的title -->
     <string name="search_caouch_subfragment_title_ability">资质</string>
@@ -76,6 +82,14 @@
     <string name="search_room_sub_fragment_listitem_roomdistrict">昌平区</string>
     <string name="search_room_sub_fragment_listitem_roomaddress">昌平区 沙河城铁站(B1口出)南拐再右拐然后向西100米学院国际大厦(Z座1001)</string>
     <string name="search_room_sub_fragment_listitem_roomdistance">0.77km</string>
+    <string name="search_coauch_sub_fragment_listitem_username">温柔的语</string>
+    <string name="search_coauch_sub_fragment_listitem_userlevel">国家队队员</string>
+    <string name="search_coauch_sub_fragment_listitem_userkinds">斯诺克</string>
+    <string name="search_coauch_sub_fragment_listitem_userdistan">100米以内</string>
+    <string name="search_dating_sub_fragment_listitem_user_declar">我最喜爱的台球杯开始报名啦</string>
+    <string name="search_dating_detailed_activity_time">12:20</string>
+    <string name="search_dating_detailed_activity_time_1">21:20</string>
+
 
     <!--用于球厅Fragment当中的一些字符串-->
     <string name="search_room_sub_fragment_price_indi">人均 ￥</string>
@@ -132,12 +146,13 @@
     <string name="btn_liaoba_add_friend">添加好友</string>
     <string name="btn_back">返回</string>
     <string name="btn_message_search">搜索</string>
-    <string name="tv_contact_my_friends">我的好友:</string>
+    <string name="btn_message_cancel">取消</string>
+    <string name="tv_contact_my_friends">分组</string>
     <string name="tv_add_persion_nearby">附近的人</string>
-    <string name="ed_add_persion_by_phone_or_account">以手机/账户添加好友</string>
+    <string name="ed_add_persion_by_phone_or_account">请输入手机号/账号</string>
     <string name="mentioned_me">提到我的</string>
-    <string name="mentioned_me_reply">回复</string>
-    <string name="mentioned_me_friend_request">好友请求</string>
+    <string name="billiard_dating">约球</string>
+    <string name="mentioned_me_friend_request">活动</string>
 
     <!-- 活动 -->
     <string name="xlistview_header_hint_normal">下拉刷新</string>
@@ -149,7 +164,7 @@
     <string name="time">时间</string>
     <string name="distance">距离</string>
     <string name="back">返回</string>
-    <string name="issueactivities">发布活动</string>
+    <string name="issueactivities">发布</string>
     <string name="activities_title">活动主题</string>
     <string name="activities_site">活动地点</string>
     <string name="activities_time">活动时间</string>
@@ -159,7 +174,7 @@
     <string name="activities_phone">电话</string>
     <string name="activities_send">发布</string>
     <string name="activities_sendinfo">发布约球信息</string>
-    <string name="activities">活动</string>
+    <string name="activities">商家活动</string>
     <string name="search">搜索</string>
     <string name="login">登录</string>
     <string name="commit">提交</string>
@@ -194,4 +209,9 @@
     <string name="phone_null">电话不能为空！</string>
     <string name="password_null">密码不能为空！</string>
     <string name="inputtype">1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM</string>
+
+    <string name="tv_loading">正加载,请稍后...</string>
+    <string name="no_data">网络异常...</string>
+    <string name="select_sex">性别选择</string>
+    <string name="activities_content">活动内容</string>
 </resources>

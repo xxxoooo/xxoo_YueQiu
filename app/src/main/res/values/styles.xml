@@ -5,9 +5,10 @@
         <!-- Customize your theme here. -->
         <item name="android:actionBarStyle">@style/ActionBar</item>
         <item name="android:actionBarTabStyle">@style/ActionBarTab</item>
+        <item name="android:actionMenuTextAppearance">@style/MenuTextStyle</item>
     </style>
 
-    <style name="Widget" />
+    <style name="Widget"/>
 
     <style name="Widget.MenuDrawer">
         <item name="mdMenuBackground">@color/md__defaultBackground</item>
@@ -26,6 +27,7 @@
         <item name="android:titleTextStyle">@style/ActionBar.TitleText</item>
 
     </style>
+
     <style name="ActionBarTab" parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
         <item name="android:background">@drawable/tab_indicator_ab_example</item>
     </style>
@@ -36,15 +38,15 @@
     </style>
 
     <!--用于SearchActivity-->
-    <!--定义用于控制所有的ListViewItem当中的TextView的显示的Style-->
+    <!--定义用于SearchActivity控制所有的ListViewItem当中的TextView的显示的Style-->
     <style name="ListItemTvStyle" parent="AppTheme">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">17sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textColor">@android:color/darker_gray</item>
         <item name="android:textStyle">bold</item>
     </style>
-    <!--用于定义PopupWindow当中的TextView的style-->
+    <!--用于SearchActivity定义PopupWindow当中的TextView的style-->
     <style name="PopupWindowTvStyle" parent="AppTheme">
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">24sp</item>
@@ -56,7 +58,32 @@
         <item name="android:padding">3dp</item>
     </style>
 
+    <!--用于SearchActivity当中的所有的子Fragment当中的ListView的基本的style定义-->
+    <style name="SearchSubActivityListViewStyle" parent="AppTheme">
+        <item name="android:dividerHeight">1.5dp</item>
+        <item name="android:divider">@android:color/darker_gray</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">2dp</item>
+    </style>
 
+    <!--定义SearchActivity当中的用于过滤的Button的style的控制-->
+    <style name="SearchSubFragmentFilterBtnStyle" parent="AppTheme">
+        <item name="android:textSize">17sp</item>
+        <item name="android:background">@drawable/btn_bg</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">0.5</item>
+        <item name="android:drawableRight">@drawable/search_sub_fragment_btn_filter_img</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">1dp</item>
+        <item name="android:drawablePadding">2dp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="MenuTextStyle">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">18sp</item>
+    </style>
 </resources>
 
 

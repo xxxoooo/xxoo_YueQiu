@@ -26,25 +26,8 @@ public class MyProfileActivity extends Activity {
         setContentView(R.layout.activity_myprofile);
 
         ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            LayoutInflater inflater = (LayoutInflater) getSystemService
-                    (Context.LAYOUT_INFLATER_SERVICE);
-            View customActionBarView = inflater.inflate(R.layout.custom_actionbar_layout, null);
-            View saveMenuItem = customActionBarView.findViewById(R.id.save_menu_item);
-            saveMenuItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    MyProfileActivity.this.finish();
-                }
-            });
-            TextView title = (TextView) customActionBarView.findViewById(R.id.action_bar_title);
-            title.setText(getString(R.string.search_my_profile_str));
-            actionBar.setDisplayShowCustomEnabled(true);
-            ActionBar.LayoutParams params = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            actionBar.setCustomView(customActionBarView,params);
-        }
-
-
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(getString(R.string.search_my_profile_str));
 
     }
 
@@ -56,6 +39,6 @@ public class MyProfileActivity extends Activity {
                 finish();
                 break;
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+    <!--用于SearchActivity当中的教练子Fragment的布局文件-->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:id="@+id/coauch_filter_group"
+        android:background="@drawable/btn_bg"
+        >
+
+        <Button
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:id="@+id/btn_mate_distance"
+            android:text="@string/search_caouch_subfragment_title_ability"
+            />
+
+        <View
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:padding="5dp"
+            android:layout_width="3dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            >
+        </View>
+
+        <Button
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:id="@+id/btn_mate_gender"
+            android:text="@string/search_caouch_subfragment_title_kinds"
+            />
+    </LinearLayout>
+
+    <ListView
+        style="@style/SearchSubActivityListViewStyle"
+        android:id="@+id/search_coauch_subfragment_list"
+        android:layout_below="@id/coauch_filter_group"
+        >
+
+    </ListView>
+
+
+</RelativeLayout>

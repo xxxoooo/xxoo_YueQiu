@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -90,24 +91,9 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     private void initActionBar() {
         ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            LayoutInflater inflater = (LayoutInflater) getSystemService
-                    (Context.LAYOUT_INFLATER_SERVICE);
-            View customActionBarView = inflater.inflate(R.layout.custom_actionbar_layout, null);
-            View saveMenuItem = customActionBarView.findViewById(R.id.save_menu_item);
-            saveMenuItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    LoginActivity.this.finish();
-                    overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
-                }
-            });
-            TextView title = (TextView) customActionBarView.findViewById(R.id.action_bar_title);
-            title.setText(getString(R.string.search_login_str));
-            actionBar.setDisplayShowCustomEnabled(true);
-            ActionBar.LayoutParams params = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            actionBar.setCustomView(customActionBarView, params);
-        }
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(getString(R.string.login));
+
     }
 
     private void initView() {

@@ -3,206 +3,105 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/devide_line"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.5">
-
-        <TextView
-            android:id="@+id/textView0"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:text="@string/activities_title"
-            android:textSize="20sp" />
-
-        <EditText
-            android:id="@+id/activities_issue_et_title"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/textView0"
-            android:singleLine="true"
-            android:layout_toRightOf="@+id/textView0"
-             />
-
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.5">
-
-        <TextView
-            android:id="@+id/textView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:text="@string/activities_site"
-            android:textSize="20sp" />
-
-        <EditText
-            android:singleLine="true"
-            android:id="@+id/activities_issue_et_where"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-
-            android:layout_toEndOf="@+id/textView1"
-            android:layout_toLeftOf="@+id/imageView1"
-            android:layout_toRightOf="@+id/textView1"
-            android:layout_toStartOf="@+id/imageView1" />
-
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="20dp"
-            android:src="@drawable/ic_launcher" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.5">
-
-        <TextView
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:text="@string/activities_time"
-            android:textSize="20sp" />
-
-        <EditText
-            android:singleLine="true"
-            android:id="@+id/activities_issue_et_time"
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/textView2"
-            android:layout_toLeftOf="@+id/imageView2"
-            android:layout_toRightOf="@+id/textView2"
-            android:layout_toStartOf="@+id/imageView2" />
-
-        <ImageView
-            android:id="@+id/imageView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="20dp"
-            android:src="@drawable/ic_launcher" />
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1.5">
-
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="20dp"
-            android:text="@string/activities_charge_module"
-            android:textSize="20sp" />
-
-        <EditText
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@+id/textView3"
-            android:singleLine="true"
-            android:layout_toLeftOf="@+id/imageView3"
-            android:layout_toRightOf="@+id/textView3"
-            android:layout_toStartOf="@+id/imageView3" />
-
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="20dp"
-            android:src="@drawable/ic_launcher" />
-    </RelativeLayout>
-
     <LinearLayout
+        android:orientation="vertical"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/login_management_background"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="6"
-        android:gravity="center"
-        android:orientation="vertical">
-
+        android:layout_height="400dp"
+        android:weightSum="1">
         <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
+            android:layout_height="60dp">
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:textSize="20sp"
                 android:layout_marginLeft="10dp"
-                android:text="@string/activities_contacts"
-                android:textSize="20sp" />
+                android:text="@string/activities_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <LinearLayout
+                android:layout_width="2dp"
+                android:background="@color/devide_line"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_height="match_parent"></LinearLayout>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:background="@null"
+                android:singleLine="true"
+                android:layout_height="20dp" />
+            </LinearLayout>
+
+        <LinearLayout
+            android:background="@color/devide_line"
+            android:layout_width="match_parent"
+            android:layout_height="1dp">
         </LinearLayout>
 
         <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center">
-
+            android:layout_height="60dp">
             <TextView
+                android:textSize="20sp"
+                android:layout_marginLeft="10dp"
+                android:text="@string/activities_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/username"
-                android:textSize="15sp" />
 
-            <EditText
-                android:id="@+id/activities_issue_et_username"
-                android:layout_width="50dp"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/activities_phone"
-                android:textSize="15sp" />
-
-            <EditText
-                android:id="@+id/activities_issue_et_phone"
-                android:layout_width="100dp"
-                android:layout_height="wrap_content"
-                android:phoneNumber="true" />
+                 />
+            <LinearLayout
+                android:layout_width="2dp"
+                android:background="@color/devide_line"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_height="match_parent"></LinearLayout>
         </LinearLayout>
-
-
         <EditText
-            android:id="@+id/activities_issue_et_info"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
             android:gravity="top"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp" />
+            android:background="@null"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+        <RelativeLayout
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_marginRight="10dp"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_centerVertical="true"
+                android:src="@drawable/group_edit_createbutton_background"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:id="@+id/activitiy_issue_add" />
+            <ImageView
+                android:src="@drawable/compose_emoticonbutton_background"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:id="@+id/activitiy_issue_emotion"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/activitiy_issue_add"
+                android:layout_toStartOf="@+id/activitiy_issue_add" />
 
-        <Button
-            android:id="@+id/activities_btn_send"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:text="@string/activities_send" />
+            </RelativeLayout>
     </LinearLayout>
 
 </LinearLayout>

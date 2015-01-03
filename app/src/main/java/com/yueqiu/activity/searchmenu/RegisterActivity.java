@@ -9,14 +9,17 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.app.ActionBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,31 +69,17 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        initView();
         initActionBar();
+        initView();
     }
 
     private void initActionBar(){
         ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            LayoutInflater inflater = (LayoutInflater) getSystemService
-                    (Context.LAYOUT_INFLATER_SERVICE);
-            View customActionBarView = inflater.inflate(R.layout.custom_actionbar_layout, null);
-            View saveMenuItem = customActionBarView.findViewById(R.id.save_menu_item);
-            saveMenuItem.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    RegisterActivity.this.finish();
-                    overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);
-                }
-            });
-            TextView title = (TextView) customActionBarView.findViewById(R.id.action_bar_title);
-            title.setText(getString(R.string.register));
-            actionBar.setDisplayShowCustomEnabled(true);
-            ActionBar.LayoutParams params = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            actionBar.setCustomView(customActionBarView,params);
-        }
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(getString(R.string.register));
     }
+
+
 
     private void Log(String msg)
     {
@@ -116,6 +105,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
     public void onClick(View v) {
         switch (v.getId())
         {
+
             case R.id.activity_register_btn_register:
                 String account = mEtUserName.getText().toString().trim();
                 if(TextUtils.isEmpty(account))
@@ -172,11 +162,20 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUESTCODE && resultCode == RESULT_OK)
-        {
-            mEtSex.setText(data.getIntExtra("sex",0) == 0 ?
+        if (requestCode == REQUESTCODE && resultCode == RESULT_OK) {
+            mEtSex.setText(data.getIntExtra("sex", 0) == 0 ?
                     getString(R.string.man) : getString(R.string.woman));
         }
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -216,6 +215,18 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
 
             }
         }.start();
+    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }
