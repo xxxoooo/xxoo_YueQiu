@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -38,7 +39,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
 /**
  * 登录Activity
  * Created by yinfeng on 14/12/17.
@@ -52,6 +52,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private EditText mEtUserId;
     private EditText mEtPwd;
     private ActionBar mActionBar;
+    private InputMethodManager mImm;
 
     private static final int LOGIN_SUCCESS = 0x01;
     private static final int LOGIN_ERROR = 0x02;
@@ -60,20 +61,25 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch (msg.what)
-            {
+            switch (msg.what) {
                 case LOGIN_ERROR:
-                    Toast.makeText(LoginActivity.this,"登录失败，请重新登录！",
+                    Toast.makeText(LoginActivity.this, msg.obj.toString(),
                             Toast.LENGTH_SHORT).show();
                     break;
                 case LOGIN_SUCCESS:
-                    Toast.makeText(LoginActivity.this,"登录成功！",
+                    Toast.makeText(LoginActivity.this, "登录成功！",
                             Toast.LENGTH_SHORT).show();
-                    Utils.getOrUpdateUserBaseInfo(LoginActivity.this,(Map<String, String>)msg.obj);
+                    Log.i(TAG, msg.obj.toString() );
+                    Utils.getOrUpdateUserBaseInfo(LoginActivity.this,
+                            (Map<String, String>) msg.obj);
+                    Toast.makeText(LoginActivity.this,"登录成功", Toast.LENGTH_SHORT).show();
+                    finish();
+                    overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                     break;
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +88,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         initActionBar();
     }
 
-    private void initActionBar(){
+    private void initActionBar() {
         ActionBar actionBar = getActionBar();
         if (actionBar != null) {
             LayoutInflater inflater = (LayoutInflater) getSystemService
@@ -93,94 +99,97 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 @Override
                 public void onClick(View v) {
                     LoginActivity.this.finish();
+                    overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 }
             });
             TextView title = (TextView) customActionBarView.findViewById(R.id.action_bar_title);
             title.setText(getString(R.string.search_login_str));
             actionBar.setDisplayShowCustomEnabled(true);
             ActionBar.LayoutParams params = new ActionBar.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            actionBar.setCustomView(customActionBarView,params);
+            actionBar.setCustomView(customActionBarView, params);
         }
     }
 
-    private void initView()
-    {
-        mBtnLogin = (Button)findViewById(R.id.login_btn_login);
-        mTvRegister = (TextView)findViewById(R.id.login_tv_register);
-        mTvForgetPwd = (TextView)findViewById(R.id.login_tv_forgetpwd);
-        mEtUserId = (EditText)findViewById(R.id.login_et_userid);
-        mEtPwd = (EditText)findViewById(R.id.login_et_pwd);
-        mActionBar = getActionBar();
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setHomeButtonEnabled(true);
-        mActionBar.setTitle(getString(R.string.login));
-
+    private void initView() {
+        mBtnLogin = (Button) findViewById(R.id.activity_login_btn_login);
+        mTvRegister = (TextView) findViewById(R.id.activity_login_tv_register);
+//        mTvForgetPwd = (TextView)findViewById(R.id.login_tv_forgetpwd);
+        mEtUserId = (EditText) findViewById(R.id.activity_login_et_username);
+        mEtPwd = (EditText) findViewById(R.id.activity_login_et_password);
+//        mActionBar = getActionBar();
+//        mActionBar.setDisplayHomeAsUpEnabled(true);
+//        mActionBar.setHomeButtonEnabled(true);
+//        mActionBar.setTitle(getString(R.string.login));
+////
         mBtnLogin.setOnClickListener(this);
-        mTvForgetPwd.setOnClickListener(this);
+//        mTvForgetPwd.setOnClickListener(this);
+       mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mTvRegister.setOnClickListener(this);
     }
 
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
-            case R.id.login_btn_login:
+        switch (view.getId()) {
+            case R.id.activity_login_btn_login:
                 final String userId = mEtUserId.getText().toString().trim();
-                if(TextUtils.isEmpty(userId)) {
+                if (TextUtils.isEmpty(userId)) {
                     Toast.makeText(LoginActivity.this, "请输入手机号或账号",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
                 final String pwd = mEtPwd.getText().toString().trim();
-                if(TextUtils.isEmpty(pwd))
-                    Toast.makeText(LoginActivity.this,"请输入密码",
+                if (TextUtils.isEmpty(pwd))
+                    Toast.makeText(LoginActivity.this, "请输入密码",
                             Toast.LENGTH_SHORT).show();
 
 
-                new Thread()
-                {
+                new Thread() {
                     @Override
                     public void run() {
                         super.run();
                         Map<String, String> map = new HashMap<String, String>();
-                        map.put(HttpConstants.LoginConstant.USERNAME,userId);
-                        map.put(HttpConstants.LoginConstant.PASSWORD,pwd);
+                        map.put(HttpConstants.LoginConstant.USERNAME, userId);
+                        map.put(HttpConstants.LoginConstant.PASSWORD, pwd);
                         String result = HttpUtil.urlClient(HttpConstants.LoginConstant.URL,
                                 map, HttpConstants.RequestMethod.POST);
                         JSONObject object = Utils.parseJson(result);
                         Message message = new Message();
-                        if(null == object)
-                        {
-                            message.what = LOGIN_ERROR;
-                        }
-                        else
-                        {
-                            message.what = LOGIN_SUCCESS;
-                            Map<String,String> successObj = new HashMap<String, String>();
-                            successObj.put("username",userId);
-                            successObj.put("password",pwd);
-                            try {
-                                successObj.put("token",object.getJSONObject("result").
+                        try {
+                            if (object.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
+                                message.what = LOGIN_ERROR;
+                                message.obj = object.getString("msg");
+                            } else {
+                                message.what = LOGIN_SUCCESS;
+                                Map<String, String> successObj = new HashMap<String, String>();
+                                successObj.put("username", userId);
+                                successObj.put("password", pwd);
+                                successObj.put("user_id",object.getJSONObject("result").
+                                        getString("user_id"));
+                                successObj.put("token", object.getJSONObject("result").
                                         getString("token"));
-                                successObj.put("token",object.getJSONObject("result").
+                                successObj.put("login_time", object.getJSONObject("result").
                                         getString("login_time"));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                                successObj.put("phone", object.getJSONObject("result").
+                                        getString("phone"));
+                                successObj.put("img_url", object.getJSONObject("result").
+                                        getString("img_url"));
+                                message.obj = successObj;
+
                             }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
 
                         mHandler.sendMessage(message);
                     }
                 }.start();
 
-
-                    Toast.makeText(LoginActivity.this,"登录失败，请重新登录！",
-                            Toast.LENGTH_SHORT).show();
+                mImm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 break;
-            case R.id.login_tv_forgetpwd:
-                break;
-            case R.id.login_tv_register:
-                startActivity(new Intent(LoginActivity.this,RegisterActivity.class));
+            case R.id.activity_login_tv_register:
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
         }
 
@@ -189,11 +198,10 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
+        switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
-                overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -201,11 +209,10 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode)
-        {
+        switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 finish();
-                overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
         }
         return super.onKeyDown(keyCode, event);

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:id="@+id/activity_select_man">
+        <TextView
+            android:text="@string/man"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+
+            android:id="@+id/activity_select_sex_tv_man"
+            android:layout_width="wrap_content"
+            android:textSize="20sp"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/activity_select_sex_iv_man"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:visibility="gone"
+            android:src="@drawable/common_icon_checkmark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+       </RelativeLayout>
+
+    <LinearLayout
+        android:background="@color/devide_line"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"></LinearLayout>
+    <RelativeLayout
+        android:id="@+id/activity_select_woman"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+        <TextView
+            android:text="@string/woman"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:id="@+id/activity_select_sex_tv_woman"
+            android:layout_width="wrap_content"
+            android:textSize="20sp"
+            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/activity_select_sex_iv_woman"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:visibility="gone"
+            android:src="@drawable/common_icon_checkmark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+    <LinearLayout
+        android:background="@color/devide_line"
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"></LinearLayout>
+</LinearLayout>

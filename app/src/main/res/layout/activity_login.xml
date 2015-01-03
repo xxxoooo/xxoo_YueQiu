@@ -1,104 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/devide_line"
     android:orientation="vertical">
 
-
     <LinearLayout
-        android:layout_marginTop="100dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+
         android:orientation="vertical">
 
         <LinearLayout
-            android:gravity="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_launcher" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/login_management_background"
+            android:orientation="vertical">
 
             <EditText
-                android:id="@+id/login_et_userid"
-                android:layout_width="200dp"
+                android:id="@+id/activity_login_et_username"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@null"
+                android:drawableLeft="@drawable/login_user"
+                android:drawablePadding="10dp"
                 android:hint="@string/userid"
-                android:layout_height="wrap_content" />
-        </LinearLayout>
+                android:singleLine="true" />
 
-        <LinearLayout
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_launcher" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="1.5dp"
+                android:background="@color/devide_line"></LinearLayout>
 
             <EditText
-                android:id="@+id/login_et_pwd"
-                android:layout_width="200dp"
-                android:password="true"
+                android:id="@+id/activity_login_et_password"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@null"
+                android:drawableLeft="@drawable/login_key"
+                android:drawablePadding="10dp"
                 android:hint="@string/password"
-                android:layout_height="wrap_content" />
+                android:password="true"
+                android:singleLine="true" />
+
         </LinearLayout>
+
+        <Button
+            android:id="@+id/activity_login_btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="20dp"
+            android:clickable="true"
+            android:background="@drawable/btn_login"
+            android:text="@string/login"
+            android:textSize="20sp"
+            android:textColor="@color/white" />
     </LinearLayout>
+
     <LinearLayout
-        android:layout_marginTop="100dp"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-       <LinearLayout
-           android:id="@+id/login_ll"
-           android:layout_width="match_parent"
-            android:orientation="horizontal"
-           android:layout_centerInParent="true"
-           android:gravity="center"
-           android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp"
+        android:layout_centerHorizontal="true">
 
-           <Button
-               android:id="@+id/login_btn_login"
-               android:layout_width="200dp"
-               android:layout_centerInParent="true"
-               android:text="@string/commit"
-               android:layout_height="wrap_content" />
-
-       </LinearLayout>
-       <RelativeLayout
-           android:layout_width="match_parent"
-           android:layout_height="wrap_content">
-           <TextView
-               android:id="@+id/login_tv_forgetpwd"
-               android:layout_width="wrap_content"
-               android:text="@string/forgetpwd"
-               android:layout_height="wrap_content"
-
-               android:layout_gravity="center_horizontal"
-               android:layout_alignParentTop="true"
-               android:layout_alignParentRight="true"
-               android:layout_alignParentEnd="true"
-               android:layout_marginRight="95dp" />
-
-           <TextView
-               android:id="@+id/login_tv_register"
-               android:layout_width="wrap_content"
-               android:text="@string/register"
-               android:layout_height="wrap_content"
-               android:layout_gravity="center_horizontal"
-               android:layout_marginLeft="95dp"
-               android:layout_alignParentTop="true"
-               android:layout_alignParentLeft="true"
-               android:layout_alignParentStart="true" />
-
-       </RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:textColor="@color/md__defaultBackground"
+            android:text="还没有账户？" />
+        <TextView
+            android:id="@+id/activity_login_tv_register"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/photo_album_text_orange"
+            android:textSize="18sp"
+            android:text="马上注册" />
     </LinearLayout>
 
 
-
-</LinearLayout>
+</RelativeLayout>

@@ -167,7 +167,7 @@
     <string name="register">注册</string>
     <string name="man">男</string>
     <string name="woman">女</string>
-    <string name="userid">手机号或账号</string>
+    <string name="userid">手机号/账号</string>
     <string name="password">密码</string>
 
     <string name="title_activity_billiards_dating">BilliardsDatingActivity</string>
@@ -190,4 +190,8 @@
     <string name="unset">未设定</string>
 
     <string name="tv_search">搜索</string>
+    <string name="account_null">账户不能为空！</string>
+    <string name="phone_null">电话不能为空！</string>
+    <string name="password_null">密码不能为空！</string>
+    <string name="inputtype">1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM</string>
 </resources>
