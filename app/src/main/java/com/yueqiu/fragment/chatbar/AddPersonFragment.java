@@ -41,7 +41,6 @@ public class AddPersonFragment extends Fragment {
 //        view.findViewById(R.id.chatbar_add_persion_search).setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
-//                //TODO:result of search，new Activity or fragment
 //                Intent intent = new Intent(getActivity(), ChatBarSearchResultActivity.class);
 //                startActivity(intent);
 //            }

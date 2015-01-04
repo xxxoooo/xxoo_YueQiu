@@ -49,6 +49,7 @@
         <activity android:name=".activity.searchmenu.ActivitiesIssueActivity" />
         <activity android:name=".activity.searchmenu.FeedbackActivity" />
         <activity android:name=".activity.searchmenu.MyProfileActivity" />
+        <activity android:name=".ProfileSetupActivity"/>
         <activity android:name=".activity.searchmenu.MyfavorCollActivity" />
         <activity android:name=".activity.searchmenu.PublishedInfoActivity" />
 
