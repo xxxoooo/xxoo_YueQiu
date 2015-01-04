@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <ImageView
+            android:src="@drawable/account"
+            android:id="@+id/my_activities_lv_item_iv_head"
+            android:layout_width="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="10dp"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/my_activities_lv_item_iv_head"
+            android:layout_toEndOf="@id/my_activities_lv_item_iv_head"
+            android:id="@+id/linearLayout2">
+            <TextView
+                android:id="@+id/my_activities_lv_item_tv_nick_name"
+                android:text="会飞的鱼"
+                android:textSize="22sp"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+               />
+            <TextView
+                android:id="@+id/my_activities_lv_item_tv_message"
+                android:text="有朋自远方来，不亦说乎。"
+                android:textColor="@color/gray_font"
+                android:textSize="14sp"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+               />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:id="@+id/my_activities_lv_item_tv_time"
+            android:text="2014-12-24"
+            android:textSize="13sp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            android:textColor="@color/gray_font"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+</LinearLayout>

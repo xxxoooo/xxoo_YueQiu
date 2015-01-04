@@ -1,4 +1,4 @@
-package com.yueqiu.fragment;
+package com.yueqiu.fragment.myparticipation;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -19,7 +19,7 @@ import com.yueqiu.R;
  * Created by doushuqi on 14/12/20.
  * 提到我中回复标签页
  */
-public class ReplyMentionMeFragment extends Fragment {
+public class BilliardDatingFragment extends Fragment {
     private static final String TAG = "ReplyMentionMeFragment";
     private ListView mListView;
 

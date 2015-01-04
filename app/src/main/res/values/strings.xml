@@ -152,7 +152,7 @@
     <string name="ed_add_persion_by_phone_or_account">请输入手机号/账号</string>
     <string name="mentioned_me">提到我的</string>
     <string name="billiard_dating">约球</string>
-    <string name="mentioned_me_friend_request">活动</string>
+    <string name="participation_activities">活动</string>
 
     <!-- 活动 -->
     <string name="xlistview_header_hint_normal">下拉刷新</string>
