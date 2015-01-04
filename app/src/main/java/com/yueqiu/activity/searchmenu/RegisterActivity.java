@@ -2,14 +2,24 @@ package com.yueqiu.activity.searchmenu;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.app.ActionBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,26 +27,59 @@ import com.yueqiu.R;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.HttpUtil;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by yinfeng on 14/12/18.
  */
-public class RegisterActivity extends Activity  implements View.OnClickListener, RadioGroup.OnCheckedChangeListener{
+public class RegisterActivity extends Activity  implements View.OnClickListener{
     private static final String TAG = "RegisterActivity";
-    private TextView mTvBack;
-    private EditText mEtUserName,mEtPwd,mEtNumber;
-    private RadioGroup mRGroup;
+    private static final int REQUESTCODE = 0x03;
+    private static final int REGISTER_SUCCESS = 0x00;
+    private static final int REGISTER_ERROR = 0x01;
+    private static final int CODE_MAN = 0;
+    private static final int CODE_WOMAN = 1;
+    private EditText mEtUserName,mEtPwd,mEtNumber,mEtSex;
     private Button mBtnRegister;
-    private String account, phone, sex, pwd;
-    private ActionBar mActionBar;
+    private TextView mTvLogin;
+    private Intent mIntent;
+    private Handler handler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what)
+            {
+                case REGISTER_ERROR:
+                    toast(msg.obj.toString());
+                    break;
+                case REGISTER_SUCCESS:
+                    toast("注册成功，请登录！");
+                    RegisterActivity.this.finish();
+                    overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);
+                    break;
+            }
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        initActionBar();
         initView();
     }
+
+    private void initActionBar(){
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(getString(R.string.register));
+    }
+
+
 
     private void Log(String msg)
     {
@@ -45,79 +88,145 @@ public class RegisterActivity extends Activity  implements View.OnClickListener,
 
     private void initView()
     {
-        mTvBack = (TextView) findViewById(R.id.register_tv_back);
-        mEtUserName = (EditText) findViewById(R.id.register_et_username);
-        mEtPwd = (EditText) findViewById(R.id.register_et_pwd);
-        mEtNumber = (EditText) findViewById(R.id.register_et_phonenumber);
-        mRGroup = (RadioGroup) findViewById(R.id.register_rg_sex);
-        mBtnRegister = (Button) findViewById(R.id.register_btn_register);
-        mActionBar = getActionBar();
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setHomeButtonEnabled(true);
-        mActionBar.setTitle(getString(R.string.register));
-        mRGroup.setOnCheckedChangeListener(this);
-        mTvBack.setOnClickListener(this);
+        mEtUserName = (EditText) findViewById(R.id.activity_register_et_account);
+        mEtPwd = (EditText) findViewById(R.id.activity_register_et_password);
+        mEtNumber = (EditText) findViewById(R.id.activity_register_et_phone);
+        mEtSex = (EditText)findViewById(R.id.activity_register_et_sex);
+        mTvLogin = (TextView) findViewById(R.id.activity_register_tv_login);
+        mBtnRegister = (Button) findViewById(R.id.activity_register_btn_register);
+        mEtSex.setText(getString(R.string.man));
+        mIntent = getIntent();
         mBtnRegister.setOnClickListener(this);
+        mEtSex.setOnClickListener(this);
+        mTvLogin.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId())
         {
-            case R.id.register_tv_back:
-                finish();
+
+            case R.id.activity_register_btn_register:
+                String account = mEtUserName.getText().toString().trim();
+                if(TextUtils.isEmpty(account))
+                {
+                    toast(getString(R.string.account_null));
+                    return ;
+                }
+                String phone = mEtNumber.getText().toString().trim();
+                if(TextUtils.isEmpty(phone))
+                {
+                    toast(getString(R.string.phone_null));
+                    return ;
+                }
+                String password = mEtPwd.getText().toString().trim();
+                if(TextUtils.isEmpty(password))
+                {
+                    toast(getString(R.string.password_null));
+                    return ;
+                }
+                if(password.length() < 6 || phone.length() > 30)
+                {
+                    toast("请输入6-30位的密码！");
+                    return ;
+                }
+                register(account, phone,
+                        mEtSex.getText().toString().trim(), password);
                 break;
-            case R.id.register_btn_register:
-                account = mEtUserName.getText().toString().trim();
-                if("".equals(account))
-                {
-                    Toast.makeText(RegisterActivity.this,
-                            "账号不能为空，请输入账号！",Toast.LENGTH_SHORT).show();
-                    return;
+            case R.id.activity_register_et_sex:
+                Intent intent = new Intent();
+                intent.setClass(RegisterActivity.this,ActivitySelectSex.class);
+                Log( mEtSex.getText().toString().trim());
+                if( mEtSex.getText().toString().trim().equals(getString(R.string.man)))
+                {    intent.putExtra("sex",CODE_MAN); }
+                else {
+                    intent.putExtra("sex", CODE_WOMAN);
                 }
-                if("".equals(sex))
-                {
-                    Toast.makeText(RegisterActivity.this,
-                            "请选择性别！",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                phone = mEtNumber.getText().toString().trim();
-                if("".equals(phone))
-                {
-                    Toast.makeText(RegisterActivity.this,
-                            "手机号不能为空，请输入手机号！",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                pwd = mEtPwd.getText().toString().trim();
-                if("".equals(account))
-                {
-                    Toast.makeText(RegisterActivity.this,
-                            "密码不能为空，请输入密码！",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                final Map<String,String> map = new HashMap<String, String>();
-                map.put(HttpConstants.RegisterConstant.ACCOUNT,account);
-                map.put(HttpConstants.RegisterConstant.PASSWORD,pwd);
-                map.put(HttpConstants.RegisterConstant.PHONE,phone);
-                map.put(HttpConstants.RegisterConstant.SEX, sex == "男" ? "1" : "2");
-                new Thread()
-                {
-                    @Override
-                    public void run() {
-                        super.run();
-                        String result = HttpUtil.urlClient(HttpConstants.RegisterConstant.URL,
-                                map, HttpConstants.RequestMethod.POST);
-                        Log(result);
-                    }
-                }.start();
+                startActivityForResult(intent,REQUESTCODE);
+                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                break;
+            case R.id.activity_register_tv_login:
+                finish();
+                overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);
                 break;
         }
     }
 
-    @Override
-    public void onCheckedChanged(RadioGroup group, int checkedId) {
-        int radioButtonId = group.getCheckedRadioButtonId();
-        RadioButton radioButton = (RadioButton)RegisterActivity.this.findViewById(radioButtonId);
-        sex = radioButton.getText().toString().trim();
+    private void toast(String msg)
+    {
+        Toast.makeText(RegisterActivity.this, msg, Toast.LENGTH_SHORT)
+                .show();;
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUESTCODE && resultCode == RESULT_OK) {
+            mEtSex.setText(data.getIntExtra("sex", 0) == 0 ?
+                    getString(R.string.man) : getString(R.string.woman));
+        }
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private void register(final String account, final String phone,
+                          final String sex, final String pwd)
+    {
+        final Map<String, String> requestMap = new HashMap<String, String>();
+        requestMap.put(HttpConstants.RegisterConstant.ACCOUNT, account);
+        requestMap.put(HttpConstants.RegisterConstant.PHONE, phone);
+        requestMap.put(HttpConstants.RegisterConstant.SEX, sex.equals(
+                getString(R.string.man)) ? String.valueOf(1) : String.valueOf(2));
+        requestMap.put(HttpConstants.RegisterConstant.PASSWORD, pwd);
+        new Thread()
+        {
+            @Override
+            public void run() {
+                super.run();
+                String result = HttpUtil.urlClient(HttpConstants.RegisterConstant.URL,
+                        requestMap,HttpConstants.RequestMethod.POST);
+                try {
+                    JSONObject object = new JSONObject(result);
+                    Message msg = new Message();
+                    if(object.getInt("code") != HttpConstants.ResponseCode.NORMAL)
+                    {
+                        msg.what = REGISTER_ERROR;
+                        msg.obj = object.getString("msg");
+                    }
+                    else
+                    {
+                        msg.what = REGISTER_SUCCESS;
+                        msg.obj = object.getString("msg");
+                    }
+                    handler.sendMessage(msg);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }.start();
+    }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
 }

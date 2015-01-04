@@ -44,7 +44,6 @@ public class ChatBarItemAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        Log.e(TAG, "getView " + position + " " + convertView);
         if (convertView == null) {
             convertView = mLayoutInflater.inflate(R.layout.item_chatbar_account, null);
             viewHolder = new ViewHolder();
@@ -52,7 +51,6 @@ public class ChatBarItemAdapter extends BaseAdapter {
             viewHolder.mAccount = (TextView) convertView.findViewById(R.id.chatbar_item_account_tv);
             viewHolder.mLastMessage = (TextView) convertView.findViewById(R.id.chatbar_item_lastmessage_tv);
             viewHolder.mSendTime = (TextView) convertView.findViewById(R.id.chatbar_item_sendtime_tv);
-            Log.e(TAG, " button  " + viewHolder.mImageView + " title " + viewHolder.mAccount + " text " + viewHolder.mLastMessage);
             //绑定viewholder对象
             convertView.setTag(viewHolder);
         } else {

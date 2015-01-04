@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="match_parent"
+                android:padding="8dp"
                 android:layout_gravity="center_horizontal"
                 android:minHeight="?android:attr/listPreferredItemHeight">
 
 
     <ImageView
         android:id="@+id/chatbar_item_account_iv"
-        android:layout_marginLeft="15dp"
         android:layout_alignParentLeft="true"
         android:layout_marginRight="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:src="@drawable/ic_launcher"/>
+        android:src="@drawable/account"/>
 
     <LinearLayout
         android:layout_toRightOf="@id/chatbar_item_account_iv"
@@ -27,22 +27,45 @@
             android:id="@+id/chatbar_item_account_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="帐户"/>
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp"
+            android:textSize="23sp"
+            android:text="雪花飘落"/>
 
-        <TextView
-            android:id="@+id/chatbar_item_lastmessage_tv"
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="显示最后发的消息"/>
+            android:layout_height="wrap_content">
+            <TextView
+                style="@style/ListItemTvStyle"
+                android:layout_margin="4dp"
+                android:id="@+id/chatbar_item_lastmessage_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="2dp"
+                android:padding="2dp"
+                android:text="男"
+                android:drawableRight="@drawable/male"
+                android:background="@drawable/textview_withdrawable_bg"/>
+            <TextView
+                style="@style/ListItemTvStyle"
+                android:layout_margin="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="2dp"
+                android:text="海淀区"
+                android:background="@drawable/textview_withdrawable_bg"/>
+            </LinearLayout>
+
+
     </LinearLayout>
 
     <TextView
         android:id="@+id/chatbar_item_sendtime_tv"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="12:12:12"/>
+        android:text="12-19 12:12"/>
 
 </RelativeLayout>

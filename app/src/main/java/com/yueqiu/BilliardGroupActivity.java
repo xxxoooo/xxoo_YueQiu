@@ -3,6 +3,9 @@ package com.yueqiu;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.FragmentTransaction;
+import android.app.SearchManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -12,7 +15,9 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.SearchView;
 
+import com.yueqiu.activity.searchmenu.nearby.SearchResultActivity;
 import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
 
 /**
@@ -52,9 +57,6 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         public Fragment getItem(int i) {
 
             Fragment mFragment = new BilliardGroupBasicFragment();
-            Bundle mArgs = new Bundle();
-            mArgs.putString(BILLIARD_TAB_NAME,mTitles[i]);
-            mFragment.setArguments(mArgs);
             return mFragment;
         }
 
@@ -87,7 +89,11 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.billiard_group, menu);
+        getMenuInflater().inflate(R.menu.billiard_search, menu);
+
+        SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
 
@@ -109,7 +115,6 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setTitle(getString(R.string.billiard_group));
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle(getString(R.string.billiard_group));
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mPagerAdapter);
@@ -130,6 +135,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
     @Override
     protected void onPause() {
         super.onPause();
+        mActionBar.removeAllTabs();
     }
 
 }

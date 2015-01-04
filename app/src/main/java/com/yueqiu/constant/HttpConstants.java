@@ -52,7 +52,7 @@ public class HttpConstants {
         /*
          * 账号
          */
-        public static final String ACCOUNT = "account";
+        public static final String ACCOUNT = "username";
 
         /*
          * 手机号

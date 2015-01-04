@@ -1,6 +1,8 @@
 package com.yueqiu;
 
 import android.app.ActionBar;
+import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -18,14 +20,16 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.SearchView;
 
 import com.yueqiu.activity.searchmenu.ActivitiesIssueActivity;
 import com.yueqiu.activity.searchmenu.FeedbackActivity;
 import com.yueqiu.activity.searchmenu.LoginActivity;
-import com.yueqiu.activity.searchmenu.MentionedMeActivity;
+import com.yueqiu.activity.searchmenu.MyParticipationActivity;
 import com.yueqiu.activity.searchmenu.MyProfileActivity;
 import com.yueqiu.activity.searchmenu.MyfavorCollActivity;
 import com.yueqiu.activity.searchmenu.PublishedInfoActivity;
+import com.yueqiu.activity.searchmenu.nearby.SearchResultActivity;
 import com.yueqiu.adapter.SlideViewAdapter;
 import com.yueqiu.bean.ListItem;
 import com.yueqiu.bean.SlideAccountItem;
@@ -71,6 +75,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     {
         super.onCreate(savedInstanceState);
         mContext = this;
+        handleIntent(getIntent());
         initDrawer();
         mActionBar = getActionBar();
         mTitles = new String[]{getString(R.string.search_billiard_mate_str),
@@ -78,7 +83,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                 getString(R.string.search_billiard_assist_coauch_str),
                 getString(R.string.search_billiard_coauch_str),
                 getString(R.string.search_billiard_room_str)
-                };
+        };
         mViewPager = (ViewPager) findViewById(R.id.search_parent_fragment_view_pager);
 
         mGroup = (RadioGroup) findViewById(R.id.search_parent_radio_group);
@@ -113,7 +118,6 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     protected void onResume()
     {
         super.onResume();
-        mActionBar.removeAllTabs();
         mActionBar.setTitle(getString(R.string.billiard_search));
         setupTabs();
         mNearbyRadio.setChecked(true);
@@ -161,12 +165,15 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                     .setTabListener(this);
             mActionBar.addTab(tab);
         }
+
+
     }
 
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
     {
+        mViewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override
@@ -178,7 +185,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     @Override
     public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
     {
-        mViewPager.setCurrentItem(tab.getPosition());
+
     }
 
     private class SectionPagerAdapter extends FragmentPagerAdapter
@@ -202,8 +209,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
             Fragment fragment = null;
             Bundle args = null;
 
-            switch (index)
-            {
+            switch (index) {
                 case 0:
                     fragment = BilliardsSearchMateFragment.newInstance(mContext, "");
                     args = new Bundle();
@@ -258,28 +264,43 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.billiard_search, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
     {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+
         int id = item.getItemId();
         switch (id) {
-            case R.id.action_settings:
-                return true;
             case android.R.id.home:
                 mMenuDrawer.toggleMenu();
-
                 break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent)
+    {
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            Log.d("wy", query);
+        }
     }
 
     private void initDrawer()
@@ -297,7 +318,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
         String[] values = new String[]{
                 getString(R.string.search_my_profile_str),
-                getString(R.string.search_mentioned_me_str),
+                getString(R.string.search_my_participation_str),
                 getString(R.string.search_my_favor_collection_str),
                 getString(R.string.search_my_published_info_str),
                 getString(R.string.search_publishing_dating_billiards_info_str),
@@ -340,7 +361,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         intent.setClass(BilliardSearchActivity.this, MyProfileActivity.class);
                         break;
                     case 2:
-                        intent.setClass(BilliardSearchActivity.this, MentionedMeActivity.class);
+                        intent.setClass(BilliardSearchActivity.this, MyParticipationActivity.class);
                         break;
                     case 3:
                         intent.setClass(BilliardSearchActivity.this, MyfavorCollActivity.class);

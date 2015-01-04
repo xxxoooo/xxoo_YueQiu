@@ -4,12 +4,38 @@
                 android:layout_height="match_parent"
                 tools:context=".MainActivity">
 
+    <LinearLayout
+        android:id="@+id/my_profile_footer"
+        android:layout_margin="10dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
 
+        <Button
+            android:id="@+id/update_assistant_btn"
+            android:layout_width="165dp"
+            android:layout_height="44dp"
+            android:background="@drawable/update_assistant_click"
+            android:text="@string/update_to_assistant"
+            android:textColor="@color/white"
+            />
+
+        <Button
+            android:id="@+id/update_coach_btn"
+            android:layout_marginLeft="10dp"
+            android:layout_width="165dp"
+            android:layout_height="44dp"
+            android:background="@drawable/update_coach_click"
+            android:text="@string/update_to_coach"
+            android:textColor="@color/white"/>
+    </LinearLayout>
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_above="@id/my_profile_footer">
 
         <com.yueqiu.view.CustomerScrollView
             android:id="@+id/customer_view"
@@ -29,10 +55,11 @@
                     android:background="@drawable/list_corner_round_bg">
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_photo"
                         android:layout_width="match_parent"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
-                        android:layout_height="60dp">
+                        android:layout_height="72dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -56,10 +83,11 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_account"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="44dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -82,8 +110,9 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_gender"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp"
+                        android:layout_height="44dp"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2">
 
@@ -110,15 +139,18 @@
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
                     android:background="@drawable/list_corner_round_bg">
 
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_nick_name"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="44dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -128,6 +160,7 @@
                             android:text="@string/nick_name"/>
 
                         <TextView
+                            android:id="@+id/my_profile_nick_name_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -142,10 +175,11 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_region"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="44dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -155,6 +189,7 @@
                             android:text="@string/region"/>
 
                         <TextView
+                            android:id="@+id/my_profile_region_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -169,10 +204,11 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_level"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="44dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -182,6 +218,7 @@
                             android:text="@string/level"/>
 
                         <TextView
+                            android:id="@+id/my_profile_level_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -196,10 +233,11 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_ball_type"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="44dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -209,6 +247,7 @@
                             android:text="@string/ball_type"/>
 
                         <TextView
+                            android:id="@+id/my_profile_ball_type_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -223,10 +262,11 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_billiards_cue"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="44dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -236,6 +276,7 @@
                             android:text="@string/billiards_cue"/>
 
                         <TextView
+                            android:id="@+id/my_profile_billiards_cue_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -250,10 +291,11 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_cue_habits"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="44dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -263,6 +305,7 @@
                             android:text="@string/cue_habits"/>
 
                         <TextView
+                            android:id="@+id/my_profile_cue_habits_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -277,10 +320,11 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_play_age"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="44dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -290,6 +334,7 @@
                             android:text="@string/play_age"/>
 
                         <TextView
+                            android:id="@+id/my_profile_play_age_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -304,10 +349,11 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_idol"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="44dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -317,6 +363,7 @@
                             android:text="@string/idol"/>
 
                         <TextView
+                            android:id="@+id/my_profile_idol_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -331,10 +378,11 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_sign"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="44dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -344,6 +392,7 @@
                             android:text="@string/sign"/>
 
                         <TextView
+                            android:id="@+id/my_profile_sign_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -358,10 +407,11 @@
                         android:background="@color/devide_line"/>
 
                     <RelativeLayout
+                        android:id="@+id/my_profile_the_new_post"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
                         android:layout_width="match_parent"
-                        android:layout_height="50dp">
+                        android:layout_height="44dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -371,6 +421,7 @@
                             android:text="@string/the_new_post"/>
 
                         <ImageView
+                            android:id="@+id/my_profile_the_new_post_im"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -385,6 +436,7 @@
         </com.yueqiu.view.CustomerScrollView>
 
     </LinearLayout>
+
 
 
 </RelativeLayout>
