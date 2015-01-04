@@ -22,6 +22,36 @@ import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
  */
 public class SubFragmentsCommonUtils
 {
+
+    // 定义用于处理从Fragment的ListView点击之后切换到具体的Activity时的切换过程
+    // 以下是用于球厅Fragment当中需要传输的数据的详细的key值
+    public static final String KEY_BUNDLE_SEARCH_ROOM_FRAGMENT = "searchRoomFragment";
+    public static final String KEY_ROOM_FRAGMENT_PRICE = "roomPrice";
+    public static final String KEY_ROOM_FRAGMENT_TAG = "roomTag";
+    public static final String KEY_ROOM_FRAGMENT_ADDRESS = "roomAddress";
+    public static final String KEY_ROOM_FRAGMENT_PHONE = "roomPhone";
+    public static final String KEY_ROOM_FRAGMENT_PHOTO = "roomPhoto";
+    public static final String KEY_ROOM_FRAGMENT_NAME = "roomName";
+    public static final String KEY_ROOM_FRAGMENT_LEVEL = "roomLevel";
+
+    // 以下是用于球友Fragment当中需要传输的数据的详细的key值
+    public static final String KEY_BUNDLE_SEARCH_MATE_FRAGMENT = "searchMateFragment";
+
+    // 以下是用于约球Fragment当中需要传输的数据的详细的key值
+    public static final String KEY_BUNDLE_SEARCH_DATING_FRAGMENT = "searchDatingFragment";
+    public static final String KEY_DATING_FRAGMENT_PHOTO = "datingPhoto";
+    public static final String KEY_DATING_FRAGMENT_NAME = "datingName";
+    public static final String KEY_DATING_FRAGMENT_GENDER = "datingGender";
+    public static final String KEY_DATING_FRAGMENT_FOLLOWNUM = "datingFollowNum";
+    public static final String KEY_DATING_PUBLISH_TIME = "datingTime";
+
+    // 以下是用于教练Fragment当中需要传输的数据的详细的key值
+    public static final String KEY_BUNDLE_SEARCH_COAUCH_FRAGMENT = "searchCoauchFragment";
+
+    // 以下是用于助教Fragment当中需要传输的数据的详细的key值
+    public static final String KEY_BUNDLE_SEARCH_ASSISTCOAUCH_FRAGMENT = "searchAssistCoauchFragment";
+
+
     private SubFragmentsCommonUtils(){}
 
     /**

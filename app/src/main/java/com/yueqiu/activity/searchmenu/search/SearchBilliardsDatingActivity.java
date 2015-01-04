@@ -1,5 +1,6 @@
 package com.yueqiu.activity.searchmenu.search;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -20,7 +21,7 @@ import java.util.List;
 /**
  * @author scguo
  *
- * 用于实现约球详细的Activity,即点击约球Fragment当中的ListView当中的任何一个item的时候跳转到的
+ * 用于实现约球详细的Activity,即点击约球Fragment(BilliardsSearchDatingFragment)当中的ListView当中的任何一个item的时候跳转到的
  * 一个页面，就是约球详情Activity
  *
  */
@@ -53,6 +54,16 @@ public class SearchBilliardsDatingActivity extends Activity
         initGridList();
         mGridAlreadyFlow.setAdapter(new SearchDatingDetailedGridAdapter(this, (ArrayList<SearchDatingDetailedAlreadyBean>) mFollowList));
     }
+
+    private void initActionBar()
+    {
+        ActionBar actionBar = getActionBar();
+
+
+
+    }
+
+
 
     private List<SearchDatingDetailedAlreadyBean> mFollowList = new ArrayList<SearchDatingDetailedAlreadyBean>();
 

@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/img_search_room_detailed_photo"
-            android:src="@drawable/test_pager_1"
+            android:src="@drawable/test_pager_5"
             />
 
         <RelativeLayout
@@ -50,7 +50,7 @@
                 android:id="@+id/ratingbar_search_room_detailed_ratingbar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="?android:ratingBarStyleIndicator"
+                style="@style/SearchActivityRatingBarStyle"
                 android:numStars="5"
                 android:rating="4.0"
                 android:padding="3dp"

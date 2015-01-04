@@ -2,6 +2,7 @@ package com.yueqiu.fragment.search;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,10 +10,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.yueqiu.R;
+import com.yueqiu.activity.searchmenu.search.SearchBilliardRoomActivity;
 import com.yueqiu.adapter.SearchRoomSubFragmentListAdapter;
 import com.yueqiu.bean.SearchRoomSubFragmentRoomBean;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
@@ -77,7 +81,7 @@ public class BilliardsSearchRoomFragment extends Fragment
     private List<SearchRoomSubFragmentRoomBean> mRoomList = new ArrayList<SearchRoomSubFragmentRoomBean>();
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
         mView = inflater.inflate(R.layout.search_room_fragment_layout, container, false);
@@ -92,6 +96,28 @@ public class BilliardsSearchRoomFragment extends Fragment
         mRoomListView = (ListView) mView.findViewById(R.id.search_room_subfragment_listview);
         initListStaticTestData();
         mRoomListView.setAdapter(new SearchRoomSubFragmentListAdapter(sContext, (ArrayList<SearchRoomSubFragmentRoomBean>) mRoomList));
+
+        mRoomListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                SearchRoomSubFragmentRoomBean bean = mRoomList.get(position);
+                Bundle bundle = new Bundle();
+                bundle.putString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getRoomPhotoUrl());
+                bundle.putString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getRoomName());
+                bundle.putFloat(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, bean.getLevel());
+                bundle.putDouble(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, bean.getPrice());
+                bundle.putString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, bean.getDetailedAddress());
+
+                // set the arguments into the bundle, and transferred into the RoomDetailedActivity
+                Intent intent = new Intent(sContext, SearchBilliardRoomActivity.class);
+                intent.putExtra(SubFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, bundle);
+
+                sContext.startActivity(intent);
+            }
+        });
 
         return mView;
     }

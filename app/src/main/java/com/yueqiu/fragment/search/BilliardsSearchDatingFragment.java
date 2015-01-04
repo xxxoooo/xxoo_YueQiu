@@ -1,15 +1,18 @@
 package com.yueqiu.fragment.search;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
 import com.yueqiu.R;
+import com.yueqiu.activity.searchmenu.search.SearchBilliardsDatingActivity;
 import com.yueqiu.adapter.SearchDatingSubFragmentListAdapter;
 import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
@@ -72,6 +75,22 @@ public class BilliardsSearchDatingFragment extends Fragment
         mDatingListView = (ListView) mView.findViewById(R.id.search_dating_subfragment_list);
         initTestData();
         mDatingListView.setAdapter(new SearchDatingSubFragmentListAdapter(sContext, (ArrayList<SearchDatingSubFragmentDatingBean>) mDatingList));
+
+        mDatingListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                SearchDatingSubFragmentDatingBean bean = mDatingList.get(position);
+                Bundle args = new Bundle();
+                args.putString(SubFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO, bean.getUserPhoto());
+
+
+                Intent intent = new Intent(sContext, SearchBilliardsDatingActivity.class);
+                intent.putExtra(SubFragmentsCommonUtils.KEY_BUNDLE_SEARCH_DATING_FRAGMENT, args);
+                sContext.startActivity(intent);
+            }
+        });
 
         return mView;
     }

@@ -14,6 +14,9 @@ import com.yueqiu.R;
  * @author scguo
  *
  * 这是用于展示球厅的具体Activity
+ * 当我们点击球厅子Fragment(BilliardsSearchRoomFragment)当中的ListView的任何的一个item，就会
+ * 跳转到当前的这个Fragment当中
+ *
  *
  */
 public class SearchBilliardRoomActivity extends Activity
