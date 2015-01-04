@@ -72,6 +72,20 @@
     <string name="search_room_subfragment_title_price">价格</string>
     <string name="search_room_subfragment_title_review">好评</string>
 
+    <!--球厅Activity当中的一些关键字段-->
+    <string name="search_room_detailedactivity_detailed_info_separator">详细信息</string>
+
+    <string name="search_room_detailedactivity_price_indi">人均:</string>
+    <string name="search_room_detailedactivity_tag_indi">标签:</string>
+    <string name="search_room_detailedactivity_address_indi">地址:</string>
+    <string name="search_room_detailedactivity_phone_indi">电话:</string>
+    <!--以下是以上的字段对应的测试字符串-->
+    <string name="search_room_detailedactivity_price_test">37元</string>
+    <string name="search_room_detailedactivity_tag_test">苏州桥</string>
+    <string name="search_room_detailedactivity_address_test">苏州街29号维亚大厦B1楼(苏州街地铁站北侧)</string>
+    <!--需要注意的是以下的是电话号码字段，我们需要做成超链接的形式，即可以调用implicit intent的链接-->
+    <string name="search_room_detailedactivity_phone_test">(010)52712345</string>
+
     <!-- TOOD: 以下的测试字符串都是需要在正式发布时删掉的 -->
     <!-- 用于测试的默认字符串 -->
     <!-- 这是用于显示在ViewPager下面的一行广告语 -->

@@ -10,6 +10,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +30,11 @@ import com.yueqiu.adapter.SlideViewAdapter;
 import com.yueqiu.bean.ListItem;
 import com.yueqiu.bean.SlideAccountItem;
 import com.yueqiu.bean.SlideOtherItem;
+import com.yueqiu.fragment.search.BilliardsSearchAssistCoauchFragment;
+import com.yueqiu.fragment.search.BilliardsSearchCoauchFragment;
+import com.yueqiu.fragment.search.BilliardsSearchDatingFragment;
 import com.yueqiu.fragment.search.BilliardsSearchMateFragment;
+import com.yueqiu.fragment.search.BilliardsSearchRoomFragment;
 import com.yueqiu.view.menudrawer.MenuDrawer;
 import com.yueqiu.view.menudrawer.Position;
 
@@ -69,18 +74,21 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         initDrawer();
         mActionBar = getActionBar();
         mTitles = new String[]{getString(R.string.search_billiard_mate_str),
+                getString(R.string.search_billiard_dating_str),
                 getString(R.string.search_billiard_assist_coauch_str),
                 getString(R.string.search_billiard_coauch_str),
-                getString(R.string.search_billiard_room_str),
-                getString(R.string.search_billiard_dating_str)};
+                getString(R.string.search_billiard_room_str)
+                };
         mViewPager = (ViewPager) findViewById(R.id.search_parent_fragment_view_pager);
 
         mGroup = (RadioGroup) findViewById(R.id.search_parent_radio_group);
         mNearbyRadio = (RadioButton) findViewById(R.id.first_title_nearby);
-        mGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        mGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+        {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch(checkedId){
+            public void onCheckedChanged(RadioGroup group, int checkedId)
+            {
+                switch (checkedId) {
                     case R.id.first_title_nearby:
                         break;
                     case R.id.first_title_chatbar:
@@ -88,11 +96,11 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         startActivity(mIntent);
                         break;
                     case R.id.first_title_activity:
-                        mIntent.setClass(BilliardSearchActivity.this,ActivitiesActivity.class);
+                        mIntent.setClass(BilliardSearchActivity.this, ActivitiesActivity.class);
                         startActivity(mIntent);
                         break;
                     case R.id.first_title_group:
-                        mIntent.setClass(BilliardSearchActivity.this,BilliardGroupActivity.class);
+                        mIntent.setClass(BilliardSearchActivity.this, BilliardGroupActivity.class);
                         startActivity(mIntent);
                         break;
                 }
@@ -147,15 +155,13 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
         int i;
         final int count = mPagerAdapter.getCount();
-        for (i = 0; i < count; i++)
-        {
+        for (i = 0; i < count; i++) {
             tab = mActionBar.newTab()
                     .setText(mPagerAdapter.getPageTitle(i))
                     .setTabListener(this);
             mActionBar.addTab(tab);
         }
     }
-
 
 
     @Override
@@ -186,10 +192,51 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         @Override
         public Fragment getItem(int index)
         {
-            Fragment fragment = BilliardsSearchMateFragment.newInstance(mContext, "testguoshichao");
-            Bundle args = new Bundle();
-            args.putString("test", mTitles[index]);
-            fragment.setArguments(args);
+            Log.d(TAG, " the current index are : " + index);
+//            Fragment mateFragment = BilliardsSearchMateFragment.newInstance(mContext, "testguoshichao");
+//            Bundle args = new Bundle();
+//            args.putString("test", mTitles[index]);
+//            mateFragment.setArguments(args);
+//
+//            return mateFragment;
+            Fragment fragment = null;
+            Bundle args = null;
+
+            switch (index)
+            {
+                case 0:
+                    fragment = BilliardsSearchMateFragment.newInstance(mContext, "");
+                    args = new Bundle();
+                    args.putString("", mTitles[index]);
+                    fragment.setArguments(args);
+                    break;
+                case 1:
+                    fragment = BilliardsSearchDatingFragment.newInstance(mContext, "");
+                    args = new Bundle();
+                    args.putString("", mTitles[index]);
+                    fragment.setArguments(args);
+                    break;
+                case 2:
+                    fragment = BilliardsSearchAssistCoauchFragment.newInstance(mContext, "");
+                    args = new Bundle();
+                    args.putString("", mTitles[index]);
+                    fragment.setArguments(args);
+                    break;
+                case 3:
+                    fragment = BilliardsSearchCoauchFragment.newInstance(mContext, "");
+                    args = new Bundle();
+                    args.putString("", mTitles[index]);
+                    fragment.setArguments(args);
+                    break;
+                case 4:
+                    fragment = BilliardsSearchRoomFragment.newInstance(mContext, "");
+                    args = new Bundle();
+                    args.putString("", mTitles[index]);
+                    fragment.setArguments(args);
+                    break;
+                default:
+                    break;
+            }
 
             return fragment;
         }
@@ -207,6 +254,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         }
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
@@ -222,7 +270,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        switch(id){
+        switch (id) {
             case R.id.action_settings:
                 return true;
             case android.R.id.home:
@@ -233,7 +281,9 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
         return super.onOptionsItemSelected(item);
     }
-    private void initDrawer(){
+
+    private void initDrawer()
+    {
         mMenuDrawer = MenuDrawer.attach(this, MenuDrawer.Type.BEHIND, Position.LEFT, MenuDrawer.MENU_DRAG_WINDOW);
         mMenuDrawer.setContentView(R.layout.activity_billiard_search);
         mMenuDrawer.setMenuView(R.layout.slide_drawer_layout);
@@ -242,7 +292,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        SlideAccountItem accountItem = new SlideAccountItem(R.drawable.account,"如果我是一片海",100);
+        SlideAccountItem accountItem = new SlideAccountItem(R.drawable.account, "如果我是一片海", 100);
         mItemList.add(accountItem);
 
         String[] values = new String[]{
@@ -266,21 +316,23 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         };
 
         SlideOtherItem otherItem;
-        for(int i=0;i<values.length;i++){
-            otherItem = new SlideOtherItem(resIds[i],values[i],false);
+        for (int i = 0; i < values.length; i++) {
+            otherItem = new SlideOtherItem(resIds[i], values[i], false);
             mItemList.add(otherItem);
         }
 
-        SlideViewAdapter adapter = new SlideViewAdapter(this,mItemList);
+        SlideViewAdapter adapter = new SlideViewAdapter(this, mItemList);
 
         mMenuList = (ListView) findViewById(R.id.menu_drawer_list);
         mMenuList.setAdapter(adapter);
 
-        mMenuList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mMenuList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
                 Intent intent = new Intent();
-                switch(position){
+                switch (position) {
                     case 0:
                         intent.setClass(BilliardSearchActivity.this, LoginActivity.class);
                         break;
@@ -320,18 +372,22 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle state) {
+    protected void onRestoreInstanceState(Bundle state)
+    {
         super.onRestoreInstanceState(state);
         mMenuDrawer.restoreState(state.getParcelable(STATE_MENUDRAWER));
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(Bundle outState)
+    {
         super.onSaveInstanceState(outState);
         outState.putParcelable(STATE_MENUDRAWER, mMenuDrawer.saveState());
     }
+
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         final int drawerState = mMenuDrawer.getDrawerState();
         if (drawerState == MenuDrawer.STATE_OPEN || drawerState == MenuDrawer.STATE_OPENING) {
             mMenuDrawer.closeMenu();

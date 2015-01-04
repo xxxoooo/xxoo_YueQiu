@@ -9,8 +9,8 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:id="@+id/img_dating_subfragment_listitem_photo"
-        android:padding="4dp"
-        android:layout_margin="4dp"
+        android:padding="2dp"
+        android:layout_margin="1dp"
         android:src="@drawable/ic_launcher"
         android:layout_alignParentLeft="true"
         />
@@ -21,10 +21,10 @@
         android:id="@+id/tv_dating_subfragment_listitem_nickname"
         android:layout_toRightOf="@id/img_dating_subfragment_listitem_photo"
         android:text="@string/search_coauch_sub_fragment_listitem_username"
-        android:textSize="19sp"
+        android:textSize="17sp"
         android:textColor="@android:color/black"
         android:layout_marginLeft="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="1dp"
         android:padding="4dp"
         />
     
@@ -34,7 +34,6 @@
         android:text="@string/search_dating_sub_fragment_listitem_user_declar"
         android:layout_below="@id/tv_dating_subfragment_listitem_nickname"
         android:layout_toRightOf="@id/img_dating_subfragment_listitem_photo"
-        android:textSize="19sp"
         android:paddingLeft="4dp"
         android:padding="4dp"
         android:layout_marginLeft="4dp"
