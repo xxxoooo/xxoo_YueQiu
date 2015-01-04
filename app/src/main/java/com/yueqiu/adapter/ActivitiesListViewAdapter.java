@@ -6,10 +6,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 
 import com.yueqiu.R;
+import com.yueqiu.bean.Activities;
 
 import java.util.ArrayList;
 
@@ -18,14 +20,13 @@ import java.util.ArrayList;
  */
 public class ActivitiesListViewAdapter extends BaseAdapter {
 
-    private ArrayList<String> mList;
+    private ArrayList<Activities> mList;
     private Context mContext;
 
-    public ActivitiesListViewAdapter(ArrayList<String> list,Context context)
+    public ActivitiesListViewAdapter(ArrayList<Activities> list,Context context)
     {
         this.mList = list;
         this.mContext = context;
-        Log.i("TAG",mList.size()+"");
     }
 
     @Override
@@ -66,6 +67,10 @@ public class ActivitiesListViewAdapter extends BaseAdapter {
 
     public static class Holder
     {
-        public static TextView tv;
+        public static TextView tv_title;
+        public static TextView tv_activities_time;
+        public static TextView tv_time_day;
+        public static TextView tv_time_hour;
+        public static ImageView iv;
     }
 }

@@ -11,7 +11,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
@@ -26,7 +25,7 @@ import android.widget.SearchView;
 import com.yueqiu.activity.searchmenu.ActivitiesIssueActivity;
 import com.yueqiu.activity.searchmenu.FeedbackActivity;
 import com.yueqiu.activity.searchmenu.LoginActivity;
-import com.yueqiu.activity.searchmenu.MentionedMeActivity;
+import com.yueqiu.activity.searchmenu.MyParticipationActivity;
 import com.yueqiu.activity.searchmenu.MyProfileActivity;
 import com.yueqiu.activity.searchmenu.MyfavorCollActivity;
 import com.yueqiu.activity.searchmenu.PublishedInfoActivity;
@@ -35,11 +34,9 @@ import com.yueqiu.adapter.SlideViewAdapter;
 import com.yueqiu.bean.ListItem;
 import com.yueqiu.bean.SlideAccountItem;
 import com.yueqiu.bean.SlideOtherItem;
-import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
 import com.yueqiu.fragment.search.BilliardsSearchMateFragment;
 import com.yueqiu.view.menudrawer.MenuDrawer;
 import com.yueqiu.view.menudrawer.Position;
-import com.yueqiu.view.menudrawer.compat.ActionBarHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -272,7 +269,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
         String[] values = new String[]{
                 getString(R.string.search_my_profile_str),
-                getString(R.string.search_mentioned_me_str),
+                getString(R.string.search_my_participation_str),
                 getString(R.string.search_my_favor_collection_str),
                 getString(R.string.search_my_published_info_str),
                 getString(R.string.search_publishing_dating_billiards_info_str),
@@ -313,7 +310,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         intent.setClass(BilliardSearchActivity.this, MyProfileActivity.class);
                         break;
                     case 2:
-                        intent.setClass(BilliardSearchActivity.this, MentionedMeActivity.class);
+                        intent.setClass(BilliardSearchActivity.this, MyParticipationActivity.class);
                         break;
                     case 3:
                         intent.setClass(BilliardSearchActivity.this, MyfavorCollActivity.class);

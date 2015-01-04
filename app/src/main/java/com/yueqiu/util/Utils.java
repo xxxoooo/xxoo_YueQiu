@@ -2,6 +2,7 @@ package com.yueqiu.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Environment;
 import android.util.Log;
 
@@ -21,7 +22,9 @@ public class Utils {
     private static final String TAG = "Utils";
 
     private static SharedPreferences mSharedPreferences;
-    public static void getOrUpdateUserBaseInfo(Context context,Map<String,String> map)
+
+
+    public static void getOrUpdateUserBaseInfo(Context context, Map<String,String> map)
     {
         mSharedPreferences = context.getSharedPreferences(PublicConstant.USERBASEUSER,
                                                             Context.MODE_PRIVATE);
@@ -53,9 +56,6 @@ public class Utils {
         JSONObject object = null;
         try{
             object = new JSONObject(result);
-            log(object.toString());
-            if(Integer.valueOf(object.get("code").toString()) != 1001);
-               return null;
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -74,6 +74,21 @@ public class Utils {
     private static void log(String msg)
     {
         Log.i(TAG,"----"+msg+"----");
+    }
+
+
+    /**
+     * 检测当前网络是否可用
+     * @param context
+     * @return
+     */
+    public static boolean networkAvaiable(Context context)
+    {
+        ConnectivityManager connManager = (ConnectivityManager) context.
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connManager.getActiveNetworkInfo() != null)
+            return connManager.getActiveNetworkInfo().isAvailable();
+        return false;
     }
 
 

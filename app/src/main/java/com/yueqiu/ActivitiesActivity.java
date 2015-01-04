@@ -1,86 +1,67 @@
 package com.yueqiu;
 
 import android.app.ActionBar;
+import android.app.Activity;
+import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.SearchView;
 
-import com.yueqiu.R;
-import com.yueqiu.fragment.FriendRequestFragment;
-import com.yueqiu.fragment.ReplyMentionMeFragment;
-import com.yueqiu.fragment.activities.ActivitiesFragment;
-import com.yueqiu.fragment.activities.ActivitiesFragment1;
-import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
+import com.yueqiu.activity.searchmenu.nearby.SearchResultActivity;
+import com.yueqiu.adapter.ActivitiesListViewAdapter;
+import com.yueqiu.bean.Activities;
+
+import java.util.ArrayList;
 
 
 /**
  * Created by yinfeng on 14/12/18.
  */
-public class ActivitiesActivity extends FragmentActivity implements View.OnClickListener,ActionBar.TabListener {
+public class ActivitiesActivity extends Activity implements View.OnClickListener {
     private static final String TAG = "ActivitiesActivity";
-    private ActivitiesFragment1 mFragment;
     private ActionBar mActionBar;
-    private String mTitles[];
-    private ViewPager mViewPager;
-    private SectionPagerAdapter mPagerAdapter;
+    private ListView mListView;
+    private ActivitiesListViewAdapter mAdapter;
+    private ArrayList<Activities> mListData;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activites);
-        mTitles = new String[]{
-                getString(R.string.time),
-                getString(R.string.distance)
-        };
         initActionBar();
         initView();
 
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        ActionBar actionBar = getActionBar();
-        actionBar.setTitle(getString(R.string.activities));
-    }
 
     private void initView()
     {
-        mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.activitis_pager);
-        mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
-            @Override
-            public void onPageSelected(int position) {
-                mActionBar.setSelectedNavigationItem(position);
-            }
-        });
+        mListView = (ListView)findViewById(R.id.activity_activities_lv);
+        initData();
+        mAdapter = new ActivitiesListViewAdapter(mListData ,ActivitiesActivity.this);
+        mListView.setAdapter(mAdapter);
 
-        ActionBar.Tab tab;
-        for(int i=0; i<mPagerAdapter.getCount();i++){
-            tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
-            mActionBar.addTab(tab);
+    }
+
+    private void initData()
+    {
+        mListData = new ArrayList<Activities>();
+        for (int i = 0; i  < 20; i++)
+        {
+            mListData.add(new Activities());
         }
     }
+
 
     private void initActionBar(){
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setTitle(getString(R.string.tab_title_activity));
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
     }
 
     @Override
@@ -88,43 +69,7 @@ public class ActivitiesActivity extends FragmentActivity implements View.OnClick
 
     }
 
-    @Override
-    public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-        mViewPager.setCurrentItem(tab.getPosition());
-    }
 
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-
-    }
-
-    @Override
-    public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
-
-    }
-
-    public class SectionPagerAdapter extends FragmentPagerAdapter {
-
-        public SectionPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int i) {
-            mFragment = new ActivitiesFragment1();
-            return mFragment;
-        }
-
-        @Override
-        public int getCount() {
-            return 2;
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mTitles[position];
-        }
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -134,6 +79,16 @@ public class ActivitiesActivity extends FragmentActivity implements View.OnClick
                 finish();
                 break;
         }
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.billiard_search, menu);
+
+        SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
 }

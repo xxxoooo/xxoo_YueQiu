@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.yueqiu">grad
+    package="com.yueqiu">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -13,16 +13,13 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".BilliardGroupActivity"
-            android:label="@string/app_name"
-            >
-        </activity>
+            android:label="@string/app_name"></activity>
         <activity
             android:name=".BilliardSearchActivity"
             android:label="@string/app_name"
             >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
+                <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER"/>
 
             </intent-filter>
@@ -41,23 +38,30 @@
         </activity>
 
         <!-- 聊吧Activity -->
-        <activity
-            android:name=".ChatBarActivity"/>
-        <activity android:name=".ChatBarSearchResultActivity"/>
-        <activity android:name=".ChatBarSearchActivity"/>
+        <activity android:name=".ChatBarActivity" />
+        <activity android:name=".ChatBarSearchResultActivity" />
+        <activity android:name=".ChatBarSearchActivity" />
         <!--聊吧 END-->
 
-        <activity android:name=".ActivitiesActivity"/>
+        <activity android:name=".ActivitiesActivity" />
 
         <!-- 侧滑Menu -->
-        <activity android:name=".activity.searchmenu.RegisterActivity"/>
-        <activity android:name=".activity.searchmenu.LoginActivity"/>
-        <activity android:name=".activity.searchmenu.ActivitiesIssueActivity"/>
-        <activity android:name=".activity.searchmenu.FeedbackActivity"/>
-        <activity android:name=".activity.searchmenu.MentionedMeActivity"/>
-        <activity android:name=".activity.searchmenu.MyProfileActivity"/>
-        <activity android:name=".activity.searchmenu.MyfavorCollActivity"/>
-        <activity android:name=".activity.searchmenu.PublishedInfoActivity"/>
+        <activity android:name=".activity.searchmenu.ActivitiesIssueActivity" />
+        <activity android:name=".activity.searchmenu.FeedbackActivity" />
+        <activity android:name=".activity.searchmenu.MyProfileActivity" />
+        <activity android:name=".activity.searchmenu.MyfavorCollActivity" />
+        <activity android:name=".activity.searchmenu.PublishedInfoActivity" />
+
+        <activity
+            android:name=".activity.searchmenu.RegisterActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.searchmenu.LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.searchmenu.ActivitySelectSex"
+            android:screenOrientation="portrait" />
+        <activity android:name=".activity.searchmenu.MyParticipationActivity"/>
         <activity
             android:name=".activity.searchmenu.nearby.SearchBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating">
@@ -66,9 +70,6 @@
             android:name=".activity.searchmenu.nearby.SearchBilliardRoomActivity"
             android:label="@string/title_activity_search_billiard_room">
         </activity>
-        <activity android:name=".activity.searchmenu.RegisterActivity"/>
-        <activity android:name=".activity.searchmenu.LoginActivity"/>
-
 
 
     </application>
