@@ -174,7 +174,7 @@
     <string name="ed_add_persion_by_phone_or_account">请输入手机号/账号</string>
     <string name="mentioned_me">提到我的</string>
     <string name="billiard_dating">约球</string>
-    <string name="mentioned_me_friend_request">活动</string>
+    <string name="participation_activities">活动</string>
 
     <!-- 活动 -->
     <string name="xlistview_header_hint_normal">下拉刷新</string>
@@ -225,6 +225,13 @@
     <string name="sign">签名</string>
     <string name="the_new_post">最新照片</string>
     <string name="unset">未设定</string>
+    <string name="update_to_assistant">升级助教</string>
+    <string name="update_to_coach">升级教练</string>
+    <string name="cost">费用</string>
+    <string name="type">类型</string>
+    <string name="profession_experiences">职业经历</string>
+    <string name="setup_confirm">确认</string>
+    <string name="picture">照片</string>
 
     <string name="tv_search">搜索</string>
     <string name="account_null">账户不能为空！</string>
