@@ -89,7 +89,6 @@ public class MyFavorBasicFragment extends Fragment{
         map.put(HttpConstants.Published.STAR_NO,0);
         map.put(HttpConstants.Published.END_NO, 9);
         String result = HttpUtil.urlClient(HttpConstants.Published.URL,map, HttpConstants.RequestMethod.GET);
-        //Log.d("wy","result->" + result);
         try {
             JSONObject jsonResult = new JSONObject(result);
 

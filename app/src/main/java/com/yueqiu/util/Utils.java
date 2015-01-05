@@ -42,6 +42,7 @@ public class Utils {
         YueQiuApp.sUserInfo.setImg_url(map.get(PublicConstant.IMG_URL));
         YueQiuApp.sUserInfo.setAccount(map.get(PublicConstant.USER_NAME));
         YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(PublicConstant.USER_ID)));
+        YueQiuApp.sUserInfo.setPhone(map.get(PublicConstant.PHONE));
     }
 
     public static void removeUserBaseInfo(Context context)

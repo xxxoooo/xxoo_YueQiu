@@ -407,10 +407,12 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         YueQiuApp.sUserInfo.setImg_url("");
         YueQiuApp.sUserInfo.setAccount(getString(R.string.guest));
         YueQiuApp.sUserInfo.setUser_id(0);
+        YueQiuApp.sUserInfo.setPhone("");
 
         mEditor.putString(PublicConstant.USER_NAME,getString(R.string.guest));
         mEditor.putString(PublicConstant.USER_ID,"0");
         mEditor.putString(PublicConstant.IMG_URL,"");
+        mEditor.putString(PublicConstant.PHONE,"");
         mEditor.apply();
 
 
