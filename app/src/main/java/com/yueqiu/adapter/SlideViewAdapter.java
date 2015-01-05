@@ -1,6 +1,15 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.os.Build;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +37,7 @@ public class SlideViewAdapter extends BaseAdapter {
         this.mList = list;
         this.mInflater = LayoutInflater.from(context);
     }
+
     /**
      * How many items are in the data set represented by this Adapter.
      *
@@ -110,10 +120,32 @@ public class SlideViewAdapter extends BaseAdapter {
                }else{
                    accountHolder = (ViewAccountHolder) convertView.getTag();
                }
-               SlideAccountItem accoutItem = (SlideAccountItem) item;
-               accountHolder.image.setImageResource(accoutItem.getImgId());
-               accountHolder.name.setText(accoutItem.getName());
-               accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accoutItem.getGolden());
+               SlideAccountItem accountItem = (SlideAccountItem) item;
+               int embedResId = R.drawable.lable_friend;
+               if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_assist_coauch_str))){
+                   embedResId = R.drawable.lable_assistant;
+               }else if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_mate_str))){
+                   embedResId = R.drawable.lable_friend;
+               }else if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_coauch_str))){
+                   embedResId = R.drawable.lable_coach;
+               }
+
+               String img = accountItem.getImg();
+               Bitmap source = null;
+               if(img.equals("")){
+                   source = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.account);
+               }else {
+                   try {
+                       byte[] bitmapArray;
+                       bitmapArray = Base64.decode(img, Base64.DEFAULT);
+                       source = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
+                   } catch (Exception e) {
+                       e.printStackTrace();
+                   }
+               }
+               accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(),source,embedResId));
+               accountHolder.name.setText(accountItem.getName());
+               accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accountItem.getGolden());
                break;
             case ListItem.ITEM_BASIC:
                 if(convertView == null){
@@ -121,12 +153,13 @@ public class SlideViewAdapter extends BaseAdapter {
                     holder = new ViewHolder();
                     holder.image = (ImageView) convertView.findViewById(R.id.other_image);
                     holder.name = (TextView) convertView.findViewById(R.id.other_name);
-                    holder.hasMsg = (ImageView) convertView.findViewById(R.id.other_has_msg);
-                    holder.bottom = (ImageView) convertView.findViewById(R.id.other_bottom);
+                    holder.hasMsg = convertView.findViewById(R.id.other_has_msg);
+                    holder.bottom = convertView.findViewById(R.id.other_bottom);
                     convertView.setTag(holder);
                 }else{
                     holder = (ViewHolder) convertView.getTag();
                 }
+
                 SlideOtherItem otherItem = (SlideOtherItem) item;
                 holder.image.setImageResource(otherItem.getImgId());
                 holder.name.setText(otherItem.getName());
@@ -134,6 +167,9 @@ public class SlideViewAdapter extends BaseAdapter {
                     holder.hasMsg.setVisibility(View.VISIBLE);
                 }else{
                     holder.hasMsg.setVisibility(View.INVISIBLE);
+                }
+                if(position == mList.size()-1){
+                    holder.bottom.setVisibility(View.INVISIBLE);
                 }
             break;
         }
@@ -149,8 +185,42 @@ public class SlideViewAdapter extends BaseAdapter {
     private class ViewHolder{
         ImageView image;
         TextView  name;
-        ImageView hasMsg;
-        ImageView bottom;
+        View hasMsg;
+        View bottom;
+    }
+
+    private Bitmap embedBitmap(Resources resources,Bitmap source,int embedImgId){
+//        BitmapFactory.Options options = new BitmapFactory.Options();
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+//            options.inMutable = true;
+//        }
+        //options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        //Bitmap source = BitmapFactory.decodeResource(resources,sourceId,options);
+        Bitmap embedded;
+        if(source.isMutable()){
+            embedded = source;
+        }else{
+            embedded = source.copy(Bitmap.Config.ARGB_8888,true);
+            source.recycle();
+        }
+
+        embedded.setHasAlpha(true);
+
+        final int srcWidth = embedded.getWidth();
+        final int srcHeight = embedded.getHeight();
+
+        Canvas canvas = new Canvas(embedded);
+        Bitmap mask = BitmapFactory.decodeResource(resources,embedImgId);
+        final int maskWidth = mask.getWidth();
+        final int maskHeight = mask.getHeight();
+
+        Paint paint = new Paint();
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
+        canvas.drawBitmap(mask,srcWidth-maskWidth,srcHeight-maskHeight,paint);
+
+        mask.recycle();
+
+        return embedded;
     }
 
 }

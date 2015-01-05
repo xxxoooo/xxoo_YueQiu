@@ -6,6 +6,8 @@ import android.net.ConnectivityManager;
 import android.os.Environment;
 import android.util.Log;
 
+import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.PublicConstant;
 
 import org.json.JSONException;
@@ -36,6 +38,10 @@ public class Utils {
             editor.putString(entry.getKey(),entry.getValue());
         }
         editor.commit();
+
+        YueQiuApp.sUserInfo.setImg_url(map.get(PublicConstant.IMG_URL));
+        YueQiuApp.sUserInfo.setAccount(map.get(PublicConstant.USER_NAME));
+        YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(PublicConstant.USER_ID)));
     }
 
     public static void removeUserBaseInfo(Context context)

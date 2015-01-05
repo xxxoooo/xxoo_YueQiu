@@ -30,6 +30,7 @@ import android.app.ActionBar;
 
 import com.yueqiu.R;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 
@@ -68,12 +69,9 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                             Toast.LENGTH_SHORT).show();
                     break;
                 case LOGIN_SUCCESS:
-                    Toast.makeText(LoginActivity.this, "登录成功！",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, getString(R.string.login_success),Toast.LENGTH_SHORT).show();
                     Log.i(TAG, msg.obj.toString() );
-                    Utils.getOrUpdateUserBaseInfo(LoginActivity.this,
-                            (Map<String, String>) msg.obj);
-                    Toast.makeText(LoginActivity.this,"登录成功", Toast.LENGTH_SHORT).show();
+                    Utils.getOrUpdateUserBaseInfo(LoginActivity.this,(Map<String, String>) msg.obj);
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                     break;
@@ -102,10 +100,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 //        mTvForgetPwd = (TextView)findViewById(R.id.login_tv_forgetpwd);
         mEtUserId = (EditText) findViewById(R.id.activity_login_et_username);
         mEtPwd = (EditText) findViewById(R.id.activity_login_et_password);
-//        mActionBar = getActionBar();
-//        mActionBar.setDisplayHomeAsUpEnabled(true);
-//        mActionBar.setHomeButtonEnabled(true);
-//        mActionBar.setTitle(getString(R.string.login));
 ////
         mBtnLogin.setOnClickListener(this);
 //        mTvForgetPwd.setOnClickListener(this);
@@ -120,13 +114,13 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             case R.id.activity_login_btn_login:
                 final String userId = mEtUserId.getText().toString().trim();
                 if (TextUtils.isEmpty(userId)) {
-                    Toast.makeText(LoginActivity.this, "请输入手机号或账号",
+                    Toast.makeText(LoginActivity.this, getString(R.string.login_without_phone_or_account),
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
                 final String pwd = mEtPwd.getText().toString().trim();
                 if (TextUtils.isEmpty(pwd))
-                    Toast.makeText(LoginActivity.this, "请输入密码",
+                    Toast.makeText(LoginActivity.this, getString(R.string.login_without_pasword),
                             Toast.LENGTH_SHORT).show();
 
 
@@ -146,20 +140,20 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                                 message.what = LOGIN_ERROR;
                                 message.obj = object.getString("msg");
                             } else {
-                                message.what = LOGIN_SUCCESS;
                                 Map<String, String> successObj = new HashMap<String, String>();
-                                successObj.put("username", userId);
-                                successObj.put("password", pwd);
-                                successObj.put("user_id",object.getJSONObject("result").
+                                successObj.put(PublicConstant.USER_NAME, userId);
+                                successObj.put(PublicConstant.PASSWORD, pwd);
+                                successObj.put(PublicConstant.USER_ID,object.getJSONObject("result").
                                         getString("user_id"));
-                                successObj.put("token", object.getJSONObject("result").
+                                successObj.put(PublicConstant.TOKEN, object.getJSONObject("result").
                                         getString("token"));
-                                successObj.put("login_time", object.getJSONObject("result").
+                                successObj.put(PublicConstant.LOGIN_TIME, object.getJSONObject("result").
                                         getString("login_time"));
-                                successObj.put("phone", object.getJSONObject("result").
+                                successObj.put(PublicConstant.PHONE, object.getJSONObject("result").
                                         getString("phone"));
-                                successObj.put("img_url", object.getJSONObject("result").
+                                successObj.put(PublicConstant.IMG_URL, object.getJSONObject("result").
                                         getString("img_url"));
+                                message.what = LOGIN_SUCCESS;
                                 message.obj = successObj;
 
                             }

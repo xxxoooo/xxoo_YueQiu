@@ -20,27 +20,31 @@
         android:layout_height="wrap_content"
         android:id="@+id/button_tool"
         android:layout_centerInParent="true"
+        android:layout_toLeftOf="@+id/other_name"
         android:visibility="invisible"/>
     <TextView
         android:id="@+id/other_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/button_tool"
-        android:layout_centerVertical="true"
+        android:layout_centerInParent="true"
         android:text="我的资料"
         android:textColor="@android:color/white"/>
-    <ImageView
+    <View
         android:id="@+id/other_has_msg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         android:layout_toRightOf="@+id/other_name"
         android:layout_above="@+id/other_name"
-        android:src="@drawable/ic_launcher"
+        android:background="@color/slide_drawer_more_other_has_msg"
         android:visibility="invisible"/>
-    <ImageView
-        android:id = "@+id/other_bottom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <View
+        android:id="@+id/other_bottom"
+        android:layout_width="400dp"
+        android:layout_height="1dp"
+        android:layout_marginLeft="20dp"
+        android:background="@color/slide_drawer_more_other_divider_color"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="20dp"/>
 
 
 

@@ -3,7 +3,7 @@ package com.yueqiu.bean;
 /**
  * Created by wangyun on 14/12/30.
  */
-public class GroupNoteBean {
+public class GroupNoteInfo {
     private int noteId;
     private String userId;
     private String userName;

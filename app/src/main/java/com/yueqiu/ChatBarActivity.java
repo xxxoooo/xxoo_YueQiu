@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -95,6 +96,7 @@ public class ChatBarActivity extends FragmentActivity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 this.finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -130,6 +132,16 @@ public class ChatBarActivity extends FragmentActivity {
 
     private void initView() {
 
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

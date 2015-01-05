@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp">
+    <ImageView
+        android:id="@+id/published_item_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/account"/>
+    <TextView
+        android:id="@+id/published_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/published_item_image"
+        android:layout_toRightOf="@+id/published_item_image"
+        android:layout_marginLeft="10dp"
+        android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/published_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/published_title"
+        android:layout_alignLeft="@+id/published_title"
+        android:layout_marginTop="20dp"
+        android:ellipsize="end"
+        android:textSize="16sp"
+        />
+    <TextView
+        android:id="@+id/published_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:textSize="12sp"/>
+
+</RelativeLayout>

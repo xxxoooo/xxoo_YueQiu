@@ -97,8 +97,11 @@ public class MyfavorCollActivity extends FragmentActivity implements ActionBar.T
         @Override
         public Fragment getItem(int i) {
 
-            Fragment mFragment = new MyFavorBasicFragment();
-            return mFragment;
+            Fragment fragment = new MyFavorBasicFragment();
+            Bundle args = new Bundle();
+            args.putInt("type",i);
+            fragment.setArguments(args);
+            return fragment;
         }
 
         @Override
