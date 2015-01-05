@@ -114,7 +114,7 @@
         <item name="android:textColor">@android:color/darker_gray</item>
         <item name="android:textStyle">bold</item>
         <item name="android:clickable">true</item>
-
+        <item name="android:background">@drawable/share_icon_bg</item>
     </style>
 
     <!--用于约球详情分享的PopupWindow当中的Button-->

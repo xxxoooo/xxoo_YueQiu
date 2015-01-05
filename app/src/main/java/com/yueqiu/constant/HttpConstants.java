@@ -7,8 +7,6 @@ package com.yueqiu.constant;
 public class HttpConstants
 {
 
-    public static final String URL = "http://hxu0480201.my3w.com/index.php/v1";
-
     /**
      * 请求方式
      */
@@ -184,6 +182,15 @@ public class HttpConstants
          * 结束条数
          */
         public static final String END_NO = "end_no";
+    }
+
+    /**
+     * 用于请求教练的相关信息的Http url常量
+     */
+    public static final class SearchCoauchConstants
+    {
+        public static final String URL = "/home/coach";
+
     }
 
     /**

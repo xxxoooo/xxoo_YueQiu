@@ -17,6 +17,9 @@ import com.yueqiu.bean.SearchCoauchSubFragmentCoauchBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.Utils;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -124,7 +127,9 @@ public class BilliardsSearchCoauchFragment extends Fragment
         requestParams.put("start_no", startNum + "");
         requestParams.put("end_no", endNum + "");
 
-//        String rawResult = HttpUtil.urlClient(HttpConstants.)
+        String rawResult = HttpUtil.urlClient(HttpConstants.SearchCoauchConstants.URL, requestParams, HttpConstants.RequestMethod.GET);
+        JSONObject object = Utils.parseJson(rawResult);
+
 
 
         return "";

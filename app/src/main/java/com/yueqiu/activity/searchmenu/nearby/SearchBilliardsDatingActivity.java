@@ -173,6 +173,8 @@ public class SearchBilliardsDatingActivity extends Activity
     }
 
     private PopupWindow mPopupWindow;
+    private TextView mTvYueqiu, mTvYueqiuFriend, mTvFriendCircle, mTvWeichat, mTvQQZone, mTvTencentWeibo, mTvSinaWeibo, mTvRenren;
+    private Button mBtnCopyLink, mBtnCancel;
     // 弹出约球详情分享的popupWindow
     private void popupShareWindow()
     {
@@ -180,6 +182,7 @@ public class SearchBilliardsDatingActivity extends Activity
         mPopupWindow = new PopupWindow(popupWindowView, RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT, true);
         mPopupWindow.setTouchable(true);
         mPopupWindow.setOutsideTouchable(true);
+        mPopupWindow.setFocusable(true);
         // 我们是必须要为PopupWindow设置一个Background drawable才能使PopupWindow工作正常
         // 当时我们由于已经在layout当中设置了background，所以这里我们使用一个技巧就是设置background的Bitmap为null
         mPopupWindow.setBackgroundDrawable(new BitmapDrawable(getResources(), (Bitmap) null));
@@ -190,27 +193,54 @@ public class SearchBilliardsDatingActivity extends Activity
         mPopupWindow.setAnimationStyle(R.style.SearchDatingDetailedPopupWindowStyle);
 
         // TODO: 处理PopupWindow当中的TextView被点击之后的处理事件
-        // TODO: 当前还无法正常响应PopupWindow当中的组件的点击事件
+        // TODO: 当前PopupWindow中的TextView和Button是可以响应点击事件的，例如点击之后可以弹出Toast，但是却不可以使用selector，这是一个很严重的问题
+        (mTvYueqiu = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_yuqeiufirend)).setOnClickListener(new OnShareIconClickListener());
+        (mTvYueqiuFriend = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_yueqiucircle)).setOnClickListener(new OnShareIconClickListener());
+        (mTvFriendCircle = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_friendcircle)).setOnClickListener(new OnShareIconClickListener());
+        (mTvWeichat = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_weichat)).setOnClickListener(new OnShareIconClickListener());
 
+        (mTvQQZone = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_qqzone)).setOnClickListener(new OnShareIconClickListener());
+        (mTvTencentWeibo = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_qqweibo)).setOnClickListener(new OnShareIconClickListener());
+        (mTvSinaWeibo = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_sinaweibo)).setOnClickListener(new OnShareIconClickListener());
+        (mTvRenren = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_renren)).setOnClickListener(new OnShareIconClickListener());
 
+        (mBtnCopyLink = (Button) popupWindowView.findViewById(R.id.btn_search_dating_detailed_copylink)).setOnClickListener(new OnShareIconClickListener());
+        (mBtnCancel = (Button) popupWindowView.findViewById(R.id.btn_search_dating_detailed_cancel)).setOnClickListener(new OnShareIconClickListener());
 
         mPopupWindow.showAtLocation(findViewById(R.id.search_dating_detailed_activity_main), Gravity.BOTTOM, 0, 0);
-        mPopupWindow.getContentView().setOnKeyListener(new View.OnKeyListener()
-        {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event)
-            {
-                if (keyCode == KeyEvent.KEYCODE_MENU && event.getRepeatCount() == 0 && event.getAction() == KeyEvent.ACTION_DOWN)
-                {
-                    if (mPopupWindow != null && mPopupWindow.isShowing())
-                    {
-                        mPopupWindow.dismiss();
-                    }
-                    return true;
-                }
-                return false;
-            }
-        });
     }
+
+    private class OnShareIconClickListener implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v)
+        {
+            switch (v.getId())
+            {
+                case R.id.img_search_dating_detail_share_yuqeiufirend:
+                    Toast.makeText(SearchBilliardsDatingActivity.this, "shareing", Toast.LENGTH_LONG).show();
+                    break;
+                case R.id.img_search_dating_detail_share_yueqiucircle:
+                    break;
+                case R.id.img_search_dating_detail_share_friendcircle:
+                    break;
+                case R.id.img_search_dating_detail_share_weichat:
+                    break;
+                case R.id.img_search_dating_detail_share_qqzone:
+                    break;
+                case R.id.img_search_dating_detail_share_qqweibo:
+                    break;
+                case R.id.img_search_dating_detail_share_sinaweibo:
+                    break;
+                case R.id.img_search_dating_detail_share_renren:
+                    break;
+                case R.id.btn_search_dating_detailed_copylink:
+                    break;
+                case R.id.btn_search_dating_detailed_cancel:
+                    break;
+            }
+        }
+    }
+
 
 }

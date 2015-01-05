@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--创建用于约球分享的图标的背景-->
+    <item>
+        <shape android:shape="rectangle"></shape>
+        <color android:color="@color/white"></color>
+    </item>
+
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+        </shape>
+        <color android:color="@color/light_blue"></color>
+    </item>
+</selector>

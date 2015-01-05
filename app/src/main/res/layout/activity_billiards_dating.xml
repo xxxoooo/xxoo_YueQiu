@@ -151,6 +151,7 @@
         android:layout_margin="5dp"
         android:horizontalSpacing="7dp"
         android:verticalSpacing="10dp"
+        android:gravity="center"
         >
     </GridView>
 

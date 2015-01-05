@@ -2,6 +2,7 @@ package com.yueqiu.fragment.search.common;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -76,21 +77,9 @@ public class SubFragmentsCommonUtils
         popupWindow.setOutsideTouchable(true);
         popupWindow.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.popup_window_bg));
 
-        popupWindow.setTouchInterceptor(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                switch (v.getId()) {
-                    default:
-                        break;
-                }
-                return true;
-
-            }
-        });
-
         popupWindow.showAsDropDown(anchorView);
+
+
     }
 
 

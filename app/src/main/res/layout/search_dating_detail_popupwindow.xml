@@ -6,7 +6,8 @@
                 android:paddingRight="18dp"
                 android:paddingLeft="18dp"
                 android:paddingTop="18dp"
-    android:background="@drawable/share_popup_window_bg">
+    android:background="@drawable/share_popup_window_bg"
+    android:clickable="false">
 
     <!--用于约球详情Activity当中点击分享按钮之后弹出的popupWindow-->
 
