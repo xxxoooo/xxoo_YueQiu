@@ -12,7 +12,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.yueqiu.R;
-import com.yueqiu.activity.searchmenu.search.SearchBilliardsDatingActivity;
+import com.yueqiu.activity.searchmenu.nearby.SearchBilliardsDatingActivity;
 import com.yueqiu.adapter.SearchDatingSubFragmentListAdapter;
 import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;

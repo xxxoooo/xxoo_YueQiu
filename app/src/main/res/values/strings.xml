@@ -51,6 +51,19 @@
     <string name="search_dating_subfragment_title_publishdata">发布时间</string>
     <string name="search_dating_detailed_btn_i_want_in">我要参加</string>
     <string name="search_dating_detailed_tv_already_in">已参加人员</string>
+    <!--约球详情Activity的标题-->
+    <string name="search_dating_detailed_actionbar_title">约球详情</string>
+    <string name="search_dating_detailed_btn_copylink_str">复制详情连接</string>
+    <string name="search_dating_detailed_btn_cancel_str">取消</string>
+    <!--约球详情当中的分享的ImageView当中的title-->
+    <string name="search_dating_detailed_title_yueqiufriend">约求好友</string>
+    <string name="search_dating_detailed_title_friendcircle">微信朋友圈</string>
+    <string name="search_dating_detailed_title_weichat">微信好友</string>
+    <string name="search_dating_detailed_title_qqzone">QQ空间</string>
+    <string name="search_dating_detailed_title_tecentweibo">腾讯微博</string>
+    <string name="search_dating_detailed_title_sinaweibo">新浪微博</string>
+    <string name="search_dating_detailed_title_renren">人人网</string>
+
 
     <!-- 3.助教子Fragment的title -->
     <string name="search_assistcaouch_subfragment_title_distance">距离</string>
@@ -71,6 +84,7 @@
     <string name="search_room_subfragment_title_distance">距离</string>
     <string name="search_room_subfragment_title_price">价格</string>
     <string name="search_room_subfragment_title_review">好评</string>
+
 
     <!--球厅Activity当中的一些关键字段-->
     <string name="search_room_detailedactivity_detailed_info_separator">详细信息</string>
@@ -199,8 +213,8 @@
     <string name="userid">手机号/账号</string>
     <string name="password">密码</string>
 
-    <string name="title_activity_billiards_dating">BilliardsDatingActivity</string>
-    <string name="title_activity_search_billiard_room">SearchBilliardRoomActivity</string>
+    <string name="title_activity_billiards_dating">约球详情</string>
+    <string name="title_activity_search_billiard_room">球厅详情</string>
 
     <!--我的资料-->
     <string name="photo">头像</string>

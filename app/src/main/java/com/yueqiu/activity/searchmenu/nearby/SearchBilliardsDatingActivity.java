@@ -2,12 +2,17 @@ package com.yueqiu.activity.searchmenu.nearby;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yueqiu.R;
@@ -55,15 +60,6 @@ public class SearchBilliardsDatingActivity extends Activity
         mGridAlreadyFlow.setAdapter(new SearchDatingDetailedGridAdapter(this, (ArrayList<SearchDatingDetailedAlreadyBean>) mFollowList));
     }
 
-    private void initActionBar()
-    {
-        ActionBar actionBar = getActionBar();
-
-
-
-    }
-
-
 
     private List<SearchDatingDetailedAlreadyBean> mFollowList = new ArrayList<SearchDatingDetailedAlreadyBean>();
 
@@ -95,13 +91,35 @@ public class SearchBilliardsDatingActivity extends Activity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings)
-        {
-            return true;
-        }
 
+        switch (id)
+        {
+            case R.id.search_room_action_collect:
+                return true;
+            case R.id.search_room_action_share:
+                popupShareWindow();
+                return true;
+        }
         return super.onOptionsItemSelected(item);
     }
+
+    // 弹出约球详情分享的popupWindow
+    private void popupShareWindow()
+    {
+
+        View popupWindowView = getLayoutInflater().inflate(R.layout.search_dating_detail_popupwindow, null);
+        PopupWindow popupWindow = new PopupWindow(popupWindowView, RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT, true);
+        popupWindow.setTouchable(true);
+        popupWindow.setOutsideTouchable(true);
+        // 我们是必须要为PopupWindow设置一个Background drawable才能使PopupWindow工作正常
+        // 当时我们由于已经在layout当中设置了background，所以这里我们使用一个技巧就是设置background的Bitmap为null
+        popupWindow.setBackgroundDrawable(new BitmapDrawable(getResources(), (Bitmap) null));
+
+
+
+
+    }
+
 
 
 }

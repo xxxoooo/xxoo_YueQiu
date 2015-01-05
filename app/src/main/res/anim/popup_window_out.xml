@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--定义约球详情activity当中的PopupWindow消失过程的动画-->
+    <translate
+        android:fromYDelta="0.0"
+        android:toYDelta="100.0%"
+        android:duration="250">
+
+    </translate>
+</set>
