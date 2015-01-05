@@ -4,7 +4,7 @@
     <!--用于控制显示一个TextView的背景图片-->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#27272700"></solid>
+            <solid android:color="@color/devide_line"></solid>
             <corners android:radius="7dp"></corners>
         </shape>
     </item>

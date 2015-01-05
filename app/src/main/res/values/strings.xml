@@ -72,6 +72,8 @@
     <string name="search_dating_subfragment_title_distance">距离</string>
     <string name="search_dating_subfragment_title_publishdata">发布时间</string>
     <string name="search_dating_detailed_btn_i_want_in">我要参加</string>
+    <string name="search_dating_detailed_btn_i_want_in_success">您已成功提交请求</string>
+    <string name="search_dating_detailed_btn_i_want_in_failed">抱歉，您的请求失败了</string>
     <string name="search_dating_detailed_tv_already_in">已参加人员</string>
     <!--约球详情Activity的标题-->
     <string name="search_dating_detailed_actionbar_title">约球详情</string>
@@ -86,6 +88,8 @@
     <string name="search_dating_detailed_title_sinaweibo">新浪微博</string>
     <string name="search_dating_detailed_title_renren">人人网</string>
 
+    <string name="search_dating_detailed_action_collect">加入到我的收藏</string>
+    <string name="search_dating_detailed_action_share">分享到朋友圈</string>
 
     <!-- 3.助教子Fragment的title -->
     <string name="search_assistcaouch_subfragment_title_distance">距离</string>

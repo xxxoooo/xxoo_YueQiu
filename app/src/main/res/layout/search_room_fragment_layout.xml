@@ -79,7 +79,7 @@
             android:padding="5dp"
             android:layout_width="3dp"
             android:layout_height="match_parent"
-            android:background="@android:color/white"
+            android:background="@color/light_gray"
             >
         </View>
 
@@ -97,7 +97,7 @@
             android:padding="5dp"
             android:layout_width="3dp"
             android:layout_height="match_parent"
-            android:background="@android:color/white"
+            android:background="@color/light_gray"
             >
         </View>
 
@@ -115,7 +115,7 @@
             android:padding="5dp"
             android:layout_width="3dp"
             android:layout_height="match_parent"
-            android:background="@android:color/white"
+            android:background="@color/light_gray"
             >
         </View>
 

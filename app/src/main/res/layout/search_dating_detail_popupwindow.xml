@@ -5,7 +5,8 @@
                 android:paddingBottom="8dp"
                 android:paddingRight="18dp"
                 android:paddingLeft="18dp"
-                android:paddingTop="18dp">
+                android:paddingTop="18dp"
+    android:background="@drawable/share_popup_window_bg">
 
     <!--用于约球详情Activity当中点击分享按钮之后弹出的popupWindow-->
 
@@ -54,7 +55,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/first_group"
         android:id="@+id/second_group"
-        android:weightSum="4">
+        android:weightSum="4"
+        android:layout_marginBottom="77dp">
 
         <TextView
             android:text="@string/search_dating_detailed_title_qqzone"
@@ -86,9 +88,9 @@
     </LinearLayout>
 
     <Button
+        android:layout_below="@id/second_group"
         android:text="@string/search_dating_detailed_btn_cancel_str"
         android:textColor="#111111"
-        android:layout_alignParentBottom="true"
         android:id="@+id/btn_search_dating_detailed_cancel"
         style="@style/SearchDatingBtn"
         android:background="@drawable/search_dating_detailed_btn_bg_cancel"

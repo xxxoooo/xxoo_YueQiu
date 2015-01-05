@@ -4,7 +4,8 @@ package com.yueqiu.constant;
 /**
  * Created by yinfeng on 14/12/22.
  */
-public class HttpConstants {
+public class HttpConstants
+{
 
     public static final String URL = "http://hxu0480201.my3w.com/index.php/v1";
 
@@ -40,8 +41,8 @@ public class HttpConstants {
     /**
      * 用户注册请求参数
      * 发送Post请求
-     * @author yinfeng
      *
+     * @author yinfeng
      */
     public static final class RegisterConstant
     {
@@ -73,8 +74,8 @@ public class HttpConstants {
     /**
      * 登录请求参数
      * 发送Post请求
-     * @author yinfeng
      *
+     * @author yinfeng
      */
     public static final class LoginConstant
     {
@@ -94,7 +95,8 @@ public class HttpConstants {
     /**
      * 登出
      */
-    public static final class LogoutConstant{
+    public static final class LogoutConstant
+    {
 
         public static final String URL = "/user/logout";
     }
@@ -102,15 +104,16 @@ public class HttpConstants {
     /**
      * 我的发布
      */
-    public static final class Published{
+    public static final class Published
+    {
 
-        public static final String URL      = "/center/getPublishList";
+        public static final String URL = "/center/getPublishList";
 
-        public static final String TYPE     = "type";
+        public static final String TYPE = "type";
 
-        public static final String STAR_NO  = "start_no";
+        public static final String STAR_NO = "start_no";
 
-        public static final String END_NO   = "end_no";
+        public static final String END_NO = "end_no";
     }
 
     /*
@@ -186,8 +189,8 @@ public class HttpConstants {
     /**
      * 球厅请求参数
      * 发送POST请求
-     * @author yinfeng
      *
+     * @author yinfeng
      */
     public static final class SearchHallConstant
     {
@@ -323,12 +326,10 @@ public class HttpConstants {
     }
 
 
-
-
     /**
      * Json 状态码
-     * @author yinfeng
      *
+     * @author yinfeng
      */
     public static final class ResponseCode
     {
@@ -377,6 +378,13 @@ public class HttpConstants {
          */
         public static final int a8 = 1009;
     }
+
+
+    // 这是SearchActivity当中的球厅Fragment当中的请求数据的过程
+    // 因为服务器端使用的是大众点评的SDK，所以我们的请求地址是以大众点评为基础的
+    public static final String DP_BASE_URL = "http://developer.dianping.com/index";
+    public static final String DP_DEVELOPER_ID = "dpuser_0929737787";
+    public static final String DP_DEVELOPER_PSW = "Taiqiu123";
 
 
 }

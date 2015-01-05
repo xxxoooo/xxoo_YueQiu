@@ -19,6 +19,7 @@ import com.yueqiu.R;
 import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
 import com.yueqiu.adapter.SearchMateSubFragmentListAdapter;
 import com.yueqiu.bean.SearchMateSubFragmentUserBean;
+import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +86,7 @@ public class BilliardsSearchMateFragment extends Fragment
         mArgs = args.getString(BILLIARD_SEARCH_TAB_NAME);
 
         // then, inflate the image view pager
-        initViewPager();
+        SubFragmentsCommonUtils.initViewPager(sContext, mView, R.id.mate_fragment_gallery_pager, R.id.mate_fragment_gallery_pager_indicator_group);
 
         initListViewDataSrc();
         mSubFragmentList.setAdapter(new SearchMateSubFragmentListAdapter(sContext, (ArrayList<SearchMateSubFragmentUserBean>) mUserList));
@@ -93,107 +94,6 @@ public class BilliardsSearchMateFragment extends Fragment
         return mView;
     }
 
-    private ViewPager mImgGalleryViewPager;
-    private int[] mPagerImgResArr;
-    private ImageView[] mPagerImgViewArr;
-
-    private ImageView[] mPagerIndicatorImgList;
-    private SearchMateFragmentViewPagerImgAdapter mGalleryImgAdapter;
-    private LinearLayout mGalleryIndicatorGroup;
-
-    private void initViewPager()
-    {
-        // TODO: the following are just for testing data source, and we should use the VolleyNetworkImageView to retrieve such images
-        mPagerImgResArr = new int[] {R.drawable.test_pager_1, R.drawable.test_pager_2, R.drawable.test_pager_3, R.drawable.test_pager_4};
-
-        mImgGalleryViewPager = (ViewPager) mView.findViewById(R.id.mate_fragment_gallery_pager);
-        mGalleryIndicatorGroup = (LinearLayout) mView.findViewById(R.id.mate_fragment_gallery_pager_indicator_group);
-
-        // init the viewpager indicator group
-        mPagerIndicatorImgList = new ImageView[mPagerImgResArr.length];
-        int i;
-        final int size = mPagerIndicatorImgList.length;
-        ImageView indicatorView;
-        for (i = 0; i < size; ++i)
-        {
-            indicatorView = new ImageView(sContext);
-            indicatorView.setLayoutParams(new ViewGroup.LayoutParams(10, 10));
-
-            mPagerIndicatorImgList[i] = indicatorView;
-            if (i == 0)
-            {
-                mPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_focused);
-            } else
-            {
-                mPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
-            }
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(new ViewGroup.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
-            params.leftMargin = 5;
-            params.rightMargin = 5;
-            mGalleryIndicatorGroup.addView(indicatorView, params);
-        }
-
-        // load the image into the ImageView array
-        mPagerImgViewArr = new ImageView[size];
-        final int imgSize = mPagerImgResArr.length;
-        int j;
-        for (j = 0; j < imgSize; ++j)
-        {
-            ImageView imgView = new ImageView(sContext);
-            mPagerImgViewArr[j] = imgView;
-            imgView.setBackgroundResource(mPagerImgResArr[j]);
-        }
-
-
-        mGalleryImgAdapter = new SearchMateFragmentViewPagerImgAdapter(mPagerImgViewArr);
-
-        mImgGalleryViewPager.setAdapter(mGalleryImgAdapter);
-
-        mImgGalleryViewPager.setCurrentItem(mPagerImgViewArr.length * 100); // this is the default displaying page
-
-        mImgGalleryViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
-        {
-            @Override
-            public void onPageScrolled(int position, float v, int i2)
-            {
-            }
-
-            @Override
-            public void onPageSelected(int position)
-            {
-                // change the background of the indicator that below the gallery image view
-                setImageBackground(position % mPagerImgViewArr.length);
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i)
-            {
-
-            }
-        });
-    }
-
-    /**
-     * method use to change the image that corresponds to the gallery image
-     * @param selectedItem
-     */
-    private void setImageBackground(int selectedItem)
-    {
-        int i;
-        final int size = mPagerIndicatorImgList.length;
-        for (i = 0; i < size; ++i)
-        {
-            if (i == selectedItem)
-            {
-                mPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_focused);
-            } else
-            {
-                mPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
-            }
-        }
-    }
 
     @Override
     public void onPause()
@@ -219,51 +119,23 @@ public class BilliardsSearchMateFragment extends Fragment
             switch (v.getId())
             {
                 case R.id.btn_mate_gender:
-                    initPopupWindow(sContext, sBtnGenderFilter, R.layout.search_mate_subfragment_gender_popupwindow);
+                    SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnGenderFilter, R.layout.search_mate_subfragment_gender_popupwindow);
                     break;
                 case R.id.btn_mate_distance:
-                    initPopupWindow(sContext, sBtnDistanceFilter, R.layout.search_mate_subfragment_distance_popupwindow);
+                    SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnDistanceFilter, R.layout.search_mate_subfragment_distance_popupwindow);
                     break;
                 default:
                     break;
             }
         }
     }
-    // this is for the popupWindow that use to displayed that correspond to the filter button
-    protected static void initPopupWindow(Context context, View anchorView, int layoutResId)
+
+    // TODO: 用于获取球友列表中的信息
+    private void retrieveMateRawInfo()
     {
-        final int popupWidth = LinearLayout.LayoutParams.MATCH_PARENT;
-        final int popupHeight = LinearLayout.LayoutParams.WRAP_CONTENT;
 
-        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View popupWindowLayout = layoutInflater.inflate(layoutResId, null);
-
-        final PopupWindow popupWindow = new PopupWindow(context);
-        popupWindow.setContentView(popupWindowLayout);
-        popupWindow.setWidth(popupWidth);
-        popupWindow.setHeight(popupHeight);
-        popupWindow.setFocusable(true);
-        popupWindow.setTouchable(true);
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.popup_window_bg));
-
-        popupWindow.setTouchInterceptor(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                switch (v.getId())
-                {
-                    default:
-                        break;
-                }
-                return true;
-
-            }
-        });
-
-        popupWindow.showAsDropDown(anchorView);
     }
+
 
 
     private List<SearchMateSubFragmentUserBean> mUserList = new ArrayList<SearchMateSubFragmentUserBean>();

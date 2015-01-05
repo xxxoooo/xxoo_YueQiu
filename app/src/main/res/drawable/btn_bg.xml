@@ -12,7 +12,7 @@
     <!-- the default state -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="@android:color/darker_gray">
+            <solid android:color="@color/devide_line">
             </solid>
             <corners android:radius="8dp"></corners>
         </shape>

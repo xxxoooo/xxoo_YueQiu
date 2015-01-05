@@ -14,9 +14,12 @@ import android.widget.ListView;
 import com.yueqiu.R;
 import com.yueqiu.adapter.SearchCoauchSubFragmentListAdapter;
 import com.yueqiu.bean.SearchCoauchSubFragmentCoauchBean;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
+import com.yueqiu.util.HttpUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -107,6 +110,24 @@ public class BilliardsSearchCoauchFragment extends Fragment
             }
 
         }
+    }
+
+
+    // TODO: 用于获取教练的列表信息的网络请求处理过程
+    private String retrieveCoauchInfo(final String userId, final String range, final int level, final int startNum, final int endNum)
+    {
+        // 创建请求参数
+        HashMap<String, String> requestParams = new HashMap<String, String>();
+        requestParams.put("user_id", userId);
+        requestParams.put("range", range);
+        requestParams.put("level", level + "");
+        requestParams.put("start_no", startNum + "");
+        requestParams.put("end_no", endNum + "");
+
+//        String rawResult = HttpUtil.urlClient(HttpConstants.)
+
+
+        return "";
     }
 
 

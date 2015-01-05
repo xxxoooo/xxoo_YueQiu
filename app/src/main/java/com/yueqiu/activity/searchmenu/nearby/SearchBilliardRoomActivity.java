@@ -1,6 +1,8 @@
 package com.yueqiu.activity.searchmenu.nearby;
 
+import android.app.ActionBar;
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +31,8 @@ public class SearchBilliardRoomActivity extends Activity
     private TextView mRoomPrice, mRoomTag, mRoomAddress, mRoomPhone;
     private TextView mRoomDetailedInfo;
 
+    private ActionBar mActionBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -51,6 +55,27 @@ public class SearchBilliardRoomActivity extends Activity
         // then, we need the data that transferred from the previous listView item to inflate
         // the detailed content of these TextView and ImageViews
 
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
+        {
+            mActionBar = getActionBar();
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+    }
+
+
+    // TODO: 用于得到球厅详情信息的网络请求处理过程
+    private String getRoomDetailedInfo()
+    {
+
+
+        return "";
     }
 
     @Override

@@ -114,6 +114,15 @@ public class BilliardsSearchDatingFragment extends Fragment
         }
     }
 
+
+    // TODO: 以下就是获取约球信息列表的网络请求处理过程
+    // TODO: 这个方法获取到是原始的json数据，我们需要转换成Java bean列表
+    private String retrieveDatingInfo()
+    {
+        return "";
+    }
+
+
     // TODO: 以下都是测试数据,在测试接口的时候将他们删除掉
     private void initTestData()
     {

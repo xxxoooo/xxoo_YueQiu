@@ -100,6 +100,14 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
         }
     }
 
+
+    // TODO: 用于获取助教信息列表的方法
+    private void retrieveAssistCoauchRawInfo()
+    {
+
+    }
+
+
     // TODO: 在测试接口的时候删除下面的方法
     //以下是用于初始化过程当中的测试数据
     private List<SearchAssistCoauchSubFragmentBean> mAssistCoauchList = new ArrayList<SearchAssistCoauchSubFragmentBean>();

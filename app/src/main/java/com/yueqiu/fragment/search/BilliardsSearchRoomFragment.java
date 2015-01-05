@@ -23,12 +23,10 @@ import java.util.List;
 
 /**
  * @author scguo
- *
- * 这个是用于显示球厅的Fragment
- * 球厅的Fragment同MateFragment结构相同，但是ListView的差别很大。我们需要完全重新创建一个ListView
- * 用于显示关于每一个球厅的ListView item
- *
- *
+ *         <p/>
+ *         这个是用于显示球厅的Fragment
+ *         球厅的Fragment同MateFragment结构相同，但是ListView的差别很大。我们需要完全重新创建一个ListView
+ *         用于显示关于每一个球厅的ListView item
  */
 public class BilliardsSearchRoomFragment extends Fragment
 {
@@ -60,6 +58,7 @@ public class BilliardsSearchRoomFragment extends Fragment
     }
 
     private static Context sContext;
+
     public BilliardsSearchRoomFragment()
     {
     }
@@ -84,7 +83,7 @@ public class BilliardsSearchRoomFragment extends Fragment
 
         SubFragmentsCommonUtils.initViewPager(sContext, mView, R.id.room_fragment_gallery_pager, R.id.room_fragment_gallery_pager_indicator_group);
 
-                (sBtnDistrict = (Button) mView.findViewById(R.id.btn_room_district)).setOnClickListener(new OnFilterBtnClickListener());
+        (sBtnDistrict = (Button) mView.findViewById(R.id.btn_room_district)).setOnClickListener(new OnFilterBtnClickListener());
         (sBtnDistan = (Button) mView.findViewById(R.id.btn_room_distance)).setOnClickListener(new OnFilterBtnClickListener());
         (sBtnPrice = (Button) mView.findViewById(R.id.btn_room_price)).setOnClickListener(new OnFilterBtnClickListener());
         (sBtnApprisal = (Button) mView.findViewById(R.id.btn_room_apprisal)).setOnClickListener(new OnFilterBtnClickListener());
@@ -123,8 +122,7 @@ public class BilliardsSearchRoomFragment extends Fragment
         @Override
         public void onClick(View v)
         {
-            switch (v.getId())
-            {
+            switch (v.getId()) {
                 case R.id.btn_room_district:
                     SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnDistrict, R.layout.search_mate_subfragment_gender_popupwindow);
                     break;
@@ -144,6 +142,14 @@ public class BilliardsSearchRoomFragment extends Fragment
     }
 
 
+    // TODO: 用于获取球厅信息的列表
+    private void retrieveRoomRawInfo()
+    {
+
+
+    }
+
+
     // use the static data to init the BilliardsSearchRoomFragment
     private void initListStaticTestData()
     {
@@ -155,8 +161,7 @@ public class BilliardsSearchRoomFragment extends Fragment
         String address = mRes.getString(R.string.search_room_sub_fragment_listitem_roomaddress);
 
         int i;
-        for (i = 0; i < 100; ++i)
-        {
+        for (i = 0; i < 100; ++i) {
             mRoomList.add(new SearchRoomSubFragmentRoomBean("", roomName, level, price, address, distance));
         }
     }
