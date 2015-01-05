@@ -60,10 +60,18 @@ public class SearchDatingDetailedGridAdapter extends BaseAdapter
             viewHolder = new ViewHolder();
             viewHolder.mPhoto = (ImageView) convertView.findViewById(R.id.img_grid_search_dating_detailed_userphoto);
             viewHolder.mName = (TextView) convertView.findViewById(R.id.tv_grid_search_dating_detailed_username);
-
+            convertView.setTag(viewHolder);
+        } else
+        {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
+        SearchDatingDetailedAlreadyBean bean = mBeanList.get(position);
 
+        // then, inflate the layout
+        // TODO: the following user photo are the test data, and change them later
+        viewHolder.mPhoto.setImageResource(R.drawable.ic_launcher);
+        viewHolder.mName.setText(bean.getUserName());
 
         return convertView;
     }

@@ -18,6 +18,7 @@
     <string name="billiard_key_serach">关键字搜索</string>
     <string name="billiard_post">发帖</string>
     <string name="billiard_back">返回</string>
+    <string name="billiard_group_issue_article">发布话题</string>
     <string name="title_activity_my">MyActivity</string>
     <string name="title_activity_billiard_search">BilliardSearchActivity</string>
     <string name="title_activity_billiard_group">BilliardGroupActivity</string>
@@ -73,6 +74,19 @@
     <string name="search_dating_subfragment_title_publishdata">发布时间</string>
     <string name="search_dating_detailed_btn_i_want_in">我要参加</string>
     <string name="search_dating_detailed_tv_already_in">已参加人员</string>
+    <!--约球详情Activity的标题-->
+    <string name="search_dating_detailed_actionbar_title">约球详情</string>
+    <string name="search_dating_detailed_btn_copylink_str">复制详情连接</string>
+    <string name="search_dating_detailed_btn_cancel_str">取消</string>
+    <!--约球详情当中的分享的ImageView当中的title-->
+    <string name="search_dating_detailed_title_yueqiufriend">约求好友</string>
+    <string name="search_dating_detailed_title_friendcircle">微信朋友圈</string>
+    <string name="search_dating_detailed_title_weichat">微信好友</string>
+    <string name="search_dating_detailed_title_qqzone">QQ空间</string>
+    <string name="search_dating_detailed_title_tecentweibo">腾讯微博</string>
+    <string name="search_dating_detailed_title_sinaweibo">新浪微博</string>
+    <string name="search_dating_detailed_title_renren">人人网</string>
+
 
     <!-- 3.助教子Fragment的title -->
     <string name="search_assistcaouch_subfragment_title_distance">距离</string>
@@ -93,6 +107,21 @@
     <string name="search_room_subfragment_title_distance">距离</string>
     <string name="search_room_subfragment_title_price">价格</string>
     <string name="search_room_subfragment_title_review">好评</string>
+
+
+    <!--球厅Activity当中的一些关键字段-->
+    <string name="search_room_detailedactivity_detailed_info_separator">详细信息</string>
+
+    <string name="search_room_detailedactivity_price_indi">人均:</string>
+    <string name="search_room_detailedactivity_tag_indi">标签:</string>
+    <string name="search_room_detailedactivity_address_indi">地址:</string>
+    <string name="search_room_detailedactivity_phone_indi">电话:</string>
+    <!--以下是以上的字段对应的测试字符串-->
+    <string name="search_room_detailedactivity_price_test">37元</string>
+    <string name="search_room_detailedactivity_tag_test">苏州桥</string>
+    <string name="search_room_detailedactivity_address_test">苏州街29号维亚大厦B1楼(苏州街地铁站北侧)</string>
+    <!--需要注意的是以下的是电话号码字段，我们需要做成超链接的形式，即可以调用implicit intent的链接-->
+    <string name="search_room_detailedactivity_phone_test">(010)52712345</string>
 
     <!-- TOOD: 以下的测试字符串都是需要在正式发布时删掉的 -->
     <!-- 用于测试的默认字符串 -->
@@ -138,8 +167,8 @@
     <string name="search_subfragment_listitem_gender_default_str">女</string>
 
     <!-- 定义反馈Activity当中的string资源 -->
-    <string name="search_feedback_acti_title_indi_str">标题:</string>
-    <string name="search_feedback_acti_content_indi_str">内容:</string>
+    <string name="search_feedback_acti_title_indi_str">标题</string>
+    <string name="search_feedback_acti_content_indi_str">内容</string>
     <string name="search_feedback_acti_leave_contact_indi_str">请留下联系方式:</string>
     <string name="search_feedback_acti_btn_submit_str">提交</string>
     <string name="search_feedback_acti_et_leave_contact_hint">手机号/邮箱/QQ</string>
@@ -186,14 +215,18 @@
     <string name="time">时间</string>
     <string name="distance">距离</string>
     <string name="back">返回</string>
+    <string name="four_to_thirty_words">4~30个汉字</string>
     <string name="issueactivities">发布</string>
     <string name="activities_title">活动主题</string>
     <string name="activities_site">活动地点</string>
-    <string name="activities_time">活动时间</string>
+    <string name="activities_start_time">开始时间</string>
+    <string name="activities_end_time">结束时间</string>
     <string name="activities_charge_module">收费模式</string>
-    <string name="activities_contacts">联系人:</string>
+    <string name="activities_contacts">联系人：</string>
     <string name="username">昵称</string>
-    <string name="activities_phone">电话</string>
+    <string name="activities_phone">联系电话</string>
+    <string name="activity_illustration">活动说明</string>
+    <string name="can_empty">可不填</string>
     <string name="activities_send">发布</string>
     <string name="activities_sendinfo">发布约球信息</string>
     <string name="activities">商家活动</string>
@@ -206,9 +239,12 @@
     <string name="woman">女</string>
     <string name="userid">手机号/账号</string>
     <string name="password">密码</string>
+    <string name="charge_module_free">我请客</string>
+    <string name="charge_module_pay">你付钱</string>
+    <string name="charge_module_aa">平摊</string>
 
-    <string name="title_activity_billiards_dating">BilliardsDatingActivity</string>
-    <string name="title_activity_search_billiard_room">SearchBilliardRoomActivity</string>
+    <string name="title_activity_billiards_dating">约球详情</string>
+    <string name="title_activity_search_billiard_room">球厅详情</string>
 
     <!--我的资料-->
     <string name="photo">头像</string>

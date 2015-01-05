@@ -2,6 +2,8 @@ package com.yueqiu.bean;
 
 /**
  * Created by scguo on 14/12/25.
+ *
+ * 用于SearchActivity当中的教练的Bean文件
  */
 public class SearchCoauchSubFragmentCoauchBean
 {

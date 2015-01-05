@@ -12,16 +12,16 @@
         android:src="@drawable/ic_launcher"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
-        android:padding="4dp"
-        android:layout_margin="4dp"
+        android:padding="2dp"
+        android:layout_margin="1dp"
         />
 
     <TextView
         style="@style/ListItemTvStyle"
         android:id="@+id/tv_coauch_subfragment_listitem_name"
-        android:textSize="19sp"
+        android:textSize="17sp"
         android:padding="4dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="1dp"
         android:layout_toRightOf="@id/img_coauch_subfragment_listitem_photo"
         android:text="@string/search_coauch_sub_fragment_listitem_username"
         android:textColor="@android:color/black"

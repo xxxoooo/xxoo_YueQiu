@@ -13,6 +13,9 @@ import com.yueqiu.constant.PublicConstant;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -62,7 +65,14 @@ public class Utils {
     {
         JSONObject object = null;
         try{
-            object = new JSONObject(result);
+            if(result != null) {
+                object = new JSONObject(result);
+            }else{
+                object = new JSONObject();
+                object.put("code",1010);
+                object.put("msg","error");
+                object.put("result",null);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -98,5 +108,60 @@ public class Utils {
         return false;
     }
 
+    /**
+     * String类型转换为Date
+     * @param currTime
+     * @param formatType
+     * @return
+     */
+    public static Date stringToDate(String currTime, String formatType)throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat(formatType);
+        Date date = formatter.parse(currTime);
+        return date;
+    }
+    /**
+     * Date类型转换为String
+     */
+    public static String dateToString(Date data, String formatType) {
+        return new SimpleDateFormat(formatType).format(data);
+    }
+    /**
+     *long类型转换为Date类型
+     */
+    public static Date longToDate(long currTime,String formatType) throws ParseException {
+        Date old = new Date(currTime);
+        String time = dateToString(old, formatType);
+        Date date = stringToDate(time, formatType);
+        return date;
+    }
+
+    /**
+     * long类型时间转换为String类型
+     */
+    public static String longToString(long currTime,String formatType) throws ParseException {
+        Date date = longToDate(currTime, formatType);
+        String strTime = dateToString(date, formatType);
+        return strTime;
+    }
+
+    /**
+     * Date类型转换为long
+     */
+    public static long dateToLong(Date date) {
+        return date.getTime();
+    }
+    /**
+     * String类型转换为long
+     */
+    public static long stringToLong(String strTime, String formatType)
+            throws ParseException {
+        Date date = stringToDate(strTime, formatType); // String类型转成date类型
+        if (date == null) {
+            return 0;
+        } else {
+            long currentTime = dateToLong(date); // date类型转成long类型
+            return currentTime;
+        }
+    }
 
 }

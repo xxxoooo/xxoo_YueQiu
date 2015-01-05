@@ -5,16 +5,17 @@ package com.yueqiu.bean;
  * Created by wangyun on 14/12/29.
  */
 public class SlideAccountItem implements ListItem{
-    private int mResId;
     private String mName;
     private int mGolden;
     private String mTitle;
     private String mImg;
-    public SlideAccountItem(String img,String name,int golden,String title){
+    private int mUserId;
+    public SlideAccountItem(String img,String name,int golden,String title,int userId){
         this.mImg = img;
         this.mName = name;
         this.mGolden = golden;
         this.mTitle = title;
+        this.mUserId = userId;
     }
     @Override
     public int getType() {
@@ -42,4 +43,10 @@ public class SlideAccountItem implements ListItem{
     public void setTitle(String title){
         this.mTitle = title;
     }
+
+    public int getUserId() {
+        return mUserId;
+    }
+
+
 }

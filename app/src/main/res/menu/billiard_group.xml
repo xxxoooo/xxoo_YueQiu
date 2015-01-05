@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.yueqiu.BilliardSearchActivity" >
+    <item android:id="@+id/group_nemu_search"
+        android:title="@string/search_search_btn_str"
+        android:icon="@drawable/search"
+        android:showAsAction="collapseActionView|ifRoom"
+        android:actionViewClass="android.widget.SearchView"/>
+    <item
+        android:title="@string/billiard_group_issue_article"
+        android:id="@+id/group_menu_editor"
+        android:icon="@drawable/title_edit"
+        android:showAsAction="always"/>
+</menu>

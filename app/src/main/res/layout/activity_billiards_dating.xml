@@ -50,6 +50,26 @@
         android:layout_marginTop="4dp"
         android:textStyle="bold"/>
 
+    <!--这里还应该有另一图案，就是每一个用户的受关注的数目，
+        具体包括一个眼睛的ImageView以及另一用于显示具体的被follow的数目的TextView
+        但是现在没有提供这个图片，所以我们放到以后实现,
+        但是考虑到眼睛的图片是固定的，所以我们直接采用一个TextView来进行实现，
+        即采用TextView当中的Drawable left来直接加载-->
+    <TextView
+        style="@style/ListItemTvStyle"
+        android:id="@+id/tv_search_dating_detail_follow_num"
+        android:layout_toRightOf="@id/tv_search_dating_detail_gender"
+        android:text="221"
+        android:layout_below="@id/tv_search_dating_detail_nickname"
+        android:drawableLeft="@drawable/eye_follow"
+        android:drawablePadding="3dp"
+        android:paddingLeft="4dp"
+        android:padding="4dp"
+        android:layout_marginLeft="9dp"
+        android:layout_marginTop="4dp"
+        android:textStyle="bold"
+        />
+
 
     <TextView
         android:id="@+id/tv_search_dating_detailed_time_1"
@@ -74,7 +94,6 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="7dp"
         />
-
 
 
     <View

@@ -21,7 +21,7 @@ import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 
-import com.yueqiu.activity.searchmenu.nearby.SearchResultActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.chatbar.ContactFragment;
 import com.yueqiu.fragment.chatbar.MessageFragment;

@@ -5,11 +5,59 @@
 
     <!--用于SearchActivity当中的约球子Fragment的布局文件-->
 
+    <FrameLayout
+        android:id="@+id/dating_gallery_view_pager_zone"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@android:color/holo_orange_light">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/dating_frament_gallery_pager"
+            android:layout_width="match_parent"
+            android:layout_height="140dp">
+
+        </android.support.v4.view.ViewPager>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/dating_fragment_gallery_pager_indicator_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="5dp"
+                android:gravity="right"
+                android:orientation="horizontal"
+                >
+            </LinearLayout>
+        </RelativeLayout>
+
+    </FrameLayout>
+
+    <TextView
+        android:background="@android:color/background_light"
+        android:id="@+id/tv_dating_gallery_view_pager_indication"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/dating_gallery_view_pager_zone"
+        android:layout_centerHorizontal="true"
+        android:text="@string/search_gallery_pager_test_str"
+        android:textStyle="normal"
+        android:textColor="@android:color/darker_gray"
+        android:padding="2dp"
+        android:textSize="13sp"
+        />
+
+
     <!-- 以下是控制ListView筛选显示的Button组合-->
     <!-- 在SearchActivity当中，RadioButton只是用于添加额外的选项的，不是用于
          展示不同的ListView的，每一个Fragment都只是单独的对应于同一个ListView，
          当我们点击了不同的button之后，添加的只是额外的筛选条件 -->
     <LinearLayout
+        android:layout_below="@id/tv_dating_gallery_view_pager_indication"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -55,7 +103,7 @@
             android:layout_width="0dp"
             android:layout_weight="0.5"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_dating_gender"
+            android:id="@+id/btn_dating_publichdate"
             android:text="@string/search_dating_subfragment_title_publishdata"
             android:background="@drawable/btn_bg"
             android:checked="true"
