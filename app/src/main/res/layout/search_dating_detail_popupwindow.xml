@@ -17,24 +17,28 @@
         android:orientation="horizontal"
         android:weightSum="4"
         >
+
         <TextView
             style="@style/SearchDatingDetailedImgViewStyle"
             android:id="@+id/img_search_dating_detail_share_yuqeiufirend"
             android:drawableTop="@drawable/share_friends"
             android:text="@string/search_dating_detailed_title_yueqiufriend"
             />
+
         <TextView
             style="@style/SearchDatingDetailedImgViewStyle"
             android:id="@+id/img_search_dating_detail_share_yueqiucircle"
             android:drawableTop="@drawable/share_group"
             android:text="@string/search_dating_detailed_title_yueqiufriend"
             />
+
         <TextView
             android:text="@string/search_dating_detailed_title_friendcircle"
             style="@style/SearchDatingDetailedImgViewStyle"
             android:id="@+id/img_search_dating_detail_share_friendcircle"
             android:drawableTop="@drawable/share_circle_friends"
             />
+
         <TextView
             android:text="@string/search_dating_detailed_title_weichat"
             android:drawableTop="@drawable/share_weizin_friends"
@@ -58,18 +62,21 @@
             android:id="@+id/img_search_dating_detail_share_qqzone"
             android:drawableTop="@drawable/share_qqzone"
             />
+
         <TextView
             android:text="@string/search_dating_detailed_title_tecentweibo"
             style="@style/SearchDatingDetailedImgViewStyle"
             android:id="@+id/img_search_dating_detail_share_qqweibo"
             android:drawableTop="@drawable/share_tengxun_weibo"
             />
+
         <TextView
             android:text="@string/search_dating_detailed_title_sinaweibo"
             style="@style/SearchDatingDetailedImgViewStyle"
             android:id="@+id/img_search_dating_detail_share_sinaweibo"
             android:drawableTop="@drawable/share_sina_weibo"
             />
+
         <TextView
             android:text="@string/search_dating_detailed_title_renren"
             android:drawableTop="@drawable/share_renren"
@@ -79,21 +86,21 @@
     </LinearLayout>
 
     <Button
-        android:text="@string/search_dating_detailed_btn_copylink_str"
-        android:textColor="@android:color/white"
-        android:layout_above="@id/btn_search_dating_detailed_cancel"
-        android:id="@+id/btn_search_dating_detailed_copylink"
-        style="@style/SearchDatingBtn"
-        android:background="@drawable/search_dating_detail_btn_bg"
-        />
-
-    <Button
         android:text="@string/search_dating_detailed_btn_cancel_str"
         android:textColor="#111111"
         android:layout_alignParentBottom="true"
         android:id="@+id/btn_search_dating_detailed_cancel"
         style="@style/SearchDatingBtn"
         android:background="@drawable/search_dating_detailed_btn_bg_cancel"
+        />
+
+    <Button
+        android:text="@string/search_dating_detailed_btn_copylink_str"
+        android:textColor="@android:color/white"
+        android:layout_above="@id/btn_search_dating_detailed_cancel"
+        android:id="@+id/btn_search_dating_detailed_copylink"
+        style="@style/SearchDatingBtn"
+        android:background="@drawable/search_dating_detail_btn_bg"
         />
 
 

@@ -5,8 +5,11 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -21,6 +24,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.yueqiu.activity.searchmenu.ActivitiesIssueActivity;
 import com.yueqiu.activity.searchmenu.FeedbackActivity;
@@ -34,16 +38,26 @@ import com.yueqiu.adapter.SlideViewAdapter;
 import com.yueqiu.bean.ListItem;
 import com.yueqiu.bean.SlideAccountItem;
 import com.yueqiu.bean.SlideOtherItem;
+import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.search.BilliardsSearchAssistCoauchFragment;
 import com.yueqiu.fragment.search.BilliardsSearchCoauchFragment;
 import com.yueqiu.fragment.search.BilliardsSearchDatingFragment;
 import com.yueqiu.fragment.search.BilliardsSearchMateFragment;
 import com.yueqiu.fragment.search.BilliardsSearchRoomFragment;
+import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.Utils;
 import com.yueqiu.view.menudrawer.MenuDrawer;
 import com.yueqiu.view.menudrawer.Position;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 /**
  * 首页的SearchActivity
@@ -54,6 +68,9 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
     private static final String STATE_MENUDRAWER = "com.yueqiu.menuDrawer";
     private static final int NUM_OF_FRAGMENTS = 5;
+
+    private static final int LOGOUT_SUCCESS = 0;
+    private static final int LOGOUT_FAILED = 1;
 
     // make the instances of the basic fragment that directly loaded in the BilliardSearchActivity
     private BilliardsSearchMateFragment mMateFragment;
@@ -67,7 +84,10 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private RadioButton mNearbyRadio;
     private Intent mIntent = new Intent();
     private MenuDrawer mMenuDrawer;
+    private SlideViewAdapter mAdapter;
     private ListView mMenuList;
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
     private List<ListItem> mItemList = new ArrayList<ListItem>();
 
     @Override
@@ -75,15 +95,22 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     {
         super.onCreate(savedInstanceState);
         mContext = this;
-        handleIntent(getIntent());
-        initDrawer();
+        mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
         mActionBar = getActionBar();
         mTitles = new String[]{getString(R.string.search_billiard_mate_str),
                 getString(R.string.search_billiard_dating_str),
                 getString(R.string.search_billiard_assist_coauch_str),
                 getString(R.string.search_billiard_coauch_str),
-                getString(R.string.search_billiard_room_str)
-        };
+                getString(R.string.search_billiard_room_str)};
+        mMenuDrawer = MenuDrawer.attach(this, MenuDrawer.Type.BEHIND, Position.LEFT, MenuDrawer.MENU_DRAG_WINDOW);
+        mMenuDrawer.setContentView(R.layout.activity_billiard_search);
+        mMenuDrawer.setMenuView(R.layout.slide_drawer_layout);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         mViewPager = (ViewPager) findViewById(R.id.search_parent_fragment_view_pager);
 
         mGroup = (RadioGroup) findViewById(R.id.search_parent_radio_group);
@@ -99,27 +126,31 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                     case R.id.first_title_chatbar:
                         mIntent.setClass(BilliardSearchActivity.this, ChatBarActivity.class);
                         startActivity(mIntent);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
                     case R.id.first_title_activity:
                         mIntent.setClass(BilliardSearchActivity.this, ActivitiesActivity.class);
                         startActivity(mIntent);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
                     case R.id.first_title_group:
                         mIntent.setClass(BilliardSearchActivity.this, BilliardGroupActivity.class);
                         startActivity(mIntent);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
                 }
 
             }
         });
+
     }
 
     @Override
     protected void onResume()
     {
         super.onResume();
-        mActionBar.setTitle(getString(R.string.billiard_search));
         setupTabs();
+        initDrawer();
         mNearbyRadio.setChecked(true);
     }
 
@@ -287,33 +318,19 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     protected void onNewIntent(Intent intent)
     {
         super.onNewIntent(intent);
-        handleIntent(intent);
-    }
-
-    private void handleIntent(Intent intent)
-    {
-
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            Log.d("wy", query);
-        }
     }
 
     private void initDrawer()
     {
-        mMenuDrawer = MenuDrawer.attach(this, MenuDrawer.Type.BEHIND, Position.LEFT, MenuDrawer.MENU_DRAG_WINDOW);
-        mMenuDrawer.setContentView(R.layout.activity_billiard_search);
-        mMenuDrawer.setMenuView(R.layout.slide_drawer_layout);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-        }
-
-        SlideAccountItem accountItem = new SlideAccountItem(R.drawable.account, "如果我是一片海", 100);
+        mItemList.clear();
+        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getAccount(),
+                100, YueQiuApp.sUserInfo.getTitle());
         mItemList.add(accountItem);
 
         String[] values = new String[]{
@@ -326,14 +343,13 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                 getString(R.string.search_logout_str)
         };
         int[] resIds = new int[]{
-                R.drawable.e01,
-                R.drawable.e02,
-                R.drawable.e03,
-                R.drawable.e04,
-                R.drawable.e05,
-                R.drawable.e06,
-                R.drawable.e07,
-                R.drawable.e08
+                R.drawable.more_my_information,
+                R.drawable.more_my_part_in,
+                R.drawable.more_my_collection,
+                R.drawable.more_my_issue,
+                R.drawable.more_publish_ball,
+                R.drawable.more_feed_back,
+                R.drawable.more_exit
         };
 
         SlideOtherItem otherItem;
@@ -343,9 +359,10 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         }
 
         SlideViewAdapter adapter = new SlideViewAdapter(this, mItemList);
+        mAdapter = new SlideViewAdapter(this, mItemList);
 
         mMenuList = (ListView) findViewById(R.id.menu_drawer_list);
-        mMenuList.setAdapter(adapter);
+        mMenuList.setAdapter(mAdapter);
 
         mMenuList.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
@@ -356,29 +373,48 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                 switch (position) {
                     case 0:
                         intent.setClass(BilliardSearchActivity.this, LoginActivity.class);
+                        startActivity(intent);
                         break;
                     case 1:
                         intent.setClass(BilliardSearchActivity.this, MyProfileActivity.class);
+                        startActivity(intent);
                         break;
                     case 2:
                         intent.setClass(BilliardSearchActivity.this, MyParticipationActivity.class);
+                        startActivity(intent);
                         break;
                     case 3:
                         intent.setClass(BilliardSearchActivity.this, MyfavorCollActivity.class);
+                        startActivity(intent);
                         break;
                     case 4:
                         intent.setClass(BilliardSearchActivity.this, PublishedInfoActivity.class);
+                        startActivity(intent);
                         break;
                     case 5:
                         intent.setClass(BilliardSearchActivity.this, ActivitiesIssueActivity.class);
+                        startActivity(intent);
                         break;
                     case 6:
                         intent.setClass(BilliardSearchActivity.this, FeedbackActivity.class);
+                        startActivity(intent);
                         break;
                     case 7:
+                        if (Utils.networkAvaiable(BilliardSearchActivity.this)) {
+                            new Thread(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    logout();
+                                }
+                            }).start();
+                        } else {
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                 }
-                startActivity(intent);
+
                 final int drawerState = mMenuDrawer.getDrawerState();
                 if (drawerState == MenuDrawer.STATE_OPEN || drawerState == MenuDrawer.STATE_OPENING) {
                     mMenuDrawer.closeMenu();
@@ -389,6 +425,62 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         });
         mMenuDrawer.peekDrawer();
 
+
+    }
+
+    private Handler mHandler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg)
+        {
+            switch (msg.what) {
+                case LOGOUT_SUCCESS:
+                    resetUSerInfo();
+                    Toast.makeText(BilliardSearchActivity.this, getString(R.string.logout_success), Toast.LENGTH_SHORT).show();
+                    break;
+                case LOGOUT_FAILED:
+                    Toast.makeText(BilliardSearchActivity.this, getString(R.string.logout_failed), Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
+
+    private void logout()
+    {
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(PublicConstant.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+        String result = HttpUtil.urlClient(HttpConstants.LogoutConstant.URL,
+                map, HttpConstants.RequestMethod.GET);
+        try {
+            JSONObject resultJson = new JSONObject(result);
+            int rtCode = resultJson.getInt("code");
+            if (rtCode == HttpConstants.ResponseCode.NORMAL) {
+                mHandler.sendEmptyMessage(LOGOUT_SUCCESS);
+            } else {
+                mHandler.sendEmptyMessage(LOGOUT_FAILED);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void resetUSerInfo()
+    {
+        YueQiuApp.sUserInfo.setImg_url("");
+        YueQiuApp.sUserInfo.setAccount(getString(R.string.guest));
+        YueQiuApp.sUserInfo.setUser_id(0);
+
+        mEditor.putString(PublicConstant.USER_NAME, getString(R.string.guest));
+        mEditor.putString(PublicConstant.USER_ID, "0");
+        mEditor.putString(PublicConstant.IMG_URL, "");
+        mEditor.apply();
+
+
+        mItemList.remove(0);
+        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getAccount(),
+                0, YueQiuApp.sUserInfo.getTitle());
+        mItemList.add(0, accountItem);
+        mAdapter.notifyDataSetChanged();
 
     }
 
@@ -416,6 +508,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         }
         super.onBackPressed();
     }
+
 
 }
 

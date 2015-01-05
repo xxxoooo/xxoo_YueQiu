@@ -12,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -93,15 +94,19 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
 
     public class SectionPagerAdapter extends FragmentPagerAdapter {
 
+
         public SectionPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
         public Fragment getItem(int i) {
+            Fragment fragment = new MyFavorBasicFragment();
+            Bundle args = new Bundle();
+            args.putInt("type",i);
+            fragment.setArguments(args);
+            return fragment;
 
-            Fragment mFragment = new MyFavorBasicFragment();
-            return mFragment;
         }
 
         @Override

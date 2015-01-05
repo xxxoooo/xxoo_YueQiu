@@ -1,23 +1,17 @@
 package com.yueqiu.fragment.group;
 
-import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTabHost;
-import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
-import com.yueqiu.BilliardGroupActivity;
 import com.yueqiu.R;
 import com.yueqiu.adapter.GroupBasicAdapter;
-import com.yueqiu.bean.GroupNoteBean;
+import com.yueqiu.bean.GroupNoteInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +24,7 @@ public class BilliardGroupBasicFragment extends Fragment {
     private View mView;
     private RadioGroup mGroup;
     private ListView mListView;
-    private List<GroupNoteBean> mList = new ArrayList<GroupNoteBean>();
+    private List<GroupNoteInfo> mList = new ArrayList<GroupNoteInfo>();
     private GroupBasicAdapter mAdapter;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,7 +34,7 @@ public class BilliardGroupBasicFragment extends Fragment {
 
         mListView = (ListView) mView.findViewById(R.id.billiard_group_listview);
 
-        GroupNoteBean bean1 = new GroupNoteBean();
+        GroupNoteInfo bean1 = new GroupNoteInfo();
         bean1.setTitle("求助台球高手们");
         bean1.setContent("我接触台球时间挺长...");
         bean1.setBrowseCount(213);

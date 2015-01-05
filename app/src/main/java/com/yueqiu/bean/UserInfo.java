@@ -232,6 +232,7 @@ public class UserInfo {
     public void setNew_img_real(String new_img_real) {
         this.new_img_real = new_img_real;
     }
+
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
         json.put(JSON_IMGREAL, img_real);

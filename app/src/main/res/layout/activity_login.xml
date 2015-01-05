@@ -9,7 +9,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
         android:orientation="vertical">
 
         <LinearLayout
@@ -18,7 +17,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginTop="20dp"
-            android:background="@drawable/login_management_background"
+            android:background="@drawable/login_shape"
             android:orientation="vertical">
 
             <EditText
@@ -28,15 +27,17 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:background="@null"
-                android:drawableLeft="@drawable/login_user"
+                android:drawableLeft="@drawable/account_icon"
                 android:drawablePadding="10dp"
                 android:hint="@string/userid"
+                android:textColorHint="@color/edit_text_hint_color"
+
                 android:singleLine="true" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="1.5dp"
-                android:background="@color/devide_line"></LinearLayout>
+                android:background="@color/devide_line"/>
 
             <EditText
                 android:id="@+id/activity_login_et_password"
@@ -45,9 +46,10 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:background="@null"
-                android:drawableLeft="@drawable/login_key"
+                android:drawableLeft="@drawable/password"
                 android:drawablePadding="10dp"
                 android:hint="@string/password"
+                android:textColorHint="@color/edit_text_hint_color"
                 android:password="true"
                 android:singleLine="true" />
 
@@ -59,9 +61,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="40dp"
             android:clickable="true"
-            android:background="@drawable/btn_login"
+            android:background="@drawable/login_button_bg"
             android:text="@string/login"
             android:textSize="20sp"
             android:textColor="@color/white" />
@@ -81,14 +83,14 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textColor="@color/md__defaultBackground"
-            android:text="还没有账户？" />
+            android:text="@string/have_no_account_yet" />
         <TextView
             android:id="@+id/activity_login_tv_register"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/photo_album_text_orange"
+            android:textColor="@color/login_btn_normal"
             android:textSize="18sp"
-            android:text="马上注册" />
+            android:text="@string/register_right_now" />
     </LinearLayout>
 
 
