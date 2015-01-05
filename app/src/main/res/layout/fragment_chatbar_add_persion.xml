@@ -1,62 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical"
-              android:background="@color/bg_container">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+    <FrameLayout
+        android:id="@+id/chatbar_search_progressbar_container"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-
-        <!--<LinearLayout
-            android:id="@+id/chatbar_add_persion_search"
-            android:layout_height="40dp"
-            android:layout_width="match_parent"
-            android:layout_margin="10dp"
-            android:background="@drawable/acm_inputbox"
-            android:orientation="horizontal"
-            android:layout_centerVertical="true">
-
-            <ImageView
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:scaleType="fitXY"
-                android:contentDescription="@string/app_name"
-                android:src="@android:drawable/ic_search_category_default"/>
-
-            <EditText
-
-                android:layout_height="match_parent"
-                android:layout_width="match_parent"
-                android:layout_gravity="center_vertical"
-                android:hint="@string/ed_add_persion_by_phone_or_account"
-                android:background="@null"
-                android:textSize="17sp"
-                android:textColor="@color/gray_font"/>
-        </LinearLayout>-->
+        <ProgressBar
+            style="@android:style/Widget.Holo.Light.ProgressBar.Large"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_margin="10dp"
-        android:gravity="center_vertical"
         android:layout_width="match_parent"
-        android:layout_height="40dp">
-        
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/near_icon"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
-            android:textSize="23sp"
-            android:text="@string/tv_add_persion_nearby"/>
+        <LinearLayout
+            android:id="@+id/search_friend_nearby"
+            android:orientation="horizontal"
+            android:layout_margin="10dp"
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:clickable="true"
+            android:background="@drawable/list_corner_round_mid2"><!--临时的-->
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/near_icon"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:textSize="23sp"
+                android:text="@string/tv_add_persion_nearby"/>
 
         </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.3dip"
-        android:layout_marginTop="10dp"
-        android:background="#696969" />
-</LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.3dip"
+            android:background="#696969"/>
+
+
+        <ListView
+            android:id="@+id/search_result_container"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </ListView>
+    </LinearLayout>
+
+</FrameLayout>

@@ -322,6 +322,17 @@ public class HttpConstants {
         public static final String END_NO = "end_no";
     }
 
+    /*
+     * 聊吧中添加好友页面通过附近的人获取好友列表
+     */
+    public static final class SearchPeopleByNearby
+    {
+        public static final String URL = "/friend/nearby";
+
+        //请求参数：位置坐标
+        public static final String LAT = "lat";
+        public static final String LNG = "lng";
+    }
 
 
 

@@ -131,7 +131,6 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     Message message = new Message();
                     try {
                         if (object.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
-
                             message.what = DATA_ERROR;
                             message.obj = object.getString("msg");
                         } else {
