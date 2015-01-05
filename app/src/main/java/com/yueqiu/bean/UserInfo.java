@@ -1,5 +1,6 @@
 package com.yueqiu.bean;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -249,5 +250,27 @@ public class UserInfo {
         json.put(JSON_SIGN, idol_name);
         json.put(JSON_NEW_IMG, new_img_real);
         return json;
+    }
+
+    public UserInfo(JSONObject obj) throws JSONException {
+        img_url = String.valueOf(obj.getInt("img_url"));
+        account = String.valueOf(obj.getInt("account"));
+        username = String.valueOf(obj.getInt("username"));
+        district = obj.getString("district");
+        level = String.valueOf(obj.getInt("level"));
+        ball_type = String.valueOf(obj.getInt("ball_type"));
+        appoint_date = obj.getString("appoint_date");
+        ballArm = obj.getString("ballArm");
+        usedType = obj.getString("usedType");
+        ballAge = obj.getInt("ballAge");
+        idol = String.valueOf(obj.getInt("idol"));
+        idol_name = obj.getString("idol_name");
+        new_img = obj.getString("new_img");
+        JSONArray list_data = obj.getJSONArray("sex");//TODO
+
+    }
+
+    public UserInfo() {
+
     }
 }

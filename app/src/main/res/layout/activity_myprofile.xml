@@ -69,6 +69,7 @@
                             android:text="@string/photo"/>
 
                         <ImageView
+                            android:id="@+id/my_profile_photo_iv"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_marginRight="10dp"
@@ -97,6 +98,7 @@
                             android:text="@string/account"/>
 
                         <TextView
+                            android:id="@+id/my_profile_account_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -124,6 +126,7 @@
                             android:text="@string/gender"/>
 
                         <TextView
+                            android:id="@+id/my_profile_gender_tv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"

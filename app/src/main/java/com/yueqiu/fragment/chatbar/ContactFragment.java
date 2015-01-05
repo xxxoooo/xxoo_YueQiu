@@ -74,9 +74,9 @@ public class ContactFragment extends Fragment {
         @Override
         protected Integer doInBackground(Integer... params) {
             int result = -1;
-            maps.put("球友", TestData.getRecentChats());
-            maps.put("助教", TestData.getRecentChats());
-            maps.put("教练", TestData.getRecentChats());
+//            maps.put("球友", TestData.getRecentChats());
+//            maps.put("助教", TestData.getRecentChats());
+//            maps.put("教练", TestData.getRecentChats());
             result = 1;
             return result;
         }
