@@ -120,10 +120,10 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 startMyActivity(0);
                 break;
             case R.id.my_profile_account:
-                startMyActivity(1);
+//                startMyActivity(1);
                 break;
             case R.id.my_profile_gender:
-                startMyActivity(2);
+//                startMyActivity(2);
                 break;
             case R.id.my_profile_nick_name:
                 startMyActivity(3);
