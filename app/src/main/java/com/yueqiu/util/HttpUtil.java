@@ -2,6 +2,9 @@ package com.yueqiu.util;
 
 import android.util.Log;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +29,7 @@ public class HttpUtil {
     private static final String HTTP = "http://hxu0480201.my3w.com/index.php/v1";
 
     private static final String CHARSET = "utf-8";
+
     /**
      * 发送请求到服务器
      * @param url 请求地址。
@@ -33,13 +37,13 @@ public class HttpUtil {
      * @param method 请求的方式，如果为null或者为“”，则默认为get请求
      * @return
      */
-    public static String urlClient(String url,Map<String,String> map,String method)
+    public static <T> String urlClient(String url,Map<String,T> map,String method)
     {
         if(null == url || "".equals(url))
         {
             throw new NullPointerException("url is null!");
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(HTTP).append(url);
         boolean flag = (null == map || 0 == map.size()) ? false : true;
         if(flag)
@@ -48,10 +52,10 @@ public class HttpUtil {
             Iterator iter = map.entrySet().iterator();
             while (iter.hasNext())
             {
-                Map.Entry<String, String> entry = (Map.Entry<String, String>)iter.next();
+                Map.Entry<String, T> entry = (Map.Entry<String, T>)iter.next();
                 try {
                     sb.append(entry.getKey()).append("=").
-                            append(URLEncoder.encode(entry.getValue(), CHARSET)).
+                            append(URLEncoder.encode(String.valueOf(entry.getValue()), CHARSET)).
                             append("&");
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -88,6 +92,9 @@ public class HttpUtil {
         }
         return null;
     }
+
+
+
 
     private static void log(String msg)
     {

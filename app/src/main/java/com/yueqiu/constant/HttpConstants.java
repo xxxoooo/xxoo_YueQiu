@@ -91,6 +91,28 @@ public class HttpConstants {
         public static final String PASSWORD = "password";
     }
 
+    /**
+     * 登出
+     */
+    public static final class LogoutConstant{
+
+        public static final String URL = "/user/logout";
+    }
+
+    /**
+     * 我的发布
+     */
+    public static final class Published{
+
+        public static final String URL      = "/center/getPublishList";
+
+        public static final String TYPE     = "type";
+
+        public static final String STAR_NO  = "start_no";
+
+        public static final String END_NO   = "end_no";
+    }
+
     /*
      * 我的资料请求参数
      * 发送POST请求

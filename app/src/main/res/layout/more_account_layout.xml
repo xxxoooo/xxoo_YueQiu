@@ -18,7 +18,6 @@
         android:id="@+id/account_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="如果我是一片海"
         android:layout_below="@+id/account_image"
         android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
@@ -27,9 +26,9 @@
         android:id="@+id/account_golden"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="金币:100"
+        android:visibility="gone"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/account_name"
-        android:textColor="@color/slide_account_golden"/>
+        android:textColor="@color/login_btn_normal"/>
 
 </RelativeLayout>

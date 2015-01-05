@@ -17,7 +17,6 @@ public class SlideOtherItem implements ListItem{
         return ITEM_BASIC;
     }
 
-    @Override
     public int getImgId() {
         return mResId;
     }

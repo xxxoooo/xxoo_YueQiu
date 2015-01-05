@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yueqiu.R;
-import com.yueqiu.bean.GroupNoteBean;
+import com.yueqiu.bean.GroupNoteInfo;
 
 import java.util.List;
 
@@ -17,11 +17,11 @@ import java.util.List;
  * Created by wangyun on 14/12/30.
  */
 public class GroupBasicAdapter extends BaseAdapter{
-    private List<GroupNoteBean> mList;
+    private List<GroupNoteInfo> mList;
     private Context mContext;
     private LayoutInflater mInflater;
 
-    public GroupBasicAdapter(Context context,List<GroupNoteBean> list){
+    public GroupBasicAdapter(Context context,List<GroupNoteInfo> list){
         this.mContext = context;
         this.mList = list;
         mInflater = LayoutInflater.from(mContext);

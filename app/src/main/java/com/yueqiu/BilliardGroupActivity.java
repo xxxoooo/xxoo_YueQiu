@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
@@ -55,6 +56,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
 
         @Override
         public Fragment getItem(int i) {
+            Log.d("wy","i->" + i);
 
             Fragment mFragment = new BilliardGroupBasicFragment();
             return mFragment;
@@ -102,6 +104,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         switch(item.getItemId()){
             case android.R.id.home:
                 this.finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -136,6 +139,17 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
     protected void onPause() {
         super.onPause();
         mActionBar.removeAllTabs();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

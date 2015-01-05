@@ -4,10 +4,16 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -24,7 +31,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.HttpUtil;
 
 import org.json.JSONException;
@@ -45,7 +54,8 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
     private static final int CODE_WOMAN = 1;
     private EditText mEtUserName,mEtPwd,mEtNumber,mEtSex;
     private Button mBtnRegister;
-    private TextView mTvLogin;
+    private TextView mTvLogin,mReadArticle;
+    private CheckBox mCheckBox;
     private Intent mIntent;
     private Handler handler = new Handler()
     {
@@ -58,13 +68,14 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                     toast(msg.obj.toString());
                     break;
                 case REGISTER_SUCCESS:
-                    toast("注册成功，请登录！");
+                    toast(getString(R.string.register_success));
                     RegisterActivity.this.finish();
                     overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);
                     break;
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +105,15 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
         mEtSex = (EditText)findViewById(R.id.activity_register_et_sex);
         mTvLogin = (TextView) findViewById(R.id.activity_register_tv_login);
         mBtnRegister = (Button) findViewById(R.id.activity_register_btn_register);
+        mCheckBox = (CheckBox) findViewById(R.id.register_agree_article_check);
+        mReadArticle = (TextView) findViewById(R.id.register_read_and_agree_the_article);
+
+        SpannableString spanStr = new SpannableString(getString(R.string.already_read_and_agree_the_article));
+        spanStr.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.have_agree_and_read)), 0, 7,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanStr.setSpan(new URLSpan("http://www.baidu.com"),7,16,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        mReadArticle.setText(spanStr);
+        mReadArticle.setMovementMethod(LinkMovementMethod.getInstance());
+
         mEtSex.setText(getString(R.string.man));
         mIntent = getIntent();
         mBtnRegister.setOnClickListener(this);
@@ -125,13 +145,16 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                     toast(getString(R.string.password_null));
                     return ;
                 }
-                if(password.length() < 6 || phone.length() > 30)
+                if(password.length() < 6 )
                 {
-                    toast("请输入6-30位的密码！");
+                    toast(getString(R.string.please_input_password));
                     return ;
                 }
-                register(account, phone,
-                        mEtSex.getText().toString().trim(), password);
+                if(!mCheckBox.isChecked()){
+                    toast(getString(R.string.please_read_article));
+                    return;
+                }
+                register(account, phone,mEtSex.getText().toString().trim(), password);
                 break;
             case R.id.activity_register_et_sex:
                 Intent intent = new Intent();
@@ -179,7 +202,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
     }
 
 
-    private void register(final String account, final String phone,
+    private void register(final String account,final String phone,
                           final String sex, final String pwd)
     {
         final Map<String, String> requestMap = new HashMap<String, String>();
