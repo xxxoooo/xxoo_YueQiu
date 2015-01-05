@@ -84,7 +84,7 @@
             android:layout_height="wrap_content">
             <ImageView
                 android:layout_centerVertical="true"
-                android:src="@drawable/group_edit_createbutton_background"
+                android:src="@drawable/compose_emoticonbutton_background"
                 android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
                 android:layout_marginLeft="10dp"
                 android:id="@+id/activitiy_issue_add" />
             <ImageView
-                android:src="@drawable/compose_emoticonbutton_background"
+                android:src="@drawable/message_add_background"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
