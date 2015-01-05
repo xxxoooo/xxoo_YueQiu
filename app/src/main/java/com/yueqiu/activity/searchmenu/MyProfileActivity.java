@@ -112,6 +112,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         mUserInfo = Utils.getMyProfileFromLocal(this);
         if (mUserInfo != null) {
             //从本地获取我的资料
+            Log.e(TAG, "从本地获取我的资料");
             updateUI(mUserInfo);
         } else {
             if (mUserId == 0) {
@@ -319,6 +320,8 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         String str = data.getStringExtra(EXTRA_RESULT_ID);
         if ("".equals(str) || null == str)
             return;
+        if (mUserInfo == null)
+            mUserInfo = new UserInfo();
         switch (requestCode) {
             case 0:
 
@@ -331,30 +334,39 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 break;
             case 3:
                 mNickNameTextView.setText(str);
+                mUserInfo.setUsername(str);
                 break;
             case 4:
                 mRegionTextView.setText(str);
+                mUserInfo.setDistrict(str);
                 break;
             case 5:
                 mLevelTextView.setText(str);
+                mUserInfo.setLevel(str);
                 break;
             case 6:
                 mBallTypeTextView.setText(str);
+                mUserInfo.setBall_type(str);
                 break;
             case 7:
                 mBilliardsCueTextView.setText(str);
+                mUserInfo.setBallArm(str);
                 break;
             case 8:
                 mCueHabitsTextView.setText(str);
+                mUserInfo.setUsedType(str);
                 break;
             case 9:
                 mPlayAgeTextView.setText(str);
+                mUserInfo.setBallAge(Integer.parseInt(str));
                 break;
             case 10:
                 mIdolTextView.setText(str);
+                mUserInfo.setIdol(str);
                 break;
             case 11:
                 mSignTextView.setText(str);
+                mUserInfo.setIdol_name(str);
                 break;
             case 12:
 

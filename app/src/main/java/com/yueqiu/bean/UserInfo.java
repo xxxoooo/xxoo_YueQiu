@@ -10,39 +10,39 @@ import org.json.JSONObject;
  */
 public class UserInfo {
     private int id;
-    private String img_url;//头像在网络中的地址
+    private String img_url = "";//头像在网络中的地址
     private String img_real;//头像在本地的地址
-    private String account;//账号
+    private String account = "";//账号
     private String phone;//电话
     private String password;//密码
     private int sex;//性别
     private String title;//职称
-    private String username;//昵称
-    private String district;//区域
-    private String level;//水平
-    private String ball_type;//球种
+    private String username = "";//昵称
+    private String district = "";//区域
+    private String level = "";//水平
+    private String ball_type = "";//球种
     private String appoint_date;//约球时间
-    private String ballArm;//使用球杆
-    private String usedType;//使用习惯
+    private String ballArm = "";//使用球杆
+    private String usedType = "";//使用习惯
     private int ballAge;//球龄
-    private String idol;//偶像
-    private String idol_name;//签名
-    private String new_img;//最新照片在网络中的位置
+    private String idol = "";//偶像
+    private String idol_name = "";//签名
+    private String new_img = "";//最新照片在网络中的位置
     private String new_img_real;//最新照片在本地的位置
 
-    private static final String JSON_IMGREAL = "img_real";
+    private static final String JSON_IMGREAL = "img_url";
     private static final String JSON_ACCOUNT = "account";
     private static final String JSON_SEX = "sex";
     private static final String JSON_USERNAME = "username";
-    private static final String JSON_DISTRICT= "district";
-    private static final String JSON_LEVEL= "level";
-    private static final String JSON_BALL_TYPE= "ball_type";
-    private static final String JSON_BALL_ARM= "ball_arm";
-    private static final String JSON_USED_TYPE= "used_type";
-    private static final String JSON_BALL_AGE= "ball_age";
-    private static final String JSON_IDOL= "idol";
-    private static final String JSON_SIGN= "sign";
-    private static final String JSON_NEW_IMG = "new_img_real";
+    private static final String JSON_DISTRICT = "district";
+    private static final String JSON_LEVEL = "level";
+    private static final String JSON_BALL_TYPE = "ball_type";
+    private static final String JSON_BALL_ARM = "ball_arm";
+    private static final String JSON_USED_TYPE = "used_type";
+    private static final String JSON_BALL_AGE = "ball_age";
+    private static final String JSON_IDOL = "idol";
+    private static final String JSON_SIGN = "sign";
+    private static final String JSON_NEW_IMG = "new_img";
 
 
     private String token;
@@ -236,7 +236,7 @@ public class UserInfo {
 
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
-        json.put(JSON_IMGREAL, img_real);
+        json.put(JSON_IMGREAL, img_url);
         json.put(JSON_ACCOUNT, account);
         json.put(JSON_SEX, String.valueOf(sex));
         json.put(JSON_USERNAME, username);
@@ -253,20 +253,20 @@ public class UserInfo {
     }
 
     public UserInfo(JSONObject obj) throws JSONException {
-        img_url = String.valueOf(obj.getInt("img_url"));
-        account = String.valueOf(obj.getInt("account"));
-        username = String.valueOf(obj.getInt("username"));
-        district = obj.getString("district");
-        level = String.valueOf(obj.getInt("level"));
-        ball_type = String.valueOf(obj.getInt("ball_type"));
-        appoint_date = obj.getString("appoint_date");
-        ballArm = obj.getString("ballArm");
-        usedType = obj.getString("usedType");
-        ballAge = obj.getInt("ballAge");
-        idol = String.valueOf(obj.getInt("idol"));
-        idol_name = obj.getString("idol_name");
-        new_img = obj.getString("new_img");
-        JSONArray list_data = obj.getJSONArray("sex");//TODO
+        img_url = String.valueOf(obj.getString(JSON_IMGREAL));
+        account = String.valueOf(obj.getString(JSON_ACCOUNT));
+        username = String.valueOf(obj.getString(JSON_USERNAME));
+        district = obj.getString(JSON_DISTRICT);
+        level = String.valueOf(obj.getString(JSON_LEVEL));
+        ball_type = String.valueOf(obj.getString(JSON_BALL_TYPE));
+//        appoint_date = obj.getString("appoint_date");
+        ballArm = obj.getString(JSON_BALL_ARM);
+        usedType = obj.getString(JSON_USED_TYPE);
+        ballAge = obj.getInt(JSON_BALL_AGE);
+        idol = String.valueOf(obj.getString(JSON_IDOL));
+        idol_name = obj.getString(JSON_SIGN);
+//        new_img = obj.getString(JSON_NEW_IMG);
+//        JSONArray list_data = obj.getJSONArray("sex");//TODO
 
     }
 

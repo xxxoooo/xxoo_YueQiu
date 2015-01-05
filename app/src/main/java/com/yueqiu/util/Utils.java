@@ -139,9 +139,9 @@ public class Utils {
                 jsonString.append(line);
             }
             JSONArray array = (JSONArray) new JSONTokener(jsonString.toString()).nextValue();
-            for (int i = 0; i < array.length(); i++) {
-                userInfo = new UserInfo(array.getJSONObject(i));
-            }
+
+            userInfo = new UserInfo(array.getJSONObject(0));
+
 
         } catch (Exception e) {
             Log.e(TAG, "Exception: " + e.toString());
