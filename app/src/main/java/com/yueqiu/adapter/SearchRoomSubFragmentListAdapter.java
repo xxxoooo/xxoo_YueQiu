@@ -92,9 +92,6 @@ public class SearchRoomSubFragmentListAdapter extends BaseAdapter
         private TextView mRoomAddress;
         private TextView mRoomDistance;
     }
-
-
-
 }
 
 

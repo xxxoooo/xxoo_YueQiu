@@ -1,4 +1,4 @@
-package com.yueqiu.fragment.search.subfragment;
+package com.yueqiu.fragment.search.common;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
