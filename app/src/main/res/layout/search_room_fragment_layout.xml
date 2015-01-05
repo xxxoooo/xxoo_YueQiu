@@ -3,8 +3,60 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
+    <!--用于SearchActivity当中的球厅子Fragment当中的
+        ViewPager的加载-->
+    <FrameLayout
+        android:id="@+id/room_gallery_view_pager_zone"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@android:color/holo_orange_light">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/room_fragment_gallery_pager"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            >
+
+        </android.support.v4.view.ViewPager>
+
+        <!-- the indicator -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/room_fragment_gallery_pager_indicator_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="5dp"
+                android:gravity="right"
+                android:orientation="horizontal">
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </FrameLayout>
+    
+    <TextView
+        android:background="@android:color/background_light"
+        android:id="@+id/tv_room_gallery_view_pager_indication"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/room_gallery_view_pager_zone"
+        android:layout_centerHorizontal="true"
+        android:text="@string/search_gallery_pager_test_str"
+        android:textStyle="normal"
+        android:textColor="@android:color/darker_gray"
+        android:padding="2dp"
+        android:textSize="13sp"
+        />
+    
     <!--用于SearchActivity当中的球厅的子Fragment的布局文件-->
     <LinearLayout
+        android:layout_below="@id/tv_room_gallery_view_pager_indication"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -14,6 +66,7 @@
         android:background="@drawable/btn_bg">
 
         <Button
+            android:id="@+id/btn_room_district"
             android:layout_weight="0.25"
             style="@style/SearchSubFragmentFilterBtnStyle"
             android:text="@string/search_room_subfragment_title_zone"/>
@@ -31,6 +84,7 @@
         </View>
 
         <Button
+            android:id="@+id/btn_room_distance"
             android:layout_weight="0.25"
             style="@style/SearchSubFragmentFilterBtnStyle"
             android:text="@string/search_room_subfragment_title_distance"/>
@@ -48,6 +102,7 @@
         </View>
 
         <Button
+            android:id="@+id/btn_room_price"
             android:layout_weight="0.25"
             style="@style/SearchSubFragmentFilterBtnStyle"
             android:text="@string/search_room_subfragment_title_price"/>
@@ -65,6 +120,7 @@
         </View>
 
         <Button
+            android:id="@+id/btn_room_apprisal"
             android:layout_weight="0.25"
             style="@style/SearchSubFragmentFilterBtnStyle"
             android:text="@string/search_room_subfragment_title_review"/>

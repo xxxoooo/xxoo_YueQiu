@@ -6,6 +6,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -77,6 +78,7 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
         switch(id){
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
         }
         return true;
@@ -90,5 +92,16 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
         SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

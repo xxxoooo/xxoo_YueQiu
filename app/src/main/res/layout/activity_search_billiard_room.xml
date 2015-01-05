@@ -2,15 +2,155 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                tools:context="com.yueqiu.activity.searchmenu.nearby.SearchBilliardRoomActivity">
+                tools:context="com.yueqiu.activity.searchmenu.search.SearchBilliardRoomActivity">
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.yueqiu.activity.searchmenu.nearby.SearchBilliardRoomActivity">
+
+    <FrameLayout
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/img_search_room_detailed_photo_frame">
+
+        <ImageView
+            android:scaleType="fitXY"
+            android:layout_gravity="top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/img_search_room_detailed_photo"
+            android:src="@drawable/test_pager_5"
+            />
+
+        <RelativeLayout
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="#27272726">
+
+            <TextView
+                android:id="@+id/tv_search_room_detailed_name"
+                android:textStyle="bold"
+                android:textSize="19sp"
+                android:layout_centerVertical="true"
+                android:padding="4dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:text="@string/search_room_sub_fragment_listitem_roomname"
+                />
+
+            <TextView
+                android:layout_centerVertical="true"
+                android:id="@+id/tv_search_room_level_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4.0"
+                android:textSize="22sp"
+                android:textColor="@android:color/holo_orange_light"
+                android:layout_alignParentRight="true"/>
+
+            <RatingBar
+                android:id="@+id/ratingbar_search_room_detailed_ratingbar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/SearchActivityRatingBarStyle"
+                android:numStars="5"
+                android:rating="4.0"
+                android:padding="3dp"
+                android:layout_toLeftOf="@id/tv_search_room_level_num"
+                android:layout_centerVertical="true"
+                />
+
+
+        </RelativeLayout>
+
+    </FrameLayout>
 
     <TextView
-        android:text="@string/hello_world"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_below="@id/img_search_room_detailed_photo_frame"
+        style="@style/SearchRoomActivityTvStyle"
+        android:id="@+id/tv_search_room_per_people_price_indi"
+        android:drawableLeft="@drawable/price_indicator"
+        android:text="@string/search_room_detailedactivity_price_indi"
+        />
+
+    <TextView
+        android:id="@+id/tv_search_room_per_people_price"
+        style="@style/SearchRoomActivityTvStyle"
+        android:layout_below="@id/img_search_room_detailed_photo_frame"
+        android:layout_toRightOf="@id/tv_search_room_per_people_price_indi"
+        android:text="@string/search_room_detailedactivity_price_test"/>
+
+    <TextView
+        android:layout_below="@id/tv_search_room_per_people_price_indi"
+        style="@style/SearchRoomActivityTvStyle"
+        android:id="@+id/tv_search_room_tag_indi"
+        android:text="@string/search_room_detailedactivity_tag_indi"
+        android:drawableLeft="@drawable/tag_indicator"
+        />
+
+    <TextView
+        style="@style/SearchRoomActivityTvStyle"
+        android:id="@+id/tv_search_room_tag"
+        android:text="@string/search_room_detailedactivity_tag_test"
+        android:layout_toRightOf="@id/tv_search_room_tag_indi"
+        android:layout_below="@id/tv_search_room_per_people_price_indi"/>
+
+    <TextView
+        android:layout_below="@id/tv_search_room_tag_indi"
+        style="@style/SearchRoomActivityTvStyle"
+        android:id="@+id/tv_search_room_address_indi"
+        android:drawableLeft="@drawable/location_indicator"
+        android:text="@string/search_room_detailedactivity_address_indi"/>
+
+    <TextView
+        android:layout_below="@id/tv_search_room_tag_indi"
+        style="@style/SearchRoomActivityTvStyle"
+        android:id="@+id/tv_search_room_address"
+        android:text="@string/search_room_detailedactivity_address_test"
+        android:layout_toRightOf="@id/tv_search_room_address_indi"/>
+
+    <TextView
+        android:layout_below="@id/tv_search_room_address"
+        style="@style/SearchRoomActivityTvStyle"
+        android:id="@+id/search_room_phone_indi"
+        android:text="@string/search_room_detailedactivity_phone_indi"
+        android:drawableLeft="@drawable/phone_indicator"/>
+
+    <!--注意我们把以下的字符串声明成了电话号码的形式，这是很重要的-->
+    <TextView
+        android:id="@+id/tv_search_room_phone"
+        android:layout_below="@id/tv_search_room_address"
+        style="@style/SearchRoomActivityTvStyle"
+        android:layout_toRightOf="@id/search_room_phone_indi"
+        android:text="@string/search_room_detailedactivity_phone_test"
+        android:phoneNumber="true"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/darker_gray"
+        android:text="@string/search_room_detailedactivity_detailed_info_separator"
+        android:textStyle="bold"
+        android:textSize="19sp"
+        android:paddingLeft="13dp"
+        android:paddingBottom="7dp"
+        android:paddingTop="7dp"
+        android:paddingRight="7dp"
+        android:layout_margin="2dp"
+        android:layout_below="@id/search_room_phone_indi"
+        android:id="@+id/tv_separator"
+        />
+
+    <TextView
+        android:id="@+id/tv_search_room_detailed_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_separator"
+        />
+
 
 </RelativeLayout>

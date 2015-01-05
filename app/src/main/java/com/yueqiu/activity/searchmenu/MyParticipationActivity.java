@@ -11,8 +11,8 @@ import android.support.v4.view.ViewPager;
 import android.view.MenuItem;
 
 import com.yueqiu.R;
-import com.yueqiu.fragment.FriendRequestFragment;
-import com.yueqiu.fragment.ReplyMentionMeFragment;
+import com.yueqiu.fragment.myparticipation.BilliardDatingFragment;
+import com.yueqiu.fragment.myparticipation.MyActivitiesFragment;
 
 /**
  * created by doushuqi on 14/12/19.
@@ -31,13 +31,13 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
         setContentView(R.layout.activity_myparticipation);
         initActionBar();
         mTitles = new String[]{
-          getString(R.string.billiard_dating),
-          getString(R.string.activities)
+                getString(R.string.billiard_dating),
+                getString(R.string.participation_activities)
         };
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.myparticipation_container);
         mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 mActionBar.setSelectedNavigationItem(position);
@@ -45,7 +45,7 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
         });
 
         ActionBar.Tab tab;
-        for(int i=0; i<mPagerAdapter.getCount();i++){
+        for (int i = 0; i < mPagerAdapter.getCount(); i++) {
             tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
             mActionBar.addTab(tab);
         }
@@ -53,7 +53,7 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
         mViewPager.setAdapter(mPagerAdapter);
     }
 
-    private void initActionBar(){
+    private void initActionBar() {
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -64,7 +64,7 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch(id){
+        switch (id) {
             case android.R.id.home:
                 finish();
                 break;
@@ -88,7 +88,7 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
 
     }
 
-    public class SectionPagerAdapter extends FragmentPagerAdapter{
+    public class SectionPagerAdapter extends FragmentPagerAdapter {
 
         public SectionPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -96,12 +96,13 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
 
         @Override
         public Fragment getItem(int i) {
-            switch(i){
+            switch (i) {
                 case 0:
-                    mFragment = new ReplyMentionMeFragment();
+//                    mFragment = new BilliardDatingFragment();
+                    mFragment = new MyActivitiesFragment();//should to be replaced!
                     break;
                 case 1:
-                    mFragment = new FriendRequestFragment();
+                    mFragment = new MyActivitiesFragment();
                     break;
             }
             return mFragment;

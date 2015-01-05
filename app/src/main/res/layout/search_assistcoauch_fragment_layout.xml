@@ -4,9 +4,58 @@
                 android:layout_height="match_parent">
 
 
+    <FrameLayout
+        android:id="@+id/assistcoauch_gallery_view_pager_zone"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@android:color/holo_orange_light"
+        >
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/assistcoauch_fragment_gallery_pager"
+            android:layout_width="match_parent"
+            android:layout_height="140dp">
+
+        </android.support.v4.view.ViewPager>
+        <!-- the indicator-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <!--用于包含5个圆点，用于Viewpager的indicator-->
+            <LinearLayout
+                android:id="@+id/assistcoauch_fragment_gallery_pager_indicator_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="5dp"
+                android:gravity="right"
+                android:orientation="horizontal">
+
+            </LinearLayout>
+        </RelativeLayout>
+    </FrameLayout>
+
+    <!--这个区域是用于显示广告用语的-->
+    <TextView
+        android:background="@android:color/background_light"
+        android:id="@+id/tv_assistcoauch_gallery_view_pager_indication"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:layout_below="@id/assistcoauch_gallery_view_pager_zone"
+        android:layout_centerHorizontal="true"
+        android:text="@string/search_gallery_pager_test_str"
+        android:textStyle="normal"
+        android:textColor="@android:color/darker_gray"
+        android:padding="2dp"
+        android:textSize="13sp"
+        />
+
 
     <!--用于SearchActivity当中的助教子Fragment的布局文件-->
     <LinearLayout
+        android:layout_below="@id/tv_assistcoauch_gallery_view_pager_indication"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"

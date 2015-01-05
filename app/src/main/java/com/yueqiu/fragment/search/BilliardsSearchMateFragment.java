@@ -49,21 +49,27 @@ public class BilliardsSearchMateFragment extends Fragment
     private static Button sBtnDistanceFilter, sBtnGenderFilter;
 
     @SuppressLint("ValidFragment")
-    public BilliardsSearchMateFragment(Context context)
+    public BilliardsSearchMateFragment()
     {
-        sContext = context;
     }
 
     private static final String KEY_BILLIARDS_SEARCH_PARENT_FRAGMENT = "keyBilliardsSearchParentFragment";
 
     public static BilliardsSearchMateFragment newInstance(Context context, String params)
     {
-        BilliardsSearchMateFragment fragment = new BilliardsSearchMateFragment(context);
+        sContext = context;
+        BilliardsSearchMateFragment fragment = new BilliardsSearchMateFragment();
 
         Bundle args = new Bundle();
         args.putString(KEY_BILLIARDS_SEARCH_PARENT_FRAGMENT, params);
 
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -224,7 +230,7 @@ public class BilliardsSearchMateFragment extends Fragment
         }
     }
     // this is for the popupWindow that use to displayed that correspond to the filter button
-    private static void initPopupWindow(Context context, View anchorView, int layoutResId)
+    protected static void initPopupWindow(Context context, View anchorView, int layoutResId)
     {
         final int popupWidth = LinearLayout.LayoutParams.MATCH_PARENT;
         final int popupHeight = LinearLayout.LayoutParams.WRAP_CONTENT;
