@@ -120,7 +120,7 @@ public class HttpConstants
      */
     public static final class GetMyInfo
     {
-        public static final String URL = "/user/login";
+        public static final String URL = "/center/getInfo";
 
         /*
          * 用户ID
