@@ -46,7 +46,7 @@
                 android:padding="2dp"
                 android:text="男"
                 android:drawableRight="@drawable/male"
-                android:background="@drawable/textview_withdrawable_bg"/>
+                android:background="@color/devide_line"/>
             <TextView
                 style="@style/ListItemTvStyle"
                 android:layout_margin="4dp"
@@ -54,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:padding="2dp"
                 android:text="海淀区"
-                android:background="@drawable/textview_withdrawable_bg"/>
+                android:background="@color/devide_line"/>
             </LinearLayout>
 
 

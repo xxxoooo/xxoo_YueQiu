@@ -39,8 +39,6 @@
 
         <!-- 聊吧Activity -->
         <activity android:name=".ChatBarActivity" />
-        <activity android:name=".ChatBarSearchResultActivity" />
-        <activity android:name=".ChatBarSearchActivity" />
         <!--聊吧 END-->
 
         <activity android:name=".ActivitiesActivity" />

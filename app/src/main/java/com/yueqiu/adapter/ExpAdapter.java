@@ -65,7 +65,7 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
         this.maps = maps;
         this.mIphoneTreeView = mIphoneTreeView;
         groupStatusMap = new HashMap<Integer, Integer>();
-        dir = FileUtil.getRecentChatPath();
+//        dir = FileUtil.getRecentChatPath();
     }
 
 	public Object getChild(int groupPosition, int childPosition) {
