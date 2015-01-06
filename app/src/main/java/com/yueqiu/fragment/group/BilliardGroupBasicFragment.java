@@ -43,6 +43,7 @@ public class BilliardGroupBasicFragment extends Fragment {
         GroupNoteInfo bean1 = new GroupNoteInfo();
         bean1.setTitle("求助台球高手们");
         bean1.setContent("我接触台球时间挺长...");
+        //bean1.set
         bean1.setBrowseCount(213);
         bean1.setCommentCount(23);
         bean1.setIssueTime("12-20 21:20");

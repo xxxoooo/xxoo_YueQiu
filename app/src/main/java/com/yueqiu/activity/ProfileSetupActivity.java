@@ -1,4 +1,4 @@
-package com.yueqiu;
+package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.yueqiu.R;
 import com.yueqiu.activity.MyProfileActivity;
 import com.yueqiu.fragment.myprofilesetup.BallTypeSetupFragment;
 import com.yueqiu.fragment.myprofilesetup.BilliardsCueSetupFragment;

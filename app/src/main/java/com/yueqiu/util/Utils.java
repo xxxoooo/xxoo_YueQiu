@@ -36,6 +36,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -126,7 +127,6 @@ public class Utils {
     }
 
     /**
-<<<<<<< HEAD
      * String类型转换为Date
      * @param currTime
      * @param formatType
@@ -287,17 +287,17 @@ public class Utils {
     /**
      * 设置普通Activity的Menu文字的颜色为白色
      */
-    public static void setActivityMenuColor(final Activity activity){
+    public static void setActivityMenuColor(final Activity activity) {
         activity.getLayoutInflater().setFactory(
                 new android.view.LayoutInflater.Factory() {
-                    public View onCreateView(String name, Context context,AttributeSet attrs) {
+                    public View onCreateView(String name, Context context, AttributeSet attrs) {
                         // 指定自定义inflate的对象
                         if (name.equalsIgnoreCase("com.android.internal.view.menu.IconMenuItemView")
                                 || name.equalsIgnoreCase("com.android.internal.view.menu.ActionMenuItemView")) {
                             try {
                                 LayoutInflater f = activity.getLayoutInflater();
-                                final View view = f.createView(name, null,attrs);
-                                if(view instanceof TextView) {
+                                final View view = f.createView(name, null, attrs);
+                                if (view instanceof TextView) {
                                     new Handler().post(new Runnable() {
                                         public void run() {
                                             // 设置背景图片
@@ -317,6 +317,58 @@ public class Utils {
                     }
                 }
         );
+    }
+    /**
+     * 将JSONObject转换成相应对象
+     * @param clazz
+     * @param object
+     * @return
+     */
+    public static <T> T mapingObject(Class<T> clazz, JSONObject object) {
+        T t = null;
+        try {
+            t = clazz.newInstance();
+            Method[] methods = clazz.getDeclaredMethods();
+            for (int i = 0; i < methods.length; i++) {
+                String methodName = methods[i].getName();
+                if (methodName.startsWith("set")) {
+                    String fieldName = methodName.substring(3,
+                            methodName.length()).toLowerCase();
+                    Object o = object.get(fieldName);
+                    if (null != o) {
+                        methods[i].invoke(t, toRealObject(o));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return t;
+    }
+
+    /**
+     * 类型转换
+     * @param o
+     * @return
+     */
+    private static Object toRealObject(Object o) {
+        if (o instanceof Integer)
+            return (Integer) o;
+        else if (o instanceof Short)
+            return (Short) o;
+        else if (o instanceof Long)
+            return (Long) o;
+        else if (o instanceof Double)
+            return (Double) o;
+        else if (o instanceof Float)
+            return (Float) o;
+        else if (o instanceof String)
+            return (String) o;
+        else if (o instanceof Boolean)
+            return (Boolean) o;
+        else if (o instanceof Byte)
+            return (Byte) o;
+        return o;
     }
 
 }

@@ -8,13 +8,10 @@ import android.os.Message;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.yueqiu.ProfileSetupActivity;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.UserInfo;
-import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
-import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 
@@ -24,14 +21,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -80,6 +80,10 @@
             android:name=".activity.GroupSelectTopicTypeActivity"
             android:label="@string/title_activity_group_select_topic_type" >
         </activity>
+        <activity
+            android:name=".activity.GroupTopicDetailActivity"
+            android:label="@string/title_activity_group_topic_detail" >
+        </activity>
     </application>
 
 </manifest>

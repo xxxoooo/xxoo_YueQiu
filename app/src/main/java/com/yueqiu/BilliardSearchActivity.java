@@ -300,44 +300,6 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-
-        LayoutInflater layoutInflater = getLayoutInflater();
-        final LayoutInflater.Factory existingFactory = layoutInflater.getFactory();
-        // use introspection to allow a new Factory to be set
-        try {
-            Field field = LayoutInflater.class.getDeclaredField("mFactorySet");
-            field.setAccessible(true);
-            field.setBoolean(layoutInflater, false);
-            getLayoutInflater().setFactory(new LayoutInflater.Factory() {
-                @Override
-                public View onCreateView(String name, final Context context, AttributeSet attrs) {
-                    View view = null;
-                    // if a factory was already set, we use the returned view
-                    if (existingFactory != null) {
-                        if (name.equalsIgnoreCase("com.android.internal.view.menu.IconMenuItemView")
-                                || name.equalsIgnoreCase("com.android.internal.view.menu.ActionMenuItemView")) {
-                            view = existingFactory.onCreateView(name, context, attrs);
-                            if(view instanceof TextView) {
-                                final View finalView = view;
-                                new Handler().post(new Runnable() {
-                                    public void run() {
-                                        ((TextView) finalView).setTextColor(getResources().getColor(R.color.white));
-                                     }
-                                });
-                            }
-                        }
-                    }
-                    return view;
-                }
-            });
-        } catch (NoSuchFieldException e) {
-            // ...
-        } catch (IllegalArgumentException e) {
-            // ...
-        } catch (IllegalAccessException e) {
-            // ...
-        }
-
         getMenuInflater().inflate(R.menu.billiard_search, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);

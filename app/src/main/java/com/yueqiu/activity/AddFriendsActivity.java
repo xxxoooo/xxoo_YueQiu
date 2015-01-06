@@ -1,7 +1,9 @@
-package com.yueqiu;
+package com.yueqiu.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
+
+import com.yueqiu.R;
 
 /**
  * Created by administrator on 14/12/25.

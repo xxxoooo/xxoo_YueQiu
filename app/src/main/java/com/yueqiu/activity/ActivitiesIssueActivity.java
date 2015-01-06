@@ -2,8 +2,14 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -63,6 +69,28 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         mEndTime = (TextView) findViewById(R.id.activity_end_time_text);
         mChargeModule = (TextView) findViewById(R.id.activity_charge_module_text);
 
+//        Html.ImageGetter imageGetter = new Html.ImageGetter() {
+//            @Override
+//            public Drawable getDrawable(String source) {
+//                int id = Integer.parseInt(source);
+//                Drawable d = getResources().getDrawable(id);
+//                d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
+//                return d;
+//            }
+//        };
+        Drawable drawable = getResources().getDrawable(R.drawable.e02);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        //需要处理的文本，[smile]是需要被替代的文本
+        SpannableString spannable = new SpannableString("[smile]");
+        //要让图片替代指定的文字就要用ImageSpan
+        ImageSpan span = new ImageSpan(drawable, ImageSpan.ALIGN_BASELINE);
+        //开始替换，注意第2和第3个参数表示从哪里开始替换到哪里替换结束（start和end）
+        //最后一个参数类似数学中的集合,[5,12)表示从5到12，包括5但不包括12
+        spannable.setSpan(span, 0,"[smile]".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        mTitle.setText("aaaa" + spannable);
+
+
+
         final Calendar calendar = Calendar.getInstance();
 
         mDatePickerDialog = DatePickerDialog.newInstance(this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), false);
@@ -110,6 +138,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.activity_location_text:
+                Log.d("wy",mTitle.getText().toString());
                 break;
             case R.id.activity_start_time_text:
                 mDatePickerDialog.setVibrate(false);
@@ -135,7 +164,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
                 }else if(mChargeModule.getText().equals(getString(R.string.charge_module_pay))){
                     intent.putExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_PAY);
                 }else{
-                    intent.putExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_AA);
+                   intent.putExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_AA);
                 }
                 startActivityForResult(intent,0);
                 overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);

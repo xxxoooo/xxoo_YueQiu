@@ -277,5 +277,6 @@
     <string name="activities_content">活动内容</string>
     <string name="please_login_first">请先登录，登录后才可使用全部功能</string>
     <string name="title_activity_group_select_topic_type">GroupSelectTopicTypeActivity</string>
+    <string name="title_activity_group_topic_detail">GroupTopicDetailActivity</string>
 
 </resources>
