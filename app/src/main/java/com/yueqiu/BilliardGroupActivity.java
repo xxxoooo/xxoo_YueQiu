@@ -43,7 +43,8 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
                 getString(R.string.billiard_get_master),
                 getString(R.string.billiard_be_master),
                 getString(R.string.billiard_find_friend),
-                getString(R.string.billiard_equipment)
+                getString(R.string.billiard_equipment),
+                getString(R.string.billiard_other)
         };
     }
 
@@ -62,7 +63,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
 
         @Override
         public int getCount() {
-            return 5;
+            return mTitles.length;
         }
 
         @Override

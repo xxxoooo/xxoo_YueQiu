@@ -38,6 +38,7 @@ public class BilliardGroupBasicFragment extends Fragment {
         ((RadioButton)mGroup.findViewById(R.id.billiard_time_sort)).setChecked(true);
 
         mListView = (ListView) mView.findViewById(R.id.billiard_group_listview);
+        mList.clear();
         //ToDo:测试数据
         GroupNoteInfo bean1 = new GroupNoteInfo();
         bean1.setTitle("求助台球高手们");
