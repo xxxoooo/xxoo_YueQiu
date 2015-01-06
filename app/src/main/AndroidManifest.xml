@@ -41,6 +41,7 @@
 
         <!-- 聊吧Activity -->
         <activity android:name=".ChatBarActivity" />
+        <activity android:name=".AddFriendsActivity"/>
         <!--聊吧 END-->
 
         <activity android:name=".ActivitiesActivity" />

@@ -31,6 +31,7 @@ public class UserInfo {
     private String new_img_real;//最新照片在本地的位置
     private int ball_class;
 
+    private static final String JSON_USER_ID = "user_id";
     private static final String JSON_IMGREAL = "img_url";
     private static final String JSON_ACCOUNT = "username";//账户
     private static final String JSON_SEX = "sex";
@@ -240,6 +241,7 @@ public class UserInfo {
 
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
+        json.put(JSON_USER_ID, user_id);
         json.put(JSON_IMGREAL, img_url);
         json.put(JSON_ACCOUNT, account);
         json.put(JSON_SEX, String.valueOf(sex));
@@ -259,6 +261,7 @@ public class UserInfo {
     }
 
     public UserInfo(JSONObject obj) throws JSONException {
+        user_id = obj.getInt(JSON_USER_ID);
         img_url = String.valueOf(obj.getString(JSON_IMGREAL));
         account = String.valueOf(obj.getString(JSON_ACCOUNT));
         sex = obj.getInt(JSON_SEX);//接口数据含义未确定

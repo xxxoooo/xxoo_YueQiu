@@ -1,6 +1,7 @@
 package com.yueqiu.fragment.chatbar;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,8 +12,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+
+import com.yueqiu.AddFriendsActivity;
 import com.yueqiu.R;
 import com.yueqiu.adapter.ChatBarItemAdapter;
 
@@ -44,7 +48,12 @@ public class MessageFragment extends Fragment {
         mListView = (ListView) view.findViewById(R.id.chatbar_message_lv_account);
         ChatBarItemAdapter adapter = new ChatBarItemAdapter(getActivity());
         mListView.setAdapter(adapter);
-
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                startActivity(new Intent(getActivity(), AddFriendsActivity.class));
+            }
+        });
         return view;
     }
 

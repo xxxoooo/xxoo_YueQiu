@@ -3,13 +3,16 @@
 
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-    <ImageButton
+    <Button
         android:id="@+id/add_to_friends"
         android:layout_alignParentBottom="true"
         android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"/>
+        android:background="@drawable/update_assistant_click"
+        android:text="@string/btn_add_friend"
+        android:textColor="@color/white"/>
+
 
     <com.yueqiu.view.CustomerScrollView
         android:id="@+id/customer_view"
@@ -31,7 +34,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="60dp">
+                    android:layout_height="72dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -46,7 +49,7 @@
                         android:layout_marginRight="10dp"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:src="@drawable/ic_launcher"/>
+                        android:src="@drawable/account"/>
                 </RelativeLayout>
 
                 <View
@@ -56,7 +59,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -81,7 +84,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -106,14 +109,15 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:background="@drawable/list_corner_round_bg">
 
 
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -138,7 +142,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -162,7 +166,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -187,7 +191,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -211,7 +215,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -236,7 +240,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"

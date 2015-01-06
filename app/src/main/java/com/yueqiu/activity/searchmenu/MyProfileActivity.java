@@ -110,7 +110,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     //初始化我的资料数据
     private void initData() {
         mUserInfo = Utils.getMyProfileFromLocal(this);
-        if (mUserInfo != null) {
+        if (mUserInfo != null && mUserInfo.getUser_id() == mUserId) {
             //从本地获取我的资料
             Log.e(TAG, "从本地获取我的资料");
             updateUI(mUserInfo);
