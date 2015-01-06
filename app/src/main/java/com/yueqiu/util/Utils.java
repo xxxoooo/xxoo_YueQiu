@@ -23,6 +23,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -155,4 +156,58 @@ public class Utils {
         }
         return userInfo;
     }
+
+    /**
+     * 将JSONObject转换成相应对象
+     * @param clazz
+     * @param object
+     * @return
+     */
+    public static <T> T mapingObject(Class<T> clazz, JSONObject object) {
+        T t = null;
+        try {
+            t = clazz.newInstance();
+            Method[] methods = clazz.getDeclaredMethods();
+            for (int i = 0; i < methods.length; i++) {
+                String methodName = methods[i].getName();
+                if (methodName.startsWith("set")) {
+                    String fieldName = methodName.substring(3,
+                            methodName.length()).toLowerCase();
+                    Object o = object.get(fieldName);
+                    if (null != o) {
+                        methods[i].invoke(t, toRealObject(o));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return t;
+    }
+
+    /**
+     * 类型转换
+     * @param o
+     * @return
+     */
+    private static Object toRealObject(Object o) {
+        if (o instanceof Integer)
+            return (Integer) o;
+        else if (o instanceof Short)
+            return (Short) o;
+        else if (o instanceof Long)
+            return (Long) o;
+        else if (o instanceof Double)
+            return (Double) o;
+        else if (o instanceof Float)
+            return (Float) o;
+        else if (o instanceof String)
+            return (String) o;
+        else if (o instanceof Boolean)
+            return (Boolean) o;
+        else if (o instanceof Byte)
+            return (Byte) o;
+        return o;
+    }
+
 }
