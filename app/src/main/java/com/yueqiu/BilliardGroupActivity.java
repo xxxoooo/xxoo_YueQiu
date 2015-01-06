@@ -6,19 +6,20 @@ import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
-import com.yueqiu.activity.searchmenu.nearby.SearchResultActivity;
+import com.yueqiu.activity.GroupIssueTopic;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
 
 /**
@@ -42,10 +43,9 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
                 getString(R.string.billiard_get_master),
                 getString(R.string.billiard_be_master),
                 getString(R.string.billiard_find_friend),
-                getString(R.string.billiard_equipment)
+                getString(R.string.billiard_equipment),
+                getString(R.string.billiard_other)
         };
-
-
     }
 
     public class SectionPagerAdapter extends FragmentPagerAdapter{
@@ -56,7 +56,6 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
 
         @Override
         public Fragment getItem(int i) {
-            Log.d("wy","i->" + i);
 
             Fragment mFragment = new BilliardGroupBasicFragment();
             return mFragment;
@@ -64,7 +63,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
 
         @Override
         public int getCount() {
-            return 5;
+            return mTitles.length;
         }
 
         @Override
@@ -91,10 +90,10 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.billiard_search, menu);
+        getMenuInflater().inflate(R.menu.billiard_group, menu);
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        SearchView searchView =(SearchView) menu.findItem(R.id.group_nemu_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
@@ -105,6 +104,11 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
             case android.R.id.home:
                 this.finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+            case R.id.group_menu_editor:
+                Intent intent = new Intent(this, GroupIssueTopic.class);
+                startActivity(intent);
+                //overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
                 break;
         }
         return super.onOptionsItemSelected(item);

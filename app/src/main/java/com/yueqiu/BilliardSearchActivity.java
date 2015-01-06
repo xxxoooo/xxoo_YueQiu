@@ -15,7 +15,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.InflateException;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,16 +27,17 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.yueqiu.activity.searchmenu.ActivitiesIssueActivity;
-import com.yueqiu.activity.searchmenu.FeedbackActivity;
-import com.yueqiu.activity.searchmenu.LoginActivity;
-import com.yueqiu.activity.searchmenu.MyParticipationActivity;
-import com.yueqiu.activity.searchmenu.MyProfileActivity;
-import com.yueqiu.activity.searchmenu.MyfavorCollActivity;
-import com.yueqiu.activity.searchmenu.PublishedInfoActivity;
-import com.yueqiu.activity.searchmenu.nearby.SearchResultActivity;
+import com.yueqiu.activity.ActivitiesIssueActivity;
+import com.yueqiu.activity.FeedbackActivity;
+import com.yueqiu.activity.LoginActivity;
+import com.yueqiu.activity.MyParticipationActivity;
+import com.yueqiu.activity.MyProfileActivity;
+import com.yueqiu.activity.MyfavorCollActivity;
+import com.yueqiu.activity.PublishedInfoActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.SlideViewAdapter;
 import com.yueqiu.bean.ListItem;
 import com.yueqiu.bean.SlideAccountItem;
@@ -53,6 +57,7 @@ import com.yueqiu.view.menudrawer.Position;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -330,7 +335,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
         mItemList.clear();
         SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getAccount(),
-                100, YueQiuApp.sUserInfo.getTitle());
+                100, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(accountItem);
 
         String[] values = new String[]{
@@ -372,32 +377,61 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                 Intent intent = new Intent();
                 switch (position) {
                     case 0:
-                        intent.setClass(BilliardSearchActivity.this, LoginActivity.class);
+                        int user_id = YueQiuApp.sUserInfo.getUser_id();
+                        if(user_id < 1) {
+                            intent.setClass(BilliardSearchActivity.this, LoginActivity.class);
+                        }else{
+                            intent.setClass(BilliardSearchActivity.this,MyProfileActivity.class);
+                        }
                         startActivity(intent);
                         break;
                     case 1:
-                        intent.setClass(BilliardSearchActivity.this, MyProfileActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, MyProfileActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 2:
-                        intent.setClass(BilliardSearchActivity.this, MyParticipationActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, MyParticipationActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 3:
-                        intent.setClass(BilliardSearchActivity.this, MyfavorCollActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, MyfavorCollActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 4:
-                        intent.setClass(BilliardSearchActivity.this, PublishedInfoActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, PublishedInfoActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 5:
-                        intent.setClass(BilliardSearchActivity.this, ActivitiesIssueActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, ActivitiesIssueActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 6:
-                        intent.setClass(BilliardSearchActivity.this, FeedbackActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, FeedbackActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 7:
                         if (Utils.networkAvaiable(BilliardSearchActivity.this)) {
@@ -469,16 +503,18 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         YueQiuApp.sUserInfo.setImg_url("");
         YueQiuApp.sUserInfo.setAccount(getString(R.string.guest));
         YueQiuApp.sUserInfo.setUser_id(0);
+        YueQiuApp.sUserInfo.setPhone("");
 
-        mEditor.putString(PublicConstant.USER_NAME, getString(R.string.guest));
-        mEditor.putString(PublicConstant.USER_ID, "0");
-        mEditor.putString(PublicConstant.IMG_URL, "");
+        mEditor.putString(PublicConstant.USER_NAME,getString(R.string.guest));
+        mEditor.putString(PublicConstant.USER_ID,"0");
+        mEditor.putString(PublicConstant.IMG_URL,"");
+        mEditor.putString(PublicConstant.PHONE,"");
         mEditor.apply();
 
 
         mItemList.remove(0);
         SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getAccount(),
-                0, YueQiuApp.sUserInfo.getTitle());
+                0, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(0, accountItem);
         mAdapter.notifyDataSetChanged();
 
@@ -507,6 +543,13 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
             return;
         }
         super.onBackPressed();
+    }
+    private boolean checkUserId(){
+        int user_id = YueQiuApp.sUserInfo.getUser_id();
+        if(user_id < 1)
+            return false;
+        return true;
+
     }
 
 

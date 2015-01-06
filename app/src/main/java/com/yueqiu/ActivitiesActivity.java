@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.SearchView;
 
-import com.yueqiu.activity.searchmenu.nearby.SearchResultActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.ActivitiesListViewAdapter;
 import com.yueqiu.bean.Activities;
 

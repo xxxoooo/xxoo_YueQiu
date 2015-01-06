@@ -14,6 +14,8 @@ public class GroupNoteInfo {
     private String content;
     private int loveNums;
     private int commentCount;
+    private String snippet;//内容的片段摘要
+    private String attachMent;//附件流
 
     public int getLoveNums() {
         return loveNums;
@@ -93,5 +95,21 @@ public class GroupNoteInfo {
 
     public void setCommentCount(int commentCount) {
         this.commentCount = commentCount;
+    }
+
+    public String getSnippet() {
+        return snippet;
+    }
+
+    public void setSnippet(String snippet) {
+        this.snippet = snippet;
+    }
+
+    public String getAttachMent() {
+        return attachMent;
+    }
+
+    public void setAttachMent(String attachMent) {
+        this.attachMent = attachMent;
     }
 }

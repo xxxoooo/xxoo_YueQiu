@@ -1,6 +1,7 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.yueqiu.R;
+import com.yueqiu.activity.LoginActivity;
 import com.yueqiu.bean.ListItem;
 import com.yueqiu.bean.SlideAccountItem;
 import com.yueqiu.bean.SlideOtherItem;
@@ -116,6 +118,7 @@ public class SlideViewAdapter extends BaseAdapter {
                    accountHolder.image = (ImageView) convertView.findViewById(R.id.account_image);
                    accountHolder.name = (TextView) convertView.findViewById(R.id.account_name);
                    accountHolder.golden = (TextView) convertView.findViewById(R.id.account_golden);
+                   accountHolder.login = (TextView) convertView.findViewById(R.id.slide_login);
                    convertView.setTag(accountHolder);
                }else{
                    accountHolder = (ViewAccountHolder) convertView.getTag();
@@ -144,8 +147,23 @@ public class SlideViewAdapter extends BaseAdapter {
                    }
                }
                accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(),source,embedResId));
+               int user_id = accountItem.getUserId();
+               if(user_id > 1){
+                   accountHolder.login.setVisibility(View.GONE);
+                   accountHolder.golden.setVisibility(View.GONE);
+               }else {
+                   accountHolder.login.setVisibility(View.VISIBLE);
+                   accountHolder.login.setOnClickListener(new View.OnClickListener() {
+                       @Override
+                       public void onClick(View v) {
+                           Intent intent = new Intent(mContext, LoginActivity.class);
+                           mContext.startActivity(intent);
+                       }
+                   });
+               }
                accountHolder.name.setText(accountItem.getName());
-               accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accountItem.getGolden());
+
+               //accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accountItem.getGolden());
                break;
             case ListItem.ITEM_BASIC:
                 if(convertView == null){
@@ -180,6 +198,7 @@ public class SlideViewAdapter extends BaseAdapter {
         ImageView image;
         TextView  name;
         TextView  golden;
+        TextView login;
     }
 
     private class ViewHolder{

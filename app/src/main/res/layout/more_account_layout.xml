@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/slide_account_bg"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp">
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp">
 
     <ImageView
         android:id="@+id/account_image"
@@ -21,7 +21,15 @@
         android:layout_below="@+id/account_image"
         android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/white"
+        />
+    <TextView
+        android:id="@+id/slide_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/account_name"
+        />
     <TextView
         android:id="@+id/account_golden"
         android:layout_width="wrap_content"
@@ -29,6 +37,7 @@
         android:visibility="gone"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/account_name"
-        android:textColor="@color/login_btn_normal"/>
+        android:textColor="@color/login_btn_normal"
+        />
 
 </RelativeLayout>

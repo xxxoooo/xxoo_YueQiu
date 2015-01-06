@@ -1,7 +1,6 @@
 package com.yueqiu.fragment.chatbar;
 
 import android.app.ActionBar;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,8 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-
-import com.yueqiu.AddFriendsActivity;
 import com.yueqiu.R;
 import com.yueqiu.adapter.ChatBarItemAdapter;
 

@@ -34,8 +34,8 @@
             android:textSize="24sp"
             android:checked="true"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@android:color/white"
-            android:background="@drawable/billiard_search_radio_bg"/>
+            android:textColor="@color/md__defaultBackground"
+            android:background="@drawable/billiard_group_radio_bg"/>
         <RadioButton
             android:padding="10dp"
             android:id="@+id/billiard_popularity_sort"
@@ -46,9 +46,9 @@
             android:gravity="center"
             android:text="@string/billiard_poplarity"
             android:textSize="24sp"
-            android:textColor="@android:color/white"
+            android:textColor="@color/md__defaultBackground"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:background="@drawable/billiard_search_radio_bg"/>
+            android:background="@drawable/billiard_group_radio_bg"/>
 
     </RadioGroup>
 

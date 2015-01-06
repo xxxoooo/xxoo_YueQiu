@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.yueqiu.R;
-import com.yueqiu.activity.searchmenu.nearby.SearchBilliardRoomActivity;
+import com.yueqiu.activity.SearchBilliardRoomActivity;
 import com.yueqiu.adapter.SearchRoomSubFragmentListAdapter;
 import com.yueqiu.bean.SearchRoomSubFragmentRoomBean;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;

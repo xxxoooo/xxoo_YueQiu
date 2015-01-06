@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yueqiu">
+    package="com.yueqiu" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -13,67 +13,81 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".BilliardGroupActivity"
-            android:label="@string/app_name"></activity>
-        <activity
-            android:name=".BilliardSearchActivity"
-            >
+            android:label="@string/app_name" />
+        <activity android:name=".BilliardSearchActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER"/>
 
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
         <activity
-            android:name=".activity.searchmenu.nearby.SearchResultActivity"
-            android:launchMode="singleTop">
-
+            android:name=".activity.SearchResultActivity"
+            android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <meta-data android:name="android.app.searchable"
+
+            <meta-data
+                android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
 
         <!-- 聊吧Activity -->
         <activity android:name=".ChatBarActivity" />
-        <activity android:name=".AddFriendsActivity"/>
-        <!--聊吧 END-->
+
+        <activity android:name="activity.AddFriendsActivity"/>
+        <!-- 聊吧 END -->
 
         <activity android:name=".ActivitiesActivity" />
 
         <!-- 侧滑Menu -->
-        <activity android:name=".activity.searchmenu.ActivitiesIssueActivity" />
-        <activity android:name=".activity.searchmenu.FeedbackActivity" />
-        <activity android:name=".activity.searchmenu.MyProfileActivity" />
-        <activity android:name=".ProfileSetupActivity"/>
-        <activity android:name=".activity.searchmenu.MyfavorCollActivity" />
-        <activity android:name=".activity.searchmenu.PublishedInfoActivity" />
-
         <activity
-            android:name=".activity.searchmenu.RegisterActivity"
+            android:name=".activity.ActivitiesIssueActivity"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name=".activity.FeedbackActivity"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity android:name=".activity.MyProfileActivity" />
+        <activity android:name=".activity.ProfileSetupActivity" />
+        <activity android:name=".activity.MyfavorCollActivity" />
+        <activity android:name=".activity.PublishedInfoActivity" />
+        <activity android:name=".activity.SelectChargeModuleActivity" />
+        <activity
+            android:name=".activity.RegisterActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.searchmenu.LoginActivity"
+            android:name=".activity.LoginActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.searchmenu.ActivitySelectSex"
+            android:name=".activity.ActivitySelectSex"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.searchmenu.MyParticipationActivity"/>
+        <activity android:name=".activity.MyParticipationActivity" />
         <activity
-            android:name=".activity.searchmenu.nearby.SearchBilliardsDatingActivity"
-            android:label="@string/title_activity_billiards_dating">
+            android:name=".activity.SearchBilliardsDatingActivity"
+            android:label="@string/title_activity_billiards_dating" >
         </activity>
         <activity
-            android:name=".activity.searchmenu.nearby.SearchBilliardRoomActivity"
-            android:label="@string/title_activity_search_billiard_room">
+            android:name=".activity.SearchBilliardRoomActivity"
+            android:label="@string/title_activity_search_billiard_room" >
         </activity>
-
-
+        <activity
+            android:name=".activity.GroupIssueTopic"
+            android:label="@string/billiard_group_issue_article" >
+        </activity>
+        <activity
+            android:name=".activity.GroupSelectTopicTypeActivity"
+            android:label="@string/title_activity_group_select_topic_type" >
+        </activity>
+        <activity
+            android:name=".activity.GroupTopicDetailActivity"
+            android:label="@string/title_activity_group_topic_detail" >
+        </activity>
     </application>
 
 </manifest>
