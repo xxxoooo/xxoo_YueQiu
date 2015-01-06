@@ -260,6 +260,18 @@
     <string name="profession_experiences">职业经历</string>
     <string name="setup_confirm">确认</string>
     <string name="picture">照片</string>
+    <string name="level_base">基础</string>
+    <string name="level_middle">中级</string>
+    <string name="level_master">高级</string>
+    <string name="cue_1">大头杆</string>
+    <string name="cue_2">斯诺克杆</string>
+    <string name="habit_1">左手</string>
+    <string name="habit_2">右手</string>
+    <string name="habit_3">左右开弓</string>
+    <string name="ball_type_1">中式</string>
+    <string name="ball_type_2">斯诺克</string>
+    <string name="ball_type_3">九球</string>
+
 
     <string name="tv_search">搜索</string>
     <string name="account_null">账户不能为空！</string>

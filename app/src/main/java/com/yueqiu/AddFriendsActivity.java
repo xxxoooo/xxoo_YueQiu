@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 
 /**
- * Created by administrator on 14/12/25.
+ * Created by doushuqi on 14/12/25.
  */
 public class AddFriendsActivity extends Activity{
 

@@ -19,11 +19,11 @@ public class UserInfo {
     private String title;//职称
     private String username;//昵称
     private String district;//区域
-    private String level;//水平
-    private String ball_type;//球种
+    private int level;//水平
+    private int ball_type;//球种
     private String appoint_date;//约球时间
-    private String ballArm;//使用球杆
-    private String usedType;//使用习惯
+    private int ballArm;//使用球杆
+    private int usedType;//使用习惯
     private int ballAge;//球龄
     private String idol;//偶像
     private String idol_name;//签名
@@ -133,19 +133,19 @@ public class UserInfo {
         this.district = district;
     }
 
-    public String getLevel() {
+    public int getLevel() {
         return level;
     }
 
-    public void setLevel(String level) {
+    public void setLevel(int level) {
         this.level = level;
     }
 
-    public String getBall_type() {
+    public int getBall_type() {
         return ball_type;
     }
 
-    public void setBall_type(String ball_type) {
+    public void setBall_type(int ball_type) {
         this.ball_type = ball_type;
     }
 
@@ -182,19 +182,19 @@ public class UserInfo {
     }
 
 
-    public String getBallArm() {
+    public int getBallArm() {
         return ballArm;
     }
 
-    public void setBallArm(String ballArm) {
+    public void setBallArm(int ballArm) {
         this.ballArm = ballArm;
     }
 
-    public String getUsedType() {
+    public int getUsedType() {
         return usedType;
     }
 
-    public void setUsedType(String usedType) {
+    public void setUsedType(int usedType) {
         this.usedType = usedType;
     }
 
@@ -264,13 +264,13 @@ public class UserInfo {
         sex = obj.getInt(JSON_SEX);//接口数据含义未确定
         username = String.valueOf(obj.getString(JSON_USERNAME));
         district = obj.getString(JSON_DISTRICT);
-        level = String.valueOf(obj.getString(JSON_LEVEL));
-        ball_type = String.valueOf(obj.getString(JSON_BALL_TYPE));
+        level = obj.getInt(JSON_LEVEL);
+        ball_type = obj.getInt(JSON_BALL_TYPE);
 
-        ballArm = obj.getString(JSON_BALL_ARM);
-        usedType = obj.getString(JSON_USED_TYPE);
+        ballArm = obj.getInt(JSON_BALL_ARM);
+        usedType = obj.getInt(JSON_USED_TYPE);
         ballAge = "".equals(obj.getString(JSON_BALL_AGE)) ?
-                -1 : Integer.parseInt(obj.getString(JSON_BALL_AGE));
+                -1 : Integer.parseInt(obj.getString(JSON_BALL_AGE));//
         idol = String.valueOf(obj.getString(JSON_IDOL));
         idol_name = obj.getString(JSON_SIGN);
         new_img = obj.getString(JSON_NEW_IMG);

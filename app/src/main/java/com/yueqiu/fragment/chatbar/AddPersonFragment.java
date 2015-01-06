@@ -170,11 +170,15 @@ public class AddPersonFragment extends Fragment implements LocationListener {
 
     }
 
-    private void searchFriendsByKeyWords(String keyWords) {
+    /**
+     * 通过关键字查询好友
+     * @param keyWords
+     */
+    public void searchFriendsByKeyWords(String keyWords) {
         Map<String, String> map = new HashMap<String, String>();
         map.put(HttpConstants.SearchPeopleByKeyword.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
         map.put(HttpConstants.SearchPeopleByKeyword.KEYWORDS, keyWords);
-        String result = HttpUtil.urlClient(HttpConstants.SearchPeopleByNearby.URL, map, HttpConstants.RequestMethod.GET);
+        String result = HttpUtil.urlClient(HttpConstants.SearchPeopleByKeyword.URL, map, HttpConstants.RequestMethod.GET);
         try {
             JSONObject jsonResult = new JSONObject(result);
 

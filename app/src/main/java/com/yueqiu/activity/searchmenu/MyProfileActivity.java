@@ -172,15 +172,18 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 ? unset : userInfo.getUsername());
         mRegionTextView.setText("".equals(userInfo.getDistrict())
                 ? unset : userInfo.getDistrict());
-        mLevelTextView.setText("".equals(userInfo.getLevel())
-                ? unset : userInfo.getLevel());
-        mBallTypeTextView.setText("".equals(userInfo.getBall_type())
-                ? unset : userInfo.getBall_type());
-        mBilliardsCueTextView.setText("".equals(userInfo.getBallArm())
-                ? unset : userInfo.getBallArm());
-        mCueHabitsTextView.setText("".equals(userInfo.getUsedType())
-                ? unset : userInfo.getUsedType());
-        mPlayAgeTextView.setText(0 == userInfo.getBallAge()
+        mLevelTextView.setText(1 == userInfo.getLevel()
+                ? getString(R.string.level_base) : ((2 == userInfo.getLevel()) ?
+                getString(R.string.level_middle) : getString(R.string.level_master)));
+        mBallTypeTextView.setText(1 == userInfo.getBall_type()
+                ? getString(R.string.ball_type_1) : (2 == userInfo.getBall_type() ?
+                getString(R.string.ball_type_2) : getString(R.string.ball_type_3)));
+        mBilliardsCueTextView.setText(1 == userInfo.getBallArm()
+                ? getString(R.string.cue_1) : getString(R.string.cue_2));
+        mCueHabitsTextView.setText(1 == userInfo.getUsedType()
+                ? getString(R.string.habit_1) : (2 == userInfo.getUsedType() ?
+                getString(R.string.habit_2) : getString(R.string.habit_3)));
+        mPlayAgeTextView.setText(-1 == userInfo.getBallAge()
                 ? unset : String.valueOf(userInfo.getBallAge()));
         mIdolTextView.setText("".equals(userInfo.getIdol())
                 ? unset : userInfo.getIdol());
@@ -261,16 +264,16 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 startMyActivity(4);
                 break;
             case R.id.my_profile_level:
-                startMyActivity(5);
+//                startMyActivity(5);
                 break;
             case R.id.my_profile_ball_type:
-                startMyActivity(6);
+//                startMyActivity(6);
                 break;
             case R.id.my_profile_billiards_cue:
-                startMyActivity(7);
+//                startMyActivity(7);
                 break;
             case R.id.my_profile_cue_habits:
-                startMyActivity(8);
+//                startMyActivity(8);
                 break;
             case R.id.my_profile_play_age:
                 startMyActivity(9);
@@ -322,19 +325,15 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 break;
             case 5:
                 mLevelTextView.setText(str);
-                mUserInfo.setLevel(str);
                 break;
             case 6:
                 mBallTypeTextView.setText(str);
-                mUserInfo.setBall_type(str);
                 break;
             case 7:
                 mBilliardsCueTextView.setText(str);
-                mUserInfo.setBallArm(str);
                 break;
             case 8:
                 mCueHabitsTextView.setText(str);
-                mUserInfo.setUsedType(str);
                 break;
             case 9:
                 mPlayAgeTextView.setText(str);
