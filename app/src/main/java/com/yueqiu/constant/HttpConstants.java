@@ -334,6 +334,17 @@ public class HttpConstants {
         public static final String LNG = "lng";
     }
 
+    /*
+     * 聊吧中添加好友页面通过查询手机号或账号获取好友
+     */
+    public static final class SearchPeopleByKeyword
+    {
+        public static final String URL = "friend/word";
+
+        //请求参数：位置坐标
+        public static final String USER_ID = "user_id";
+        public static final String KEYWORDS = "keywords";
+    }
 
 
     /**

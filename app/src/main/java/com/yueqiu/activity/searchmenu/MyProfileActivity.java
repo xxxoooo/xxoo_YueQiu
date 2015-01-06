@@ -135,25 +135,6 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                             message.obj = object.getString("msg");
                         } else {
                             mUserInfo = new UserInfo(object.getJSONObject("result"));
-//                            userInfo.setImg_url(String.valueOf(object.getJSONObject("result").getInt("img_url")));
-//                            userInfo.setAccount(String.valueOf(object.getJSONObject("result").getInt("account")));
-//
-//                            userInfo.setUsername(String.valueOf(object.getJSONObject("result").getInt("username")));
-//                            userInfo.setDistrict(object.getJSONObject("result").getString("district"));
-//                            userInfo.setLevel(String.valueOf(object.getJSONObject("result").getInt("level")));
-//                            userInfo.setBall_type(String.valueOf(object.getJSONObject("result").getInt("ball_type")));
-//                            userInfo.setAppoint_date(object.getJSONObject("result").getString("appoint_date"));//datatime数据格式
-//                            userInfo.setBallArm(object.getJSONObject("result").getString("ballArm"));
-//                            userInfo.setUsedType(object.getJSONObject("result").getString("usedType"));
-//                            userInfo.setBallAge(object.getJSONObject("result").getInt("ballAge"));
-//                            userInfo.setIdol(String.valueOf(object.getJSONObject("result").getInt("idol")));
-//                            userInfo.setIdol_name(object.getJSONObject("result").getString("idol_name"));
-//                            userInfo.setNew_img(object.getJSONObject("result").getString("new_img"));
-//
-//                            JSONArray list_data = object.getJSONObject("result").getJSONArray("sex");
-//
-//                            Log.e("dou", "---" + userInfo.getImg_url() + "   " + userInfo.getAccount() + "   "
-//                                    + object.getJSONObject("result").getString("sex"));
                             message.what = DATA_SUCCESS;
                             message.obj = mUserInfo;
                         }

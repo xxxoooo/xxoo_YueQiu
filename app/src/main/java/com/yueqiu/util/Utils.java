@@ -123,6 +123,26 @@ public class Utils {
     }
 
     /**
+     * 直接保存RESTFUL获取的我的资料JSON数据到本地
+     * @param context
+     * @param array
+     * @throws IOException
+     * @throws JSONException
+     */
+    public static void saveMyProfileJSONFromService(Context context, JSONArray array) throws IOException, JSONException {
+
+        Writer writer = null;
+        try {
+            OutputStream out = context.openFileOutput(USER_INFO_FILE_NAME, Context.MODE_PRIVATE);
+            writer = new OutputStreamWriter(out);
+            writer.write(array.toString());
+        } finally {
+            if (writer != null)
+                writer.close();
+        }
+    }
+
+    /**
      * 从本地获取我的资料
      *
      * @return
