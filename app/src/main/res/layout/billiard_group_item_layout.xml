@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/billiard_group_title"
-        android:src="@drawable/e01"
+        android:src="@drawable/reading"
         android:layout_alignBottom="@+id/group_item_image"/>
     <TextView
         android:id="@+id/billiard_group_browse_count_text"

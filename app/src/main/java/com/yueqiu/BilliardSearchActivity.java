@@ -15,7 +15,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.InflateException;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +27,7 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.activity.ActivitiesIssueActivity;
@@ -53,6 +57,7 @@ import com.yueqiu.view.menudrawer.Position;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -295,6 +300,44 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
+
+        LayoutInflater layoutInflater = getLayoutInflater();
+        final LayoutInflater.Factory existingFactory = layoutInflater.getFactory();
+        // use introspection to allow a new Factory to be set
+        try {
+            Field field = LayoutInflater.class.getDeclaredField("mFactorySet");
+            field.setAccessible(true);
+            field.setBoolean(layoutInflater, false);
+            getLayoutInflater().setFactory(new LayoutInflater.Factory() {
+                @Override
+                public View onCreateView(String name, final Context context, AttributeSet attrs) {
+                    View view = null;
+                    // if a factory was already set, we use the returned view
+                    if (existingFactory != null) {
+                        if (name.equalsIgnoreCase("com.android.internal.view.menu.IconMenuItemView")
+                                || name.equalsIgnoreCase("com.android.internal.view.menu.ActionMenuItemView")) {
+                            view = existingFactory.onCreateView(name, context, attrs);
+                            if(view instanceof TextView) {
+                                final View finalView = view;
+                                new Handler().post(new Runnable() {
+                                    public void run() {
+                                        ((TextView) finalView).setTextColor(getResources().getColor(R.color.white));
+                                     }
+                                });
+                            }
+                        }
+                    }
+                    return view;
+                }
+            });
+        } catch (NoSuchFieldException e) {
+            // ...
+        } catch (IllegalArgumentException e) {
+            // ...
+        } catch (IllegalAccessException e) {
+            // ...
+        }
+
         getMenuInflater().inflate(R.menu.billiard_search, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -381,28 +424,52 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         startActivity(intent);
                         break;
                     case 1:
-                        intent.setClass(BilliardSearchActivity.this, MyProfileActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, MyProfileActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 2:
-                        intent.setClass(BilliardSearchActivity.this, MyParticipationActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, MyParticipationActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 3:
-                        intent.setClass(BilliardSearchActivity.this, MyfavorCollActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, MyfavorCollActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 4:
-                        intent.setClass(BilliardSearchActivity.this, PublishedInfoActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, PublishedInfoActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 5:
-                        intent.setClass(BilliardSearchActivity.this, ActivitiesIssueActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, ActivitiesIssueActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 6:
-                        intent.setClass(BilliardSearchActivity.this, FeedbackActivity.class);
-                        startActivity(intent);
+                        if(checkUserId()) {
+                            intent.setClass(BilliardSearchActivity.this, FeedbackActivity.class);
+                            startActivity(intent);
+                        }else{
+                            Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 7:
                         if (Utils.networkAvaiable(BilliardSearchActivity.this)) {
@@ -514,6 +581,13 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
             return;
         }
         super.onBackPressed();
+    }
+    private boolean checkUserId(){
+        int user_id = YueQiuApp.sUserInfo.getUser_id();
+        if(user_id < 1)
+            return false;
+        return true;
+
     }
 
 

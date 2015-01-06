@@ -6,6 +6,7 @@ import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -17,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
+import com.yueqiu.activity.GroupIssueTopic;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
 
@@ -101,6 +103,11 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
             case android.R.id.home:
                 this.finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+            case R.id.group_menu_editor:
+                Intent intent = new Intent(this, GroupIssueTopic.class);
+                startActivity(intent);
+                //overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
                 break;
         }
         return super.onOptionsItemSelected(item);

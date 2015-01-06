@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.widget.EditText;
 
 import com.yueqiu.R;
+import com.yueqiu.util.Utils;
 
 
 public class FeedbackActivity extends Activity
@@ -53,7 +54,7 @@ public class FeedbackActivity extends Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        Utils.setActivityMenuColor(this);
         getMenuInflater().inflate(R.menu.feedback, menu);
         return true;
     }

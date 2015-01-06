@@ -58,7 +58,7 @@ public class BilliardGroupBasicFragment extends Fragment {
 
         mList.add(bean1);
         mList.add(bean2);
-        Collections.sort(mList,new PopularityComparator());
+        Collections.sort(mList,new TimeComparator());
 
 
 

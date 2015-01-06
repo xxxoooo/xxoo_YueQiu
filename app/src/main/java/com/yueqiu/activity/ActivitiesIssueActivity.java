@@ -1,29 +1,41 @@
 package com.yueqiu.activity;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.yueqiu.ActivitiesActivity;
+import com.fourmob.datetimepicker.date.DatePickerDialog;
+import com.sleepbot.datetimepicker.time.RadialPickerLayout;
+import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.util.Utils;
+import java.util.Calendar;
 
 /**
  * Created by yinfeng on 14/12/19.
  */
-public class ActivitiesIssueActivity extends Activity implements View.OnClickListener{
+public class ActivitiesIssueActivity extends FragmentActivity implements View.OnClickListener,DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
 
+    public static final String DATEPICKER_TAG = "datepicker";
+    public static final String TIMEPICKER_TAG = "timepicker";
+    private static final int START_FLAG = 0;
+    private static final int END_FLAG   = 1;
     private EditText mTitle,mContactEdit,mPhoneEdit,mIllustration;
     private TextView mLocation,mStartTime,mEndTime,mChargeModule;
     private String mAccount;
     private String mPhoneNumber;
+    private DatePickerDialog mDatePickerDialog;
+    private TimePickerDialog mTimePickerDialog;
+    private StringBuilder mStartTimeStr = new StringBuilder(),
+            mEndTimeStr = new StringBuilder();
+    private int mTimeFlag;
 
     public ActivitiesIssueActivity() {
     }
@@ -51,6 +63,11 @@ public class ActivitiesIssueActivity extends Activity implements View.OnClickLis
         mEndTime = (TextView) findViewById(R.id.activity_end_time_text);
         mChargeModule = (TextView) findViewById(R.id.activity_charge_module_text);
 
+        final Calendar calendar = Calendar.getInstance();
+
+        mDatePickerDialog = DatePickerDialog.newInstance(this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), false);
+        mTimePickerDialog = TimePickerDialog.newInstance(this, calendar.get(Calendar.HOUR_OF_DAY) ,calendar.get(Calendar.MINUTE), false, false);
+
         mAccount = YueQiuApp.sUserInfo.getAccount();
         mPhoneNumber = YueQiuApp.sUserInfo.getPhone();
 
@@ -76,9 +93,11 @@ public class ActivitiesIssueActivity extends Activity implements View.OnClickLis
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.issue_activity,menu);
-        return super.onCreateOptionsMenu(menu);
+
+        Utils.setFragmentActivityMenuColor(this);
+
+        getMenuInflater().inflate(R.menu.issue_activity,menu);
+        return true;
 
     }
 
@@ -93,8 +112,20 @@ public class ActivitiesIssueActivity extends Activity implements View.OnClickLis
             case R.id.activity_location_text:
                 break;
             case R.id.activity_start_time_text:
+                mDatePickerDialog.setVibrate(false);
+                mDatePickerDialog.setYearRange(1985, 2028);
+                mDatePickerDialog.setCloseOnSingleTapDay(false);
+                mDatePickerDialog.show(getSupportFragmentManager(), DATEPICKER_TAG);
+                mTimeFlag = START_FLAG;
+                mStartTimeStr.delete(0,mStartTimeStr.length());
                 break;
             case R.id.activity_end_time_text:
+                mDatePickerDialog.setVibrate(false);
+                mDatePickerDialog.setYearRange(1985, 2028);
+                mDatePickerDialog.setCloseOnSingleTapDay(false);
+                mDatePickerDialog.show(getSupportFragmentManager(), DATEPICKER_TAG);
+                mTimeFlag = END_FLAG;
+                mEndTimeStr.delete(0,mEndTimeStr.length());
                 break;
             case R.id.activity_charge_module_text:
                 Intent intent = new Intent();
@@ -124,6 +155,34 @@ public class ActivitiesIssueActivity extends Activity implements View.OnClickLis
             }else{
                 mChargeModule.setText(getString(R.string.charge_module_aa));
             }
+        }
+    }
+
+    @Override
+    public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
+        String monthStr = month < 9 ? "0" + ++month : String.valueOf(++month);
+        String dayStr = day < 10 ? "0" + day : String.valueOf(day);
+        if(mTimeFlag == START_FLAG){
+            mStartTimeStr.append(year).append("-").append(monthStr).append("-").append(dayStr);
+        }else if(mTimeFlag == END_FLAG){
+            mEndTimeStr.append(year).append("-").append(monthStr).append("-").append(dayStr);
+        }
+        mTimePickerDialog.setVibrate(false);
+        mTimePickerDialog.setCloseOnSingleTapMinute(false);
+        mTimePickerDialog.show(getSupportFragmentManager(), TIMEPICKER_TAG);
+    }
+
+
+    @Override
+    public void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute) {
+        String hourStr = hourOfDay < 10 ? "0" + hourOfDay : String.valueOf(hourOfDay);
+        String minuteStr = minute < 10 ? "0" + minute : String.valueOf(minute);
+        if(mTimeFlag == START_FLAG){
+            mStartTimeStr.append(" ").append(hourStr).append("-").append(minuteStr);
+            mStartTime.setText(mStartTimeStr.toString());
+        }else if(mTimeFlag == END_FLAG){
+            mEndTimeStr.append(" ").append(hourStr).append("-").append(minuteStr);
+            mEndTime.setText(mEndTimeStr.toString());
         }
     }
 }

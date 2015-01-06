@@ -93,9 +93,6 @@ public class HttpUtil {
         return null;
     }
 
-
-
-
     private static void log(String msg)
     {
         Log.i(TAG, msg);
