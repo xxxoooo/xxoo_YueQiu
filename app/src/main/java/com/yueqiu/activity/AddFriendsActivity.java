@@ -6,7 +6,7 @@ import android.os.Bundle;
 import com.yueqiu.R;
 
 /**
- * Created by administrator on 14/12/25.
+ * Created by doushuqi on 14/12/25.
  */
 public class AddFriendsActivity extends Activity{
 

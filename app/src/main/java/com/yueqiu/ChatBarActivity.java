@@ -16,6 +16,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
@@ -36,6 +37,7 @@ public class ChatBarActivity extends FragmentActivity {
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
     private RadioGroup radioGroup;
+    private Fragment mCurrentFragment, mMessageFragment, mContactFragment, mAddPersonFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +49,8 @@ public class ChatBarActivity extends FragmentActivity {
         ((RadioButton) radioGroup.findViewById(R.id.radio0)).setChecked(true);
 
         transaction = fragmentManager.beginTransaction();
-        Fragment fragment = new MessageFragment();
-        transaction.replace(R.id.chatbar_fragment_container, fragment);
+        mMessageFragment = new MessageFragment();
+        transaction.replace(R.id.chatbar_fragment_container, mMessageFragment);
         transaction.commit();
 
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -57,24 +59,30 @@ public class ChatBarActivity extends FragmentActivity {
                 switch (checkedId) {
                     case R.id.radio0:
                         transaction = fragmentManager.beginTransaction();
-                        Fragment messageFragment = new MessageFragment();
-                        transaction.replace(R.id.chatbar_fragment_container, messageFragment);
+                        if (mMessageFragment == null)
+                            mMessageFragment = new MessageFragment();
+                        transaction.replace(R.id.chatbar_fragment_container, mMessageFragment);
                         transaction.commit();
                         mActionBar.setTitle(R.string.btn_liaoba_message);
+                        mCurrentFragment = mMessageFragment;
                         break;
                     case R.id.radio1:
                         transaction = fragmentManager.beginTransaction();
-                        Fragment contactFragment = new ContactFragment();
-                        transaction.replace(R.id.chatbar_fragment_container, contactFragment);
+                        if (mContactFragment == null)
+                            mContactFragment = new ContactFragment();
+                        transaction.replace(R.id.chatbar_fragment_container, mContactFragment);
                         transaction.commit();
                         mActionBar.setTitle(R.string.btn_liaoba_contact);
+                        mCurrentFragment = mContactFragment;
                         break;
                     case R.id.radio2:
                         transaction = fragmentManager.beginTransaction();
-                        Fragment addPersonFragment = new AddPersonFragment();
-                        transaction.replace(R.id.chatbar_fragment_container, addPersonFragment);
+                        if (mAddPersonFragment == null)
+                            mAddPersonFragment = new AddPersonFragment();
+                        transaction.replace(R.id.chatbar_fragment_container, mAddPersonFragment);
                         transaction.commit();
                         mActionBar.setTitle(R.string.btn_liaoba_add_friend);
+                        mCurrentFragment = mAddPersonFragment;
                         break;
                 }
             }
@@ -109,30 +117,39 @@ public class ChatBarActivity extends FragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.billiard_search, menu);
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        final SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+
+        if (mCurrentFragment instanceof AddPersonFragment) {
+            //get friend by phone number or account number
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ((AddPersonFragment) mCurrentFragment).searchFriendsByKeyWords(searchView.getQuery().toString());
+                        }
+                    }).start();
+                    mCurrentFragment.getView().findViewById(R.id.chatbar_search_progressbar_container).setVisibility(View.VISIBLE);
+                    ((InputMethodManager) getSystemService(INPUT_METHOD_SERVICE)).toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) {
+                    return false;
+                }
+            });
+        } else
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
-
-//    @Override
-//    public boolean onMenuItemSelected(int featureId, MenuItem item) {
-//        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.chatbar_fragment_container);
-//        switch (item.getItemId()) {
-//            case R.id.chatbar_menu_search:
-//                if (fragment instanceof MessageFragment) {
-//                    Intent intent = new Intent(this, ChatBarSearchActivity.class);
-//                    startActivity(intent);
-//                }
-//                break;
-//        }
-//
-//        return super.onMenuItemSelected(featureId, item);
-//    }
 
     private void initView() {
 
     }
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {

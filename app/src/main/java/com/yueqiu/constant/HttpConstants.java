@@ -232,12 +232,7 @@ public class HttpConstants {
      */
     public static final class AppointBll
     {
-        public static final String URL = "/user/appointBll";
-
-        /*
-         * 约球id
-         */
-        public static final String APPOINT_ID = "appoint_id";
+        public static final String URL = "center/publish";
 
         public static final String USER_ID = "user_id";
 
@@ -245,45 +240,18 @@ public class HttpConstants {
 
         public static final String ADDRESS = "address";
 
-//		 public static final String 
-    }
+        public static final String BEGIN_TIME = "begin_time";
 
-    /*
-     * 我的发布（包含：约球、活动、台球圈）
-     * 发送GET请求
-     */
-    public static final class GetPublish
-    {
-        public static final String URL = "/user/getPublish";
+        public static final String END_TIME = "end_time";
 
-        /*
-         * 用户ID
-         */
-        public static final String USER_ID = "user_id";
+        public static final String MODULE = "module";
 
-        /*
-         * 发布类型
-         * 1、约球
-         * 2、活动
-         * 3、台球圈
-         */
-        public static final String TYPE_ID = "type_id";
+        public static final String CONTENT = "content";
 
-        /*
-         * 搜索关键字
-         */
-        public static final String KEYWORDS = "keywords";
+        public static final String CONTACT = "contact";
 
-        /*
-         * 开始条数（默认为0）
-         */
-        public static final String START_NO = "start_no";
+        public static final String PHONE  = "phone";
 
-
-        /*
-         * 结束条数
-         */
-        public static final String END_NO = "end_no";
     }
 
     /*
@@ -322,7 +290,29 @@ public class HttpConstants {
         public static final String END_NO = "end_no";
     }
 
+    /*
+     * 聊吧中添加好友页面通过附近的人获取好友列表
+     */
+    public static final class SearchPeopleByNearby
+    {
+        public static final String URL = "/friend/nearby";
 
+        //请求参数：位置坐标
+        public static final String LAT = "lat";
+        public static final String LNG = "lng";
+    }
+
+    /*
+     * 聊吧中添加好友页面通过查询手机号或账号获取好友
+     */
+    public static final class SearchPeopleByKeyword
+    {
+        public static final String URL = "friend/word";
+
+        //请求参数：位置坐标
+        public static final String USER_ID = "user_id";
+        public static final String KEYWORDS = "keywords";
+    }
 
 
     /**

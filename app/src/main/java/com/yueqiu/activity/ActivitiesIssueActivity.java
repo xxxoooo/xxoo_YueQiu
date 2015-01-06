@@ -2,14 +2,8 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,22 +15,21 @@ import com.sleepbot.datetimepicker.time.RadialPickerLayout;
 import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+
 import com.yueqiu.util.Utils;
 import java.util.Calendar;
 
-/**
- * Created by yinfeng on 14/12/19.
- */
 public class ActivitiesIssueActivity extends FragmentActivity implements View.OnClickListener,DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
 
     public static final String DATEPICKER_TAG = "datepicker";
     public static final String TIMEPICKER_TAG = "timepicker";
     private static final int START_FLAG = 0;
     private static final int END_FLAG   = 1;
-    private EditText mTitle,mContactEdit,mPhoneEdit,mIllustration;
-    private TextView mLocation,mStartTime,mEndTime,mChargeModule;
-    private String mAccount;
-    private String mPhoneNumber;
+    private EditText mTitleEdit,mContactEdit,mPhoneEdit,mIllustrationEdit;
+    private TextView mLocationTv,mStartTimeTv,mEndTimeTv,mChargeModuleTv;
+    private String mContactStr,mPhoneNumberStr,mTitleStr,mLocationStr;
+    private String mIllustrationStr;
+    private int mChargeModule;
     private DatePickerDialog mDatePickerDialog;
     private TimePickerDialog mTimePickerDialog;
     private StringBuilder mStartTimeStr = new StringBuilder(),
@@ -60,35 +53,15 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
 
     }
     private void initView(){
-        mTitle = (EditText) findViewById(R.id.activitie_title_edit_text);
-        mLocation = (TextView) findViewById(R.id.activity_location_text);
-        mContactEdit = (EditText) findViewById(R.id.activity_contact_edit_text);
-        mPhoneEdit = (EditText) findViewById(R.id.activity_contact_phone_edit_text);
+        mTitleEdit          = (EditText) findViewById(R.id.activitie_title_edit_text);
+        mContactEdit    = (EditText) findViewById(R.id.activity_contact_edit_text);
+        mPhoneEdit      = (EditText) findViewById(R.id.activity_contact_phone_edit_text);
+        mIllustrationEdit   = (EditText) findViewById(R.id.activity_illustrate_edit_text);
 
-        mStartTime = (TextView) findViewById(R.id.activity_start_time_text);
-        mEndTime = (TextView) findViewById(R.id.activity_end_time_text);
-        mChargeModule = (TextView) findViewById(R.id.activity_charge_module_text);
-
-//        Html.ImageGetter imageGetter = new Html.ImageGetter() {
-//            @Override
-//            public Drawable getDrawable(String source) {
-//                int id = Integer.parseInt(source);
-//                Drawable d = getResources().getDrawable(id);
-//                d.setBounds(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
-//                return d;
-//            }
-//        };
-        Drawable drawable = getResources().getDrawable(R.drawable.e02);
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        //需要处理的文本，[smile]是需要被替代的文本
-        SpannableString spannable = new SpannableString("[smile]");
-        //要让图片替代指定的文字就要用ImageSpan
-        ImageSpan span = new ImageSpan(drawable, ImageSpan.ALIGN_BASELINE);
-        //开始替换，注意第2和第3个参数表示从哪里开始替换到哪里替换结束（start和end）
-        //最后一个参数类似数学中的集合,[5,12)表示从5到12，包括5但不包括12
-        spannable.setSpan(span, 0,"[smile]".length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        mTitle.setText("aaaa" + spannable);
-
+        mStartTimeTv      = (TextView) findViewById(R.id.activity_start_time_text);
+        mEndTimeTv        = (TextView) findViewById(R.id.activity_end_time_text);
+        mChargeModuleTv   = (TextView) findViewById(R.id.activity_charge_module_text);
+        mLocationTv       = (TextView) findViewById(R.id.activity_location_text);
 
 
         final Calendar calendar = Calendar.getInstance();
@@ -96,24 +69,27 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         mDatePickerDialog = DatePickerDialog.newInstance(this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), false);
         mTimePickerDialog = TimePickerDialog.newInstance(this, calendar.get(Calendar.HOUR_OF_DAY) ,calendar.get(Calendar.MINUTE), false, false);
 
-        mAccount = YueQiuApp.sUserInfo.getAccount();
-        mPhoneNumber = YueQiuApp.sUserInfo.getPhone();
+        mContactStr = YueQiuApp.sUserInfo.getAccount();
+        mPhoneNumberStr = YueQiuApp.sUserInfo.getPhone();
 
-        mContactEdit.setText(mAccount);
-        mPhoneEdit.setText(mPhoneNumber);
+        mContactEdit.setText(mContactStr);
+        mPhoneEdit.setText(mPhoneNumberStr);
 
-        mLocation.setOnClickListener(this);
-        mStartTime.setOnClickListener(this);
-        mEndTime.setOnClickListener(this);
-        mChargeModule.setOnClickListener(this);
+        mLocationTv.setOnClickListener(this);
+        mStartTimeTv.setOnClickListener(this);
+        mEndTimeTv.setOnClickListener(this);
+        mChargeModuleTv.setOnClickListener(this);
 
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch(id){
             case android.R.id.home:
                 finish();
+                break;
+            case R.id.issue_activity:
                 break;
         }
         return true;
@@ -129,16 +105,10 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
 
     }
 
-    /**
-     * Called when a view has been clicked.
-     *
-     * @param v The view that was clicked.
-     */
     @Override
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.activity_location_text:
-                Log.d("wy",mTitle.getText().toString());
                 break;
             case R.id.activity_start_time_text:
                 mDatePickerDialog.setVibrate(false);
@@ -159,12 +129,15 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
             case R.id.activity_charge_module_text:
                 Intent intent = new Intent();
                 intent.setClass(this,SelectChargeModuleActivity.class);
-                if(mChargeModule.getText().equals(getString(R.string.charge_module_free))){
+                if(mChargeModuleTv.getText().equals(getString(R.string.charge_module_free))){
                     intent.putExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_FREE);
-                }else if(mChargeModule.getText().equals(getString(R.string.charge_module_pay))){
+                    mChargeModule = SelectChargeModuleActivity.MODULE_FREE;
+                }else if(mChargeModuleTv.getText().equals(getString(R.string.charge_module_pay))){
                     intent.putExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_PAY);
+                    mChargeModule = SelectChargeModuleActivity.MODULE_PAY;
                 }else{
                    intent.putExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_AA);
+                    mChargeModule = SelectChargeModuleActivity.MODULE_AA;
                 }
                 startActivityForResult(intent,0);
                 overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
@@ -178,11 +151,11 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         if (requestCode == 0 && resultCode == RESULT_OK) {
             int module = data.getIntExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_FREE);
             if(module == SelectChargeModuleActivity.MODULE_FREE){
-                mChargeModule.setText(getString(R.string.charge_module_free));
+                mChargeModuleTv.setText(getString(R.string.charge_module_free));
             }else if(module == SelectChargeModuleActivity.MODULE_PAY){
-                mChargeModule.setText(getString(R.string.charge_module_pay));
+                mChargeModuleTv.setText(getString(R.string.charge_module_pay));
             }else{
-                mChargeModule.setText(getString(R.string.charge_module_aa));
+                mChargeModuleTv.setText(getString(R.string.charge_module_aa));
             }
         }
     }
@@ -208,10 +181,11 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         String minuteStr = minute < 10 ? "0" + minute : String.valueOf(minute);
         if(mTimeFlag == START_FLAG){
             mStartTimeStr.append(" ").append(hourStr).append("-").append(minuteStr);
-            mStartTime.setText(mStartTimeStr.toString());
+            mStartTimeTv.setText(mStartTimeStr.toString());
         }else if(mTimeFlag == END_FLAG){
             mEndTimeStr.append(" ").append(hourStr).append("-").append(minuteStr);
-            mEndTime.setText(mEndTimeStr.toString());
+            mEndTimeTv.setText(mEndTimeStr.toString());
         }
     }
+
 }

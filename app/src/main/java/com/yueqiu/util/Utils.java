@@ -3,10 +3,14 @@ package com.yueqiu.util;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.InflateException;
@@ -39,10 +43,9 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-/**
- * Created by yinfeng on 14/12/26.
- */
 public class Utils {
 
     private static final String TAG = "Utils";
@@ -200,6 +203,26 @@ public class Utils {
     }
 
     /**
+     * 直接保存RESTFUL获取的我的资料JSON数据到本地
+     * @param context
+     * @param array
+     * @throws IOException
+     * @throws JSONException
+     */
+    public static void saveMyProfileJSONFromService(Context context, JSONArray array) throws IOException, JSONException {
+
+        Writer writer = null;
+        try {
+            OutputStream out = context.openFileOutput(USER_INFO_FILE_NAME, Context.MODE_PRIVATE);
+            writer = new OutputStreamWriter(out);
+            writer.write(array.toString());
+        } finally {
+            if (writer != null)
+                writer.close();
+        }
+    }
+
+    /**
      * 从本地获取我的资料
      *
      * @return
@@ -319,6 +342,25 @@ public class Utils {
         );
     }
     /**
+     * 在EditText中插入表情图片
+     * @param sourceStr
+     */
+    public static SpannableStringBuilder addImgIntoEditText(Context context,String sourceStr,String replaceStr,int drawableResId){
+        SpannableStringBuilder spannable = new SpannableStringBuilder(sourceStr);
+        Pattern pattern = Pattern.compile(replaceStr);
+        Matcher matcher = pattern.matcher(sourceStr);
+
+        Drawable drawable = context.getResources().getDrawable(drawableResId);
+        drawable.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
+
+        while(matcher.find()){
+            ImageSpan span = new ImageSpan(drawable,ImageSpan.ALIGN_BASELINE);
+            spannable.setSpan(span,matcher.start(),matcher.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        return spannable;
+    }
+
+    /**
      * 将JSONObject转换成相应对象
      * @param clazz
      * @param object
@@ -370,5 +412,18 @@ public class Utils {
             return (Byte) o;
         return o;
     }
+
+    //    private final class ProImageGetter implements Html.ImageGetter{
+//
+//        @Override
+//        public Drawable getDrawable(String source) {
+//            // 获取到资源id
+//            int id = Integer.parseInt(source);
+//            Drawable drawable = getResources().getDrawable(id);
+//            drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+//            return drawable;
+//        }
+//    }
+
 
 }

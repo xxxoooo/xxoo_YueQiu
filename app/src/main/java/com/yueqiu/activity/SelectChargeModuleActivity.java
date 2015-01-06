@@ -17,9 +17,9 @@ import com.yueqiu.R;
  */
 public class SelectChargeModuleActivity extends Activity implements View.OnClickListener{
     public  static final String MODULE_KEY = "charge_module";
-    public  static final int MODULE_FREE = 0;
-    public  static final int MODULE_PAY  = 1;
-    public  static final int MODULE_AA   = 2;
+    public  static final int MODULE_FREE = 1;
+    public  static final int MODULE_PAY  = 2;
+    public  static final int MODULE_AA   = 3;
     private View mFree,mPay,mAA;
     private ImageView mIvFree,mIvPay,mIvAA;
     private ActionBar mActionBar;

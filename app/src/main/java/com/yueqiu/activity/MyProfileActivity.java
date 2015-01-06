@@ -125,30 +125,10 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     Message message = new Message();
                     try {
                         if (object.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
-
                             message.what = DATA_ERROR;
                             message.obj = object.getString("msg");
                         } else {
                             mUserInfo = new UserInfo(object.getJSONObject("result"));
-//                            userInfo.setImg_url(String.valueOf(object.getJSONObject("result").getInt("img_url")));
-//                            userInfo.setAccount(String.valueOf(object.getJSONObject("result").getInt("account")));
-//
-//                            userInfo.setUsername(String.valueOf(object.getJSONObject("result").getInt("username")));
-//                            userInfo.setDistrict(object.getJSONObject("result").getString("district"));
-//                            userInfo.setLevel(String.valueOf(object.getJSONObject("result").getInt("level")));
-//                            userInfo.setBall_type(String.valueOf(object.getJSONObject("result").getInt("ball_type")));
-//                            userInfo.setAppoint_date(object.getJSONObject("result").getString("appoint_date"));//datatime数据格式
-//                            userInfo.setBallArm(object.getJSONObject("result").getString("ballArm"));
-//                            userInfo.setUsedType(object.getJSONObject("result").getString("usedType"));
-//                            userInfo.setBallAge(object.getJSONObject("result").getInt("ballAge"));
-//                            userInfo.setIdol(String.valueOf(object.getJSONObject("result").getInt("idol")));
-//                            userInfo.setIdol_name(object.getJSONObject("result").getString("idol_name"));
-//                            userInfo.setNew_img(object.getJSONObject("result").getString("new_img"));
-//
-//                            JSONArray list_data = object.getJSONObject("result").getJSONArray("sex");
-//
-//                            Log.e("dou", "---" + userInfo.getImg_url() + "   " + userInfo.getAccount() + "   "
-//                                    + object.getJSONObject("result").getString("sex"));
                             message.what = DATA_SUCCESS;
                             message.obj = mUserInfo;
                         }
@@ -186,15 +166,18 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 ? unset : userInfo.getUsername());
         mRegionTextView.setText("".equals(userInfo.getDistrict())
                 ? unset : userInfo.getDistrict());
-        mLevelTextView.setText("".equals(userInfo.getLevel())
-                ? unset : userInfo.getLevel());
-        mBallTypeTextView.setText("".equals(userInfo.getBall_type())
-                ? unset : userInfo.getBall_type());
-        mBilliardsCueTextView.setText("".equals(userInfo.getBallArm())
-                ? unset : userInfo.getBallArm());
-        mCueHabitsTextView.setText("".equals(userInfo.getUsedType())
-                ? unset : userInfo.getUsedType());
-        mPlayAgeTextView.setText(0 == userInfo.getBallAge()
+        mLevelTextView.setText(1 == userInfo.getLevel()
+                ? getString(R.string.level_base) : ((2 == userInfo.getLevel()) ?
+                getString(R.string.level_middle) : getString(R.string.level_master)));
+        mBallTypeTextView.setText(1 == userInfo.getBall_type()
+                ? getString(R.string.ball_type_1) : (2 == userInfo.getBall_type() ?
+                getString(R.string.ball_type_2) : getString(R.string.ball_type_3)));
+        mBilliardsCueTextView.setText(1 == userInfo.getBallArm()
+                ? getString(R.string.cue_1) : getString(R.string.cue_2));
+        mCueHabitsTextView.setText(1 == userInfo.getUsedType()
+                ? getString(R.string.habit_1) : (2 == userInfo.getUsedType() ?
+                getString(R.string.habit_2) : getString(R.string.habit_3)));
+        mPlayAgeTextView.setText(-1 == userInfo.getBallAge()
                 ? unset : String.valueOf(userInfo.getBallAge()));
         mIdolTextView.setText("".equals(userInfo.getIdol())
                 ? unset : userInfo.getIdol());
@@ -275,16 +258,16 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 startMyActivity(4);
                 break;
             case R.id.my_profile_level:
-                startMyActivity(5);
+//                startMyActivity(5);
                 break;
             case R.id.my_profile_ball_type:
-                startMyActivity(6);
+//                startMyActivity(6);
                 break;
             case R.id.my_profile_billiards_cue:
-                startMyActivity(7);
+//                startMyActivity(7);
                 break;
             case R.id.my_profile_cue_habits:
-                startMyActivity(8);
+//                startMyActivity(8);
                 break;
             case R.id.my_profile_play_age:
                 startMyActivity(9);
@@ -336,19 +319,15 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 break;
             case 5:
                 mLevelTextView.setText(str);
-                mUserInfo.setLevel(str);
                 break;
             case 6:
                 mBallTypeTextView.setText(str);
-                mUserInfo.setBall_type(str);
                 break;
             case 7:
                 mBilliardsCueTextView.setText(str);
-                mUserInfo.setBallArm(str);
                 break;
             case 8:
                 mCueHabitsTextView.setText(str);
-                mUserInfo.setUsedType(str);
                 break;
             case 9:
                 mPlayAgeTextView.setText(str);

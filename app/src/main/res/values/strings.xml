@@ -243,6 +243,17 @@
     <string name="charge_module_aa">平摊</string>
     <string name="title_activity_billiards_dating">约球详情</string>
     <string name="title_activity_search_billiard_room">球厅详情</string>
+    <string name="activity_title_cannot_empty">活动主题不能为空</string>
+    <string name="activity_title_length_less">活动主题字数不能少于4个字</string>
+    <string name="activity_title_length_more">活动主题字数不能多于30个字</string>
+    <string name="activity_location_cannot_empty">活动地点不能为空</string>
+    <string name="activity_start_time_cannot_empty">开始时间不能为空</string>
+    <string name="activity_end_time_cannot_empty">结束时间不能为空</string>
+    <string name="activity_start_cannot_more_than_end">开始时间不能大于结束时间</string>
+    <string name="activity_charge_module_cannot_empty">收费模式不能为空</string>
+    <string name="activity_submit_success">发布活动成功</string>
+    <string name="activity_submit_failed">发布活动失败</string>
+
 
     <!-- 我的资料 -->
     <string name="photo">头像</string>
@@ -266,6 +277,20 @@
     <string name="profession_experiences">职业经历</string>
     <string name="setup_confirm">确认</string>
     <string name="picture">照片</string>
+
+    <string name="level_base">基础</string>
+    <string name="level_middle">中级</string>
+    <string name="level_master">高级</string>
+    <string name="cue_1">大头杆</string>
+    <string name="cue_2">斯诺克杆</string>
+    <string name="habit_1">左手</string>
+    <string name="habit_2">右手</string>
+    <string name="habit_3">左右开弓</string>
+    <string name="ball_type_1">中式</string>
+    <string name="ball_type_2">斯诺克</string>
+    <string name="ball_type_3">九球</string>
+
+
     <string name="tv_search">搜索</string>
     <string name="account_null">账户不能为空！</string>
     <string name="phone_null">电话不能为空！</string>
