@@ -37,7 +37,10 @@ public class ChatBarActivity extends FragmentActivity {
     private FragmentManager fragmentManager;
     private FragmentTransaction transaction;
     private RadioGroup radioGroup;
-    private Fragment mCurrentFragment, mMessageFragment, mContactFragment, mAddPersonFragment;
+    private Fragment mCurrentFragment;
+    private Fragment mMessageFragment = new MessageFragment();
+    private Fragment mContactFragment = new ContactFragment();
+    private Fragment mAddPersonFragment = new AddPersonFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,46 +50,40 @@ public class ChatBarActivity extends FragmentActivity {
         fragmentManager = getSupportFragmentManager();
         radioGroup = (RadioGroup) findViewById(R.id.radioGroup1);
         ((RadioButton) radioGroup.findViewById(R.id.radio0)).setChecked(true);
-
         transaction = fragmentManager.beginTransaction();
-        mMessageFragment = new MessageFragment();
-        transaction.replace(R.id.chatbar_fragment_container, mMessageFragment);
+        transaction.add(R.id.chatbar_fragment_container, mMessageFragment);
         transaction.commit();
-
+        mCurrentFragment = mMessageFragment;
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId) {
                     case R.id.radio0:
-                        transaction = fragmentManager.beginTransaction();
-                        if (mMessageFragment == null)
-                            mMessageFragment = new MessageFragment();
-                        transaction.replace(R.id.chatbar_fragment_container, mMessageFragment);
-                        transaction.commit();
+                        switchFragment(mMessageFragment);
                         mActionBar.setTitle(R.string.btn_liaoba_message);
-                        mCurrentFragment = mMessageFragment;
                         break;
                     case R.id.radio1:
-                        transaction = fragmentManager.beginTransaction();
-                        if (mContactFragment == null)
-                            mContactFragment = new ContactFragment();
-                        transaction.replace(R.id.chatbar_fragment_container, mContactFragment);
-                        transaction.commit();
+                        switchFragment(mContactFragment);
                         mActionBar.setTitle(R.string.btn_liaoba_contact);
-                        mCurrentFragment = mContactFragment;
                         break;
                     case R.id.radio2:
-                        transaction = fragmentManager.beginTransaction();
-                        if (mAddPersonFragment == null)
-                            mAddPersonFragment = new AddPersonFragment();
-                        transaction.replace(R.id.chatbar_fragment_container, mAddPersonFragment);
-                        transaction.commit();
+                        switchFragment(mAddPersonFragment);
                         mActionBar.setTitle(R.string.btn_liaoba_add_friend);
-                        mCurrentFragment = mAddPersonFragment;
                         break;
                 }
             }
         });
+    }
+
+    private void switchFragment(Fragment fragment) {
+        if (mCurrentFragment == fragment)
+            return;
+        transaction = fragmentManager.beginTransaction();
+        if (fragment.isAdded())
+            transaction.hide(mCurrentFragment).show(fragment).commit();
+        else
+            transaction.hide(mCurrentFragment).add(R.id.chatbar_fragment_container, fragment).commit();
+        mCurrentFragment = fragment;
     }
 
     @Override

@@ -203,7 +203,7 @@ public class Utils {
     }
 
     /**
-     * 直接保存RESTFUL获取的我的资料JSON数据到本地
+     * 直接保存RESTFUL获取的资料JSON数据到本地
      * @param context
      * @param array
      * @throws IOException

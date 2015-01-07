@@ -5,15 +5,16 @@
               android:layout_height="match_parent">
 <LinearLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/gray">
+    android:layout_height="25dp"
+    android:background="@color/devide_line">
     <TextView
         android:id="@+id/contact_my_friends"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginLeft="10dp"
         android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        android:textColor="#adadad"
         android:text="@string/tv_contact_my_friends"/>
     </LinearLayout>
 

@@ -12,7 +12,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="8dp"
+            android:paddingLeft="8dp"
             android:layout_gravity="center_horizontal"
             android:minHeight="?android:attr/listPreferredItemHeight">
 
@@ -86,7 +86,8 @@
             android:layout_width="match_parent"
             android:gravity="top"
             android:background="@null"
-            android:layout_height="120dp"
+            android:layout_height="90dp"
+            android:textColorHint="@color/edit_text_hint_color"
             android:hint="我是....."/>
     </FrameLayout>
 

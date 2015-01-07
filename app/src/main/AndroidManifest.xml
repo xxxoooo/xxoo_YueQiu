@@ -40,8 +40,9 @@
 
         <!-- 聊吧Activity -->
         <activity android:name=".ChatBarActivity" />
+        <activity android:name=".activity.AddFriendsActivity"/>
+        <activity android:name=".activity.FriendsApplicationActivity"/>
 
-        <activity android:name="activity.AddFriendsActivity"/>
         <!-- 聊吧 END -->
 
         <activity android:name=".ActivitiesActivity" />

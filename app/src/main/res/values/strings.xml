@@ -211,6 +211,11 @@
     <string name="student">徒弟</string>
     <string name="expert">高手</string>
     <string name="beginner">菜鸟</string>
+    <string name="qiuyou_request">球友请求</string>
+    <string name="qiuyou_application">球友申请</string>
+    <string name="qiuyou_application_clear">清空</string>
+    <string name="qiuyou_manage">球友管理</string>
+    <string name="qiuyou_manage_finish">完成</string>
 
 
     <!-- 活动 -->

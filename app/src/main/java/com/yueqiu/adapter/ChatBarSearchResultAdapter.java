@@ -49,12 +49,12 @@ public class ChatBarSearchResultAdapter extends BaseAdapter {
         ViewHolder viewHolder;
         Log.e(TAG, "getView " + position + " " + convertView);
         if (convertView == null) {
-            convertView = mLayoutInflater.inflate(R.layout.item_chatbar_search_result, null);
+            convertView = mLayoutInflater.inflate(R.layout.item_chatbar_account, null);
             viewHolder = new ViewHolder();
             viewHolder.mImageView = (ImageView) convertView.findViewById(R.id.chatbar_item_account_iv);
             viewHolder.mAccount = (TextView) convertView.findViewById(R.id.chatbar_item_account_tv);
-            viewHolder.mBaseInfo = (TextView) convertView.findViewById(R.id.chatbar_item_base_info_tv);
-            viewHolder.mButton = (Button) convertView.findViewById(R.id.chatbar_item_add_friend_btn);
+//            viewHolder.mBaseInfo = (TextView) convertView.findViewById(R.id.chatbar_item_base_info_tv);
+//            viewHolder.mButton = (Button) convertView.findViewById(R.id.chatbar_item_add_friend_btn);
             //绑定viewholder对象
             convertView.setTag(viewHolder);
         } else {

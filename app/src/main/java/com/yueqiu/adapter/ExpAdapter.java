@@ -194,9 +194,9 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
         holder.onLineView.setText(getChildrenCount(groupPosition) + "/"
                 + getChildrenCount(groupPosition));
         if (isExpanded) {
-            holder.iconView.setImageResource(R.drawable.qb_down);
+            holder.iconView.setImageResource(R.drawable.arrow_down);
         } else {
-            holder.iconView.setImageResource(R.drawable.qb_right);
+            holder.iconView.setImageResource(R.drawable.arrow_right);
         }
         return convertView;
     }
