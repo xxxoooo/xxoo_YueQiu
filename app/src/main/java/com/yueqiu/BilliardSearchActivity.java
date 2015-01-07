@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
@@ -45,6 +46,7 @@ import com.yueqiu.fragment.search.BilliardsSearchCoauchFragment;
 import com.yueqiu.fragment.search.BilliardsSearchDatingFragment;
 import com.yueqiu.fragment.search.BilliardsSearchMateFragment;
 import com.yueqiu.fragment.search.BilliardsSearchRoomFragment;
+import com.yueqiu.fragment.search.common.SearchSubFragmentConstants;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.menudrawer.MenuDrawer;
@@ -72,9 +74,6 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private static final int LOGOUT_SUCCESS = 0;
     private static final int LOGOUT_FAILED = 1;
 
-    // make the instances of the basic fragment that directly loaded in the BilliardSearchActivity
-    private BilliardsSearchMateFragment mMateFragment;
-
     private ViewPager mViewPager;
     private String[] mTitles;
     private SectionPagerAdapter mPagerAdapter;
@@ -90,10 +89,16 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private SharedPreferences.Editor mEditor;
     private List<ListItem> mItemList = new ArrayList<ListItem>();
 
+    private FragmentManager mFragmentManager;
+    private FragmentTransaction mFragmentTransaction;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        mFragmentManager = getSupportFragmentManager();
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+
         mContext = this;
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
@@ -219,9 +224,14 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
     }
 
+    private static final String TAG_MATE_FRAGMENT = "searchMateFragment";
+    private static final String TAG_DATING_FRAGMENT = "searchDatingFragment";
+    private static final String TAG_ASSISTCOAUCH_FRAGMENT = "searchAssistCoauchFragment";
+    private static final String TAG_COAUCH_FRAGMENT = "searchCoauchFragment";
+    private static final String TAG_ROOM_FRAGMENT = "searchRoomFragment";
+
     private class SectionPagerAdapter extends FragmentPagerAdapter
     {
-
         public SectionPagerAdapter(FragmentManager fm)
         {
             super(fm);
@@ -230,50 +240,55 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         @Override
         public Fragment getItem(int index)
         {
-            Log.d(TAG, " the current index are : " + index);
-//            Fragment mateFragment = BilliardsSearchMateFragment.newInstance(mContext, "testguoshichao");
-//            Bundle args = new Bundle();
-//            args.putString("test", mTitles[index]);
-//            mateFragment.setArguments(args);
-//
-//            return mateFragment;
+            Log.d(TAG, " the current Fragment index are : " + index);
             Fragment fragment = null;
-            Bundle args = null;
+            Bundle args;
 
             switch (index) {
                 case 0:
-                    fragment = BilliardsSearchMateFragment.newInstance(mContext, "");
+                    fragment = BilliardsSearchMateFragment.newInstance(mContext, "MateFragment");
                     args = new Bundle();
-                    args.putString("", mTitles[index]);
+                    args.putString(SearchSubFragmentConstants.MATE_FRAGMENT_INIT, mTitles[index]);
                     fragment.setArguments(args);
+                    Log.d(TAG, "mate fragment has been created ");
+
                     break;
                 case 1:
-                    fragment = BilliardsSearchDatingFragment.newInstance(mContext, "");
+                    fragment = BilliardsSearchDatingFragment.newInstance(mContext, "DatingFragment");
                     args = new Bundle();
-                    args.putString("", mTitles[index]);
+                    args.putString(SearchSubFragmentConstants.DATING_FRAGMENT_INIT, mTitles[index]);
                     fragment.setArguments(args);
+                    Log.d(TAG, "dating fragment has been created ");
+
                     break;
                 case 2:
-                    fragment = BilliardsSearchAssistCoauchFragment.newInstance(mContext, "");
+                    fragment = BilliardsSearchAssistCoauchFragment.newInstance(mContext, "AssistCoauchFragment");
                     args = new Bundle();
-                    args.putString("", mTitles[index]);
+                    args.putString(SearchSubFragmentConstants.ASSIST_COAUCH_FRAGMENT_INIT, mTitles[index]);
                     fragment.setArguments(args);
+                    Log.d(TAG, "assist coauch fragment has been created ");
+
                     break;
                 case 3:
-                    fragment = BilliardsSearchCoauchFragment.newInstance(mContext, "");
+                    fragment = BilliardsSearchCoauchFragment.newInstance(mContext, "CoauchFragment");
                     args = new Bundle();
-                    args.putString("", mTitles[index]);
+                    args.putString(SearchSubFragmentConstants.COAUCH_FRAGMENT_INIT, mTitles[index]);
                     fragment.setArguments(args);
+                    Log.d(TAG, "coauch fragment has been created ");
+
                     break;
                 case 4:
-                    fragment = BilliardsSearchRoomFragment.newInstance(mContext, "");
+                    fragment = BilliardsSearchRoomFragment.newInstance(mContext, "RoomFragment");
                     args = new Bundle();
-                    args.putString("", mTitles[index]);
+                    args.putString(SearchSubFragmentConstants.ROOM_FRAGMENT_INIT, mTitles[index]);
                     fragment.setArguments(args);
+                    Log.d(TAG, "room fragment has been created ");
+
                     break;
                 default:
                     break;
             }
+
 
             return fragment;
         }

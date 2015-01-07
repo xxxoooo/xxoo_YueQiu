@@ -2,6 +2,7 @@ package com.yueqiu.fragment.search.common;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -14,6 +15,8 @@ import android.widget.PopupWindow;
 import com.yueqiu.R;
 import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
 
+import java.awt.font.TextAttribute;
+
 /**
  * Created by scguo on 15/1/4.
  * <p/>
@@ -23,6 +26,7 @@ import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
  */
 public class SubFragmentsCommonUtils
 {
+    private static final String TAG = "SubFragmentsCommonUtils";
 
     // 定义用于处理从Fragment的ListView点击之后切换到具体的Activity时的切换过程
     // 以下是用于球厅Fragment当中需要传输的数据的详细的key值
@@ -92,6 +96,7 @@ public class SubFragmentsCommonUtils
         {
             if (i == selectedItem)
             {
+                Log.d(TAG, " the current selected item are : " + i + " and set the image resource here ");
                 sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_focused);
             } else
             {
@@ -100,6 +105,15 @@ public class SubFragmentsCommonUtils
         }
 
     }
+
+    // TODO: 这里我们使用的是服务器端的同学开发的接口
+    // TODO: 这里我们加载的是商家推荐的信息的列表，也就是显示在每一个Fragment当中的最上面的滚动的Image Gallery
+    private void retrieveRecommdedRoomInfo()
+    {
+
+
+    }
+
 
     private static ImageView[] sPagerIndicatorImgList;
     private static ImageView[] sPagerImgArr;
@@ -128,7 +142,7 @@ public class SubFragmentsCommonUtils
         sPagerIndicatorImgList = new ImageView[sPagerImgResArr.length];
 
         final int size = sPagerIndicatorImgList.length;
-
+        Log.d(TAG, " the size we get are : " + size);
         ImageView indicatorView;
         int i;
         for (i = 0; i < size; ++i)
@@ -137,8 +151,10 @@ public class SubFragmentsCommonUtils
             indicatorView.setLayoutParams(new ViewGroup.LayoutParams(10, 10));
 
             sPagerIndicatorImgList[i] = indicatorView;
+            // 用于初始化所有的indicator的初始状态
             if (i == 0)
             {
+                Log.d(TAG, " we have reset all the pager indicator here, and this is the wrong place here ");
                 sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_focused);
             } else
             {
@@ -164,20 +180,20 @@ public class SubFragmentsCommonUtils
         sGalleryImgAdapter = new SearchMateFragmentViewPagerImgAdapter(sPagerImgArr);
         sImgGalleryViewPager.setAdapter(sGalleryImgAdapter);
         sImgGalleryViewPager.setCurrentItem(sPagerImgArr.length * 100);
+
         sImgGalleryViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
-
             @Override
             public void onPageScrolled(int i, float v, int i2)
             {
-
             }
 
             @Override
             public void onPageSelected(int i)
             {
-                setImgBackground(i % sPagerImgArr.length);
-
+                Log.d(TAG, " the current page index are : " + i + ", and the selected index are : " + i % sPagerImgArr.length);
+//                setImgBackground(i % sPagerImgArr.length);
+                setImgBackground(i % size);
             }
 
             @Override
@@ -187,4 +203,8 @@ public class SubFragmentsCommonUtils
             }
         });
     }
+
+
+
+
 }

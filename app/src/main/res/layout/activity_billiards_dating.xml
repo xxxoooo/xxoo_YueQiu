@@ -165,7 +165,7 @@
         android:layout_margin="6dp"
         android:textStyle="bold"
         android:textColor="@android:color/white"
-        android:background="@drawable/big_btn_bg"
+        android:background="@drawable/login_button_bg"
         />
 
 </RelativeLayout>

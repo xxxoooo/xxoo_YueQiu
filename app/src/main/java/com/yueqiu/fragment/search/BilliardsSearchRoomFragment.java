@@ -89,12 +89,13 @@ public class BilliardsSearchRoomFragment extends Fragment
         (sBtnApprisal = (Button) mView.findViewById(R.id.btn_room_apprisal)).setOnClickListener(new OnFilterBtnClickListener());
 
         mRoomListView = (ListView) mView.findViewById(R.id.search_room_subfragment_listview);
+
+        // TODO: 初始化测试数据
         initListStaticTestData();
         mRoomListView.setAdapter(new SearchRoomSubFragmentListAdapter(sContext, (ArrayList<SearchRoomSubFragmentRoomBean>) mRoomList));
 
         mRoomListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
-
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
@@ -115,6 +116,19 @@ public class BilliardsSearchRoomFragment extends Fragment
         });
 
         return mView;
+    }
+
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
     }
 
     private static class OnFilterBtnClickListener implements View.OnClickListener
@@ -143,11 +157,13 @@ public class BilliardsSearchRoomFragment extends Fragment
 
 
     // TODO: 用于获取球厅信息的列表
-    private void retrieveRoomRawInfo()
+    // TODO: 注意这里我们得到的是整个球厅的Fragment当中的列表的所有的信息的列表
+    // TODO: 这里我们使用的是大众点评推荐的接口
+    private void retrieveRoomListInfo()
     {
 
-
     }
+
 
 
     // use the static data to init the BilliardsSearchRoomFragment

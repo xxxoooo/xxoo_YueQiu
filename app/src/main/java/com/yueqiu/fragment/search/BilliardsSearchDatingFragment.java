@@ -3,7 +3,11 @@ package com.yueqiu.fragment.search;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +19,14 @@ import com.yueqiu.R;
 import com.yueqiu.activity.searchmenu.nearby.SearchBilliardsDatingActivity;
 import com.yueqiu.adapter.SearchDatingSubFragmentListAdapter;
 import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
+import com.yueqiu.util.HttpUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by scguo on 14/12/30.
@@ -62,7 +70,7 @@ public class BilliardsSearchDatingFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-        mView = inflater.inflate(R.layout.search_dating_fragment_layout, null);
+        mView = inflater.inflate(R.layout.search_dating_fragment_layout, container, false);
 
         SubFragmentsCommonUtils.initViewPager(sContext, mView, R.id.dating_frament_gallery_pager, R.id.dating_fragment_gallery_pager_indicator_group);
 
@@ -73,6 +81,12 @@ public class BilliardsSearchDatingFragment extends Fragment
         mArgs = args;
 
         mDatingListView = (ListView) mView.findViewById(R.id.search_dating_subfragment_list);
+
+        sHandler.sendEmptyMessage(START_RETRIEVE_ALL_DATA);
+
+        sHandler.sendEmptyMessage(START_RETRIEVE_ALL_DATA);
+
+        // TODO: 以下加载的是测试数据，我们以后需要移除
         initTestData();
         mDatingListView.setAdapter(new SearchDatingSubFragmentListAdapter(sContext, (ArrayList<SearchDatingSubFragmentDatingBean>) mDatingList));
 
@@ -115,13 +129,64 @@ public class BilliardsSearchDatingFragment extends Fragment
     }
 
 
-    // TODO: 以下就是获取约球信息列表的网络请求处理过程
-    // TODO: 这个方法获取到是原始的json数据，我们需要转换成Java bean列表
-    private String retrieveDatingInfo()
+    /**
+     *
+     * @param userId
+     * @param range 发布约球信息的大致距离,距离范围。例如1000米以内
+     * @param date 发布日期
+     * @param startNum 请求信息的开始的条数的数目(当我们进行分页请求的时候，我们就会用到这个特性，即每次当用户滑动到列表低端或者当用户滑动更新的时候，我们需要
+     *                 通过更改startNum的值来进行分页加载的具体实现)
+     * @param endNum 请求列表信息的结束条目，例如我们可以一次只加载10条，当用户请求的时候再加载更多的数据
+     *
+     */
+    private static void retrieveDatingInfo(final String userId, final String range, final int date, final int startNum, final int endNum)
     {
-        return "";
+        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
+        requestParams.put("user_id", userId);
+        requestParams.put("range", range);
+        requestParams.put("date", date + "");
+        requestParams.put("start_no", startNum + "");
+        requestParams.put("end_no", endNum + "");
+
+        String rawResult = HttpUtil.urlClient(HttpConstants.SearchDating.URL, requestParams, HttpConstants.RequestMethod.GET);
+        Log.d(TAG, " the raw result we get for the dating info are : " + rawResult);
+//        if (!TextUtils.isEmpty(rawResult))
+//        {
+//
+//        }
+
+
+
     }
 
+    private static final int START_RETRIEVE_ALL_DATA = 1 << 1;
+    private static final int RETRIEVE_DATA_WITH_RANGE_FILTERED = 1 << 2;
+    private static final int RETRIEVE_DATA_WITH_DATE_FILTERED = 1 << 3;
+
+    private static Handler sHandler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg)
+        {
+            switch (msg.what)
+            {
+                case START_RETRIEVE_ALL_DATA:
+                    new Thread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            retrieveDatingInfo("1", "", 1, 1, 1);
+                        }
+                    }).start();
+                    break;
+                case RETRIEVE_DATA_WITH_DATE_FILTERED:
+                    break;
+                case RETRIEVE_DATA_WITH_RANGE_FILTERED:
+                    break;
+            }
+        }
+    };
 
     // TODO: 以下都是测试数据,在测试接口的时候将他们删除掉
     private void initTestData()

@@ -128,113 +128,63 @@ public class HttpConstants
         public static final String USER_ID = "user_id";
     }
 
-    /*
-     * 球友、约球、助教、和教练的请求参数
+    /**
+     * 球友的请求参数
      * 发送Get请求
      */
-    public static final class SearchPerson
+    public static final class SearchMate
     {
-        public static final String URL = "/home/searchPerson";
+        public static final String URL = "/home/friend";
+    }
 
-        /*
-         * 用户ID
-         */
-        public static final String USER_ID = "user_id";
+    /**
+     * 约球的请求参数
+     * 发送GET请求
+     */
+    public static final class SearchDating
+    {
+        public static final String URL = "/home/appointBall";
+    }
 
-        /*
-         * 距离
-         */
-        public static final String RANGE = "range";
-
-        /*
-         * 性别 男1 女2
-         */
-        public static final String SEX = "sex";
-
-        /*
-         * 发布时间
-         */
-        public static final String DATE = "date";
-
-        /*
-         * 费用
-         */
-        public static final String MONEY = "money";
-
-        /*
-         * 球种
-         */
-        public static final String CLASS = "class";
-
-        /*
-         * 水平
-         */
-        public static final String LEVEL = "level";
-
-
-        /*
-         * 开始条数
-         * 默认0
-         */
-        public static final String START_NO = "start_no";
-
-        /*
-         * 结束条数
-         */
-        public static final String END_NO = "end_no";
+    /**
+     * 助教的请求参数
+     *
+     */
+    public static final class SearchAssistCoauch
+    {
+       public static final String URL = "/home/tutor";
     }
 
     /**
      * 用于请求教练的相关信息的Http url常量
      */
-    public static final class SearchCoauchConstants
+    public static final class SearchCoauch
     {
         public static final String URL = "/home/coach";
 
     }
 
     /**
-     * 球厅请求参数
-     * 发送POST请求
-     *
-     * @author yinfeng
+     * 用于请求球厅的相关信息的列表
+     * 这里我们需要注意的是，当我们请求的是球厅Fragment当中的listView当中的信息时，我们使用的是
+     * 大众点评的接口来获得大众点评推荐的所有的球厅的列表的信息
+     * 也就是说这里我们SearchRoom使用的是大众点评的接口，而不是服务器端的同志开发的接口
      */
-    public static final class SearchHallConstant
+    public static final class SearchRoom
     {
-        public static final String URL = "/home/ searchHall";
-
-        /*
-         * 区域
-         */
-        public static final String DISTRICT = "district";
-
-        /*
-         * 距离
-         */
-        public static final String RANGE = "range";
-
-        /*
-         * 价格
-         */
-        public static final String PRICE = "price";
-
-        /*
-         * 好评
-         */
-        public static final String COMMENT = "comment";
-
-
-        /*
-         * 开始条数
-         * 默认0
-         */
-        public static final String START_NO = "start_no";
-
-        /*
-         * 结束条数
-         */
-        public static final String END_NO = "end_no";
+        public static final String URL = "";
     }
+
+    /**
+     * 这是用于请求商家推荐的球厅Url地址
+     * 我们通过这个接口获得的信息主要是用于显示球厅Fragment上面显示的Image Gallery列表
+     *
+     */
+    public static final class SearchRoomRecommendation
+    {
+        public static final String URL = "/home/GetBallHall";
+    }
+
 
     /*
      * 球厅、约球详情、发布约球

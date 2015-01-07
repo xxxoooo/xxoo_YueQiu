@@ -8,6 +8,7 @@
         <item name="android:actionMenuTextAppearance">@style/MenuTextStyle</item>
     </style>
 
+
     <style name="Widget"/>
 
     <style name="Widget.MenuDrawer">
