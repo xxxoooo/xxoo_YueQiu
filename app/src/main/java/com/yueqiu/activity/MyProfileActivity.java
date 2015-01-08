@@ -159,7 +159,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     private void updateUI(UserInfo userInfo) {
         String unset = getString(R.string.unset);
 //        mPhotoImageView.setImageDrawable();
-        mAccountTextView.setText(userInfo.getAccount());
+        mAccountTextView.setText(userInfo.getUsername());
         mGenderTextView.setText(userInfo.getSex() == 1
                 ? getString(R.string.man) : getString(R.string.woman));
         mNickNameTextView.setText("".equals(userInfo.getUsername())
@@ -177,8 +177,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         mCueHabitsTextView.setText(1 == userInfo.getUsedType()
                 ? getString(R.string.habit_1) : (2 == userInfo.getUsedType() ?
                 getString(R.string.habit_2) : getString(R.string.habit_3)));
-        mPlayAgeTextView.setText(-1 == userInfo.getBallAge()
-                ? unset : String.valueOf(userInfo.getBallAge()));
+        mPlayAgeTextView.setText(userInfo.getBallAge());
         mIdolTextView.setText("".equals(userInfo.getIdol())
                 ? unset : userInfo.getIdol());
         mSignTextView.setText("".equals(userInfo.getIdol_name())
@@ -332,7 +331,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 break;
             case 9:
                 mPlayAgeTextView.setText(str);
-                mUserInfo.setBallAge(Integer.parseInt(str));
+                mUserInfo.setBallAge(str);
                 break;
             case 10:
                 mIdolTextView.setText(str);

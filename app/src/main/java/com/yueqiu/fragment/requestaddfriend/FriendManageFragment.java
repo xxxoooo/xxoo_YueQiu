@@ -31,7 +31,9 @@ public class FriendManageFragment extends Fragment {
     private Fragment mFragment;
     private int whoCreate;
     private TextView mTextView;
-    private int mGroupId;
+    private int mGroupId;//分组id
+    private String mComment;//备注
+    private String[] mLabel;//标签
     private static final int REQUEST_CODE = 0;
 
     @Override

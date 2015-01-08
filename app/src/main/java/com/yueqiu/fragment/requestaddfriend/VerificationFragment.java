@@ -11,9 +11,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.util.Utils;
+
 
 /**
  * Created by doushuqi on 15/1/6.
@@ -23,6 +26,12 @@ public class VerificationFragment extends Fragment {
     private FragmentManager mFragmentManager;
     private ActionBar mActionBar;
     public static final String ARGUMENTS_KEY = "com.yueqiu.fragment.requestaddfriend.arguments_key";
+    private ImageView mPhoto;
+    private String mAccount;
+    private String mGender;
+    private String mDistrict;
+    private TextView mAccountTextView, mGenderTextView, mDistrictTextView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,16 +40,28 @@ public class VerificationFragment extends Fragment {
             mActionBar.setTitle(R.string.identity_verify);
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
-
         setHasOptionsMenu(true);
         mFragmentManager = getActivity().getSupportFragmentManager();
+        mAccount = getArguments().getString(FriendProfileFragment.ACCOUNT_KEY);
+        mGender = getArguments().getString(FriendProfileFragment.GENDER_KEY);
+        mDistrict = getArguments().getString(FriendProfileFragment.DISTRICT_KEY);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_identity_verification, container, false);
-
+        init(view);
         return view;
+    }
+
+    private void init(View v) {
+        mPhoto = (ImageView) v.findViewById(R.id.account_iv);
+        mAccountTextView = (TextView) v.findViewById(R.id.account_tv);
+        mGenderTextView = (TextView) v.findViewById(R.id.gender_tv);
+        mDistrictTextView = (TextView) v.findViewById(R.id.district_tv);
+        mAccountTextView.setText(mAccount);
+        mGenderTextView.setText(mGender);
+        mDistrictTextView.setText(mDistrict);
     }
 
     @Override

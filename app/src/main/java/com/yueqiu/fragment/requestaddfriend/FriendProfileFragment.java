@@ -44,6 +44,13 @@ public class FriendProfileFragment extends Fragment {
     private int mUserId;
     private static final int DATA_SUCCESS = 1;
     private UserInfo mFriendInfo;
+    public static final String IMG_URL_REAL_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.img_url";
+    public static final String ACCOUNT_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.account_key";
+    public static final String GENDER_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.gender_key";
+    public static final String DISTRICT_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.district_key";
+
+    private String img_path, account, gender, nick_name, district, level, ball_type, ball_arm, used_type;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,7 +76,13 @@ public class FriendProfileFragment extends Fragment {
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle args = new Bundle();
+                args.putString(IMG_URL_REAL_KEY, img_path);
+                args.putString(ACCOUNT_KEY, account);
+                args.putString(GENDER_KEY, gender);
+                args.putString(DISTRICT_KEY, district);
                 Fragment fragment = new VerificationFragment();
+                fragment.setArguments(args);
                 mFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
             }
         });
@@ -134,23 +147,35 @@ public class FriendProfileFragment extends Fragment {
     };
 
     private void updateUI(){
-//        mImageView.setImageDrawable();
-        mAccountTextView.setText(mFriendInfo.getAccount());
-        mGenderTextView.setText(mFriendInfo.getSex() == 1
-                ? getString(R.string.man) : getString(R.string.woman));
-        mNickNameTextView.setText(mFriendInfo.getUsername());
-        mDistrictTextView.setText(mFriendInfo.getDistrict());
-        mLevelTextView.setText(1 == mFriendInfo.getLevel()
+
+        String img_url = mFriendInfo.getImg_url();
+        img_path = mFriendInfo.getImg_url();//fake
+        account = mFriendInfo.getUsername();
+        gender = mFriendInfo.getSex() == 1
+                ? getString(R.string.man) : getString(R.string.woman);
+        nick_name = mFriendInfo.getUsername();
+        district = mFriendInfo.getDistrict();
+        level = 1 == mFriendInfo.getLevel()
                 ? getString(R.string.level_base) : ((2 == mFriendInfo.getLevel()) ?
-                getString(R.string.level_middle) : getString(R.string.level_master)));
-        mBallTypeTextView.setText(1 == mFriendInfo.getBall_type()
+                getString(R.string.level_middle) : getString(R.string.level_master));
+        ball_type = 1 == mFriendInfo.getBall_type()
                 ? getString(R.string.ball_type_1) : (2 == mFriendInfo.getBall_type() ?
-                getString(R.string.ball_type_2) : getString(R.string.ball_type_3)));
-        mBallArmTextView.setText(1 == mFriendInfo.getBallArm()
-                ? getString(R.string.cue_1) : getString(R.string.cue_2));
-        mUsedTypeTextView.setText(1 == mFriendInfo.getUsedType()
+                getString(R.string.ball_type_2) : getString(R.string.ball_type_3));
+        ball_arm = 1 == mFriendInfo.getBallArm()
+                ? getString(R.string.cue_1) : getString(R.string.cue_2);
+        used_type = 1 == mFriendInfo.getUsedType()
                 ? getString(R.string.habit_1) : (2 == mFriendInfo.getUsedType() ?
-                getString(R.string.habit_2) : getString(R.string.habit_3)));
+                getString(R.string.habit_2) : getString(R.string.habit_3));
+
+//        mImageView.setImageDrawable();
+        mAccountTextView.setText(account);
+        mGenderTextView.setText(gender);
+        mNickNameTextView.setText(nick_name);
+        mDistrictTextView.setText(district);
+        mLevelTextView.setText(level);
+        mBallTypeTextView.setText(ball_type);
+        mBallArmTextView.setText(ball_arm);
+        mUsedTypeTextView.setText(used_type);
     }
 
     private void toast() {
