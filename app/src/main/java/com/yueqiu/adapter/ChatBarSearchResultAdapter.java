@@ -91,14 +91,7 @@ public class ChatBarSearchResultAdapter extends BaseAdapter {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.dialog_chatbar_add_friends);
-            TextView textView = (TextView)findViewById(R.id.back);
-            textView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dismiss();
-                }
-            });
+
         }
     }
 }

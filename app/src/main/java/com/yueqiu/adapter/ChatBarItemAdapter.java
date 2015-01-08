@@ -49,7 +49,7 @@ public class ChatBarItemAdapter extends BaseAdapter {
             viewHolder = new ViewHolder();
             viewHolder.mImageView = (ImageView) convertView.findViewById(R.id.chatbar_item_account_iv);
             viewHolder.mAccount = (TextView) convertView.findViewById(R.id.chatbar_item_account_tv);
-            viewHolder.mLastMessage = (TextView) convertView.findViewById(R.id.chatbar_item_lastmessage_tv);
+            viewHolder.mGender = (TextView) convertView.findViewById(R.id.chatbar_item_gender_tv);
             viewHolder.mSendTime = (TextView) convertView.findViewById(R.id.chatbar_item_sendtime_tv);
             viewHolder.mVerifyMessage = (TextView) convertView.findViewById(R.id.friends_application_verify_message);
             viewHolder.mDistrict = (TextView) convertView.findViewById(R.id.chatbar_item_district_tv);
@@ -66,8 +66,8 @@ public class ChatBarItemAdapter extends BaseAdapter {
             viewHolder.mAccount.setText("验证消息");
             viewHolder.mVerifyMessage.setVisibility(View.VISIBLE);
             viewHolder.mVerifyMessage.setText("tangxin请求添加为好友");
-//            viewHolder.mImageView.setImageResource(R.drawable.ic_launcher);
-            viewHolder.mLastMessage.setVisibility(View.GONE);
+            viewHolder.mImageView.setImageResource(R.drawable.message);
+            viewHolder.mGender.setVisibility(View.GONE);
             viewHolder.mDistrict.setVisibility(View.GONE);
         }
 
@@ -77,7 +77,7 @@ public class ChatBarItemAdapter extends BaseAdapter {
     final class ViewHolder {
         public ImageView mImageView;
         public TextView mAccount;
-        public TextView mLastMessage;
+        public TextView mGender;
         public TextView mSendTime;
         public TextView mVerifyMessage;
         public TextView mDistrict;

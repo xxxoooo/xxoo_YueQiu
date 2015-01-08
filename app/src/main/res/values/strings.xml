@@ -216,6 +216,10 @@
     <string name="qiuyou_application_clear">清空</string>
     <string name="qiuyou_manage">球友管理</string>
     <string name="qiuyou_manage_finish">完成</string>
+    <string name="identity_verify">身份验证</string>
+    <string name="next">下一步</string>
+    <string name="send">发送</string>
+    <string name="set_group">移至分组</string>
 
 
     <!-- 活动 -->
@@ -283,7 +287,7 @@
     <string name="idol">偶像</string>
     <string name="sign">签名</string>
     <string name="the_new_post">最新照片</string>
-    <string name="unset">未设定</string>
+    <string name="unset">未设置</string>
     <string name="update_to_assistant">升级助教</string>
     <string name="update_to_coach">升级教练</string>
     <string name="cost">费用</string>

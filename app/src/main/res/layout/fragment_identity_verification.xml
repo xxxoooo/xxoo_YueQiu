@@ -86,7 +86,7 @@
             android:layout_width="match_parent"
             android:gravity="top"
             android:background="@null"
-            android:layout_height="90dp"
+            android:layout_height="120dp"
             android:textColorHint="@color/edit_text_hint_color"
             android:hint="我是....."/>
     </FrameLayout>

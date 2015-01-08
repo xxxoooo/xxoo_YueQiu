@@ -17,11 +17,12 @@ public class FriendsApplicationActivity extends SingleFragmentActivity {
     public final static Fragment sFriendsApplication = new FriendsApplicationFragment();
     public Fragment mCurrentFragment;
     private FragmentManager mFragmentManager = getSupportFragmentManager();
+    private ActionBar mActionBar;
 
     @Override
     public Fragment createFragment() {
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar = getActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
         mCurrentFragment = sFriendsApplication;
         return mCurrentFragment;
     }
@@ -37,7 +38,13 @@ public class FriendsApplicationActivity extends SingleFragmentActivity {
         else{
             transaction.hide(mCurrentFragment).add(R.id.fragment_container, fragment).commit();
         }
-
+        setActionBarTitle(fragment);
         mCurrentFragment = fragment;
+    }
+
+    private void setActionBarTitle(Fragment fragment) {
+        if (fragment instanceof FriendsApplicationFragment)
+            mActionBar.setTitle(R.string.qiuyou_application);
+        else mActionBar.setTitle(R.string.qiuyou_manage);
     }
 }

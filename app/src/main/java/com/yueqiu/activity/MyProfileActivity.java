@@ -237,10 +237,11 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         switch (v.getId()) {
             case R.id.update_assistant_btn:
                 //TODO:升级助教界面
-//                Intent intent = new Intent(this,);
+                startActivity(new Intent(this, UpdateAssistantActivity.class));
                 break;
             case R.id.update_coach_btn:
                 //TODO:升级教练界面
+                startActivity(new Intent(this, UpdateAssistantActivity.class));
                 break;
             case R.id.my_profile_photo:
                 startMyActivity(0);

@@ -40,8 +40,9 @@
 
         <!-- 聊吧Activity -->
         <activity android:name=".ChatBarActivity" />
-        <activity android:name=".activity.AddFriendsActivity"/>
+        <activity android:name=".activity.FriendSetGroupActivity"/>
         <activity android:name=".activity.FriendsApplicationActivity"/>
+        <activity android:name=".activity.RequestAddFriendActivity"/>
 
         <!-- 聊吧 END -->
 
@@ -59,6 +60,7 @@
         <activity android:name=".activity.MyfavorCollActivity" />
         <activity android:name=".activity.PublishedInfoActivity" />
         <activity android:name=".activity.SelectChargeModuleActivity" />
+        <activity android:name=".activity.UpdateAssistantActivity"/>
         <activity
             android:name=".activity.RegisterActivity"
             android:screenOrientation="portrait" />

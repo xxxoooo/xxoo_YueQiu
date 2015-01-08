@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,9 +32,20 @@ public class FriendsApplicationFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().getActionBar().setTitle(R.string.qiuyou_application);
         setHasOptionsMenu(true);
         mFragmentManager = getActivity().getSupportFragmentManager();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getActivity().getActionBar().setTitle(R.string.qiuyou_application);
     }
 
     @Override
@@ -98,7 +110,10 @@ public class FriendsApplicationFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         //点击同意按钮
+                        Bundle args = new Bundle();
+                        args.putInt(VerificationFragment.ARGUMENTS_KEY, 0);
                         Fragment fragment = new FriendManageFragment();
+                        fragment.setArguments(args);
                         ((FriendsApplicationActivity)getActivity()).switchFragment(fragment);
                     }
                 });

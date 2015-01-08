@@ -60,6 +60,8 @@
             android:background="@color/devide_line"/>
 
         <RelativeLayout
+            android:id="@+id/friend_manage_set_group"
+            android:clickable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -69,7 +71,7 @@
                 android:layout_height="45dp"
                 android:gravity="center_vertical"
                 android:textSize="18sp"
-                android:text="球友"/>
+                android:text="@string/search_billiard_mate_str"/>
 
             <ImageView
                 android:layout_width="wrap_content"
