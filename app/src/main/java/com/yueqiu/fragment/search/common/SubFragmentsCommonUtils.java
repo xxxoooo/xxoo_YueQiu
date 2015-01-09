@@ -2,6 +2,8 @@ package com.yueqiu.fragment.search.common;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -13,6 +15,8 @@ import android.widget.PopupWindow;
 import com.yueqiu.R;
 import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
 
+import java.awt.font.TextAttribute;
+
 /**
  * Created by scguo on 15/1/4.
  * <p/>
@@ -22,6 +26,8 @@ import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
  */
 public class SubFragmentsCommonUtils
 {
+    private static final String TAG = "SubFragmentsCommonUtils";
+
 
     // 定义用于处理从Fragment的ListView点击之后切换到具体的Activity时的切换过程
     // 以下是用于球厅Fragment当中需要传输的数据的详细的key值
@@ -54,11 +60,14 @@ public class SubFragmentsCommonUtils
 
     private SubFragmentsCommonUtils(){}
 
+
+    // TODO: 以下的这个方法已经不再使用，在确定没有类用这个方法之后就删除掉
     /**
      * @param context
      * @param anchorView  当前的popupWindow是依附于具体的哪一个View组件
      * @param layoutResId 用于显示当前的PopupWindow的具体的布局文件
      */
+    @Deprecated
     public static void initPopupWindow(Context context, View anchorView, int layoutResId)
     {
         final int popupWidth = LinearLayout.LayoutParams.MATCH_PARENT;
@@ -72,28 +81,34 @@ public class SubFragmentsCommonUtils
         popupWindow.setWidth(popupWidth);
         popupWindow.setHeight(popupHeight);
         popupWindow.setFocusable(true);
-        popupWindow.setTouchable(true);
+
         popupWindow.setOutsideTouchable(true);
         popupWindow.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.popup_window_bg));
-
-        popupWindow.setTouchInterceptor(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                switch (v.getId()) {
-                    default:
-                        break;
-                }
-                return true;
-
-            }
-        });
 
         popupWindow.showAsDropDown(anchorView);
     }
 
+    public static PopupWindow getFilterPopupWindow(Context context, View anchorView, View popupLayoutView)
+    {
+        final int popupWidth = LinearLayout.LayoutParams.MATCH_PARENT;
+        final int popupHeight = LinearLayout.LayoutParams.WRAP_CONTENT;
 
+//        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        View popupWindowLayout = layoutInflater.inflate(layoutResId, null);
+
+        final PopupWindow popupWindow = new PopupWindow(context);
+        popupWindow.setContentView(popupLayoutView);
+        popupWindow.setWidth(popupWidth);
+        popupWindow.setHeight(popupHeight);
+        popupWindow.setFocusable(true);
+
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.popup_window_bg));
+
+        popupWindow.showAsDropDown(anchorView);
+
+        return popupWindow;
+    }
 
     private static void setImgBackground(int selectedItem)
     {
@@ -103,6 +118,7 @@ public class SubFragmentsCommonUtils
         {
             if (i == selectedItem)
             {
+                Log.d(TAG, " the current selected item are : " + i + " and set the image resource here ");
                 sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_focused);
             } else
             {
@@ -111,6 +127,15 @@ public class SubFragmentsCommonUtils
         }
 
     }
+
+    // TODO: 这里我们使用的是服务器端的同学开发的接口
+    // TODO: 这里我们加载的是商家推荐的信息的列表，也就是显示在每一个Fragment当中的最上面的滚动的Image Gallery
+    private void retrieveRecommdedRoomInfo()
+    {
+
+
+    }
+
 
     private static ImageView[] sPagerIndicatorImgList;
     private static ImageView[] sPagerImgArr;
@@ -139,7 +164,7 @@ public class SubFragmentsCommonUtils
         sPagerIndicatorImgList = new ImageView[sPagerImgResArr.length];
 
         final int size = sPagerIndicatorImgList.length;
-
+        Log.d(TAG, " the size we get are : " + size);
         ImageView indicatorView;
         int i;
         for (i = 0; i < size; ++i)
@@ -148,8 +173,10 @@ public class SubFragmentsCommonUtils
             indicatorView.setLayoutParams(new ViewGroup.LayoutParams(10, 10));
 
             sPagerIndicatorImgList[i] = indicatorView;
+            // 用于初始化所有的indicator的初始状态
             if (i == 0)
             {
+                Log.d(TAG, " we have reset all the pager indicator here, and this is the wrong place here ");
                 sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_focused);
             } else
             {
@@ -175,20 +202,20 @@ public class SubFragmentsCommonUtils
         sGalleryImgAdapter = new SearchMateFragmentViewPagerImgAdapter(sPagerImgArr);
         sImgGalleryViewPager.setAdapter(sGalleryImgAdapter);
         sImgGalleryViewPager.setCurrentItem(sPagerImgArr.length * 100);
+
         sImgGalleryViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
-
             @Override
             public void onPageScrolled(int i, float v, int i2)
             {
-
             }
 
             @Override
             public void onPageSelected(int i)
             {
-                setImgBackground(i % sPagerImgArr.length);
-
+                Log.d(TAG, " the current page index are : " + i + ", and the selected index are : " + i % sPagerImgArr.length);
+//                setImgBackground(i % sPagerImgArr.length);
+                setImgBackground(i % size);
             }
 
             @Override
@@ -198,4 +225,8 @@ public class SubFragmentsCommonUtils
             }
         });
     }
+
+
+
+
 }

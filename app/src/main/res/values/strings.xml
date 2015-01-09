@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
-    <string name="app_name">YueQiu</string>
+    <string name="app_name">约求</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
@@ -47,6 +47,7 @@
     <string name="network_not_available">网络未连接，请检查网络后重试</string>
 
     <!-- 搜索 -->
+    <string name="search_search_btn_str">搜索</string>
     <!-- 定义SearchActivity当中的Actionbar当中的menuItem -->
     <string name="search_account_name_str">账户:</string>
     <string name="search_my_gold_coin_num_str">我的金币:</string>
@@ -75,7 +76,22 @@
     <string name="search_dating_subfragment_title_distance">距离</string>
     <string name="search_dating_subfragment_title_publishdata">发布时间</string>
     <string name="search_dating_detailed_btn_i_want_in">我要参加</string>
+    <string name="search_dating_detailed_btn_i_want_in_success">您已成功提交请求</string>
+    <string name="search_dating_detailed_btn_i_want_in_failed">抱歉，您的请求失败了</string>
     <string name="search_dating_detailed_tv_already_in">已参加人员</string>
+
+    <!--约球当中的popupWindow中的string资源-->
+    <string name="search_dating_popupwindow_no_filter">约球时间(智能排序)</string>
+    <string name="search_dating_popupwindow_one">1天内</string>
+    <string name="search_dating_popupwindow_two">2天内</string>
+    <string name="search_dating_popupwindow_three">3天内</string>
+    <string name="search_dating_popupwindow_four">4天内</string>
+    <string name="search_dating_popupwindow_five">5天内</string>
+    <string name="search_dating_popupwindow_six">6天内</string>
+    <string name="search_dating_popupwindow_seven">7天内</string>
+    <string name="search_dating_popupwindow_other">其他</string>
+
+
     <!-- 约球详情Activity的标题 -->
     <string name="search_dating_detailed_actionbar_title">约球详情</string>
     <string name="search_dating_detailed_btn_copylink_str">复制详情连接</string>
@@ -88,6 +104,9 @@
     <string name="search_dating_detailed_title_tecentweibo">腾讯微博</string>
     <string name="search_dating_detailed_title_sinaweibo">新浪微博</string>
     <string name="search_dating_detailed_title_renren">人人网</string>
+
+    <string name="search_dating_detailed_action_collect">加入到我的收藏</string>
+    <string name="search_dating_detailed_action_share">分享到朋友圈</string>
 
     <!-- 3.助教子Fragment的title -->
     <string name="search_assistcaouch_subfragment_title_distance">距离</string>
@@ -104,12 +123,35 @@
     <!-- 4.教练子Fragment的title -->
     <string name="search_caouch_subfragment_title_ability">资质</string>
     <string name="search_caouch_subfragment_title_kinds">球种</string>
+    <string name="search_coauch_filter_level_no_filter">教练资质(智能筛选)</string>
+    <string name="search_coauch_filter_kinds_no_filter">球种(智能筛选)</string>
+    <string name="search_coauch_filter_kinds_sinuoke">斯诺克</string>
+    <string name="search_coauch_filter_kinds_jiuqiu">九球</string>
+    <string name="search_coauch_filter_kinds_desk">桌球</string>
+    <string name="search_coauch_filter_level_guojiadui">前国家队队员</string>
+    <string name="search_coauch_filter_level_pre_guojiadui">准国家队队员</string>
+    <string name="search_coauch_filter_level_in_guojiadui">在役国家队队员</string>
 
     <!-- 5.球厅子Fragment的title -->
     <string name="search_room_subfragment_title_zone">区域</string>
     <string name="search_room_subfragment_title_distance">距离</string>
     <string name="search_room_subfragment_title_price">价格</string>
     <string name="search_room_subfragment_title_review">好评</string>
+
+    <string name="search_room_popupwindow_do_notfilter">区域(不限)</string>
+    <!--球厅当中的popupWindow的用于筛选的各个区域的名字-->
+    <string name="search_room_popupwindow_region_chaoyang">朝阳区</string>
+    <string name="search_room_popupwindow_region_haidian">海地区</string>
+    <string name="search_room_popupwindow_region_dongcheng">通州区</string>
+    <string name="search_room_popupwindow_region_xicheng">西城区</string>
+    <string name="search_room_popupwindow_region_feitaiqu">丰台区</string>
+    <string name="search_room_popupwindow_region_changping">昌平区</string>
+    <string name="search_room_popupwindow_region_tongzhou">通州区</string>
+    <string name="search_room_popupwindow_region_daxing">大兴区</string>
+    <string name="search_room_popupwindow_region_shijingshan">石景山区</string>
+
+    <string name="search_room_collect_success_indicator">您已经成功的收集了该球厅的信息</string>
+
 
     <!-- 球厅Activity当中的一些关键字段 -->
     <string name="search_room_detailedactivity_detailed_info_separator">详细信息</string>
@@ -159,6 +201,10 @@
     <string name="search_mate_popupmenu_item_2000_str">2000米以内</string>
     <string name="search_mate_popupmenu_item_5000_str">5000米以内</string>
 
+    <string name="search_room_price_popupwindow_no_filter">价格(智能筛选)</string>
+    <string name="search_room_price_popupwindow_lowtohigh">价格从低到高</string>
+    <string name="search_room_price_popupwindow_hightolow">价格从高到低</string>
+
     <!-- 用于球友子Fragment当中定义的字段值 -->
     <string name="search_subfragment_listitem_gender_indi_str">性别:</string>
     <string name="search_subfragment_listitem_account_indi_str">账户:</string>
@@ -174,7 +220,6 @@
     <string name="search_feedback_acti_et_leave_content_hint">具体建议...</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_hint_str">请输入关键词</string>
-    <string name="search_search_btn_str">搜索</string>
 
     <!-- 用于在Tab当中显示的4个Tab当中显示的地步栏当中显示的字符串 -->
     <string name="tab_title_search">附近</string>
@@ -196,7 +241,6 @@
     <string name="btn_liaoba_add_friend">添加好友</string>
     <string name="btn_add_friend">加好友</string>
     <string name="btn_back">返回</string>
-    <string name="btn_message_search">搜索</string>
     <string name="btn_message_cancel">取消</string>
     <string name="tv_contact_my_friends">分组</string>
     <string name="tv_add_persion_nearby">附近的人</string>
@@ -247,10 +291,9 @@
     <string name="activities_send">发布</string>
     <string name="activities_sendinfo">发布约球信息</string>
     <string name="activities">商家活动</string>
-    <string name="search">搜索</string>
     <string name="login">登录</string>
     <string name="commit">提交</string>
-    <string name="forgetpwd">忘记密码</string>
+    <string name="forgetpwd">忘记密码 ?</string>
     <string name="register">注册</string>
     <string name="man">男</string>
     <string name="woman">女</string>
@@ -271,7 +314,6 @@
     <string name="activity_charge_module_cannot_empty">收费模式不能为空</string>
     <string name="activity_submit_success">发布活动成功</string>
     <string name="activity_submit_failed">发布活动失败</string>
-
 
     <!-- 我的资料 -->
     <string name="photo">头像</string>
@@ -295,7 +337,6 @@
     <string name="profession_experiences">职业经历</string>
     <string name="setup_confirm">确认</string>
     <string name="picture">照片</string>
-
     <string name="level_base">基础</string>
     <string name="level_middle">中级</string>
     <string name="level_master">高级</string>
@@ -307,9 +348,6 @@
     <string name="ball_type_1">中式</string>
     <string name="ball_type_2">斯诺克</string>
     <string name="ball_type_3">九球</string>
-
-
-    <string name="tv_search">搜索</string>
     <string name="account_null">账户不能为空！</string>
     <string name="phone_null">电话不能为空！</string>
     <string name="password_null">密码不能为空！</string>
@@ -321,6 +359,7 @@
     <string name="please_login_first">请先登录，登录后才可使用全部功能</string>
     <string name="title_activity_group_select_topic_type">GroupSelectTopicTypeActivity</string>
     <string name="title_activity_group_topic_detail">GroupTopicDetailActivity</string>
+
     <string name="activities_detail">活动详情</string>
     <string name="activities_collect">收藏</string>
     <string name="activities_share">分享</string>
@@ -333,4 +372,12 @@
     <string name="checknum">验证码</string>
     <string name="phonenum">手机</string>
     <string name="join">我要参加</string>
+
+    <string name="your_published_info_is_empty">你还没有发布任何活动</string>
+    <string name="pre_request_text">正在加载中...</string>
+    <string name="pre_login_text">正在登录中...</string>
+    <string name="pre_register_text">正在注册中...</string>
+    <string name="title_activity_start">StartActivity</string>
+    <string name="title_activity_test">TestActivity</string>
+
 </resources>

@@ -2,6 +2,8 @@ package com.yueqiu.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,7 +13,9 @@ import android.view.MenuItem;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.UserInfo;
+import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 
@@ -22,6 +26,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,6 +56,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     //data
     private int mUserId = YueQiuApp.sUserInfo.getUser_id();
     private UserInfo mUserInfo;
+    private JSONArray mJSONArray;
     private static final int DATA_ERROR = 1;
     private static final int DATA_SUCCESS = 2;
 
@@ -103,15 +109,21 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
 
     //初始化我的资料数据
     private void initData() {
-        mUserInfo = Utils.getMyProfileFromLocal(this);
-        if (mUserInfo != null && mUserInfo.getUser_id() == mUserId) {
-            //从本地获取我的资料
-            Log.e(TAG, "从本地获取我的资料");
-            updateUI(mUserInfo);
-        } else {
-            if (mUserId == 0) {
-                return; //游客状态！！是否要显示我的资料界面
-            }
+//        mJSONArray = Utils.getJSONFromLocal(this);
+//        try {
+//            mUserInfo = new UserInfo(mJSONArray.getJSONObject(0));
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        };
+//        if (mUserInfo != null) {
+//            //从本地获取我的资料
+//            Log.e(TAG, "从本地获取我的资料");
+//            updateUI(mUserInfo);
+//        } else {
+//            if (mUserId == 0) {
+//                return; //游客状态！！是否要显示我的资料界面
+//            }
+        if (Utils.networkAvaiable(this)) {
 
             new Thread(new Runnable() {
                 @Override
@@ -138,8 +150,14 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     }
                 }
             }).start();
+        }else{
+            mUserInfo = getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+            mHandler.obtainMessage(DATA_SUCCESS,mUserInfo).sendToTarget();
         }
     }
+    //}
+
+
 
     private Handler mHandler = new Handler() {
         @Override
@@ -159,18 +177,18 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     private void updateUI(UserInfo userInfo) {
         String unset = getString(R.string.unset);
 //        mPhotoImageView.setImageDrawable();
-        mAccountTextView.setText(userInfo.getUsername());
+        mAccountTextView.setText(userInfo.getAccount());
         mGenderTextView.setText(userInfo.getSex() == 1
                 ? getString(R.string.man) : getString(R.string.woman));
-        mNickNameTextView.setText("".equals(userInfo.getUsername())
-                ? unset : userInfo.getUsername());
+        mNickNameTextView.setText("".equals(userInfo.getNickName())
+                ? unset : userInfo.getNickName());
         mRegionTextView.setText("".equals(userInfo.getDistrict())
                 ? unset : userInfo.getDistrict());
         mLevelTextView.setText(1 == userInfo.getLevel()
                 ? getString(R.string.level_base) : ((2 == userInfo.getLevel()) ?
                 getString(R.string.level_middle) : getString(R.string.level_master)));
-        mBallTypeTextView.setText(1 == userInfo.getBall_type()
-                ? getString(R.string.ball_type_1) : (2 == userInfo.getBall_type() ?
+        mBallTypeTextView.setText(1 == userInfo.getBall_class()
+                ? getString(R.string.ball_type_1) : (2 == userInfo.getBall_class() ?
                 getString(R.string.ball_type_2) : getString(R.string.ball_type_3)));
         mBilliardsCueTextView.setText(1 == userInfo.getBallArm()
                 ? getString(R.string.cue_1) : getString(R.string.cue_2));
@@ -188,16 +206,16 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     @Override
     protected void onPause() {
         super.onPause();
-        //保存数据到本地
-        if (mUserInfo != null) {
-            try {
-                Utils.updateMyProfile(this, mUserInfo);
-            } catch (IOException e) {
-                Log.e(TAG, "IOException: " + e.toString());
-            } catch (JSONException e) {
-                Log.e(TAG, "JSONException: " + e.toString());
-            }
-        }
+//        //保存数据到本地
+//        if (mUserInfo != null) {
+//            try {
+//                Utils.updateJSONData(this, mUserInfo,Utils.USER_INFO_FILE_NAME);
+//            } catch (IOException e) {
+//                Log.e(TAG, "IOException: " + e.toString());
+//            } catch (JSONException e) {
+//                Log.e(TAG, "JSONException: " + e.toString());
+//            }
+//        }
 
     }
 
@@ -311,7 +329,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 break;
             case 3:
                 mNickNameTextView.setText(str);
-                mUserInfo.setUsername(str);
+                mUserInfo.setNickName(str);
                 break;
             case 4:
                 mRegionTextView.setText(str);
@@ -342,11 +360,41 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 mUserInfo.setIdol_name(str);
                 break;
             case 12:
-
                 break;
 
         }
     }
 
+    private UserInfo getUserByUserId(String userId){
+        DBUtils dbUtil = new DBUtils(this, DatabaseConstant.UserTable.CREATE_SQL);
+        SQLiteDatabase db = dbUtil.getReadableDatabase();
+        UserInfo info = new UserInfo();
+        String sql = "select * from " + DatabaseConstant.UserTable.TABLE + " where " + DatabaseConstant.UserTable.USER_ID + "=?";
+        Cursor cursor = db.rawQuery(sql,new String[]{userId});
+        if(cursor != null || cursor.getCount() != 0){
+            cursor.moveToFirst();
+            info.setUser_id(Integer.valueOf(userId));
+            info.setAccount(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.ACCOUNT)));
+            info.setPhone(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.PHONE)));
+            info.setPassword(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.PASSWORD)));
+            info.setSex(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.SEX)));
+            info.setTitle(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.TITLE)));
+            info.setImg_url(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.IMG_URL)));
+            info.setNickName(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.USERNAME)));
+            info.setDistrict(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.DISTRICT)));
+            info.setLevel(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.LEVEL)));
+            info.setBall_class(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALL_CLASS)));
+            info.setAppoint_date(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.APPOINT_DATE)));
+            info.setBallArm(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALLARM)));
+            info.setUsedType(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.USERDTYPE)));
+            info.setBallAge(String.valueOf(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALLAGE))));
+            info.setIdol(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.IDOL)));
+            info.setIdol_name(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.IDOL_NAME)));
+            info.setNew_img(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.NEW_IMG)));
+            info.setLogin_time(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.LOGIN_TIME)));
+        }
+        cursor.close();
+        return info;
+    }
 
 }

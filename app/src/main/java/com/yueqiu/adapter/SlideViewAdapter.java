@@ -117,7 +117,6 @@ public class SlideViewAdapter extends BaseAdapter {
                    accountHolder = new ViewAccountHolder();
                    accountHolder.image = (ImageView) convertView.findViewById(R.id.account_image);
                    accountHolder.name = (TextView) convertView.findViewById(R.id.account_name);
-                   accountHolder.golden = (TextView) convertView.findViewById(R.id.account_golden);
                    accountHolder.login = (TextView) convertView.findViewById(R.id.slide_login);
                    convertView.setTag(accountHolder);
                }else{
@@ -133,25 +132,27 @@ public class SlideViewAdapter extends BaseAdapter {
                    embedResId = R.drawable.lable_coach;
                }
 
-               String img = accountItem.getImg();
-               Bitmap source = null;
-               if(img.equals("")){
-                   source = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.account);
-               }else {
-                   try {
-                       byte[] bitmapArray;
-                       bitmapArray = Base64.decode(img, Base64.DEFAULT);
-                       source = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
-                   } catch (Exception e) {
-                       e.printStackTrace();
-                   }
-               }
-               accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(),source,embedResId));
                int user_id = accountItem.getUserId();
-               if(user_id > 1){
+               if(user_id > 0){
                    accountHolder.login.setVisibility(View.GONE);
-                   accountHolder.golden.setVisibility(View.GONE);
+                   accountHolder.name.setVisibility(View.VISIBLE);
+                   accountHolder.name.setText(accountItem.getName());
+                   String img = accountItem.getImg();
+                   Bitmap source = null;
+                   if(img.equals("")){
+                       source = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.head_img);
+                   }else {
+                       try {
+                           byte[] bitmapArray;
+                           bitmapArray = Base64.decode(img, Base64.DEFAULT);
+                           source = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
+                       } catch (Exception e) {
+                           e.printStackTrace();
+                       }
+                   }
+                   accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(),source,embedResId));
                }else {
+                   accountHolder.name.setVisibility(View.GONE);
                    accountHolder.login.setVisibility(View.VISIBLE);
                    accountHolder.login.setOnClickListener(new View.OnClickListener() {
                        @Override
@@ -160,8 +161,9 @@ public class SlideViewAdapter extends BaseAdapter {
                            mContext.startActivity(intent);
                        }
                    });
+                   accountHolder.image.setImageResource(R.drawable.head_img);
                }
-               accountHolder.name.setText(accountItem.getName());
+
 
                //accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accountItem.getGolden());
                break;

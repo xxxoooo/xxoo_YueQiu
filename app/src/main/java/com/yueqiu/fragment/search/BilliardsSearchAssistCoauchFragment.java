@@ -4,19 +4,26 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 
 import com.yueqiu.R;
 import com.yueqiu.adapter.SearchAssistCoauchSubFragmentListAdapter;
 import com.yueqiu.bean.SearchAssistCoauchSubFragmentBean;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
+import com.yueqiu.util.HttpUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by scguo on 14/12/30.
@@ -78,15 +85,35 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
 
     private static class OnFilterBtnClickListener implements View.OnClickListener
     {
+        private LayoutInflater inflater = (LayoutInflater) sContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        private PopupWindow popupWindow;
+
         @Override
         public void onClick(View v)
         {
             switch (v.getId()) {
                 case R.id.btn_assistcoauch_distance:
-                    SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnDistance, R.layout.search_mate_subfragment_distance_popupwindow);
+                    String[] disStrList = {
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_500_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_1000_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_2000_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_5000_str)
+                    };
+
+                    View distanceFilterView = inflater.inflate(R.layout.search_mate_subfragment_distance_popupwindow, null);
+                    Button btnDistanceNoFilter = (Button) distanceFilterView.findViewById(R.id.search_mate_popupwindow_intro);
+                    btnDistanceNoFilter.setOnClickListener(new AssistCoauchPopupInternalHandler());
+                    ListView distanList = (ListView) distanceFilterView.findViewById(R.id.list_search_mate_distance_filter_list);
+                    distanList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, disStrList));
+
+                    popupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistance, distanceFilterView);
+
                     break;
                 case R.id.btn_assistcoauch_cost:
                     SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnCost, R.layout.search_mate_subfragment_gender_popupwindow);
+
+
+
                     break;
                 case R.id.btn_assistcoauch_kinds:
                     SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnCost, R.layout.search_mate_subfragment_distance_popupwindow);
@@ -99,6 +126,49 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
             }
         }
     }
+
+    private final static class AssistCoauchPopupInternalHandler implements View.OnClickListener
+    {
+
+        @Override
+        public void onClick(View v)
+        {
+
+        }
+    }
+
+
+    // TODO: 用于获取助教信息列表的方法
+
+    /**
+     *
+     * @param userId
+     * @param range 助教的距离
+     * @param money 助教的费用，也就是price
+     * @param classes 助教的球种，也就是kinds
+     * @param level 助教的级别
+     * @param startNum 请求信息的开始的条数
+     * @param endNum 请求信息的结束条数
+     */
+    private void retrieveAssistCoauchRawInfo(final String userId, final String range, final int money, final int classes, final int level, final int startNum, final int endNum)
+    {
+        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
+        requestParams.put("user_id", userId);
+        requestParams.put("range", range);
+        requestParams.put("money", money + "");
+        requestParams.put("class", classes + "");
+        requestParams.put("start_no", startNum + "");
+        requestParams.put("end_no", endNum + "");
+
+        String rawResult = HttpUtil.urlClient(HttpConstants.SearchAssistCoauch.URL, requestParams, HttpConstants.RequestMethod.GET);
+        Log.d(TAG, " the rawResult we get are : " + rawResult);
+        if (!TextUtils.isEmpty(rawResult))
+        {
+
+        }
+
+    }
+
 
     // TODO: 在测试接口的时候删除下面的方法
     //以下是用于初始化过程当中的测试数据

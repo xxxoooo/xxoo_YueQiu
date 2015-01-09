@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -23,6 +24,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -42,6 +45,7 @@ import com.yueqiu.adapter.SlideViewAdapter;
 import com.yueqiu.bean.ListItem;
 import com.yueqiu.bean.SlideAccountItem;
 import com.yueqiu.bean.SlideOtherItem;
+import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.search.BilliardsSearchAssistCoauchFragment;
@@ -49,6 +53,7 @@ import com.yueqiu.fragment.search.BilliardsSearchCoauchFragment;
 import com.yueqiu.fragment.search.BilliardsSearchDatingFragment;
 import com.yueqiu.fragment.search.BilliardsSearchMateFragment;
 import com.yueqiu.fragment.search.BilliardsSearchRoomFragment;
+import com.yueqiu.fragment.search.common.SearchSubFragmentConstants;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.menudrawer.MenuDrawer;
@@ -77,9 +82,6 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private static final int LOGOUT_SUCCESS = 0;
     private static final int LOGOUT_FAILED = 1;
 
-    // make the instances of the basic fragment that directly loaded in the BilliardSearchActivity
-    private BilliardsSearchMateFragment mMateFragment;
-
     private ViewPager mViewPager;
     private String[] mTitles;
     private SectionPagerAdapter mPagerAdapter;
@@ -95,10 +97,17 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private SharedPreferences.Editor mEditor;
     private List<ListItem> mItemList = new ArrayList<ListItem>();
 
+    private FragmentManager mFragmentManager;
+    private FragmentTransaction mFragmentTransaction;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        mFragmentManager = getSupportFragmentManager();
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+
         mContext = this;
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
@@ -179,7 +188,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setHomeButtonEnabled(true);
         mActionBar.setIcon(R.drawable.slide_menu_icon);
-        mActionBar.setTitle(getString(R.string.billiard_search));
+        mActionBar.setTitle(getString(R.string.app_name));
 
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
@@ -224,9 +233,14 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
     }
 
+    private static final String TAG_MATE_FRAGMENT = "searchMateFragment";
+    private static final String TAG_DATING_FRAGMENT = "searchDatingFragment";
+    private static final String TAG_ASSISTCOAUCH_FRAGMENT = "searchAssistCoauchFragment";
+    private static final String TAG_COAUCH_FRAGMENT = "searchCoauchFragment";
+    private static final String TAG_ROOM_FRAGMENT = "searchRoomFragment";
+
     private class SectionPagerAdapter extends FragmentPagerAdapter
     {
-
         public SectionPagerAdapter(FragmentManager fm)
         {
             super(fm);
@@ -235,50 +249,55 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         @Override
         public Fragment getItem(int index)
         {
-            Log.d(TAG, " the current index are : " + index);
-//            Fragment mateFragment = BilliardsSearchMateFragment.newInstance(mContext, "testguoshichao");
-//            Bundle args = new Bundle();
-//            args.putString("test", mTitles[index]);
-//            mateFragment.setArguments(args);
-//
-//            return mateFragment;
+            Log.d(TAG, " the current Fragment index are : " + index);
             Fragment fragment = null;
-            Bundle args = null;
+            Bundle args;
 
             switch (index) {
                 case 0:
-                    fragment = BilliardsSearchMateFragment.newInstance(mContext, "");
+                    fragment = BilliardsSearchMateFragment.newInstance(mContext, "MateFragment");
                     args = new Bundle();
-                    args.putString("", mTitles[index]);
+                    args.putString(SearchSubFragmentConstants.MATE_FRAGMENT_INIT, mTitles[index]);
                     fragment.setArguments(args);
+                    Log.d(TAG, "mate fragment has been created ");
+
                     break;
                 case 1:
-                    fragment = BilliardsSearchDatingFragment.newInstance(mContext, "");
+                    fragment = BilliardsSearchDatingFragment.newInstance(mContext, "DatingFragment");
                     args = new Bundle();
-                    args.putString("", mTitles[index]);
+                    args.putString(SearchSubFragmentConstants.DATING_FRAGMENT_INIT, mTitles[index]);
                     fragment.setArguments(args);
+                    Log.d(TAG, "dating fragment has been created ");
+
                     break;
                 case 2:
-                    fragment = BilliardsSearchAssistCoauchFragment.newInstance(mContext, "");
+                    fragment = BilliardsSearchAssistCoauchFragment.newInstance(mContext, "AssistCoauchFragment");
                     args = new Bundle();
-                    args.putString("", mTitles[index]);
+                    args.putString(SearchSubFragmentConstants.ASSIST_COAUCH_FRAGMENT_INIT, mTitles[index]);
                     fragment.setArguments(args);
+                    Log.d(TAG, "assist coauch fragment has been created ");
+
                     break;
                 case 3:
-                    fragment = BilliardsSearchCoauchFragment.newInstance(mContext, "");
+                    fragment = BilliardsSearchCoauchFragment.newInstance(mContext, "CoauchFragment");
                     args = new Bundle();
-                    args.putString("", mTitles[index]);
+                    args.putString(SearchSubFragmentConstants.COAUCH_FRAGMENT_INIT, mTitles[index]);
                     fragment.setArguments(args);
+                    Log.d(TAG, "coauch fragment has been created ");
+
                     break;
                 case 4:
-                    fragment = BilliardsSearchRoomFragment.newInstance(mContext, "");
+                    fragment = BilliardsSearchRoomFragment.newInstance(mContext, "RoomFragment");
                     args = new Bundle();
-                    args.putString("", mTitles[index]);
+                    args.putString(SearchSubFragmentConstants.ROOM_FRAGMENT_INIT, mTitles[index]);
                     fragment.setArguments(args);
+                    Log.d(TAG, "room fragment has been created ");
+
                     break;
                 default:
                     break;
             }
+
 
             return fragment;
         }
@@ -304,10 +323,16 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        //ToDo:不起作用，得重新找方法
+        int search_mag_icon_id = searchView.getContext().getResources().getIdentifier("android:id/search_mag_icon", null, null);
+        ImageView  search_mag_icon = (ImageView)searchView.findViewById(search_mag_icon_id);//获取搜索图标
+        search_mag_icon.setImageResource(R.drawable.search);
+
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
 
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
@@ -334,7 +359,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     {
 
         mItemList.clear();
-        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
+        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getAccount(),
                 100, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(accountItem);
 
@@ -363,7 +388,6 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
             mItemList.add(otherItem);
         }
 
-        SlideViewAdapter adapter = new SlideViewAdapter(this, mItemList);
         mAdapter = new SlideViewAdapter(this, mItemList);
 
         mMenuList = (ListView) findViewById(R.id.menu_drawer_list);
@@ -457,7 +481,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
             }
         });
-        mMenuDrawer.peekDrawer();
+        //mMenuDrawer.peekDrawer();
 
 
     }
@@ -482,7 +506,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private void logout()
     {
         Map<String, String> map = new HashMap<String, String>();
-        map.put(PublicConstant.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+        map.put(DatabaseConstant.UserTable.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
         String result = HttpUtil.urlClient(HttpConstants.LogoutConstant.URL,
                 map, HttpConstants.RequestMethod.GET);
         try {
@@ -501,19 +525,19 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private void resetUSerInfo()
     {
         YueQiuApp.sUserInfo.setImg_url("");
-        YueQiuApp.sUserInfo.setUsername(getString(R.string.guest));
+        YueQiuApp.sUserInfo.setAccount(getString(R.string.guest));
         YueQiuApp.sUserInfo.setUser_id(0);
         YueQiuApp.sUserInfo.setPhone("");
 
-        mEditor.putString(PublicConstant.USER_NAME,getString(R.string.guest));
-        mEditor.putString(PublicConstant.USER_ID,"0");
-        mEditor.putString(PublicConstant.IMG_URL,"");
-        mEditor.putString(PublicConstant.PHONE,"");
+        mEditor.putString(DatabaseConstant.UserTable.ACCOUNT,getString(R.string.guest));
+        mEditor.putString(DatabaseConstant.UserTable.USER_ID,"0");
+        mEditor.putString(DatabaseConstant.UserTable.IMG_URL,"");
+        mEditor.putString(DatabaseConstant.UserTable.PHONE,"");
         mEditor.apply();
 
 
         mItemList.remove(0);
-        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
+        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getAccount(),
                 0, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(0, accountItem);
         mAdapter.notifyDataSetChanged();

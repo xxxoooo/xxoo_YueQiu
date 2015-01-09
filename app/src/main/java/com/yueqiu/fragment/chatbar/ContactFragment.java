@@ -16,6 +16,7 @@ import com.yueqiu.YueQiuApp;
 import com.yueqiu.adapter.ExpAdapter;
 import com.yueqiu.bean.ContactsList;
 import com.yueqiu.bean.RecentChat;
+import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.AsyncTaskBase;
@@ -127,7 +128,7 @@ public class ContactFragment extends Fragment {
         HashMap<Integer, List<ContactsList.Contacts>> maps = new HashMap<Integer, List<ContactsList.Contacts>>();
         for (int i = 0; i < 3; i++) {
             Map<String, Integer> map = new HashMap<String, Integer>();
-            map.put(PublicConstant.USER_ID, YueQiuApp.sUserInfo.getUser_id());
+            map.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
             map.put(HttpConstants.ContactsList.GROUP_ID, i + 1);
             String result = HttpUtil.urlClient(HttpConstants.ContactsList.URL, map, HttpConstants.RequestMethod.GET);
 

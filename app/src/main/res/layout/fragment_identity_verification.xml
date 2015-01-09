@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:src="@drawable/account"/>
+                android:src="@drawable/head_img"/>
 
             <LinearLayout
                 android:layout_toRightOf="@id/account_iv"

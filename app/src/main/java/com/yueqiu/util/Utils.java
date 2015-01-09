@@ -1,10 +1,12 @@
 package com.yueqiu.util;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -20,13 +22,16 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
-import com.yueqiu.bean.UserInfo;
+import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.PublicConstant;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,7 +58,7 @@ public class Utils {
     private static final String TAG = "Utils";
 
     //user info local data serializer file name
-    private static final String USER_INFO_FILE_NAME = "userInfo.json";
+    public static final String USER_INFO_FILE_NAME = "userInfo.json";
     private static SharedPreferences mSharedPreferences;
 
 
@@ -64,14 +69,17 @@ public class Utils {
         Iterator iterator = map.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator.next();
-            editor.putString(entry.getKey(), entry.getValue());
+            if(entry.getKey() != DatabaseConstant.UserTable.PASSWORD)
+                editor.putString(entry.getKey(), entry.getValue());
         }
         editor.commit();
 
-        YueQiuApp.sUserInfo.setImg_url(map.get(PublicConstant.IMG_URL));
-        YueQiuApp.sUserInfo.setUsername(map.get(PublicConstant.USER_NAME));
-        YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(PublicConstant.USER_ID)));
-        YueQiuApp.sUserInfo.setPhone(map.get(PublicConstant.PHONE));
+
+        YueQiuApp.sUserInfo.setImg_url(map.get(DatabaseConstant.UserTable.IMG_URL));
+        YueQiuApp.sUserInfo.setAccount(map.get(DatabaseConstant.UserTable.ACCOUNT));
+        YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(DatabaseConstant.UserTable.USER_ID)));
+        YueQiuApp.sUserInfo.setPhone(map.get(DatabaseConstant.UserTable.PHONE));
+
     }
 
     public static void removeUserBaseInfo(Context context) {
@@ -189,15 +197,32 @@ public class Utils {
     /*
      * 更新我的资料
      */
-    public static void updateMyProfile(Context context, UserInfo userInfo) throws IOException, JSONException {
-        JSONArray array = new JSONArray();
-        array.put(userInfo.toJSON());
+    public static void updateJSONData(Context context, JSONHelper jsonHelper,String path) throws IOException, JSONException {
+        //JSONArray array = new JSONArray();
+        //array.put(jsonHelper.toJSON());
 
-        Writer writer = null;
+        JSONObject object = jsonHelper.toJSON();
+
+        FileWriter writer = null;
         try {
-            OutputStream out = context.openFileOutput(USER_INFO_FILE_NAME, Context.MODE_PRIVATE);
-            writer = new OutputStreamWriter(out);
-            writer.write(array.toString());
+            //OutputStream out = context.openFileOutput(path, Context.MODE_PRIVATE);
+            File file = context.getFileStreamPath(path);
+            RandomAccessFile randomFile = new RandomAccessFile(file,"rw");
+            long randomLength = randomFile.length();
+            if(randomLength == 0 ){
+                randomFile.seek(randomLength);
+                randomFile.writeBytes("[");
+            }else if(randomLength == 1){
+                randomFile.seek(randomLength);
+                randomFile.writeBytes(object.toString() + "]");
+            }
+            else{
+                randomFile.seek(randomLength-1);
+                randomFile.writeBytes(object.toString() + "]");
+            }
+
+            randomFile.close();
+
         } finally {
             if (writer != null)
                 writer.close();
@@ -229,20 +254,18 @@ public class Utils {
      *
      * @return
      */
-    public static UserInfo getMyProfileFromLocal(Context context) {
-        UserInfo userInfo = null;
+    public static JSONArray getJSONFromLocal(Context context) {
         BufferedReader reader = null;
+        JSONArray array = null;
         try {
             InputStream is = context.openFileInput(USER_INFO_FILE_NAME);
             reader = new BufferedReader(new InputStreamReader(is));
             StringBuilder jsonString = new StringBuilder();
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 jsonString.append(line);
             }
-            JSONArray array = (JSONArray) new JSONTokener(jsonString.toString()).nextValue();
-
-            userInfo = new UserInfo(array.getJSONObject(0));
+            array = (JSONArray) new JSONTokener(jsonString.toString()).nextValue();
 
 
         } catch (Exception e) {
@@ -255,7 +278,7 @@ public class Utils {
                     Log.e(TAG, "IOException: " + e.toString());
                 }
         }
-        return userInfo;
+        return array;
     }
 
     /**
@@ -324,10 +347,12 @@ public class Utils {
                                 final View view = f.createView(name, null, attrs);
                                 if (view instanceof TextView) {
                                     new Handler().post(new Runnable() {
+                                        @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
                                         public void run() {
                                             // 设置背景图片
                                             //view.setBackgroundResource(R.color.login_btn_normal);
                                             ((TextView) view).setTextColor(activity.getResources().getColor(R.color.white));
+
                                         }
                                     });
                                 }
@@ -416,6 +441,7 @@ public class Utils {
             return (Byte) o;
         return o;
     }
+
 
     //    private final class ProImageGetter implements Html.ImageGetter{
 //

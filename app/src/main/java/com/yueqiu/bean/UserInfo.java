@@ -1,6 +1,7 @@
 package com.yueqiu.bean;
 
-import org.json.JSONArray;
+import com.yueqiu.util.JSONHelper;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -8,45 +9,29 @@ import org.json.JSONObject;
  * 用户基本信息实体类
  * Created by yinfeng on 14/12/23.
  */
-public class UserInfo {
+public class UserInfo implements JSONHelper {
     private int id;
     private String img_url;//头像在网络中的地址
     private String img_real;//头像在本地的地址
-    private String username;//账号
+    private String account;//账号
     private String phone;//电话
     private String password;//密码
     private int sex;//性别
     private String title;//职称
-
-    public void setNick(String nick) {
-        this.nick = nick;
-    }
-
-    public void setBall_class(int ball_class) {
-        this.ball_class = ball_class;
-    }
-
-    public String getNick() {
-
-        return nick;
-    }
-
-    public int getBall_class() {
-        return ball_class;
-    }
-
-    private String nick;//昵称
+    private String nickName;//昵称
     private String district;//区域
     private int level;//水平
-    private int ball_type;//球种
     private String appoint_date;//约球时间
     private int ballArm;//使用球杆
     private int usedType;//使用习惯
-        private String ballAge;//球龄
+    private String ballAge;//球龄
     private String idol;//偶像
     private String idol_name;//签名
     private String new_img;//最新照片在网络中的位置
     private String new_img_real;//最新照片在本地的位置
+    private String token;
+    private int user_id;
+    private String login_time;//登录时间
     private int ball_class;
 
     private static final String JSON_USER_ID = "user_id";
@@ -56,7 +41,6 @@ public class UserInfo {
     private static final String JSON_USERNAME = "nick";//昵称
     private static final String JSON_DISTRICT = "district";
     private static final String JSON_LEVEL = "level";
-    private static final String JSON_BALL_TYPE = "ball_type";
     private static final String JSON_BALL_ARM = "ballArm";
     private static final String JSON_USED_TYPE = "usedType";
     private static final String JSON_BALL_AGE = "ballAge";
@@ -68,9 +52,7 @@ public class UserInfo {
 
 
 
-    private String token;
-    private int user_id;
-    private String login_time;//登录时间
+
 
     public String getImg_url() {
         return img_url;
@@ -128,12 +110,12 @@ public class UserInfo {
         this.title = title;
     }
 
-    public String getUsername() {
-        return username;
+    public String getNickName() {
+        return nickName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
     public String getDistrict() {
@@ -150,14 +132,6 @@ public class UserInfo {
 
     public void setLevel(int level) {
         this.level = level;
-    }
-
-    public int getBall_type() {
-        return ball_type;
-    }
-
-    public void setBall_type(int ball_type) {
-        this.ball_type = ball_type;
     }
 
     public String getAppoint_date() {
@@ -249,40 +223,35 @@ public class UserInfo {
         this.new_img_real = new_img_real;
     }
 
-    public JSONObject toJSON() throws JSONException {
-        JSONObject json = new JSONObject();
-        json.put(JSON_USER_ID, user_id);
-        json.put(JSON_IMGREAL, img_url);
-        json.put(JSON_ACCOUNT, username);
-        json.put(JSON_SEX, String.valueOf(sex));
-        json.put(JSON_USERNAME, nick);
-        json.put(JSON_DISTRICT, district);
-        json.put(JSON_LEVEL, level);
-        json.put(JSON_BALL_TYPE, ball_type);
-        json.put(JSON_BALL_ARM, ballArm);
-        json.put(JSON_USED_TYPE, usedType);
-        json.put(JSON_BALL_AGE, String.valueOf(ballAge));
-        json.put(JSON_IDOL, idol);
-        json.put(JSON_SIGN, idol_name);
-        json.put(JSON_NEW_IMG, new_img);
-        json.put(JSON_CLASS, ball_class);
-        json.put(JSON_APPOINT_DATE, appoint_date);
-        return json;
+    public int getBall_class() {
+        return ball_class;
+    }
+
+    public void setBall_class(int ball_class) {
+        this.ball_class = ball_class;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
     }
 
     public UserInfo(JSONObject obj) throws JSONException {
         user_id = obj.getInt(JSON_USER_ID);
         img_url = String.valueOf(obj.getString(JSON_IMGREAL));
-        username = String.valueOf(obj.getString(JSON_ACCOUNT));
+        account = String.valueOf(obj.getString(JSON_ACCOUNT));
         sex = obj.getInt(JSON_SEX);//接口数据含义未确定
-        nick = String.valueOf(obj.getString(JSON_USERNAME));
+        nickName = String.valueOf(obj.getString(JSON_USERNAME));
         district = obj.getString(JSON_DISTRICT);
         level = obj.getInt(JSON_LEVEL);
-        ball_type = obj.getInt(JSON_BALL_TYPE);
 
         ballArm = obj.getInt(JSON_BALL_ARM);
         usedType = obj.getInt(JSON_USED_TYPE);
-        ballAge = obj.getString(JSON_BALL_AGE);//
+        ballAge = "".equals(obj.getString(JSON_BALL_AGE)) ?
+                "0" : obj.getString(JSON_BALL_AGE);//
         idol = String.valueOf(obj.getString(JSON_IDOL));
         idol_name = obj.getString(JSON_SIGN);
         new_img = obj.getString(JSON_NEW_IMG);
@@ -293,5 +262,26 @@ public class UserInfo {
 
     public UserInfo() {
 
+    }
+
+    @Override
+    public JSONObject toJSON() throws JSONException{
+        JSONObject json = new JSONObject();
+        json.put(JSON_USER_ID, user_id);
+        json.put(JSON_IMGREAL, img_url);
+        json.put(JSON_ACCOUNT, account);
+        json.put(JSON_SEX, String.valueOf(sex));
+        json.put(JSON_USERNAME, nickName);
+        json.put(JSON_DISTRICT, district);
+        json.put(JSON_LEVEL, level);
+        json.put(JSON_BALL_ARM, ballArm);
+        json.put(JSON_USED_TYPE, usedType);
+        json.put(JSON_BALL_AGE, String.valueOf(ballAge));
+        json.put(JSON_IDOL, idol);
+        json.put(JSON_SIGN, idol_name);
+        json.put(JSON_NEW_IMG, new_img);
+        json.put(JSON_CLASS, ball_class);
+        json.put(JSON_APPOINT_DATE, appoint_date);
+        return json;
     }
 }

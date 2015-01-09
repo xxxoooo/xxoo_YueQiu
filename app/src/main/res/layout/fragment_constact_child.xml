@@ -13,7 +13,7 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="10.0dip"
-        android:src="@drawable/account"
+        android:src="@drawable/head_img"
         android:contentDescription="@string/app_name" 
         android:scaleType="fitXY"/>
 

@@ -6,5 +6,6 @@
         android:title="@string/billiard_post"
         android:orderInCategory="100"
         android:showAsAction="always"
+
         />
 </menu>
