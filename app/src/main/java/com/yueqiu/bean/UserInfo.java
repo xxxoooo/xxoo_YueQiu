@@ -261,7 +261,8 @@ public class UserInfo implements JSONHelper {
 
         ballArm = obj.getInt(JSON_BALL_ARM);
         usedType = obj.getInt(JSON_USED_TYPE);
-        ballAge = obj.getString(JSON_BALL_AGE);//
+        ballAge = "".equals(obj.getString(JSON_BALL_AGE)) ?
+                "0" : obj.getString(JSON_BALL_AGE);//
         idol = String.valueOf(obj.getString(JSON_IDOL));
         idol_name = obj.getString(JSON_SIGN);
         new_img = obj.getString(JSON_NEW_IMG);

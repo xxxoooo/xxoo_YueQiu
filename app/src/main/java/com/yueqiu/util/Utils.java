@@ -67,7 +67,8 @@ public class Utils {
         Iterator iterator = map.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator.next();
-            editor.putString(entry.getKey(), entry.getValue());
+            if(entry.getKey() != DatabaseConstant.UserTable.PASSWORD)
+                editor.putString(entry.getKey(), entry.getValue());
         }
         editor.commit();
 

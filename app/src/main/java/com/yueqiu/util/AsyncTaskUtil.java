@@ -9,9 +9,6 @@ import com.yueqiu.constant.PublicConstant;
 import org.json.JSONObject;
 import java.util.Map;
 
-/**
- * Created by wangyun on 15/1/7.
- */
 public class AsyncTaskUtil<T> extends AsyncTask<Map<String,String>,Void,JSONObject>{
 
     private Map<String,T> mMap;

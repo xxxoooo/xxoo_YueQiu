@@ -203,8 +203,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
                         mHandler.obtainMessage(LOGIN_SUCCESS,successObj).sendToTarget();
 
-
-
                     }
                 }else{
                     mHandler.obtainMessage(LOGIN_ERROR,object.getString("msg")).sendToTarget();

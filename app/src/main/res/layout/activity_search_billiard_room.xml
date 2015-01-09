@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+    android:id="@+id/search_room_detailed_whole_container">
 
     <FrameLayout
         android:layout_alignParentTop="true"
@@ -27,7 +28,7 @@
             <TextView
                 android:id="@+id/tv_search_room_detailed_name"
                 android:textStyle="bold"
-                android:textSize="19sp"
+                android:textSize="17sp"
                 android:layout_centerVertical="true"
                 android:padding="4dp"
                 android:layout_width="wrap_content"
@@ -52,12 +53,11 @@
                 android:layout_height="wrap_content"
                 style="@style/SearchActivityRatingBarStyle"
                 android:numStars="5"
-                android:rating="4.0"
-                android:padding="3dp"
+                android:rating="4.5"
+                android:layout_marginLeft="5dp"
                 android:layout_toLeftOf="@id/tv_search_room_level_num"
                 android:layout_centerVertical="true"
                 />
-
 
         </RelativeLayout>
 
@@ -121,7 +121,8 @@
         style="@style/SearchRoomActivityTvStyle"
         android:layout_toRightOf="@id/search_room_phone_indi"
         android:text="@string/search_room_detailedactivity_phone_test"
-        android:phoneNumber="true"/>
+        android:autoLink="phone"
+        />
 
     <TextView
         android:layout_width="match_parent"

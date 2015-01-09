@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="devide_line">#eaeef2</color>
+    <color name="light_gray">#d3d3d3</color>
     <color name="gray_font">#818181</color>
     <color name="edit_text_hint_color">#dbe1e8</color>
     <color name="lightwhite">#fff</color>

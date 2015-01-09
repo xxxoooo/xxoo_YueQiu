@@ -1,5 +1,8 @@
 package com.yueqiu.bean;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by scguo on 14/12/25.
  *
@@ -62,4 +65,34 @@ public class SearchDatingSubFragmentDatingBean
     {
         this.mUserDistance = distance;
     }
+
+
+    private static final String JSON_USER_ID = "user_id";
+    private static final String JSON_USERNAME = "username";
+    private static final String JSON_CONTENT = "content";
+    private static final String JSON_RANGE = "range";
+    private static final String JSON_IMG_URL = "img_url";
+
+    public JSONObject toJson() throws JSONException
+    {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put(JSON_USERNAME, mUserName);
+        jsonObject.put(JSON_CONTENT, mUserDeclare);
+        jsonObject.put(JSON_RANGE, mUserDistance);
+        jsonObject.put(JSON_IMG_URL, mUserPhoto);
+
+        return jsonObject;
+    }
+
+    public SearchDatingSubFragmentDatingBean parseJson(JSONObject jsonObject) throws JSONException
+    {
+        mUserPhoto = String.valueOf(jsonObject.get(JSON_IMG_URL));
+        mUserName = String.valueOf(jsonObject.get(JSON_USERNAME));
+        mUserDeclare = String.valueOf(jsonObject.get(JSON_CONTENT));
+        mUserDistance = String.valueOf(jsonObject.get(JSON_RANGE));
+
+        return new SearchDatingSubFragmentDatingBean(mUserPhoto, mUserName, mUserDeclare, mUserDistance);
+    }
+
+
 }

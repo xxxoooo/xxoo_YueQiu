@@ -12,7 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
-import com.yueqiu.activity.MyProfileActivity;
 import com.yueqiu.fragment.myprofilesetup.BallTypeSetupFragment;
 import com.yueqiu.fragment.myprofilesetup.BilliardsCueSetupFragment;
 import com.yueqiu.fragment.myprofilesetup.CuehabitsSetupFragment;

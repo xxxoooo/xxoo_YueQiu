@@ -152,6 +152,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             }).start();
         }else{
             mUserInfo = getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+            mHandler.obtainMessage(DATA_SUCCESS,mUserInfo).sendToTarget();
         }
     }
     //}

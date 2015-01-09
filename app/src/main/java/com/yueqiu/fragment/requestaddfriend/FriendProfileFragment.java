@@ -150,10 +150,10 @@ public class FriendProfileFragment extends Fragment {
 
         String img_url = mFriendInfo.getImg_url();
         img_path = mFriendInfo.getImg_url();//fake
-        account = mFriendInfo.getUsername();
+        account = mFriendInfo.getAccount();
         gender = mFriendInfo.getSex() == 1
                 ? getString(R.string.man) : getString(R.string.woman);
-        nick_name = mFriendInfo.getUsername();
+        nick_name = mFriendInfo.getAccount();
         district = mFriendInfo.getDistrict();
         level = 1 == mFriendInfo.getLevel()
                 ? getString(R.string.level_base) : ((2 == mFriendInfo.getLevel()) ?

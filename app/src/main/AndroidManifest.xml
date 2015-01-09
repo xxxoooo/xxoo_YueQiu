@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yueqiu" >
+          package="com.yueqiu">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -13,18 +13,20 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".BilliardGroupActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
         <activity
             android:name=".BilliardSearchActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
+
             </intent-filter>
         </activity>
         <activity
@@ -32,14 +34,12 @@
             android:launchMode="singleTop"
             android:screenOrientation="portrait" >
             <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.SEARCH"/>
+                <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
-
             <meta-data
                 android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+                android:resource="@xml/searchable"/>
         </activity>
 
         <!-- 聊吧Activity -->
@@ -86,23 +86,26 @@
 
         <activity
             android:name=".activity.RegisterActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.LoginActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.ActivitySelectSex"
-            android:screenOrientation="portrait" />
-        <activity android:name=".activity.MyParticipationActivity" />
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.MyParticipationActivity"/>
         <activity
             android:name=".activity.SearchBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:parentActivityName=".BilliardSearchActivity">
+
         </activity>
         <activity
             android:name=".activity.SearchBilliardRoomActivity"
             android:label="@string/title_activity_search_billiard_room"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:parentActivityName=".BilliardSearchActivity">
         </activity>
         <activity
             android:name=".activity.GroupIssueTopic"
@@ -119,11 +122,7 @@
             android:label="@string/title_activity_group_topic_detail"
             android:screenOrientation="portrait" >
         </activity>
-        <activity
-            android:name=".TestActivity"
-            android:label="@string/title_activity_test" >
 
-        </activity>
     </application>
 
 </manifest>
