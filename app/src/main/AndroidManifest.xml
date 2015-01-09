@@ -44,10 +44,14 @@
         </activity>
 
         <!-- 聊吧Activity -->
-        <activity android:name=".ChatBarActivity" />
-        <activity android:name=".activity.FriendSetGroupActivity"/>
-        <activity android:name=".activity.FriendsApplicationActivity"/>
-        <activity android:name=".activity.RequestAddFriendActivity"/>
+        <activity android:name=".ChatBarActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.FriendSetGroupActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".activity.FriendsApplicationActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".activity.RequestAddFriendActivity"
+                  android:screenOrientation="portrait"/>
 
         <!-- 聊吧 END -->
 
@@ -61,8 +65,12 @@
         <activity
             android:name=".activity.FeedbackActivity"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
-        <activity android:name=".activity.MyProfileActivity" />
-        <activity android:name=".activity.ProfileSetupActivity" />
+        <activity android:name=".activity.MyProfileActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".activity.ProfileSetupActivity"
+                  android:screenOrientation="portrait"/>
+        <activity android:name=".activity.MyParticipationActivity"
+                  android:screenOrientation="portrait"/>
         <activity android:name=".activity.MyfavorCollActivity" />
         <activity android:name=".activity.PublishedInfoActivity" />
         <activity android:name=".activity.SelectChargeModuleActivity" />
@@ -76,7 +84,7 @@
         <activity
             android:name=".activity.ActivitySelectSex"
             android:screenOrientation="portrait"/>
-        <activity android:name=".activity.MyParticipationActivity"/>
+
         <activity
             android:name=".activity.SearchBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating"
@@ -96,11 +104,6 @@
         <activity
             android:name=".activity.FeedbackActivity"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
-        <activity android:name=".activity.MyProfileActivity"/>
-        <activity android:name=".activity.ProfileSetupActivity"/>
-        <activity android:name=".activity.MyfavorCollActivity"/>
-        <activity android:name=".activity.PublishedInfoActivity"/>
-        <activity android:name=".activity.SelectChargeModuleActivity"/>
     </application>
 
 </manifest>

@@ -14,7 +14,8 @@
 
         <Button
             android:id="@+id/update_assistant_btn"
-            android:layout_width="165dp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="44dp"
             android:background="@drawable/update_assistant_click"
             android:text="@string/update_to_assistant"
@@ -24,7 +25,8 @@
         <Button
             android:id="@+id/update_coach_btn"
             android:layout_marginLeft="10dp"
-            android:layout_width="165dp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="44dp"
             android:background="@drawable/update_coach_click"
             android:text="@string/update_to_coach"

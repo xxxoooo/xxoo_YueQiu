@@ -29,7 +29,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/devide_line"/>
+        android:background="@color/gray_font"/>
     <RelativeLayout
         android:id="@+id/friends_group_assist_coach"
         android:layout_width="match_parent"
@@ -57,7 +57,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/devide_line"/>
+        android:background="@color/gray_font"/>
     <RelativeLayout
         android:id="@+id/friends_group_coach"
         android:layout_width="match_parent"
@@ -85,6 +85,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/devide_line"/>
+        android:background="@color/gray_font"/>
 
 </LinearLayout>

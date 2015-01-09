@@ -375,7 +375,9 @@ public class Utils {
             Field[] fields = clazz.getDeclaredFields();
             for(int i = 0; i < fields.length; i++)
             {
-                if (String.valueOf(fields[i]).contains("JSON"))
+                if (String.valueOf(fields[i]).contains("JSON") ||
+                        String.valueOf(fields[i]).contains("img_real") ||
+                        String.valueOf(fields[i]).contains("login_time"))
                     continue;
                 Object o = object.get(fields[i].getName());
                 if(o != null)

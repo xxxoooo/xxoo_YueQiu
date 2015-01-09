@@ -18,23 +18,6 @@ public class UserInfo {
     private int sex;//性别
     private String title;//职称
 
-    public void setNick(String nick) {
-        this.nick = nick;
-    }
-
-    public void setBall_class(int ball_class) {
-        this.ball_class = ball_class;
-    }
-
-    public String getNick() {
-
-        return nick;
-    }
-
-    public int getBall_class() {
-        return ball_class;
-    }
-
     private String nick;//昵称
     private String district;//区域
     private int level;//水平
@@ -48,6 +31,9 @@ public class UserInfo {
     private String new_img;//最新照片在网络中的位置
     private String new_img_real;//最新照片在本地的位置
     private int ball_class;
+    private String token;
+    private int user_id;
+    private String login_time;//登录时间
 
     private static final String JSON_USER_ID = "user_id";
     private static final String JSON_IMGREAL = "img_url";
@@ -68,9 +54,26 @@ public class UserInfo {
 
 
 
-    private String token;
-    private int user_id;
-    private String login_time;//登录时间
+
+
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    public void setBall_class(int ball_class) {
+        this.ball_class = ball_class;
+    }
+
+    public String getNick() {
+
+        return nick;
+    }
+
+    public int getBall_class() {
+        return ball_class;
+    }
+
 
     public String getImg_url() {
         return img_url;
