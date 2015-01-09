@@ -226,30 +226,30 @@ public class BilliardsSearchMateFragment extends Fragment
             if (!TextUtils.isEmpty(String.valueOf(resultJson)))
             {
                 try
-                {
-                    final int retCode = resultJson.getInt("code");
-                    if (retCode == HttpConstants.ResponseCode.NORMAL)
+                {   if(!resultJson.isNull("code"))
                     {
-                        Log.d(TAG, "we have retrieved the data successfully");
-                        JSONObject rawSrcData = resultJson.getJSONObject("result");
-                        JSONArray srcDataList = rawSrcData.getJSONArray("list_data");
-                        final int dataSize = srcDataList.length();
-                        Log.d(TAG, " the data size are : " + dataSize);
-                        int i;
-                        for (i = 0; i < dataSize; ++i)
-                        {
-                            JSONObject dataUnit = srcDataList.getJSONObject(i);
-                            Log.d(TAG, "dataUnit we get are : " + dataUnit.toString());
-//                        String name = String.valueOf(dataUnit.get("username"));
-//                        String distance = String.valueOf(dataUnit.get("range"));
-//                        String gender = dataUnit.getString("sex");
-//                        String userDistrict = dataUnit.getString("district");
+                        final int retCode = resultJson.getInt("code");
+                        if (retCode == HttpConstants.ResponseCode.NORMAL) {
+                            Log.d(TAG, "we have retrieved the data successfully");
+                            JSONObject rawSrcData = resultJson.getJSONObject("result");
+                            JSONArray srcDataList = rawSrcData.getJSONArray("list_data");
+                            final int dataSize = srcDataList.length();
+                            Log.d(TAG, " the data size are : " + dataSize);
+                            int i;
+                            for (i = 0; i < dataSize; ++i) {
+                                JSONObject dataUnit = srcDataList.getJSONObject(i);
+                                Log.d(TAG, "dataUnit we get are : " + dataUnit.toString());
+    //                        String name = String.valueOf(dataUnit.get("username"));
+    //                        String distance = String.valueOf(dataUnit.get("range"));
+    //                        String gender = dataUnit.getString("sex");
+    //                        String userDistrict = dataUnit.getString("district");
 
-                            SearchMateSubFragmentUserBean beanData = new SearchMateSubFragmentUserBean(dataUnit);
-                            Log.d(TAG, " after converted, the bean data are : " + beanData);
+                                SearchMateSubFragmentUserBean beanData = new SearchMateSubFragmentUserBean(dataUnit);
+                                Log.d(TAG, " after converted, the bean data are : " + beanData);
 
-                            // TODO: 然后就是把这个解析后的bean文件添加到mUserList
+                                // TODO: 然后就是把这个解析后的bean文件添加到mUserList
 
+                            }
                         }
                     }
                 } catch (JSONException e) {

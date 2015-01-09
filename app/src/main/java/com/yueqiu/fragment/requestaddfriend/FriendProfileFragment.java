@@ -158,8 +158,8 @@ public class FriendProfileFragment extends Fragment {
         level = 1 == mFriendInfo.getLevel()
                 ? getString(R.string.level_base) : ((2 == mFriendInfo.getLevel()) ?
                 getString(R.string.level_middle) : getString(R.string.level_master));
-        ball_type = 1 == mFriendInfo.getBall_type()
-                ? getString(R.string.ball_type_1) : (2 == mFriendInfo.getBall_type() ?
+        ball_type = 1 == mFriendInfo.getBall_class()
+                ? getString(R.string.ball_type_1) : (2 == mFriendInfo.getBall_class() ?
                 getString(R.string.ball_type_2) : getString(R.string.ball_type_3));
         ball_arm = 1 == mFriendInfo.getBallArm()
                 ? getString(R.string.cue_1) : getString(R.string.cue_2);

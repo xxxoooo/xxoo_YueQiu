@@ -316,7 +316,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
         values.put(DatabaseConstant.UserTable.USERNAME,"");
         values.put(DatabaseConstant.UserTable.DISTRICT,"");
         values.put(DatabaseConstant.UserTable.LEVEL,1);
-        values.put(DatabaseConstant.UserTable.BALL_TYPE,1);
+        values.put(DatabaseConstant.UserTable.BALL_CLASS,1);
         values.put(DatabaseConstant.UserTable.APPOINT_DATE,"");
         values.put(DatabaseConstant.UserTable.BALLARM,1);
         values.put(DatabaseConstant.UserTable.USERDTYPE,1);

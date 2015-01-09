@@ -88,7 +88,7 @@ public class SearchMateSubFragmentListAdapter extends BaseAdapter
 
         // then, inflate the content of the listView item
         // the following user photo are all test url
-        viewHolder.mUserPhoto.setImageResource(R.drawable.ic_launcher);
+        viewHolder.mUserPhoto.setImageResource(R.drawable.head_img);
         viewHolder.mUserGender.setText(userInsta.getUserGender());
         viewHolder.mUserNickName.setText(userInsta.getUserNickName());
         viewHolder.mUserDistanceMeter.setText(userInsta.getUserDistance());

@@ -35,7 +35,8 @@
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/my_profile_footer">
+        android:layout_above="@id/my_profile_footer"
+        android:background="@color/devide_line">
 
         <com.yueqiu.view.CustomerScrollView
             android:id="@+id/customer_view"
@@ -434,8 +435,6 @@
 
                 </LinearLayout>
             </LinearLayout>
-
-
         </com.yueqiu.view.CustomerScrollView>
 
     </LinearLayout>

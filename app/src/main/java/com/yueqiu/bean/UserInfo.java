@@ -21,7 +21,6 @@ public class UserInfo implements JSONHelper {
     private String nickName;//昵称
     private String district;//区域
     private int level;//水平
-    private int ball_type;//球种
     private String appoint_date;//约球时间
     private int ballArm;//使用球杆
     private int usedType;//使用习惯
@@ -42,7 +41,6 @@ public class UserInfo implements JSONHelper {
     private static final String JSON_USERNAME = "nick";//昵称
     private static final String JSON_DISTRICT = "district";
     private static final String JSON_LEVEL = "level";
-    private static final String JSON_BALL_TYPE = "ball_type";
     private static final String JSON_BALL_ARM = "ballArm";
     private static final String JSON_USED_TYPE = "usedType";
     private static final String JSON_BALL_AGE = "ballAge";
@@ -134,14 +132,6 @@ public class UserInfo implements JSONHelper {
 
     public void setLevel(int level) {
         this.level = level;
-    }
-
-    public int getBall_type() {
-        return ball_type;
-    }
-
-    public void setBall_type(int ball_type) {
-        this.ball_type = ball_type;
     }
 
     public String getAppoint_date() {
@@ -257,7 +247,6 @@ public class UserInfo implements JSONHelper {
         nickName = String.valueOf(obj.getString(JSON_USERNAME));
         district = obj.getString(JSON_DISTRICT);
         level = obj.getInt(JSON_LEVEL);
-        ball_type = obj.getInt(JSON_BALL_TYPE);
 
         ballArm = obj.getInt(JSON_BALL_ARM);
         usedType = obj.getInt(JSON_USED_TYPE);
@@ -285,7 +274,6 @@ public class UserInfo implements JSONHelper {
         json.put(JSON_USERNAME, nickName);
         json.put(JSON_DISTRICT, district);
         json.put(JSON_LEVEL, level);
-        json.put(JSON_BALL_TYPE, ball_type);
         json.put(JSON_BALL_ARM, ballArm);
         json.put(JSON_USED_TYPE, usedType);
         json.put(JSON_BALL_AGE, String.valueOf(ballAge));

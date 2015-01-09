@@ -187,8 +187,8 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         mLevelTextView.setText(1 == userInfo.getLevel()
                 ? getString(R.string.level_base) : ((2 == userInfo.getLevel()) ?
                 getString(R.string.level_middle) : getString(R.string.level_master)));
-        mBallTypeTextView.setText(1 == userInfo.getBall_type()
-                ? getString(R.string.ball_type_1) : (2 == userInfo.getBall_type() ?
+        mBallTypeTextView.setText(1 == userInfo.getBall_class()
+                ? getString(R.string.ball_type_1) : (2 == userInfo.getBall_class() ?
                 getString(R.string.ball_type_2) : getString(R.string.ball_type_3)));
         mBilliardsCueTextView.setText(1 == userInfo.getBallArm()
                 ? getString(R.string.cue_1) : getString(R.string.cue_2));
@@ -383,7 +383,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             info.setNickName(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.USERNAME)));
             info.setDistrict(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.DISTRICT)));
             info.setLevel(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.LEVEL)));
-            info.setBall_type(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALL_TYPE)));
+            info.setBall_class(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALL_CLASS)));
             info.setAppoint_date(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.APPOINT_DATE)));
             info.setBallArm(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALLARM)));
             info.setUsedType(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.USERDTYPE)));
