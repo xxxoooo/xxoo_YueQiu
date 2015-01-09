@@ -1,4 +1,4 @@
-package com.yueqiu;
+package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -15,20 +15,17 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 
-import com.yueqiu.activity.ActivitiesDetail;
-import com.yueqiu.activity.ActivitiesIssueActivity;
-import com.yueqiu.activity.ActivityBusinessActivities;
-import com.yueqiu.activity.SearchResultActivity;
+import com.yueqiu.R;
 import com.yueqiu.adapter.ActivitiesListViewAdapter;
 import com.yueqiu.bean.Activities;
 
 import java.util.ArrayList;
 
-
 /**
- * Created by yinfeng on 14/12/18.
+ * Created by yinfeng on 15/1/9.
  */
-public class ActivitiesActivity extends Activity implements View.OnClickListener {
+public class ActivityBusinessActivities extends Activity{
+
     private static final String TAG = "ActivitiesActivity";
     private ActionBar mActionBar;
     private ListView mListView;
@@ -49,7 +46,7 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
     {
         mListView = (ListView)findViewById(R.id.activity_activities_lv);
         initData();
-        mAdapter = new ActivitiesListViewAdapter(mListData ,ActivitiesActivity.this);
+        mAdapter = new ActivitiesListViewAdapter(mListData ,ActivityBusinessActivities.this);
         mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(itemClickListener);
 
@@ -59,7 +56,7 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
     private AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            startActivity(new Intent(ActivitiesActivity.this, ActivitiesDetail.class));
+            startActivity(new Intent(ActivityBusinessActivities.this, ActivitiesDetail.class));
             overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
         }
     };
@@ -77,12 +74,7 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
     private void initActionBar(){
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle(getString(R.string.tab_title_activity));
-    }
-
-    @Override
-    public void onClick(View view) {
-
+        mActionBar.setTitle(getString(R.string.activities));
     }
 
 
@@ -95,24 +87,15 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
                 finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
-            case R.id.menu_activities:
-                startActivity(new Intent(this, ActivityBusinessActivities.class));
-                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
-                break;
-            case R.id.menu_issue_activities:
-                startActivity(new Intent(ActivitiesActivity.this, ActivitiesIssueActivity.class));
-                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
-                break;
         }
         return true;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_activities, menu);
-
-        SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        getMenuInflater().inflate(R.menu.billiard_search, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }

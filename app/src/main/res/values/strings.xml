@@ -359,6 +359,20 @@
     <string name="please_login_first">请先登录，登录后才可使用全部功能</string>
     <string name="title_activity_group_select_topic_type">GroupSelectTopicTypeActivity</string>
     <string name="title_activity_group_topic_detail">GroupTopicDetailActivity</string>
+
+    <string name="activities_detail">活动详情</string>
+    <string name="activities_collect">收藏</string>
+    <string name="activities_share">分享</string>
+    <string name="activities_type">活动类型</string>
+    <string name="groupactivity">群活动</string>
+    <string name="meetstar">球星见面会</string>
+    <string name="taiqiuzhan">台球展</string>
+    <string name="complete">赛事</string>
+    <string name="select_activity_type">选择活动类型</string>
+    <string name="checknum">验证码</string>
+    <string name="phonenum">手机</string>
+    <string name="join">我要参加</string>
+
     <string name="your_published_info_is_empty">你还没有发布任何活动</string>
     <string name="pre_request_text">正在加载中...</string>
     <string name="pre_login_text">正在登录中...</string>

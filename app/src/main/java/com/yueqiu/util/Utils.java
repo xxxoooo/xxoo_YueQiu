@@ -47,6 +47,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -407,13 +408,10 @@ public class Utils {
         T t = null;
         try {
             t = clazz.newInstance();
-//            Method[] methods = clazz.getDeclaredMethods();
+            Method[] methods = clazz.getDeclaredMethods();
             Field[] fields = clazz.getDeclaredFields();
-            fields[0].getDeclaringClass();
 
             for (int i = 0; i < fields.length; i++) {
-
-
                 if (!object.isNull(fields[i].getName())) {
                     Object o = object.get(fields[i].getName());
                     if (o != null) {
@@ -421,7 +419,6 @@ public class Utils {
                         fields[i].set(t, toRealObject(o));
                     }
                 }
-
             }
 
         } catch (Exception e) {
@@ -445,8 +442,6 @@ public class Utils {
             return (Long) o;
         else if (o instanceof Double)
             return (Double) o;
-        else if (o instanceof Float)
-            return (Float) o;
         else if (o instanceof String)
             return (String) o;
         else if (o instanceof Boolean)

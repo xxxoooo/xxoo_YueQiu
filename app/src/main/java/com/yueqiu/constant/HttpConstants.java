@@ -286,6 +286,16 @@ public class HttpConstants
         public static final String GROUP_ID = "group_id";
     }
 
+
+    /**
+     * 活动接口
+     */
+    public static class Play
+    {
+        public static final String PUBLISH = "/play/publish";
+    }
+
+
     /**
      * Json 状态码
      *
