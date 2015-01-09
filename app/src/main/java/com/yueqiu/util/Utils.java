@@ -41,6 +41,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -362,6 +363,7 @@ public class Utils {
 
     /**
      * 将JSONObject转换成相应对象
+     * 如果有浮点型的数据，都使用double
      * @param clazz
      * @param object
      * @return
@@ -370,16 +372,15 @@ public class Utils {
         T t = null;
         try {
             t = clazz.newInstance();
-            Method[] methods = clazz.getDeclaredMethods();
-            for (int i = 0; i < methods.length; i++) {
-                String methodName = methods[i].getName();
-                if (methodName.startsWith("set")) {
-                    String fieldName = methodName.substring(3,
-                            methodName.length()).toLowerCase();
-                    Object o = object.get(fieldName);
-                    if (null != o) {
-                        methods[i].invoke(t, toRealObject(o));
-                    }
+//            Method[] methods = clazz.getDeclaredMethods();
+            Field[] fields = clazz.getDeclaredFields();
+            for(int i = 0; i < fields.length; i++)
+            {
+                Object o = object.get(fields[i].getName());
+                if(o != null)
+                {
+                    fields[i].setAccessible(true);
+                    fields[i].set(t, toRealObject(o));
                 }
             }
         } catch (Exception e) {
@@ -402,8 +403,6 @@ public class Utils {
             return (Long) o;
         else if (o instanceof Double)
             return (Double) o;
-        else if (o instanceof Float)
-            return (Float) o;
         else if (o instanceof String)
             return (String) o;
         else if (o instanceof Boolean)

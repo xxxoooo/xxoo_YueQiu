@@ -52,7 +52,6 @@
             android:name=".activity.FeedbackActivity"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity android:name=".activity.MyProfileActivity" />
-        <activity android:name=".ProfileSetupActivity" />
         <activity android:name=".activity.MyfavorCollActivity" />
         <activity android:name=".activity.PublishedInfoActivity" />
         <activity android:name=".activity.SelectChargeModuleActivity" />
@@ -86,6 +85,10 @@
             android:name=".activity.GroupTopicDetailActivity"
             android:label="@string/title_activity_group_topic_detail" >
         </activity>
+        <activity android:name=".activity.ActivitiesDetail"
+            android:label="@string/activities_detail"></activity>
+        <activity android:name=".activity.ActivitySelectType"
+            android:label="@string/type"></activity>
     </application>
 
 </manifest>

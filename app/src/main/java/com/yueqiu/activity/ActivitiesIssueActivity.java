@@ -4,10 +4,12 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.fourmob.datetimepicker.date.DatePickerDialog;
@@ -35,7 +37,9 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
     private StringBuilder mStartTimeStr = new StringBuilder(),
             mEndTimeStr = new StringBuilder();
     private int mTimeFlag;
-
+    private EditText mEtActivityType;
+    private ImageView mIvAddImg, mIvExpression;
+    private static final int SELECT_TYPE = 0x02;
     public ActivitiesIssueActivity() {
     }
 
@@ -63,7 +67,9 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         mChargeModuleTv   = (TextView) findViewById(R.id.activity_charge_module_text);
         mLocationTv       = (TextView) findViewById(R.id.activity_location_text);
 
-
+        mEtActivityType = (EditText) findViewById(R.id.activitie_title_edit_type);
+        mIvAddImg = (ImageView) findViewById(R.id.activitiy_issues_iv_add_img);
+        mIvExpression = (ImageView) findViewById(R.id.activity_issues_expression);
         final Calendar calendar = Calendar.getInstance();
 
         mDatePickerDialog = DatePickerDialog.newInstance(this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), false);
@@ -79,6 +85,10 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         mStartTimeTv.setOnClickListener(this);
         mEndTimeTv.setOnClickListener(this);
         mChargeModuleTv.setOnClickListener(this);
+        mEtActivityType.setOnClickListener(this);
+        mIvExpression.setOnClickListener(this);
+        mIvAddImg.setOnClickListener(this);
+
 
     }
 
@@ -88,6 +98,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         switch(id){
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
             case R.id.issue_activity:
                 break;
@@ -97,9 +108,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
         Utils.setFragmentActivityMenuColor(this);
-
         getMenuInflater().inflate(R.menu.issue_activity,menu);
         return true;
 
@@ -108,6 +117,18 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
     @Override
     public void onClick(View v) {
         switch(v.getId()){
+            case R.id.activity_issues_expression:
+                break;
+            case R.id.activitiy_issues_iv_add_img:
+                break;
+            case R.id.activitie_title_edit_type:
+                Intent intentType = new Intent();
+                intentType.setClass(this,ActivitySelectType.class);
+                intentType.putExtra("type",getType(mEtActivityType.getText().toString().trim()));
+                startActivityForResult(intentType, SELECT_TYPE);
+                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                break;
+
             case R.id.activity_location_text:
                 break;
             case R.id.activity_start_time_text:
@@ -158,7 +179,40 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
                 mChargeModuleTv.setText(getString(R.string.charge_module_aa));
             }
         }
+
+
+        else if(requestCode == SELECT_TYPE && resultCode == RESULT_OK)
+        {
+            String type = data.getStringExtra("type");
+            if(type.equals("0"))
+                mEtActivityType.setText(getString(R.string.groupactivity));
+            else if(type.equals("1"))
+                mEtActivityType.setText(getString(R.string.meetstar));
+            else if(type.equals("2"))
+                mEtActivityType.setText(getString(R.string.taiqiuzhan));
+            else if(type.equals("3"))
+                mEtActivityType.setText(getString(R.string.complete));
+            else if(type.equals("4"))
+                mEtActivityType.setText(getString(R.string.billiard_other));
+        }
     }
+
+    private String getType(String type)
+    {
+        if(type.equals(getString(R.string.groupactivity)))
+            return "0";
+        else if(type.equals(getString(R.string.meetstar)))
+            return "1";
+        else if(type.equals(getString(R.string.taiqiuzhan)))
+            return "2";
+        else if(type.equals(getString(R.string.complete)))
+            return "3";
+        else if(type.equals(getString(R.string.billiard_other)))
+            return "4";
+        else if(type.equals(""));
+            return "0";
+    }
+
 
     @Override
     public void onDateSet(DatePickerDialog datePickerDialog, int year, int month, int day) {
@@ -188,4 +242,14 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         }
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }
