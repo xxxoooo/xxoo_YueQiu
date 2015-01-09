@@ -194,6 +194,7 @@
     <string name="btn_liaoba_message">消息</string>
     <string name="btn_liaoba_contact">联系人</string>
     <string name="btn_liaoba_add_friend">添加好友</string>
+    <string name="btn_add_friend">加好友</string>
     <string name="btn_back">返回</string>
     <string name="btn_message_search">搜索</string>
     <string name="btn_message_cancel">取消</string>
@@ -203,6 +204,23 @@
     <string name="mentioned_me">提到我的</string>
     <string name="billiard_dating">约球</string>
     <string name="participation_activities">活动</string>
+    <string name="comment">备注</string>
+    <string name="group">分组</string>
+    <string name="set_tag">给他贴个标签吧</string>
+    <string name="master">师傅</string>
+    <string name="student">徒弟</string>
+    <string name="expert">高手</string>
+    <string name="beginner">菜鸟</string>
+    <string name="qiuyou_request">球友请求</string>
+    <string name="qiuyou_application">球友申请</string>
+    <string name="qiuyou_application_clear">清空</string>
+    <string name="qiuyou_manage">球友管理</string>
+    <string name="qiuyou_manage_finish">完成</string>
+    <string name="identity_verify">身份验证</string>
+    <string name="next">下一步</string>
+    <string name="send">发送</string>
+    <string name="set_group">移至分组</string>
+
 
     <!-- 活动 -->
     <string name="xlistview_header_hint_normal">下拉刷新</string>
@@ -269,7 +287,7 @@
     <string name="idol">偶像</string>
     <string name="sign">签名</string>
     <string name="the_new_post">最新照片</string>
-    <string name="unset">未设定</string>
+    <string name="unset">未设置</string>
     <string name="update_to_assistant">升级助教</string>
     <string name="update_to_coach">升级教练</string>
     <string name="cost">费用</string>
@@ -312,5 +330,7 @@
     <string name="taiqiuzhan">台球展</string>
     <string name="complete">赛事</string>
     <string name="select_activity_type">选择活动类型</string>
-
+    <string name="checknum">验证码</string>
+    <string name="phonenum">手机</string>
+    <string name="join">我要参加</string>
 </resources>

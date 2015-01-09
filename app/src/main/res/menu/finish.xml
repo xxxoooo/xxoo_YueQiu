@@ -1,0 +1,7 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context="com.yueqiu.BilliardSearchActivity" >
+    <item android:id="@+id/qiuyou_manage_finish"
+          android:title="@string/qiuyou_manage_finish"
+          android:showAsAction="collapseActionView|ifRoom"/>
+</menu>

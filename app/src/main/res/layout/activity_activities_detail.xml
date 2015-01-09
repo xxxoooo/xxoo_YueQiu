@@ -20,19 +20,94 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.5">
+                android:layout_weight="1.0"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <TextView
+                <ImageView
+                    android:id="@+id/iv_activitiy_detail_headicon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="dada" />
-            </LinearLayout>
 
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/account" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_activities_detail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="温柔的雨" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tv_activities_sex"
+                            style="@style/ListItemTvStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+
+                            android:background="@drawable/textview_withdrawable_bg"
+                            android:drawableRight="@drawable/male"
+                            android:text="@string/man" />
+
+                        <TextView
+                            android:layout_marginLeft="5dp"
+                            android:layout_width="wrap_content"
+                            android:text="210"
+                            style="@style/ListItemTvStyle"
+                            android:id="@+id/tv_activities_detail_seesize"
+                            android:drawableLeft="@drawable/reading"
+                            android:layout_height="wrap_content" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="right"
+                    android:layout_marginRight="10dp"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:id="@+id/tv_activities_detaiL_mon"
+                        android:layout_width="wrap_content"
+                        android:text="12-20"
+                        style="@style/ListItemTvStyle"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:layout_marginLeft="10dp"
+                        android:layout_width="wrap_content"
+                        android:id="@+id/tv_activities_detail_day"
+                        android:text="21 : 20"
+                        style="@style/ListItemTvStyle"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+            <View
+                android:background="@color/devide_line"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="8">
-
+                <TextView
+                    android:text=""
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
             </LinearLayout>
 
             <LinearLayout
@@ -55,7 +130,55 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:orientation="vertical">
+               <LinearLayout
+                   android:layout_width="match_parent"
+                   android:orientation="horizontal"
+                   android:layout_marginLeft="10dp"
+                   android:layout_marginRight="10dp"
 
+                   android:layout_marginTop="5dp"
+                   android:gravity="bottom"
+                   android:layout_height="wrap_content">
+                   <TextView
+                       android:text="会飞的鱼"
+                       android:layout_weight="1"
+                       android:layout_width="wrap_content"
+                       android:drawableTop="@drawable/account"
+                       android:gravity="center"
+                       android:layout_height="wrap_content" />
+                   <TextView
+                       android:text="会飞的鱼"
+                       android:layout_weight="1"
+                       android:layout_width="wrap_content"
+                       android:drawableTop="@drawable/account"
+                       android:gravity="center"
+                       android:layout_height="wrap_content" />
+                   <TextView
+                       android:text="会飞的鱼"
+                       android:layout_weight="1"
+                       android:layout_width="wrap_content"
+                       android:drawableTop="@drawable/account"
+                       android:gravity="center"
+                       android:layout_height="wrap_content" />
+                   <TextView
+                       android:text="会飞的鱼"
+                       android:layout_weight="1"
+                       android:layout_width="wrap_content"
+                       android:drawableTop="@drawable/account"
+                       android:gravity="center"
+                       android:layout_height="wrap_content" />
+
+                   </LinearLayout>
+                <Button
+                    android:id="@+id/btn_activities_join"
+                    android:layout_width="match_parent"
+                    android:text="@string/join"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:textColor="@color/white"
+                    android:background="@drawable/login_button_bg"
+                    android:layout_marginTop="5dp"
+                    android:layout_height="wrap_content" />
             </LinearLayout>
 
         </LinearLayout>

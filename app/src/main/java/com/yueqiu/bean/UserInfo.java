@@ -12,25 +12,44 @@ public class UserInfo {
     private int id;
     private String img_url;//头像在网络中的地址
     private String img_real;//头像在本地的地址
-    private String account;//账号
+    private String username;//账号
     private String phone;//电话
     private String password;//密码
     private int sex;//性别
     private String title;//职称
-    private String username;//昵称
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
+
+    public void setBall_class(int ball_class) {
+        this.ball_class = ball_class;
+    }
+
+    public String getNick() {
+
+        return nick;
+    }
+
+    public int getBall_class() {
+        return ball_class;
+    }
+
+    private String nick;//昵称
     private String district;//区域
     private int level;//水平
     private int ball_type;//球种
     private String appoint_date;//约球时间
     private int ballArm;//使用球杆
     private int usedType;//使用习惯
-    private int ballAge;//球龄
+        private String ballAge;//球龄
     private String idol;//偶像
     private String idol_name;//签名
     private String new_img;//最新照片在网络中的位置
     private String new_img_real;//最新照片在本地的位置
     private int ball_class;
 
+    private static final String JSON_USER_ID = "user_id";
     private static final String JSON_IMGREAL = "img_url";
     private static final String JSON_ACCOUNT = "username";//账户
     private static final String JSON_SEX = "sex";
@@ -67,14 +86,6 @@ public class UserInfo {
 
     public void setImg_real(String img_real) {
         this.img_real = img_real;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
     }
 
     public int getId() {
@@ -198,11 +209,11 @@ public class UserInfo {
         this.usedType = usedType;
     }
 
-    public int getBallAge() {
+    public String getBallAge() {
         return ballAge;
     }
 
-    public void setBallAge(int ballAge) {
+    public void setBallAge(String ballAge) {
         this.ballAge = ballAge;
     }
 
@@ -240,10 +251,11 @@ public class UserInfo {
 
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
+        json.put(JSON_USER_ID, user_id);
         json.put(JSON_IMGREAL, img_url);
-        json.put(JSON_ACCOUNT, account);
+        json.put(JSON_ACCOUNT, username);
         json.put(JSON_SEX, String.valueOf(sex));
-        json.put(JSON_USERNAME, username);
+        json.put(JSON_USERNAME, nick);
         json.put(JSON_DISTRICT, district);
         json.put(JSON_LEVEL, level);
         json.put(JSON_BALL_TYPE, ball_type);
@@ -259,18 +271,18 @@ public class UserInfo {
     }
 
     public UserInfo(JSONObject obj) throws JSONException {
+        user_id = obj.getInt(JSON_USER_ID);
         img_url = String.valueOf(obj.getString(JSON_IMGREAL));
-        account = String.valueOf(obj.getString(JSON_ACCOUNT));
+        username = String.valueOf(obj.getString(JSON_ACCOUNT));
         sex = obj.getInt(JSON_SEX);//接口数据含义未确定
-        username = String.valueOf(obj.getString(JSON_USERNAME));
+        nick = String.valueOf(obj.getString(JSON_USERNAME));
         district = obj.getString(JSON_DISTRICT);
         level = obj.getInt(JSON_LEVEL);
         ball_type = obj.getInt(JSON_BALL_TYPE);
 
         ballArm = obj.getInt(JSON_BALL_ARM);
         usedType = obj.getInt(JSON_USED_TYPE);
-        ballAge = "".equals(obj.getString(JSON_BALL_AGE)) ?
-                -1 : Integer.parseInt(obj.getString(JSON_BALL_AGE));//
+        ballAge = obj.getString(JSON_BALL_AGE);//
         idol = String.valueOf(obj.getString(JSON_IDOL));
         idol_name = obj.getString(JSON_SIGN);
         new_img = obj.getString(JSON_NEW_IMG);

@@ -307,11 +307,32 @@ public class HttpConstants {
      */
     public static final class SearchPeopleByKeyword
     {
-        public static final String URL = "friend/word";
+        public static final String URL = "/friend/word";
 
         //请求参数：位置坐标
         public static final String USER_ID = "user_id";
         public static final String KEYWORDS = "keywords";
+    }
+
+    /*
+     * 聊吧中获取好友列表s
+     */
+    public static final class ContactsList
+    {
+        public static final String URL = "/friend/getList";
+
+        //请求参数：位置坐标
+        public static final String USER_ID = "user_id";
+        public static final String GROUP_ID = "group_id";
+    }
+
+
+    /**
+     * 活动接口
+     */
+    public static class Play
+    {
+        public static final String PUBLISH = "/play/publish";
     }
 
 

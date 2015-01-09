@@ -3,13 +3,16 @@
 
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-    <ImageButton
+    <Button
         android:id="@+id/add_to_friends"
         android:layout_alignParentBottom="true"
         android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"/>
+        android:background="@drawable/update_assistant_click"
+        android:text="@string/btn_add_friend"
+        android:textColor="@color/white"/>
+
 
     <com.yueqiu.view.CustomerScrollView
         android:id="@+id/customer_view"
@@ -31,7 +34,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="60dp">
+                    android:layout_height="72dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -41,12 +44,13 @@
                         android:text="@string/photo"/>
 
                     <ImageView
+                        android:id="@+id/friend_profile_photo"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:layout_marginRight="10dp"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:src="@drawable/ic_launcher"/>
+                        android:src="@drawable/account"/>
                 </RelativeLayout>
 
                 <View
@@ -56,7 +60,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -66,6 +70,7 @@
                         android:text="@string/account"/>
 
                     <TextView
+                        android:id="@+id/friend_profile_account"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
@@ -81,7 +86,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -91,6 +96,7 @@
                         android:text="@string/gender"/>
 
                     <TextView
+                        android:id="@+id/friend_profile_gender"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
@@ -106,14 +112,15 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
                 android:background="@drawable/list_corner_round_bg">
 
 
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -123,6 +130,7 @@
                         android:text="@string/nick_name"/>
 
                     <TextView
+                        android:id="@+id/friend_profile_nick_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
@@ -138,7 +146,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -148,6 +156,7 @@
                         android:text="@string/region"/>
 
                     <TextView
+                        android:id="@+id/friend_profile_district"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
@@ -162,7 +171,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -172,6 +181,7 @@
                         android:text="@string/level"/>
 
                     <TextView
+                        android:id="@+id/friend_profile_level"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
@@ -187,7 +197,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -197,6 +207,7 @@
                         android:text="@string/ball_type"/>
 
                     <TextView
+                        android:id="@+id/friend_profile_ball_type"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
@@ -211,7 +222,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -221,6 +232,7 @@
                         android:text="@string/billiards_cue"/>
 
                     <TextView
+                        android:id="@+id/friend_profile_ball_arm"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"
@@ -236,7 +248,7 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp">
+                    android:layout_height="44dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -246,6 +258,7 @@
                         android:text="@string/cue_habits"/>
 
                     <TextView
+                        android:id="@+id/friend_profile_used_type"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginRight="10dp"

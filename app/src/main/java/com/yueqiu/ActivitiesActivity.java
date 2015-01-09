@@ -17,6 +17,7 @@ import android.widget.SearchView;
 
 import com.yueqiu.activity.ActivitiesDetail;
 import com.yueqiu.activity.ActivitiesIssueActivity;
+import com.yueqiu.activity.ActivityBusinessActivities;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.ActivitiesListViewAdapter;
 import com.yueqiu.bean.Activities;
@@ -95,6 +96,8 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
             case R.id.menu_activities:
+                startActivity(new Intent(this, ActivityBusinessActivities.class));
+                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
                 break;
             case R.id.menu_issue_activities:
                 startActivity(new Intent(ActivitiesActivity.this, ActivitiesIssueActivity.class));

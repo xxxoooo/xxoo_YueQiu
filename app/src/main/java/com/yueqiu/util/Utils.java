@@ -44,6 +44,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,7 +69,7 @@ public class Utils {
         editor.commit();
 
         YueQiuApp.sUserInfo.setImg_url(map.get(PublicConstant.IMG_URL));
-        YueQiuApp.sUserInfo.setAccount(map.get(PublicConstant.USER_NAME));
+        YueQiuApp.sUserInfo.setUsername(map.get(PublicConstant.USER_NAME));
         YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(PublicConstant.USER_ID)));
         YueQiuApp.sUserInfo.setPhone(map.get(PublicConstant.PHONE));
     }
@@ -204,7 +205,7 @@ public class Utils {
     }
 
     /**
-     * 直接保存RESTFUL获取的我的资料JSON数据到本地
+     * 直接保存RESTFUL获取的资料JSON数据到本地
      * @param context
      * @param array
      * @throws IOException
@@ -372,15 +373,19 @@ public class Utils {
         T t = null;
         try {
             t = clazz.newInstance();
-//            Method[] methods = clazz.getDeclaredMethods();
+            Method[] methods = clazz.getDeclaredMethods();
             Field[] fields = clazz.getDeclaredFields();
+
+
             for(int i = 0; i < fields.length; i++)
             {
-                Object o = object.get(fields[i].getName());
-                if(o != null)
-                {
-                    fields[i].setAccessible(true);
-                    fields[i].set(t, toRealObject(o));
+
+                if (!object.isNull(fields[i].getName())) {
+                    Object o = object.get(fields[i].getName());
+                    if (o != null) {
+                        fields[i].setAccessible(true);
+                        fields[i].set(t, toRealObject(o));
+                    }
                 }
             }
         } catch (Exception e) {

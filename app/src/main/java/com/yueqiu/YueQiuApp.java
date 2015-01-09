@@ -22,7 +22,7 @@ public class YueQiuApp extends Application {
         super.onCreate();
 
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER,Context.MODE_PRIVATE);
-        sUserInfo.setAccount(mSharedPreferences.getString(PublicConstant.USER_NAME,getString(R.string.guest)));
+        sUserInfo.setUsername(mSharedPreferences.getString(PublicConstant.USER_NAME,getString(R.string.guest)));
         sUserInfo.setUser_id(Integer.valueOf(mSharedPreferences.getString(PublicConstant.USER_ID,"0")));
         sUserInfo.setImg_url(mSharedPreferences.getString(PublicConstant.IMG_URL,""));
         sUserInfo.setTitle(mSharedPreferences.getString(PublicConstant.TITLE,getString(R.string.search_billiard_mate_str)));

@@ -3,6 +3,8 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.sleepbot.datetimepicker.time.RadialPickerLayout;
@@ -18,8 +21,16 @@ import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 
+import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ActivitiesIssueActivity extends FragmentActivity implements View.OnClickListener,DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
 
@@ -40,6 +51,34 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
     private EditText mEtActivityType;
     private ImageView mIvAddImg, mIvExpression;
     private static final int SELECT_TYPE = 0x02;
+    private int mType = 0;
+    private int mModel = 0;
+
+    private static final int SUCCESS = 0x08;
+    private static final int ERROR = 0x09;
+
+    private Handler mHandler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what)
+            {
+                case SUCCESS:
+                    Toast.makeText(ActivitiesIssueActivity.this,
+                            "发布成功",Toast.LENGTH_SHORT).show();
+                    finish();
+                    overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                    break;
+                case ERROR:
+                    Toast.makeText(ActivitiesIssueActivity.this,
+                            "发布失败", Toast.LENGTH_LONG).show();
+                    break;
+            }
+        }
+    };
+
+
     public ActivitiesIssueActivity() {
     }
 
@@ -75,7 +114,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         mDatePickerDialog = DatePickerDialog.newInstance(this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), false);
         mTimePickerDialog = TimePickerDialog.newInstance(this, calendar.get(Calendar.HOUR_OF_DAY) ,calendar.get(Calendar.MINUTE), false, false);
 
-        mContactStr = YueQiuApp.sUserInfo.getAccount();
+        mContactStr = YueQiuApp.sUserInfo.getUsername();
         mPhoneNumberStr = YueQiuApp.sUserInfo.getPhone();
 
         mContactEdit.setText(mContactStr);
@@ -101,6 +140,38 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
             case R.id.issue_activity:
+                final Map<String, Object> requests = getActivityInfo();
+                new Thread()
+                {
+                    @Override
+                    public void run() {
+                        super.run();
+
+                       if(requests != null)
+                       {
+                           String result = HttpUtil.urlClient(HttpConstants.Play.PUBLISH, requests, HttpConstants.RequestMethod.GET);
+                           if(result != null)
+                           {
+                               JSONObject object = Utils.parseJson(result);
+                               Message msg = new Message();
+                               try {
+                                   if(object.getInt("code") == 1001 )
+                                   {
+                                       msg.what = SUCCESS;
+                                   }
+                                   else
+                                   {
+                                       msg.what = ERROR;
+                                   }
+                                   mHandler.sendMessage(msg);
+                               } catch (JSONException e) {
+                                   e.printStackTrace();
+                               }
+                           }
+                       }
+                    }
+                }.start();
+
                 break;
         }
         return true;
@@ -166,6 +237,58 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         }
     }
 
+    private Map<String, Object> getActivityInfo()
+    {
+        Map<String,Object> map = new HashMap<String, Object>();
+        map.put("user_id",YueQiuApp.sUserInfo.getUser_id());
+        if(mType == 0)
+        {
+            Toast.makeText(ActivitiesIssueActivity.this,"请选择活动类型",Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        map.put("type",mType);
+        String title = mTitleEdit.getText().toString().trim();
+        if(title.equals(""))
+        {
+            Toast.makeText(ActivitiesIssueActivity.this,"请填写活动主题",Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        map.put("title", title);
+        int address = 0;
+        map.put("address",address);
+        String beginTime = mStartTimeTv.getText().toString().trim();
+        if(beginTime.equals(""))
+        {
+            Toast.makeText(ActivitiesIssueActivity.this,"请选择活动开始时间",Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        map.put("begin_time",beginTime);
+        String datetime = mEndTimeTv.getText().toString().trim();
+        if(datetime.equals(""))
+        {
+            Toast.makeText(ActivitiesIssueActivity.this,"请选择活动结束时间",Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        map.put("datetime",datetime);
+        if(mModel == 0)
+        {
+            Toast.makeText(ActivitiesIssueActivity.this,"请选择消费方式",Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        map.put("model", mModel);
+        String content = mIllustrationEdit.getText().toString();
+        if(content.equals(""))
+        {
+            Toast.makeText(ActivitiesIssueActivity.this,"请填写活动说明",Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        map.put("content", content);
+        map.put("lat",  0);
+        map.put("lng", 0);
+        return map;
+    }
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -173,10 +296,13 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
             int module = data.getIntExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_FREE);
             if(module == SelectChargeModuleActivity.MODULE_FREE){
                 mChargeModuleTv.setText(getString(R.string.charge_module_free));
+                mModel = 1;
             }else if(module == SelectChargeModuleActivity.MODULE_PAY){
+                mModel = 2;
                 mChargeModuleTv.setText(getString(R.string.charge_module_pay));
             }else{
                 mChargeModuleTv.setText(getString(R.string.charge_module_aa));
+                mModel = 3;
             }
         }
 
@@ -184,16 +310,26 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         else if(requestCode == SELECT_TYPE && resultCode == RESULT_OK)
         {
             String type = data.getStringExtra("type");
-            if(type.equals("0"))
+            if(type.equals("0")) {
                 mEtActivityType.setText(getString(R.string.groupactivity));
-            else if(type.equals("1"))
+                mType = 1;
+            }
+            else if(type.equals("1")) {
                 mEtActivityType.setText(getString(R.string.meetstar));
-            else if(type.equals("2"))
+                mType = 2;
+            }
+            else if(type.equals("2")) {
                 mEtActivityType.setText(getString(R.string.taiqiuzhan));
-            else if(type.equals("3"))
+                mType = 3;
+            }
+            else if(type.equals("3")) {
                 mEtActivityType.setText(getString(R.string.complete));
-            else if(type.equals("4"))
+                mType = 4;
+            }
+            else if(type.equals("4")) {
                 mEtActivityType.setText(getString(R.string.billiard_other));
+                mType = 5;
+            }
         }
     }
 
