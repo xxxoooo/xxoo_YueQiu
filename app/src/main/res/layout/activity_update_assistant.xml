@@ -34,6 +34,7 @@
                         android:layout_height="72dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -41,12 +42,13 @@
                             android:text="@string/photo"/>
 
                         <ImageView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
                             android:layout_marginRight="10dp"
                             android:layout_alignParentRight="true"
                             android:layout_centerVertical="true"
-                            android:src="@drawable/account"/>
+                            android:src="@drawable/head_img"/>
                     </RelativeLayout>
 
                     <View
@@ -61,6 +63,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -68,6 +71,7 @@
                             android:text="@string/account"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -88,6 +92,7 @@
                         android:background="@drawable/list_corner_round_mid2">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -95,6 +100,7 @@
                             android:text="@string/gender"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -122,6 +128,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -129,6 +136,7 @@
                             android:text="@string/nick_name"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -149,6 +157,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -156,6 +165,7 @@
                             android:text="@string/region"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -176,6 +186,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -183,6 +194,7 @@
                             android:text="@string/level"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -203,6 +215,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -210,6 +223,7 @@
                             android:text="@string/ball_type"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -230,6 +244,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -237,6 +252,7 @@
                             android:text="@string/billiards_cue"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -257,6 +273,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -264,6 +281,7 @@
                             android:text="@string/cue_habits"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -284,6 +302,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -291,6 +310,7 @@
                             android:text="@string/play_age"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -311,6 +331,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -318,6 +339,7 @@
                             android:text="@string/idol"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -338,6 +360,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -345,6 +368,7 @@
                             android:text="@string/sign"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -365,6 +389,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -395,6 +420,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -402,6 +428,7 @@
                             android:text="@string/cost"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -422,6 +449,7 @@
                         android:layout_height="44dp">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -429,6 +457,7 @@
                             android:text="@string/type"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
@@ -449,6 +478,7 @@
                         android:background="@drawable/list_corner_round_mid2">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
@@ -456,6 +486,7 @@
                             android:text="@string/profession_experiences"/>
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"

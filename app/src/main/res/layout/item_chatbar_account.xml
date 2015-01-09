@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:src="@drawable/account"/>
+        android:src="@drawable/head_img"/>
 
     <LinearLayout
         android:layout_toRightOf="@id/chatbar_item_account_iv"
@@ -30,6 +30,7 @@
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:textSize="23sp"
+            style="@style/ListItemTvStyle"
             android:text="雪花飘落"/>
 
         <LinearLayout
@@ -57,6 +58,7 @@
                 android:text="海淀区"
                 android:background="@color/devide_line"/>
             <TextView
+                style="@style/ListItemTvStyle"
                 android:id="@+id/friends_application_verify_message"
                 android:visibility="invisible"
                 android:layout_width="wrap_content"
@@ -73,6 +75,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        style="@style/ListItemTvStyle"
         android:text="12-19 12:12"/>
 
 </RelativeLayout>

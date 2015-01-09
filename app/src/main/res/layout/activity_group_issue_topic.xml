@@ -51,10 +51,12 @@
                 android:layout_height="1dp">
             </LinearLayout>
             <LinearLayout
+                android:id="@+id/group_issue_type_linear"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:layout_width="match_parent"
-                android:layout_height="60dp">
+                android:layout_height="60dp"
+                android:background="@drawable/basic_textview_bg">
                 <TextView
                     android:textSize="20sp"
                     android:layout_marginLeft="10dp"
@@ -68,7 +70,6 @@
                     android:layout_width="match_parent"
                     android:layout_marginRight="10dp"
                     android:layout_marginLeft="10dp"
-                    android:background="@drawable/basic_textview_bg"
                     android:layout_height="wrap_content"
                     android:drawableRight="@drawable/arrow"
                     android:textColor="@color/md__defaultBackground"/>

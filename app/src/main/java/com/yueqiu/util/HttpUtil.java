@@ -29,10 +29,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 
-/**
- * Http请求帮助类
- * Created by yinfeng on 14/12/18.
- */
 public class HttpUtil
 {
 
@@ -52,20 +48,22 @@ public class HttpUtil
      * @param method 请求的方式，如果为null或者为“”，则默认为get请求
      * @return
      */
-    public static <T> String urlClient(String url, Map<String, T> map, String method)
+    public static <T> String urlClient(String url,Map<String,T> map,String method)
     {
-        Log.d("wy", "cacaca");
-        if (null == url || "".equals(url)) {
+        if(null == url || "".equals(url))
+        {
             throw new NullPointerException("url is null!");
         }
         StringBuilder sb = new StringBuilder();
         sb.append(HTTP).append(url);
         boolean flag = (null == map || 0 == map.size()) ? false : true;
-        if (flag) {
+        if(flag)
+        {
             sb.append("?");
             Iterator iter = map.entrySet().iterator();
-            while (iter.hasNext()) {
-                Map.Entry<String, T> entry = (Map.Entry<String, T>) iter.next();
+            while (iter.hasNext())
+            {
+                Map.Entry<String, T> entry = (Map.Entry<String, T>)iter.next();
                 try {
                     sb.append(entry.getKey()).append("=").
                             append(URLEncoder.encode(String.valueOf(entry.getValue()), CHARSET)).
@@ -79,18 +77,20 @@ public class HttpUtil
         log(sb.toString());
         try {
             URL urls = new URL(sb.toString());
-            HttpURLConnection conn = (HttpURLConnection) urls.openConnection();
+            HttpURLConnection conn = (HttpURLConnection)urls.openConnection();
             String requestMethod = (null == method || "".equals(method)) ? "GET" : method;
             conn.setRequestMethod(requestMethod);
             conn.setDoInput(true);
             conn.setDoOutput(true);
             conn.connect();
             StringBuilder result = new StringBuilder();
-            if (conn.getResponseCode() == 200) {
+            if(conn.getResponseCode() == 200)
+            {
                 InputStream in = conn.getInputStream();
                 BufferedInputStream bis = new BufferedInputStream(in);
-                byte[] data = new byte[1024];
-                while (bis.read(data) > 0) {
+                byte [] data = new byte[1024];
+                while(bis.read(data) > 0)
+                {
                     result.append(new String(data));
                 }
             }
@@ -103,6 +103,7 @@ public class HttpUtil
         }
         return null;
     }
+
 
     /**
      * 以下的这个方法是专为SearchActivity当中的SearchRoomFragment(即球厅Fragment)当中的列表,

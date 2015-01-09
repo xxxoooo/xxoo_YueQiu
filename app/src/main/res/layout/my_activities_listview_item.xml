@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         >
         <ImageView
-            android:src="@drawable/account"
+            android:src="@drawable/head_img"
             android:id="@+id/my_activities_lv_item_iv_head"
             android:layout_width="wrap_content"
             android:layout_alignParentLeft="true"
@@ -28,6 +28,7 @@
             android:layout_toEndOf="@id/my_activities_lv_item_iv_head"
             android:id="@+id/linearLayout2">
             <TextView
+                android:textColor="@color/md__defaultBackground"
                 android:id="@+id/my_activities_lv_item_tv_nick_name"
                 android:text="会飞的鱼"
                 android:textSize="22sp"
@@ -38,7 +39,7 @@
             <TextView
                 android:id="@+id/my_activities_lv_item_tv_message"
                 android:text="有朋自远方来，不亦说乎。"
-                android:textColor="@color/gray_font"
+                android:textColor="@color/md__defaultBackground"
                 android:textSize="14sp"
                 android:padding="5dp"
                 android:layout_width="wrap_content"
@@ -54,7 +55,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
-            android:textColor="@color/gray_font"
+            android:textColor="@color/md__defaultBackground"
             android:layout_height="wrap_content" />
 
     </RelativeLayout>

@@ -49,7 +49,7 @@
             android:editable="false"
             android:hint="@string/gender"
             android:textSize="18sp"
-            android:textColor="@color/edit_text_hint_color"
+            android:textColor="@color/md__defaultBackground"
             android:gravity="center_vertical"
             android:textColorHint="@color/edit_text_hint_color" />
 
@@ -164,4 +164,10 @@
             android:textSize="18sp"
             android:text="@string/login_right_now" />
         </LinearLayout>
+    <include
+        layout="@layout/pre_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        />
 </RelativeLayout>

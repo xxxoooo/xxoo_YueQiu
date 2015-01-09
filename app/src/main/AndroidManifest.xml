@@ -2,12 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.yueqiu">
 
-
     <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
@@ -19,7 +16,8 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".BilliardGroupActivity"
-            android:label="@string/app_name"></activity>
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".BilliardSearchActivity"
             android:screenOrientation="portrait"
@@ -33,7 +31,8 @@
         </activity>
         <activity
             android:name=".activity.SearchResultActivity"
-            android:launchMode="singleTop">
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -44,37 +43,64 @@
         </activity>
 
         <!-- 聊吧Activity -->
-        <activity android:name=".ChatBarActivity"
+        <activity
+            android:name=".ChatBarActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".activity.FriendSetGroupActivity"
-                  android:screenOrientation="portrait"/>
-        <activity android:name=".activity.FriendsApplicationActivity"
-                  android:screenOrientation="portrait"/>
-        <activity android:name=".activity.RequestAddFriendActivity"
-                  android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.FriendSetGroupActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.FriendsApplicationActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.RequestAddFriendActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".ChatBarActivity"
+            android:screenOrientation="portrait"/>
 
         <!-- 聊吧 END -->
 
-        <activity android:name=".ActivitiesActivity"/>
-
+        <activity
+            android:name=".ActivitiesActivity"
+            android:screenOrientation="portrait"/>
 
         <!-- 侧滑Menu -->
         <activity
             android:name=".activity.ActivitiesIssueActivity"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
         <activity
             android:name=".activity.FeedbackActivity"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
-        <activity android:name=".activity.MyProfileActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
+        <activity
+            android:name=".activity.MyProfileActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.UpdateAssistantActivity"
                   android:screenOrientation="portrait"/>
-        <activity android:name=".activity.ProfileSetupActivity"
-                  android:screenOrientation="portrait"/>
-        <activity android:name=".activity.MyParticipationActivity"
-                  android:screenOrientation="portrait"/>
-        <activity android:name=".activity.MyfavorCollActivity" />
-        <activity android:name=".activity.PublishedInfoActivity" />
-        <activity android:name=".activity.SelectChargeModuleActivity" />
-        <activity android:name=".activity.UpdateAssistantActivity"/>
+        <activity
+            android:name=".activity.ProfileSetupActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.MyParticipationActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.MyProfileActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.ProfileSetupActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.MyfavorCollActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.PublishedInfoActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.SelectChargeModuleActivity"
+            android:screenOrientation="portrait"/>
+
         <activity
             android:name=".activity.RegisterActivity"
             android:screenOrientation="portrait"/>
@@ -88,22 +114,27 @@
         <activity
             android:name=".activity.SearchBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating"
-            android:parentActivityName=".BilliardSearchActivity"
             android:screenOrientation="portrait"
-            >
+            android:parentActivityName=".BilliardSearchActivity">
+
         </activity>
         <activity
             android:name=".activity.SearchBilliardRoomActivity"
             android:label="@string/title_activity_search_billiard_room"
-            android:parentActivityName=".BilliardSearchActivity"
             android:screenOrientation="portrait"
-            />
+            android:parentActivityName=".BilliardSearchActivity">
+        </activity>
         <activity
-            android:name=".activity.ActivitiesIssueActivity"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
+            android:name=".activity.GroupIssueTopic"
+            android:label="@string/billiard_group_issue_article"
+            android:screenOrientation="portrait">
+        </activity>
         <activity
-            android:name=".activity.FeedbackActivity"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
+            android:name=".activity.GroupTopicDetailActivity"
+            android:label="@string/title_activity_group_topic_detail"
+            android:screenOrientation="portrait">
+        </activity>
+
     </application>
 
 </manifest>

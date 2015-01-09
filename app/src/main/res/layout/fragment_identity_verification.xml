@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
-                android:src="@drawable/account"/>
+                android:src="@drawable/head_img"/>
 
             <LinearLayout
                 android:layout_toRightOf="@id/account_iv"
@@ -35,6 +35,7 @@
                 android:layout_centerInParent="true">
 
                 <TextView
+                    android:textColor="@color/md__defaultBackground"
                     android:id="@+id/account_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -49,6 +50,7 @@
                     android:layout_height="wrap_content">
 
                     <TextView
+                        android:textColor="@color/md__defaultBackground"
                         android:id="@+id/gender_tv"
                         style="@style/ListItemTvStyle"
                         android:layout_margin="4dp"
@@ -61,6 +63,7 @@
                         android:background="@color/devide_line"/>
 
                     <TextView
+                        android:textColor="@color/md__defaultBackground"
                         android:id="@+id/district_tv"
                         style="@style/ListItemTvStyle"
                         android:layout_margin="4dp"

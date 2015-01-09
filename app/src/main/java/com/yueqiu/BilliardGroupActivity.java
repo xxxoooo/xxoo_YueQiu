@@ -7,6 +7,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -135,6 +136,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         Tab tab;
         for(int i=0; i<mPagerAdapter.getCount();i++){
             tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
+
             mActionBar.addTab(tab);
         }
     }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-    android:padding="2dp"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
     >
-
 
     <!--这是球友Fragment下面的子Fragment当中的ListView的item的布局文件-->
     <!-- 用于显示用户当前的头像，这里我们可以用一个BitmapUtil来实现，
@@ -15,10 +15,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/img_mate_subfragment_listitem_photo"
         android:layout_alignParentLeft="true"
-        android:src="@drawable/ic_launcher"
+        android:src="@drawable/head_img"
         android:layout_centerVertical="true"
         android:padding="2dp"
-        android:layout_margin="1dp"
         />
 
     <!-- 用于显示用户的nickName，即花名-->
@@ -27,11 +26,11 @@
         android:id="@+id/tv_mate_subfragment_listitem_nickname"
         android:text="@string/search_mate_sub_fragment_listitem_testname"
         android:layout_toRightOf="@id/img_mate_subfragment_listitem_photo"
-        android:layout_marginTop="1dp"
-        android:layout_marginLeft="4dp"
-        android:textColor="@android:color/black"
-        android:padding="4dp"
-        android:textSize="17sp"
+        android:layout_alignTop="@+id/img_mate_subfragment_listitem_photo"
+        android:layout_marginLeft="15dp"
+        android:textColor="@color/md__defaultBackground"
+        android:textSize="18sp"
+        android:layout_marginTop="12dp"
         />
 
     <!-- 用于显示用户的性别 -->
@@ -43,12 +42,12 @@
         android:text="@string/search_mate_popupmenu_item_male_str"
         android:layout_toRightOf="@id/img_mate_subfragment_listitem_photo"
         android:drawableRight="@drawable/male"
-        android:drawablePadding="3dp"
+        android:drawablePadding="6dp"
         android:paddingLeft="4dp"
         android:padding="4dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginTop="4dp"
-        android:textStyle="bold"/>
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:textStyle="normal"/>
 
     <!-- 用于显示用户当前所在的区域 -->
     <TextView
@@ -60,19 +59,19 @@
         android:text="@string/search_mate_sub_fragment_listitem_user_zone"
         android:padding="4dp"
         android:layout_marginLeft="7dp"
-        android:textStyle="bold"
+        android:textStyle="normal"
         android:layout_alignTop="@id/tv_mate_subfragment_listitem_gender"
         />
     <TextView
         style="@style/ListItemTvStyle"
         android:id="@+id/tv_mate_subfragment_listitem_distance_meter"
         android:padding="4dp"
-        android:layout_alignTop="@id/tv_mate_subfragment_listitem_nickname"
         android:layout_alignParentRight="true"
         android:text="@string/search_mate_popupmenu_item_500_str"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="7dp"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
         android:textSize="12sp"
+        android:textColor="@color/search_distance_color"
         />
 </RelativeLayout>
 

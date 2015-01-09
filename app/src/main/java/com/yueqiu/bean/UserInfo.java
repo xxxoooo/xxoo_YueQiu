@@ -1,6 +1,9 @@
 package com.yueqiu.bean;
 
-import org.json.JSONArray;
+import android.util.Log;
+
+import com.yueqiu.util.JSONHelper;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -8,31 +11,33 @@ import org.json.JSONObject;
  * 用户基本信息实体类
  * Created by yinfeng on 14/12/23.
  */
-public class UserInfo {
+public class UserInfo implements JSONHelper {
     private int id;
     private String img_url;//头像在网络中的地址
     private String img_real;//头像在本地的地址
     private String username;//账号
     private String phone;//电话
     private String password;//密码
-    private int sex;//性别
+    private String sex;//性别
     private String title;//职称
-
     private String nick;//昵称
     private String district;//区域
-    private int level;//水平
-    private int ball_type;//球种
+    private String level;//水平
     private String appoint_date;//约球时间
-    private int ballArm;//使用球杆
-    private int usedType;//使用习惯
-        private String ballAge;//球龄
+    private String ballArm;//使用球杆
+    private String usedType;//使用习惯
+    private String ballAge;//球龄
     private String idol;//偶像
     private String idol_name;//签名
     private String new_img;//最新照片在网络中的位置
     private String new_img_real;//最新照片在本地的位置
-    private int ball_class;
+    private String ball_class;
+
+
+
+    private String ball_type;
     private String token;
-    private int user_id;
+    private String user_id;
     private String login_time;//登录时间
 
     private static final String JSON_USER_ID = "user_id";
@@ -42,7 +47,6 @@ public class UserInfo {
     private static final String JSON_USERNAME = "nick";//昵称
     private static final String JSON_DISTRICT = "district";
     private static final String JSON_LEVEL = "level";
-    private static final String JSON_BALL_TYPE = "ball_type";
     private static final String JSON_BALL_ARM = "ballArm";
     private static final String JSON_USED_TYPE = "usedType";
     private static final String JSON_BALL_AGE = "ballAge";
@@ -52,26 +56,30 @@ public class UserInfo {
     private static final String JSON_CLASS = "class";
     private static final String JSON_APPOINT_DATE = "appoint_date";
 
+    public void setBall_type(int ball_type) {
+        this.ball_type = String.valueOf(ball_type);
+    }
 
+    public int getBall_type() {
+        return Integer.parseInt(ball_type);
+    }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
+    public String getUsername() {
 
-
+        return username;
+    }
     public void setNick(String nick) {
         this.nick = nick;
     }
 
-    public void setBall_class(int ball_class) {
-        this.ball_class = ball_class;
-    }
 
     public String getNick() {
 
         return nick;
-    }
-
-    public int getBall_class() {
-        return ball_class;
     }
 
 
@@ -116,11 +124,11 @@ public class UserInfo {
     }
 
     public int getSex() {
-        return sex;
+        return Integer.parseInt(sex);
     }
 
     public void setSex(int sex) {
-        this.sex = sex;
+        this.sex = String.valueOf(sex);
     }
 
     public String getTitle() {
@@ -129,14 +137,6 @@ public class UserInfo {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getDistrict() {
@@ -148,19 +148,11 @@ public class UserInfo {
     }
 
     public int getLevel() {
-        return level;
+        return Integer.parseInt(level);
     }
 
     public void setLevel(int level) {
-        this.level = level;
-    }
-
-    public int getBall_type() {
-        return ball_type;
-    }
-
-    public void setBall_type(int ball_type) {
-        this.ball_type = ball_type;
+        this.level = String.valueOf(level);
     }
 
     public String getAppoint_date() {
@@ -180,11 +172,11 @@ public class UserInfo {
     }
 
     public int getUser_id() {
-        return user_id;
+        return Integer.parseInt(user_id);
     }
 
     public void setUser_id(int user_id) {
-        this.user_id = user_id;
+        this.user_id = String.valueOf(user_id);
     }
 
     public String getLogin_time() {
@@ -197,19 +189,19 @@ public class UserInfo {
 
 
     public int getBallArm() {
-        return ballArm;
+        return Integer.parseInt(ballArm);
     }
 
     public void setBallArm(int ballArm) {
-        this.ballArm = ballArm;
+        this.ballArm = String.valueOf(ballArm);
     }
 
     public int getUsedType() {
-        return usedType;
+        return Integer.parseInt(usedType);
     }
 
     public void setUsedType(int usedType) {
-        this.usedType = usedType;
+        this.usedType = String.valueOf(usedType);
     }
 
     public String getBallAge() {
@@ -252,6 +244,16 @@ public class UserInfo {
         this.new_img_real = new_img_real;
     }
 
+    public String getBall_class() {
+        return ball_class;
+    }
+
+    public void setBall_class(String ball_class) {
+        this.ball_class = ball_class;
+    }
+
+
+    @Override
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
         json.put(JSON_USER_ID, user_id);
@@ -261,7 +263,6 @@ public class UserInfo {
         json.put(JSON_USERNAME, nick);
         json.put(JSON_DISTRICT, district);
         json.put(JSON_LEVEL, level);
-        json.put(JSON_BALL_TYPE, ball_type);
         json.put(JSON_BALL_ARM, ballArm);
         json.put(JSON_USED_TYPE, usedType);
         json.put(JSON_BALL_AGE, String.valueOf(ballAge));
@@ -271,30 +272,5 @@ public class UserInfo {
         json.put(JSON_CLASS, ball_class);
         json.put(JSON_APPOINT_DATE, appoint_date);
         return json;
-    }
-
-    public UserInfo(JSONObject obj) throws JSONException {
-        user_id = obj.getInt(JSON_USER_ID);
-        img_url = String.valueOf(obj.getString(JSON_IMGREAL));
-        username = String.valueOf(obj.getString(JSON_ACCOUNT));
-        sex = obj.getInt(JSON_SEX);//接口数据含义未确定
-        nick = String.valueOf(obj.getString(JSON_USERNAME));
-        district = obj.getString(JSON_DISTRICT);
-        level = obj.getInt(JSON_LEVEL);
-        ball_type = obj.getInt(JSON_BALL_TYPE);
-
-        ballArm = obj.getInt(JSON_BALL_ARM);
-        usedType = obj.getInt(JSON_USED_TYPE);
-        ballAge = obj.getString(JSON_BALL_AGE);//
-        idol = String.valueOf(obj.getString(JSON_IDOL));
-        idol_name = obj.getString(JSON_SIGN);
-        new_img = obj.getString(JSON_NEW_IMG);
-
-        appoint_date = obj.getString(JSON_APPOINT_DATE);
-        ball_class = obj.getInt(JSON_CLASS);
-    }
-
-    public UserInfo() {
-
     }
 }

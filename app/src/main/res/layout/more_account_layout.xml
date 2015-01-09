@@ -12,7 +12,7 @@
         android:id="@+id/account_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/account"
+        android:src="@drawable/head_img"
         android:layout_centerInParent="true"/>
     <TextView
         android:id="@+id/account_name"
@@ -25,19 +25,15 @@
         />
     <TextView
         android:id="@+id/slide_login"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="20dp"
         android:layout_centerHorizontal="true"
-        android:layout_below="@+id/account_name"
-        />
-    <TextView
-        android:id="@+id/account_golden"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_centerHorizontal="true"
-        android:layout_below="@+id/account_name"
-        android:textColor="@color/login_btn_normal"
+        android:layout_below="@+id/account_image"
+        android:layout_marginTop="30dp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/login_button_bg"
+        android:text="@string/login"
+        android:gravity="center"
         />
 
 </RelativeLayout>
