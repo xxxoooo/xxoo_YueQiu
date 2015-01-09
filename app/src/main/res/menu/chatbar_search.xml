@@ -3,7 +3,7 @@
     <item
         android:id="@+id/chatbar_menu_search"
         android:icon="@android:drawable/ic_menu_search"
-        android:title="@string/search"
+        android:title="@string/search_search_btn_str"
         android:showAsAction="ifRoom|collapseActionView"
         android:actionLayout="@layout/search_layout"/>
 </menu>

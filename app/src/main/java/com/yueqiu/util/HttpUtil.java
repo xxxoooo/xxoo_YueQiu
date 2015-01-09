@@ -39,7 +39,6 @@ public class HttpUtil {
      */
     public static <T> String urlClient(String url,Map<String,T> map,String method)
     {
-        Log.d("wy","cacaca");
         if(null == url || "".equals(url))
         {
             throw new NullPointerException("url is null!");

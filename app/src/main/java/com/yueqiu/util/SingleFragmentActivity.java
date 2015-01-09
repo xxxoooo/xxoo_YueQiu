@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.yueqiu.R;
 
@@ -13,6 +15,7 @@ import com.yueqiu.R;
 public abstract class SingleFragmentActivity extends FragmentActivity{
 
     public abstract Fragment createFragment();
+
     private int geLayoutResId() {
         return R.layout.activity_fragment_container;
     }

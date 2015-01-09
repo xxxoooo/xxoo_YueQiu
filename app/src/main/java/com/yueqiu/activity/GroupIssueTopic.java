@@ -20,6 +20,7 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
     private EditText    mTitleEdit,mContentEdit;
     private TextView    mTopicType;
     private ImageView   mIvExpression,mIvAddImg;
+    private View        mLinearType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,11 +37,12 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
         mTitleEdit = (EditText) findViewById(R.id.group_issue_title);
         mContentEdit = (EditText) findViewById(R.id.group_issue_content);
         mTopicType = (TextView) findViewById(R.id.group_issue_type);
+        mLinearType = findViewById(R.id.group_issue_type_linear);
 
         mIvExpression = (ImageView) findViewById(R.id.group_issue_express);
         mIvAddImg = (ImageView) findViewById(R.id.group_issue_add_img);
 
-        mTopicType.setOnClickListener(this);
+        mLinearType.setOnClickListener(this);
     }
 
     @Override
@@ -72,7 +74,7 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
     @Override
     public void onClick(View v) {
         switch(v.getId()){
-            case R.id.group_issue_type:
+            case R.id.group_issue_type_linear:
                 Intent intent = new Intent();
                 intent.setClass(this,GroupSelectTopicTypeActivity.class);
                 if(mTopicType.getText().equals(getString(R.string.billiard_get_master))){

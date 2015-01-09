@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         >
         <ImageView
-            android:src="@drawable/account"
+            android:src="@drawable/head_img"
             android:id="@+id/activities_lv_item_iv_head"
             android:layout_width="wrap_content"
             android:layout_alignParentLeft="true"

@@ -5,8 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:name=".YueQiuApp"
@@ -16,8 +16,11 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".BilliardGroupActivity"
-            android:label="@string/app_name" />
-        <activity android:name=".BilliardSearchActivity" >
+            android:label="@string/app_name"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".BilliardSearchActivity"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,7 +29,8 @@
         </activity>
         <activity
             android:name=".activity.SearchResultActivity"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
 
@@ -39,23 +43,39 @@
         </activity>
 
         <!-- 聊吧Activity -->
-        <activity android:name=".ChatBarActivity" />
+        <activity
+            android:name=".ChatBarActivity"
+            android:screenOrientation="portrait" />
         <!-- 聊吧 END -->
 
-        <activity android:name=".ActivitiesActivity" />
+        <activity
+            android:name=".ActivitiesActivity"
+            android:screenOrientation="portrait" />
 
         <!-- 侧滑Menu -->
         <activity
             android:name=".activity.ActivitiesIssueActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
         <activity
             android:name=".activity.FeedbackActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
-        <activity android:name=".activity.MyProfileActivity" />
-        <activity android:name=".ProfileSetupActivity" />
-        <activity android:name=".activity.MyfavorCollActivity" />
-        <activity android:name=".activity.PublishedInfoActivity" />
-        <activity android:name=".activity.SelectChargeModuleActivity" />
+        <activity
+            android:name=".activity.MyProfileActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ProfileSetupActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.MyfavorCollActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.PublishedInfoActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.SelectChargeModuleActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.RegisterActivity"
             android:screenOrientation="portrait" />
@@ -68,23 +88,33 @@
         <activity android:name=".activity.MyParticipationActivity" />
         <activity
             android:name=".activity.SearchBilliardsDatingActivity"
-            android:label="@string/title_activity_billiards_dating" >
+            android:label="@string/title_activity_billiards_dating"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".activity.SearchBilliardRoomActivity"
-            android:label="@string/title_activity_search_billiard_room" >
+            android:label="@string/title_activity_search_billiard_room"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".activity.GroupIssueTopic"
-            android:label="@string/billiard_group_issue_article" >
+            android:label="@string/billiard_group_issue_article"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".activity.GroupSelectTopicTypeActivity"
-            android:label="@string/title_activity_group_select_topic_type" >
+            android:label="@string/title_activity_group_select_topic_type"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".activity.GroupTopicDetailActivity"
-            android:label="@string/title_activity_group_topic_detail" >
+            android:label="@string/title_activity_group_topic_detail"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".TestActivity"
+            android:label="@string/title_activity_test" >
+
         </activity>
     </application>
 

@@ -1,6 +1,7 @@
 package com.yueqiu.bean;
 
-import org.json.JSONArray;
+import com.yueqiu.util.JSONHelper;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -8,7 +9,7 @@ import org.json.JSONObject;
  * 用户基本信息实体类
  * Created by yinfeng on 14/12/23.
  */
-public class UserInfo {
+public class UserInfo implements JSONHelper {
     private int id;
     private String img_url;//头像在网络中的地址
     private String img_real;//头像在本地的地址
@@ -17,7 +18,7 @@ public class UserInfo {
     private String password;//密码
     private int sex;//性别
     private String title;//职称
-    private String username;//昵称
+    private String nickName;//昵称
     private String district;//区域
     private int level;//水平
     private int ball_type;//球种
@@ -31,6 +32,7 @@ public class UserInfo {
     private String new_img_real;//最新照片在本地的位置
     private int ball_class;
 
+    private static final String JSON_USER_ID = "user_id";
     private static final String JSON_IMGREAL = "img_url";
     private static final String JSON_ACCOUNT = "username";//账户
     private static final String JSON_SEX = "sex";
@@ -117,12 +119,12 @@ public class UserInfo {
         this.title = title;
     }
 
-    public String getUsername() {
-        return username;
+    public String getNickName() {
+        return nickName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
     public String getDistrict() {
@@ -238,31 +240,12 @@ public class UserInfo {
         this.new_img_real = new_img_real;
     }
 
-    public JSONObject toJSON() throws JSONException {
-        JSONObject json = new JSONObject();
-        json.put(JSON_IMGREAL, img_url);
-        json.put(JSON_ACCOUNT, account);
-        json.put(JSON_SEX, String.valueOf(sex));
-        json.put(JSON_USERNAME, username);
-        json.put(JSON_DISTRICT, district);
-        json.put(JSON_LEVEL, level);
-        json.put(JSON_BALL_TYPE, ball_type);
-        json.put(JSON_BALL_ARM, ballArm);
-        json.put(JSON_USED_TYPE, usedType);
-        json.put(JSON_BALL_AGE, String.valueOf(ballAge));
-        json.put(JSON_IDOL, idol);
-        json.put(JSON_SIGN, idol_name);
-        json.put(JSON_NEW_IMG, new_img);
-        json.put(JSON_CLASS, ball_class);
-        json.put(JSON_APPOINT_DATE, appoint_date);
-        return json;
-    }
 
     public UserInfo(JSONObject obj) throws JSONException {
         img_url = String.valueOf(obj.getString(JSON_IMGREAL));
         account = String.valueOf(obj.getString(JSON_ACCOUNT));
         sex = obj.getInt(JSON_SEX);//接口数据含义未确定
-        username = String.valueOf(obj.getString(JSON_USERNAME));
+        nickName = String.valueOf(obj.getString(JSON_USERNAME));
         district = obj.getString(JSON_DISTRICT);
         level = obj.getInt(JSON_LEVEL);
         ball_type = obj.getInt(JSON_BALL_TYPE);
@@ -281,5 +264,27 @@ public class UserInfo {
 
     public UserInfo() {
 
+    }
+
+    @Override
+    public JSONObject toJSON() throws JSONException{
+        JSONObject json = new JSONObject();
+        json.put(JSON_USER_ID, user_id);
+        json.put(JSON_IMGREAL, img_url);
+        json.put(JSON_ACCOUNT, account);
+        json.put(JSON_SEX, String.valueOf(sex));
+        json.put(JSON_USERNAME, nickName);
+        json.put(JSON_DISTRICT, district);
+        json.put(JSON_LEVEL, level);
+        json.put(JSON_BALL_TYPE, ball_type);
+        json.put(JSON_BALL_ARM, ballArm);
+        json.put(JSON_USED_TYPE, usedType);
+        json.put(JSON_BALL_AGE, String.valueOf(ballAge));
+        json.put(JSON_IDOL, idol);
+        json.put(JSON_SIGN, idol_name);
+        json.put(JSON_NEW_IMG, new_img);
+        json.put(JSON_CLASS, ball_class);
+        json.put(JSON_APPOINT_DATE, appoint_date);
+        return json;
     }
 }

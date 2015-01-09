@@ -12,7 +12,7 @@
     <color name="gray">#DBDBDB</color>
     <color name="bg_container">#eaeaea</color>
     <color name="login_btn_normal">#f17935</color>
-    <color name="login_btn_pressed">#fff48800</color>
+    <color name="login_btn_pressed">#ce4a00</color>
     <color name="have_agree_and_read">#5e6e80</color>
     <!--侧滑-->
     <color name="actionbar_color">#2ad0b9</color>

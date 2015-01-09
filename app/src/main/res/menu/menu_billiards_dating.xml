@@ -5,13 +5,13 @@
           android:orderInCategory="100"
           android:showAsAction="always"
           android:icon="@drawable/actionbar_title_collect"
-          android:title="@string/search"/>
+          android:title="@string/search_search_btn_str"/>
 
     <item android:id="@+id/search_room_action_share"
         android:orderInCategory="100"
         android:showAsAction="always"
         android:icon="@drawable/actionbar_title_share"
-        android:title="@string/search"
+        android:title="@string/search_search_btn_str"
         >
     </item>
 
