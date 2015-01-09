@@ -14,22 +14,41 @@ public class SearchPeopleInfo {
 
     public class SearchPeopleItemInfo{
         private int user_id;//用户id
-        private int group_id;//分组id
-        private int account;//昵称，接口中这样声明的
+        private String username;//昵称
         private String img_url;//头像
         private String content;//最后发布的消息
         private String datetime;//时间
+        private int sex;//性别
+        private String district;//地区
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getUsername() {
+
+            return username;
+        }
+
+        public int getSex() {
+            return sex;
+        }
+
+        public String getDistrict() {
+            return district;
+        }
+
+        public void setSex(int sex) {
+
+            this.sex = sex;
+        }
+
+        public void setDistrict(String district) {
+            this.district = district;
+        }
 
         public void setUser_id(int user_id) {
             this.user_id = user_id;
-        }
-
-        public void setGroup_id(int group_id) {
-            this.group_id = group_id;
-        }
-
-        public void setAccount(int account) {
-            this.account = account;
         }
 
         public void setImg_url(String img_url) {
@@ -55,14 +74,6 @@ public class SearchPeopleInfo {
 
         public String getImg_url() {
             return img_url;
-        }
-
-        public int getAccount() {
-            return account;
-        }
-
-        public int getGroup_id() {
-            return group_id;
         }
 
         public int getUser_id() {

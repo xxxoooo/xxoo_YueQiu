@@ -1,6 +1,7 @@
 package com.yueqiu.fragment.chatbar;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,9 +12,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+
 import com.yueqiu.R;
+import com.yueqiu.activity.FriendsApplicationActivity;
 import com.yueqiu.adapter.ChatBarItemAdapter;
 
 /**
@@ -44,22 +48,16 @@ public class MessageFragment extends Fragment {
         mListView = (ListView) view.findViewById(R.id.chatbar_message_lv_account);
         ChatBarItemAdapter adapter = new ChatBarItemAdapter(getActivity());
         mListView.setAdapter(adapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
+                if (0 == position) {
+                    startActivity(new Intent(getActivity(), FriendsApplicationActivity.class));
+                }
+            }
+        });
         return view;
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.chatbar_menu_search:
-                break;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 }

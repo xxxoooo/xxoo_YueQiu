@@ -71,10 +71,12 @@ public class Utils {
         }
         editor.commit();
 
+
         YueQiuApp.sUserInfo.setImg_url(map.get(DatabaseConstant.UserTable.IMG_URL));
         YueQiuApp.sUserInfo.setAccount(map.get(DatabaseConstant.UserTable.ACCOUNT));
         YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(DatabaseConstant.UserTable.USER_ID)));
         YueQiuApp.sUserInfo.setPhone(map.get(DatabaseConstant.UserTable.PHONE));
+
     }
 
     public static void removeUserBaseInfo(Context context) {
@@ -225,7 +227,7 @@ public class Utils {
     }
 
     /**
-     * 直接保存RESTFUL获取的我的资料JSON数据到本地
+     * 直接保存RESTFUL获取的资料JSON数据到本地
      * @param context
      * @param array
      * @throws IOException
@@ -384,6 +386,7 @@ public class Utils {
 
     /**
      * 将JSONObject转换成相应对象
+     * 如果有浮点型的数据，都使用double
      * @param clazz
      * @param object
      * @return
@@ -392,16 +395,17 @@ public class Utils {
         T t = null;
         try {
             t = clazz.newInstance();
-            Method[] methods = clazz.getDeclaredMethods();
-            for (int i = 0; i < methods.length; i++) {
-                String methodName = methods[i].getName();
-                if (methodName.startsWith("set")) {
-                    String fieldName = methodName.substring(3,
-                            methodName.length()).toLowerCase();
-                    Object o = object.get(fieldName);
-                    if (null != o) {
-                        methods[i].invoke(t, toRealObject(o));
-                    }
+//            Method[] methods = clazz.getDeclaredMethods();
+            Field[] fields = clazz.getDeclaredFields();
+            for(int i = 0; i < fields.length; i++)
+            {
+                if (String.valueOf(fields[i]).contains("JSON"))
+                    continue;
+                Object o = object.get(fields[i].getName());
+                if(o != null)
+                {
+                    fields[i].setAccessible(true);
+                    fields[i].set(t, toRealObject(o));
                 }
             }
         } catch (Exception e) {

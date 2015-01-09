@@ -39,7 +39,7 @@
             <TextView
                 style="@style/ListItemTvStyle"
                 android:layout_margin="4dp"
-                android:id="@+id/chatbar_item_lastmessage_tv"
+                android:id="@+id/chatbar_item_gender_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:drawablePadding="2dp"
@@ -48,6 +48,7 @@
                 android:drawableRight="@drawable/male"
                 android:background="@color/devide_line"/>
             <TextView
+                android:id="@+id/chatbar_item_district_tv"
                 style="@style/ListItemTvStyle"
                 android:layout_margin="4dp"
                 android:layout_width="wrap_content"
@@ -55,7 +56,13 @@
                 android:padding="2dp"
                 android:text="海淀区"
                 android:background="@color/devide_line"/>
+            <TextView
+                android:id="@+id/friends_application_verify_message"
+                android:visibility="invisible"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
             </LinearLayout>
+
 
 
     </LinearLayout>

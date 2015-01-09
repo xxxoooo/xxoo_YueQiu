@@ -152,10 +152,11 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             }).start();
         }else{
             mUserInfo = getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
-            mHandler.obtainMessage(DATA_SUCCESS,mUserInfo).sendToTarget();
         }
     }
     //}
+
+
 
     private Handler mHandler = new Handler() {
         @Override
@@ -193,8 +194,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         mCueHabitsTextView.setText(1 == userInfo.getUsedType()
                 ? getString(R.string.habit_1) : (2 == userInfo.getUsedType() ?
                 getString(R.string.habit_2) : getString(R.string.habit_3)));
-        mPlayAgeTextView.setText(-1 == userInfo.getBallAge()
-                ? unset : String.valueOf(userInfo.getBallAge()));
+        mPlayAgeTextView.setText(userInfo.getBallAge());
         mIdolTextView.setText("".equals(userInfo.getIdol())
                 ? unset : userInfo.getIdol());
         mSignTextView.setText("".equals(userInfo.getIdol_name())
@@ -253,10 +253,11 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         switch (v.getId()) {
             case R.id.update_assistant_btn:
                 //TODO:升级助教界面
-//                Intent intent = new Intent(this,);
+                startActivity(new Intent(this, UpdateAssistantActivity.class));
                 break;
             case R.id.update_coach_btn:
                 //TODO:升级教练界面
+                startActivity(new Intent(this, UpdateAssistantActivity.class));
                 break;
             case R.id.my_profile_photo:
                 startMyActivity(0);
@@ -347,7 +348,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 break;
             case 9:
                 mPlayAgeTextView.setText(str);
-                mUserInfo.setBallAge(Integer.parseInt(str));
+                mUserInfo.setBallAge(str);
                 break;
             case 10:
                 mIdolTextView.setText(str);
@@ -385,7 +386,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             info.setAppoint_date(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.APPOINT_DATE)));
             info.setBallArm(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALLARM)));
             info.setUsedType(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.USERDTYPE)));
-            info.setBallAge(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALLAGE)));
+            info.setBallAge(String.valueOf(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALLAGE))));
             info.setIdol(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.IDOL)));
             info.setIdol_name(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.IDOL_NAME)));
             info.setNew_img(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.NEW_IMG)));

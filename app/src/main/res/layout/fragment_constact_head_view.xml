@@ -12,7 +12,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="14.0dip"
         android:scaleType="fitXY"
-        android:src="@drawable/qb_down"
+        android:src="@drawable/arrow_down"
         android:contentDescription="@string/app_name"
         android:layout_centerVertical="true"/>
 
@@ -32,7 +32,7 @@
         android:maxLines="1"
         android:singleLine="true"
         android:textColor="#ff333333"
-        android:textSize="15.0sp" />
+        android:textSize="17.0sp" />
 
     <TextView
         android:id="@+id/online_count"

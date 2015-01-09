@@ -25,11 +25,14 @@ public class UserInfo implements JSONHelper {
     private String appoint_date;//约球时间
     private int ballArm;//使用球杆
     private int usedType;//使用习惯
-    private int ballAge;//球龄
+    private String ballAge;//球龄
     private String idol;//偶像
     private String idol_name;//签名
     private String new_img;//最新照片在网络中的位置
     private String new_img_real;//最新照片在本地的位置
+    private String token;
+    private int user_id;
+    private String login_time;//登录时间
     private int ball_class;
 
     private static final String JSON_USER_ID = "user_id";
@@ -51,9 +54,7 @@ public class UserInfo implements JSONHelper {
 
 
 
-    private String token;
-    private int user_id;
-    private String login_time;//登录时间
+
 
     public String getImg_url() {
         return img_url;
@@ -69,14 +70,6 @@ public class UserInfo implements JSONHelper {
 
     public void setImg_real(String img_real) {
         this.img_real = img_real;
-    }
-
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
     }
 
     public int getId() {
@@ -200,11 +193,11 @@ public class UserInfo implements JSONHelper {
         this.usedType = usedType;
     }
 
-    public int getBallAge() {
+    public String getBallAge() {
         return ballAge;
     }
 
-    public void setBallAge(int ballAge) {
+    public void setBallAge(String ballAge) {
         this.ballAge = ballAge;
     }
 
@@ -240,8 +233,24 @@ public class UserInfo implements JSONHelper {
         this.new_img_real = new_img_real;
     }
 
+    public int getBall_class() {
+        return ball_class;
+    }
+
+    public void setBall_class(int ball_class) {
+        this.ball_class = ball_class;
+    }
+
+    public String getAccount() {
+        return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
+    }
 
     public UserInfo(JSONObject obj) throws JSONException {
+        user_id = obj.getInt(JSON_USER_ID);
         img_url = String.valueOf(obj.getString(JSON_IMGREAL));
         account = String.valueOf(obj.getString(JSON_ACCOUNT));
         sex = obj.getInt(JSON_SEX);//接口数据含义未确定
@@ -252,8 +261,7 @@ public class UserInfo implements JSONHelper {
 
         ballArm = obj.getInt(JSON_BALL_ARM);
         usedType = obj.getInt(JSON_USED_TYPE);
-        ballAge = "".equals(obj.getString(JSON_BALL_AGE)) ?
-                -1 : Integer.parseInt(obj.getString(JSON_BALL_AGE));//
+        ballAge = obj.getString(JSON_BALL_AGE);//
         idol = String.valueOf(obj.getString(JSON_IDOL));
         idol_name = obj.getString(JSON_SIGN);
         new_img = obj.getString(JSON_NEW_IMG);

@@ -1,7 +1,9 @@
 package com.yueqiu.fragment.chatbar;
 
 import android.app.ActionBar;
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -12,17 +14,23 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.activity.RequestAddFriendActivity;
 import com.yueqiu.bean.SearchPeopleInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.HttpUtil;
@@ -31,6 +39,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,12 +58,13 @@ public class AddPersonFragment extends Fragment implements LocationListener {
     private ListView mListView;
     private LocationManager mLocationManager;
     private double mLatitude, mLongitude;
+    public static final String FRIEND_INFO_USER_ID = "com.yueqiu.fragment.chatbar.friend_info.user_id";
+    public static final String FRIEND_INFO_USERNAME = "com.yueqiu.fragment.chatbar.friend_info.username";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(false);
-        setMenuVisibility(false);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -79,6 +89,41 @@ public class AddPersonFragment extends Fragment implements LocationListener {
         return view;
     }
 
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        final SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        //get friend by phone number or account number
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        searchFriendsByKeyWords(searchView.getQuery().toString());
+                    }
+                }).start();
+                if (null != mList && 0 != mList.size()) {
+                    mList.clear();
+                    mListView.deferNotifyDataSetChanged();
+                }
+                mProgressBar.setVisibility(View.VISIBLE);
+                ((InputMethodManager) getActivity()
+                        .getSystemService(Context.INPUT_METHOD_SERVICE))
+                        .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+    }
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -89,6 +134,17 @@ public class AddPersonFragment extends Fragment implements LocationListener {
                     mList = searchPeopleInfo.mList;
                     MyAdapter adapter = new MyAdapter(getActivity(), mList);
                     mListView.setAdapter(adapter);
+                    mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Intent intent = new Intent(getActivity(), RequestAddFriendActivity.class);
+                            int friendUserId = mList.get(position).getUser_id();
+                            String username = mList.get(position).getUsername();
+                            intent.putExtra(FRIEND_INFO_USER_ID, friendUserId);
+                            intent.putExtra(FRIEND_INFO_USERNAME, username);
+                            startActivity(intent);
+                        }
+                    });
                     break;
                 default:
                     break;
@@ -106,13 +162,12 @@ public class AddPersonFragment extends Fragment implements LocationListener {
 
             if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
                 SearchPeopleInfo searchPeople = new SearchPeopleInfo();
-                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
+//                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
                 JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
                 for (int i = 0; i < list_data.length(); i++) {
                     SearchPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
                     itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
-                    itemInfo.setGroup_id(list_data.getJSONObject(i).getInt("group_id"));
-                    itemInfo.setAccount(list_data.getJSONObject(i).getInt("account"));
+                    itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
                     itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
                     itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
                     itemInfo.setDatetime(list_data.getJSONObject(i).getString("datetime"));
@@ -134,10 +189,10 @@ public class AddPersonFragment extends Fragment implements LocationListener {
         if (mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
             return;
-        }else if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        } else if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
-        }else {
+        } else {
             Toast.makeText(getActivity(), "请检查GPS和网络是否可用！", Toast.LENGTH_SHORT).show();
         }
     }
@@ -172,6 +227,7 @@ public class AddPersonFragment extends Fragment implements LocationListener {
 
     /**
      * 通过关键字查询好友
+     *
      * @param keyWords
      */
     public void searchFriendsByKeyWords(String keyWords) {
@@ -184,16 +240,15 @@ public class AddPersonFragment extends Fragment implements LocationListener {
 
             if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
                 SearchPeopleInfo searchPeople = new SearchPeopleInfo();
-                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
+//                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
                 JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
                 for (int i = 0; i < list_data.length(); i++) {
                     SearchPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
                     itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
-                    itemInfo.setGroup_id(list_data.getJSONObject(i).getInt("group_id"));
-                    itemInfo.setAccount(list_data.getJSONObject(i).getInt("account"));
+                    itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
                     itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                    itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
-                    itemInfo.setDatetime(list_data.getJSONObject(i).getString("datetime"));
+                    itemInfo.setSex(list_data.getJSONObject(i).getInt("sex"));
+                    itemInfo.setDistrict(list_data.getJSONObject(i).getString("district"));
                     searchPeople.mList.add(itemInfo);
                 }
                 mHandler.obtainMessage(GET_SUCCESS, searchPeople).sendToTarget();
@@ -235,12 +290,12 @@ public class AddPersonFragment extends Fragment implements LocationListener {
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder viewHolder;
             if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.my_activities_listview_item, null);
+                convertView = mInflater.inflate(R.layout.item_chatbar_account, null);
                 viewHolder = new ViewHolder();
-                viewHolder.mImageView = (ImageView) convertView.findViewById(R.id.my_activities_lv_item_iv_head);
-                viewHolder.mNickName = (TextView) convertView.findViewById(R.id.my_activities_lv_item_tv_nick_name);
-                viewHolder.mMessage = (TextView) convertView.findViewById(R.id.my_activities_lv_item_tv_message);
-                viewHolder.mTime = (TextView) convertView.findViewById(R.id.my_activities_lv_item_tv_time);
+                viewHolder.mImageView = (ImageView) convertView.findViewById(R.id.chatbar_item_account_iv);
+                viewHolder.mNickName = (TextView) convertView.findViewById(R.id.chatbar_item_account_tv);
+                viewHolder.mGender = (TextView) convertView.findViewById(R.id.chatbar_item_gender_tv);
+                viewHolder.mDistrict = (TextView) convertView.findViewById(R.id.chatbar_item_district_tv);
                 //绑定viewholder对象
                 convertView.setTag(viewHolder);
             } else {
@@ -248,17 +303,18 @@ public class AddPersonFragment extends Fragment implements LocationListener {
             }
             Log.e(TAG, String.valueOf(convertView));
 //            viewHolder.mImageView.setImageDrawable();//设置头像
-            viewHolder.mNickName.setText(mList.get(position).getAccount());
-            viewHolder.mMessage.setText(mList.get(position).getContent());
-            viewHolder.mTime.setText(mList.get(position).getDatetime());
+            viewHolder.mNickName.setText(mList.get(position).getUsername());
+            viewHolder.mGender.setText(mList.get(position).getSex() == 1 ? getString(R.string.man) : getString(R.string.woman));
+            String district = mList.get(position).getDistrict();
+            viewHolder.mDistrict.setText("".equals(district) ? "未知" : district);
             return convertView;
         }
 
         final class ViewHolder {
             public ImageView mImageView;
             public TextView mNickName;
-            public TextView mMessage;
-            public TextView mTime;
+            public TextView mGender;
+            public TextView mDistrict;
         }
     }
 
