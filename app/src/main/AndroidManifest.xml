@@ -44,15 +44,29 @@
         </activity>
 
         <!-- 聊吧Activity -->
-        <activity android:name=".ChatBarActivity"/>
+        <activity android:name=".ChatBarActivity" />
+        <activity android:name=".activity.FriendSetGroupActivity"/>
+        <activity android:name=".activity.FriendsApplicationActivity"/>
+        <activity android:name=".activity.RequestAddFriendActivity"/>
 
-
-        <activity android:name="activity.AddFriendsActivity"/>
         <!-- 聊吧 END -->
 
         <activity android:name=".ActivitiesActivity"/>
 
 
+        <!-- 侧滑Menu -->
+        <activity
+            android:name=".activity.ActivitiesIssueActivity"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity
+            android:name=".activity.FeedbackActivity"
+            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+        <activity android:name=".activity.MyProfileActivity" />
+        <activity android:name=".activity.ProfileSetupActivity" />
+        <activity android:name=".activity.MyfavorCollActivity" />
+        <activity android:name=".activity.PublishedInfoActivity" />
+        <activity android:name=".activity.SelectChargeModuleActivity" />
+        <activity android:name=".activity.UpdateAssistantActivity"/>
         <activity
             android:name=".activity.RegisterActivity"
             android:screenOrientation="portrait"/>
@@ -67,12 +81,14 @@
             android:name=".activity.SearchBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating"
             android:parentActivityName=".BilliardSearchActivity"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity
             android:name=".activity.SearchBilliardRoomActivity"
             android:label="@string/title_activity_search_billiard_room"
             android:parentActivityName=".BilliardSearchActivity"
+            android:screenOrientation="portrait"
             />
         <activity
             android:name=".activity.ActivitiesIssueActivity"

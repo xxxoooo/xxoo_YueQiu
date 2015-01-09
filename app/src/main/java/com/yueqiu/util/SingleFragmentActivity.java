@@ -21,10 +21,10 @@ public abstract class SingleFragmentActivity extends FragmentActivity{
         super.onCreate(savedInstanceState);
         setContentView(geLayoutResId());
         FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.my_profile_setup_fragment_container);
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (fragment == null) {
             fragment = createFragment();
-            fm.beginTransaction().add(R.id.my_profile_setup_fragment_container, fragment).commit();
+            fm.beginTransaction().add(R.id.fragment_container, fragment).commit();
         }
     }
 }

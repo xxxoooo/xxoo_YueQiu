@@ -52,18 +52,18 @@ public class BilliardDatingFragment extends Fragment {
             ViewHolder viewHolder;
             Log.e(TAG, "getView " + position + " " + convertView);
             if (convertView == null) {
-                convertView = LayoutInflater.from(getActivity()).inflate(R.layout.item_reply, null);
-                viewHolder = new ViewHolder();
-                viewHolder.mImageView = (ImageView) convertView.findViewById(R.id.mention_me_account_iv);
-                viewHolder.mNickName = (TextView) convertView.findViewById(R.id.mention_me_nickname_tv);
-                viewHolder.mInfo = (TextView) convertView.findViewById(R.id.mention_meinfo_tv);
-                viewHolder.mTime = (TextView) convertView.findViewById(R.id.mention_me_time_tv);
-                viewHolder.mEditText = (EditText) convertView.findViewById(R.id.mention_me_reply_et);
-
-                viewHolder.mAdd = (Button) convertView.findViewById(R.id.mention_me_add_btn);
-                viewHolder.mReply = (Button) convertView.findViewById(R.id.mention_me_reply_btn);
+//                convertView = LayoutInflater.from(getActivity()).inflate(R.layout.item_reply, null);
+//                viewHolder = new ViewHolder();
+//                viewHolder.mImageView = (ImageView) convertView.findViewById(R.id.mention_me_account_iv);
+//                viewHolder.mNickName = (TextView) convertView.findViewById(R.id.mention_me_nickname_tv);
+//                viewHolder.mInfo = (TextView) convertView.findViewById(R.id.mention_meinfo_tv);
+//                viewHolder.mTime = (TextView) convertView.findViewById(R.id.mention_me_time_tv);
+//                viewHolder.mEditText = (EditText) convertView.findViewById(R.id.mention_me_reply_et);
+//
+//                viewHolder.mAdd = (Button) convertView.findViewById(R.id.mention_me_add_btn);
+//                viewHolder.mReply = (Button) convertView.findViewById(R.id.mention_me_reply_btn);
                 //绑定viewholder对象
-                convertView.setTag(viewHolder);
+//                convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }

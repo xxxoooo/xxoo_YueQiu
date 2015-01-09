@@ -61,7 +61,7 @@ public class ProfileSetupActivity extends SingleFragmentActivity {
 
         Intent intent = new Intent();
         Fragment fragment = getSupportFragmentManager()
-                .findFragmentById(R.id.my_profile_setup_fragment_container);
+                .findFragmentById(R.id.fragment_container);
         if (fragment instanceof PhotoSetupFragment)
             return;//TODO:上传头像 need to develop
         String str = ((EditText) fragment.getView()

@@ -69,7 +69,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         mDatePickerDialog = DatePickerDialog.newInstance(this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), false);
         mTimePickerDialog = TimePickerDialog.newInstance(this, calendar.get(Calendar.HOUR_OF_DAY) ,calendar.get(Calendar.MINUTE), false, false);
 
-        mContactStr = YueQiuApp.sUserInfo.getAccount();
+        mContactStr = YueQiuApp.sUserInfo.getUsername();
         mPhoneNumberStr = YueQiuApp.sUserInfo.getPhone();
 
         mContactEdit.setText(mContactStr);

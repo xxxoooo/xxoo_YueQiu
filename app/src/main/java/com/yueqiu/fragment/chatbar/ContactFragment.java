@@ -140,12 +140,12 @@ public class ContactFragment extends Fragment {
                     JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
                     for (int j = 0; j < list_data.length(); j++) {
                         ContactsList.Contacts contacts = contactsList.new Contacts();
-                        contacts.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
-                        contacts.setGroup_id(list_data.getJSONObject(i).getInt("group_id"));
-                        contacts.setUsername(list_data.getJSONObject(i).getString("username"));
-                        contacts.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                        contacts.setContent(list_data.getJSONObject(i).getString("content"));
-                        contacts.setCreate_time(list_data.getJSONObject(i).getString("create_time"));
+                        contacts.setUser_id(list_data.getJSONObject(j).getInt("user_id"));
+                        contacts.setGroup_id(list_data.getJSONObject(j).getInt("group_id"));
+                        contacts.setUsername(list_data.getJSONObject(j).getString("username"));
+                        contacts.setImg_url(list_data.getJSONObject(j).getString("img_url"));
+                        contacts.setContent(list_data.getJSONObject(j).getString("content"));
+                        contacts.setCreate_time(list_data.getJSONObject(j).getString("create_time"));
                         contactsList.mList.add(contacts);
                     }
                     maps.put(i, contactsList.mList);

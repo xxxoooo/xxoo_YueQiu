@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_margin="10dp"
+              android:orientation="vertical"
+              android:background="@drawable/list_corner_round_bg">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="30dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="10dp"
+        android:layout_centerInParent="true"
+        android:layout_alignParentLeft="true"
+        android:textSize="17sp"
+        android:text="@string/qiuyou_request"/>
+    <TextView
+        android:id="@+id/friends_application_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2014-12-12"
+        android:paddingRight="10dp"
+        android:textColor="@color/gray_font"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"/>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/devide_line"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:minHeight="?android:attr/listPreferredItemHeight">
+
+
+        <ImageView
+            android:id="@+id/friends_application_icon"
+            android:layout_marginLeft="10dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="8dp"
+            android:layout_margin="10dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerInParent="true"
+            android:src="@drawable/account"/>
+
+        <LinearLayout
+            android:layout_toRightOf="@id/friends_application_icon"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+
+            <TextView
+                android:id="@+id/friends_application_username"
+                android:padding="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="17sp"
+                android:text="tangxin"/>
+
+            <TextView
+                android:id="@+id/friends_application_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textSize="23sp"
+                android:text="韩寒"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/friends_application_agree"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_width="66dp"
+            android:layout_height="35dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/update_assistant_click"
+            android:textColor="@color/white"
+            android:text="同意"/>
+
+    </RelativeLayout>
+</LinearLayout>
