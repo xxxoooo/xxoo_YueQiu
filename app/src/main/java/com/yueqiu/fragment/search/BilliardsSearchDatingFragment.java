@@ -12,11 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import com.yueqiu.R;
-import com.yueqiu.activity.searchmenu.nearby.SearchBilliardsDatingActivity;
+import com.yueqiu.activity.SearchBilliardsDatingActivity;
 import com.yueqiu.adapter.SearchDatingSubFragmentListAdapter;
 import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
 import com.yueqiu.constant.HttpConstants;
@@ -111,15 +114,51 @@ public class BilliardsSearchDatingFragment extends Fragment
 
     private static class OnFilterBtnClickListener implements View.OnClickListener
     {
+        private LayoutInflater inflater = (LayoutInflater) sContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        private PopupWindow popupWindow;
+
         @Override
         public void onClick(View v)
         {
             switch (v.getId()) {
                 case R.id.btn_dating_distance:
-                    SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnDistan, R.layout.search_mate_subfragment_distance_popupwindow);
+                    String[] disStrList = {
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_500_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_1000_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_2000_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_5000_str)
+                    };
+
+                    View distanPopupView = inflater.inflate(R.layout.search_mate_subfragment_distance_popupwindow, null);
+
+                    Button btnDistanceNoFilter = (Button) distanPopupView.findViewById(R.id.search_mate_popupwindow_intro);
+                    btnDistanceNoFilter.setOnClickListener(new DatingPopupWindowInternalClickHandler());
+                    ListView distanList = (ListView) distanPopupView.findViewById(R.id.list_search_mate_distance_filter_list);
+                    distanList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, disStrList));
+
+                    SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistan, distanPopupView);
+
                     break;
                 case R.id.btn_dating_publichdate:
-                    SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnPublishDate, R.layout.search_mate_subfragment_gender_popupwindow);
+
+                    String[] dateStrList = {
+                            sContext.getResources().getString(R.string.search_dating_popupwindow_one),
+                            sContext.getResources().getString(R.string.search_dating_popupwindow_two),
+                            sContext.getResources().getString(R.string.search_dating_popupwindow_three),
+                            sContext.getResources().getString(R.string.search_dating_popupwindow_four),
+                            sContext.getResources().getString(R.string.search_dating_popupwindow_five),
+                            sContext.getResources().getString(R.string.search_dating_popupwindow_six),
+                            sContext.getResources().getString(R.string.search_dating_popupwindow_seven),
+                            sContext.getResources().getString(R.string.search_dating_popupwindow_other),
+                    };
+
+                    View datePopupView = inflater.inflate(R.layout.search_dating_subfragment_date_popupwindow, null);
+                    Button btnDateNoFilter = (Button) datePopupView.findViewById(R.id.btn_search_dating_popup_no_filter);
+                    btnDateNoFilter.setOnClickListener(new DatingPopupWindowInternalClickHandler());
+                    ListView dateList = (ListView) datePopupView.findViewById(R.id.list_search_dating_date_filter_list);
+                    dateList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, dateStrList));
+
+                    popupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnPublishDate, datePopupView);
                     break;
                 default:
                     break;
@@ -128,6 +167,21 @@ public class BilliardsSearchDatingFragment extends Fragment
         }
     }
 
+
+    private static class DatingPopupWindowInternalClickHandler implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v)
+        {
+            switch (v.getId())
+            {
+                case R.id.btn_search_dating_popup_no_filter:
+                    Toast.makeText(sContext, "No filtering, list all", Toast.LENGTH_LONG).show();
+                    break;
+
+            }
+        }
+    }
 
     /**
      *

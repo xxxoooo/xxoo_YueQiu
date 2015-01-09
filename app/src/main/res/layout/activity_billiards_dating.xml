@@ -165,8 +165,10 @@
         android:layout_margin="6dp"
         android:textStyle="bold"
         android:textColor="@android:color/white"
-        android:background="@drawable/login_button_bg"
+        android:background="@drawable/search_dating_detailed_btn_bg_cancel"
         />
+
+    <!--android:background="@drawable/login_button_bg"-->
 
 </RelativeLayout>
 

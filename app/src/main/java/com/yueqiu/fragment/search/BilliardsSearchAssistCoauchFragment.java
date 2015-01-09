@@ -9,8 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 
 import com.yueqiu.R;
 import com.yueqiu.adapter.SearchAssistCoauchSubFragmentListAdapter;
@@ -83,15 +85,35 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
 
     private static class OnFilterBtnClickListener implements View.OnClickListener
     {
+        private LayoutInflater inflater = (LayoutInflater) sContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        private PopupWindow popupWindow;
+
         @Override
         public void onClick(View v)
         {
             switch (v.getId()) {
                 case R.id.btn_assistcoauch_distance:
-                    SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnDistance, R.layout.search_mate_subfragment_distance_popupwindow);
+                    String[] disStrList = {
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_500_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_1000_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_2000_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_5000_str)
+                    };
+
+                    View distanceFilterView = inflater.inflate(R.layout.search_mate_subfragment_distance_popupwindow, null);
+                    Button btnDistanceNoFilter = (Button) distanceFilterView.findViewById(R.id.search_mate_popupwindow_intro);
+                    btnDistanceNoFilter.setOnClickListener(new AssistCoauchPopupInternalHandler());
+                    ListView distanList = (ListView) distanceFilterView.findViewById(R.id.list_search_mate_distance_filter_list);
+                    distanList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, disStrList));
+
+                    popupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistance, distanceFilterView);
+
                     break;
                 case R.id.btn_assistcoauch_cost:
                     SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnCost, R.layout.search_mate_subfragment_gender_popupwindow);
+
+
+
                     break;
                 case R.id.btn_assistcoauch_kinds:
                     SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnCost, R.layout.search_mate_subfragment_distance_popupwindow);
@@ -102,6 +124,16 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
                 default:
                     break;
             }
+        }
+    }
+
+    private final static class AssistCoauchPopupInternalHandler implements View.OnClickListener
+    {
+
+        @Override
+        public void onClick(View v)
+        {
+
         }
     }
 

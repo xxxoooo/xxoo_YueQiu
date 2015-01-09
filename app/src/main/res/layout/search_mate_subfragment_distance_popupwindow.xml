@@ -4,9 +4,9 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:layout_margin="5dp"
-    android:padding="4dp">
+    >
 
-    <TextView
+    <Button
         style="@style/PopupWindowTvStyle"
         android:id="@+id/search_mate_popupwindow_intro"
         android:text="@string/search_mate_popupmenu_item_filter_str"
@@ -19,56 +19,63 @@
         android:background="@android:color/holo_red_light">
     </View>
 
-    <TextView
-        style="@style/PopupWindowTvStyle"
-        android:id="@+id/search_mate_popupwindow_500"
-        android:text="@string/search_mate_popupmenu_item_500_str"
-        android:layout_margin="2dp"
-        />
+    <!--我们将以下的窗口内容从button替换成listView来实现-->
 
-    <View
+    <ListView
+        android:id="@+id/list_search_mate_distance_filter_list"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/darker_gray">
-    </View>
+        android:layout_height="wrap_content"
+        android:dividerHeight="2dp"
+        android:divider="@android:color/darker_gray">
 
-    <TextView
-        style="@style/PopupWindowTvStyle"
-        android:id="@+id/search_mate_popupwindow_1000"
-        android:text="@string/search_mate_popupmenu_item_1000_str"
-        android:layout_margin="2dp"
-        />
+    </ListView>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/darker_gray">
-    </View>
+    <!--我们暂时还不确定究竟是使用ListView还是一串Button两种方式究竟哪一种更有效率-->
+    <!--<Button-->
+        <!--style="@style/PopupWindowTvStyle"-->
+        <!--android:id="@+id/search_mate_popupwindow_500"-->
+        <!--android:text="@string/search_mate_popupmenu_item_500_str"-->
+        <!--android:layout_margin="2dp"-->
+        <!--/>-->
 
-    <TextView
-        style="@style/PopupWindowTvStyle"
-        android:id="@+id/search_mate_popupwindow_2000"
-        android:text="@string/search_mate_popupmenu_item_2000_str"
-        android:layout_margin="2dp"
-        />
+    <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="2dp"-->
+        <!--android:background="@android:color/darker_gray">-->
+    <!--</View>-->
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/darker_gray">
-    </View>
+    <!--<Button-->
+        <!--style="@style/PopupWindowTvStyle"-->
+        <!--android:id="@+id/search_mate_popupwindow_1000"-->
+        <!--android:text="@string/search_mate_popupmenu_item_1000_str"-->
+        <!--android:layout_margin="2dp"-->
+        <!--/>-->
 
-    <TextView
-        style="@style/PopupWindowTvStyle"
-        android:id="@+id/search_mate_popupwindow_3000"
-        android:text="@string/search_mate_popupmenu_item_5000_str"
-        android:layout_margin="2dp"
-        />
+    <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="2dp"-->
+        <!--android:background="@android:color/darker_gray">-->
+    <!--</View>-->
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/darker_gray">
-    </View>
+    <!--<Button-->
+        <!--style="@style/PopupWindowTvStyle"-->
+        <!--android:id="@+id/search_mate_popupwindow_2000"-->
+        <!--android:text="@string/search_mate_popupmenu_item_2000_str"-->
+        <!--android:layout_margin="2dp"-->
+        <!--/>-->
+
+    <!--<View-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="2dp"-->
+        <!--android:background="@android:color/darker_gray">-->
+    <!--</View>-->
+
+    <!--<Button-->
+        <!--style="@style/PopupWindowTvStyle"-->
+        <!--android:id="@+id/search_mate_popupwindow_3000"-->
+        <!--android:text="@string/search_mate_popupmenu_item_5000_str"-->
+        <!--android:layout_margin="2dp"-->
+        <!--/>-->
+
 
 </LinearLayout>

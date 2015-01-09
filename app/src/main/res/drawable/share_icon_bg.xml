@@ -2,14 +2,13 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--创建用于约球分享的图标的背景-->
-    <item>
-        <shape android:shape="rectangle"></shape>
-        <color android:color="@color/white"></color>
-    </item>
 
     <item android:state_pressed="true">
         <shape android:shape="rectangle">
+            <corners android:radius="4dp">
+            </corners>
+            <solid android:color="#f17935"/>
         </shape>
-        <color android:color="@color/light_blue"></color>
     </item>
+
 </selector>

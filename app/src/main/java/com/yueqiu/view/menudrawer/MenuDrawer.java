@@ -1107,7 +1107,7 @@ public abstract class MenuDrawer extends ViewGroup {
             invalidate();
 
             if (!mIndicatorScroller.isFinished()) {
-                postOnAnimation(mIndicatorRunnable);
+                //postOnAnimation(mIndicatorRunnable);
                 return;
             }
         }

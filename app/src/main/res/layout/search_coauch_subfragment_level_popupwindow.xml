@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <!-- 用于教练的资质的筛选的popupWindow -->
+    <Button
+        style="@style/PopupWindowTvStyle"
+        android:textColor="@android:color/holo_red_light"
+        android:id="@+id/btn_search_coauch_level_popup_no_filter"
+        android:text="@string/search_coauch_filter_level_no_filter"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:background="@android:color/holo_red_light"/>
+
+
+    <ListView
+        android:id="@+id/list_search_coauch_level_filter_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:dividerHeight="2dp"
+        android:divider="@android:color/darker_gray">
+
+    </ListView>
+
+</LinearLayout>

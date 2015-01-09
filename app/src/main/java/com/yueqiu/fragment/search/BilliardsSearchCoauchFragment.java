@@ -10,8 +10,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.adapter.SearchCoauchSubFragmentListAdapter;
@@ -99,23 +102,66 @@ public class BilliardsSearchCoauchFragment extends Fragment
 
     private static class OnFilterBtnClickListener implements View.OnClickListener
     {
+        private LayoutInflater inflater = (LayoutInflater) sContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        private PopupWindow popupWindow;
+
         @Override
         public void onClick(View v)
         {
             switch (v.getId()) {
                 case R.id.btn_coauch_ability:
-                    SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnAbility, R.layout.search_mate_subfragment_distance_popupwindow);
+                    View levelPopupView = inflater.inflate(R.layout.search_coauch_subfragment_level_popupwindow, null);
+
+                    String[] levelStrList = {
+                            sContext.getResources().getString(R.string.search_coauch_filter_level_guojiadui),
+                            sContext.getResources().getString(R.string.search_coauch_filter_level_in_guojiadui),
+                            sContext.getResources().getString(R.string.search_coauch_filter_level_pre_guojiadui),
+                    };
+
+                    Button btnLevelNoFilter = (Button) levelPopupView.findViewById(R.id.btn_search_coauch_level_popup_no_filter);
+                    btnLevelNoFilter.setOnClickListener(new CoauchFilterPopupInternalHandler());
+                    ListView levelList = (ListView) levelPopupView.findViewById(R.id.list_search_coauch_level_filter_list);
+                    levelList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, levelStrList));
+                    SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnAbility, levelPopupView);
                     break;
                 case R.id.btn_coauch_kinds:
-                    SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnKinds, R.layout.search_mate_subfragment_distance_popupwindow);
+                    String[] kindsStrList = {
+                            sContext.getResources().getString(R.string.search_coauch_filter_kinds_desk),
+                            sContext.getResources().getString(R.string.search_coauch_filter_kinds_jiuqiu),
+                            sContext.getResources().getString(R.string.search_coauch_filter_kinds_sinuoke)
+                    };
+
+                    View kindsPopupView = inflater.inflate(R.layout.search_coauch_subfragment_kinds_popupwindow, null);
+
+                    Button btnKindsNoFilter = (Button) kindsPopupView.findViewById(R.id.btn_search_coauch_kinds_popup_no_filter);
+                    btnKindsNoFilter.setOnClickListener(new CoauchFilterPopupInternalHandler());
+                    ListView kindsList = (ListView) kindsPopupView.findViewById(R.id.list_search_coauch_kinds_filter_list);
+                    kindsList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, kindsStrList));
+                    SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnKinds, kindsPopupView);
+
                     break;
                 default:
                     break;
             }
-
         }
     }
 
+    private final static class CoauchFilterPopupInternalHandler implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v)
+        {
+            switch (v.getId())
+            {
+                case R.id.btn_search_coauch_level_popup_no_filter:
+                    Toast.makeText(sContext, "do not filter the level", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.btn_search_coauch_kinds_popup_no_filter:
+                    Toast.makeText(sContext, "do not filter the kinds", Toast.LENGTH_SHORT).show();
+
+            }
+        }
+    }
 
     // TODO: 用于获取教练的列表信息的网络请求处理过程
     private static void retrieveCoauchInfo(final String userId, final String range, final int level, final int startNum, final int endNum)

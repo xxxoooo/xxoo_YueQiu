@@ -28,6 +28,7 @@ public class SubFragmentsCommonUtils
 {
     private static final String TAG = "SubFragmentsCommonUtils";
 
+
     // 定义用于处理从Fragment的ListView点击之后切换到具体的Activity时的切换过程
     // 以下是用于球厅Fragment当中需要传输的数据的详细的key值
     public static final String KEY_BUNDLE_SEARCH_ROOM_FRAGMENT = "searchRoomFragment";
@@ -59,11 +60,14 @@ public class SubFragmentsCommonUtils
 
     private SubFragmentsCommonUtils(){}
 
+
+    // TODO: 以下的这个方法已经不再使用，在确定没有类用这个方法之后就删除掉
     /**
      * @param context
      * @param anchorView  当前的popupWindow是依附于具体的哪一个View组件
      * @param layoutResId 用于显示当前的PopupWindow的具体的布局文件
      */
+    @Deprecated
     public static void initPopupWindow(Context context, View anchorView, int layoutResId)
     {
         final int popupWidth = LinearLayout.LayoutParams.MATCH_PARENT;
@@ -77,16 +81,34 @@ public class SubFragmentsCommonUtils
         popupWindow.setWidth(popupWidth);
         popupWindow.setHeight(popupHeight);
         popupWindow.setFocusable(true);
-        popupWindow.setTouchable(true);
+
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.popup_window_bg));
+
+        popupWindow.showAsDropDown(anchorView);
+    }
+
+    public static PopupWindow getFilterPopupWindow(Context context, View anchorView, View popupLayoutView)
+    {
+        final int popupWidth = LinearLayout.LayoutParams.MATCH_PARENT;
+        final int popupHeight = LinearLayout.LayoutParams.WRAP_CONTENT;
+
+//        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        View popupWindowLayout = layoutInflater.inflate(layoutResId, null);
+
+        final PopupWindow popupWindow = new PopupWindow(context);
+        popupWindow.setContentView(popupLayoutView);
+        popupWindow.setWidth(popupWidth);
+        popupWindow.setHeight(popupHeight);
+        popupWindow.setFocusable(true);
+
         popupWindow.setOutsideTouchable(true);
         popupWindow.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.popup_window_bg));
 
         popupWindow.showAsDropDown(anchorView);
 
-
+        return popupWindow;
     }
-
-
 
     private static void setImgBackground(int selectedItem)
     {

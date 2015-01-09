@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import com.yueqiu.R;
@@ -44,7 +45,12 @@ public class MessageFragment extends Fragment {
         mListView = (ListView) view.findViewById(R.id.chatbar_message_lv_account);
         ChatBarItemAdapter adapter = new ChatBarItemAdapter(getActivity());
         mListView.setAdapter(adapter);
-
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                startActivity(new Intent(getActivity(), AddFriendsActivity.class));
+            }
+        });
         return view;
     }
 

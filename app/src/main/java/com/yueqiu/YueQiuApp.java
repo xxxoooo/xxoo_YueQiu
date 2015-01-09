@@ -26,8 +26,10 @@ public class YueQiuApp extends Application {
         sUserInfo.setUser_id(Integer.valueOf(mSharedPreferences.getString(PublicConstant.USER_ID,"0")));
         sUserInfo.setImg_url(mSharedPreferences.getString(PublicConstant.IMG_URL,""));
         sUserInfo.setTitle(mSharedPreferences.getString(PublicConstant.TITLE,getString(R.string.search_billiard_mate_str)));
+        sUserInfo.setPhone(mSharedPreferences.getString(PublicConstant.PHONE,""));
 
 
 
     }
+
 }

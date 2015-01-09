@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -145,21 +146,58 @@ public class BilliardsSearchMateFragment extends Fragment
      */
     private static class BtnFilterClickListener implements View.OnClickListener
     {
+        private LayoutInflater inflater = (LayoutInflater) sContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        private PopupWindow popupWindow;
         @Override
         public void onClick(View v)
         {
             switch (v.getId()) {
                 case R.id.btn_mate_gender:
-                    SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnGenderFilter, R.layout.search_mate_subfragment_gender_popupwindow);
+                    View genderFilerView = inflater.inflate(R.layout.search_mate_subfragment_gender_popupwindow, null);
+
+                    Button btnMaleFilter = (Button) genderFilerView.findViewById(R.id.search_mate_popupwindow_male);
+                    Button btnFemaleFilter = (Button) genderFilerView.findViewById(R.id.search_mate_popupwindow_female);
+
+                    btnMaleFilter.setOnClickListener(new MatePopupInternalItemHandler());
+                    btnFemaleFilter.setOnClickListener(new MatePopupInternalItemHandler());
+
+                    popupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnGenderFilter, genderFilerView);
                     break;
                 case R.id.btn_mate_distance:
-                    SubFragmentsCommonUtils.initPopupWindow(sContext, sBtnDistanceFilter, R.layout.search_mate_subfragment_distance_popupwindow);
+                    String[] disStrList = {
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_500_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_1000_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_2000_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_5000_str)
+                    };
+
+                    View distanceFilterView = inflater.inflate(R.layout.search_mate_subfragment_distance_popupwindow, null);
+                    Button btnDistanceNoFilter = (Button) distanceFilterView.findViewById(R.id.search_mate_popupwindow_intro);
+                    btnDistanceNoFilter.setOnClickListener(new MatePopupInternalItemHandler());
+                    ListView distanList = (ListView) distanceFilterView.findViewById(R.id.list_search_mate_distance_filter_list);
+                    distanList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, disStrList));
+
+                    popupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistanceFilter, distanceFilterView);
+
                     break;
                 default:
                     break;
             }
         }
     }
+
+    private static final class MatePopupInternalItemHandler implements View.OnClickListener
+    {
+
+        @Override
+        public void onClick(View v)
+        {
+
+        }
+    }
+
+
+
 
     // TODO: 以下我们暂时采用的默认数据是1000米，筛选性别为女性作为默认的条件(需要同服务器端进一步确定默认的条件)
 

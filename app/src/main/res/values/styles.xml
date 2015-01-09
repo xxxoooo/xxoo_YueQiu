@@ -50,13 +50,13 @@
     <!--用于SearchActivity定义PopupWindow当中的TextView的style-->
     <style name="PopupWindowTvStyle" parent="AppTheme">
         <item name="android:textStyle">normal</item>
-        <item name="android:textSize">24sp</item>
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">19sp</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_gravity">left</item>
+        <item name="android:gravity">left|center_vertical</item>
         <item name="android:textColor">@android:color/darker_gray</item>
-        <item name="android:padding">3dp</item>
+        <item name="android:padding">1dp</item>
+        <item name="android:background">@drawable/popup_window_item_bg</item>
     </style>
 
     <!--用于SearchActivity当中的所有的子Fragment当中的ListView的基本的style定义-->
@@ -85,8 +85,8 @@
     <!--定义SearchActivity当中的Ratingbar的style-->
     <!--我们通过定义RatingBar的style来实现我们需要的RatingBar-->
     <style name="SearchActivityRatingBarStyle" parent="@android:style/Widget.RatingBar">
-        <item name="android:minHeight">17dp</item>
-        <item name="android:maxHeight">17dp</item>
+        <item name="android:minHeight">15dp</item>
+        <item name="android:maxHeight">15dp</item>
         <item name="android:stepSize">0.5</item>
         <item name="android:isIndicator">true</item>
         <item name="android:progressDrawable">@drawable/rating_bar_drawable</item>
@@ -107,6 +107,7 @@
     <!--用于约球详情分享的PopupWindow当中的TextView(这里我们采用TextView的Drawable
         来实现加载image)-->
     <style name="SearchDatingDetailedImgViewStyle" parent="AppTheme">
+        <item name="android:padding">4dp</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:drawablePadding">4dp</item>
@@ -139,6 +140,17 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">18sp</item>
     </style>
+
+    <style name="ShareWindowStyle" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:background">@drawable/share_popup_window_bg</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowAnimationStyle">@style/SearchDatingDetailedPopupWindowStyle</item>
+    </style>
+
 </resources>
 
 

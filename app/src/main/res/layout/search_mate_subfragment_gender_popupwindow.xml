@@ -6,7 +6,7 @@
               android:layout_margin="5dp"
     android:padding="4dp">
 
-    <TextView
+    <Button
         style="@style/PopupWindowTvStyle"
         android:id="@+id/search_mate_popupwindow_male"
         android:text="@string/search_mate_popupmenu_item_male_str"
@@ -19,7 +19,7 @@
         android:background="@android:color/darker_gray">
     </View>
 
-    <TextView
+    <Button
         style="@style/PopupWindowTvStyle"
         android:id="@+id/search_mate_popupwindow_female"
         android:text="@string/search_mate_popupmenu_item_female_str"

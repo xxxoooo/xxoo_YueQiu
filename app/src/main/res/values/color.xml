@@ -6,7 +6,7 @@
     <color name="edit_text_hint_color">#dbe1e8</color>
     <color name="lightwhite">#fff</color>
     <color name="black">#000</color>
-    <color name="white">#fff</color>
+    <color name="white">#ffffffff</color>
     <color name="whites">#ffffff</color>
     <color name="red">#f00</color>
     <color name="light_blue">#09c</color>
