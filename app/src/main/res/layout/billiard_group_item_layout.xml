@@ -13,7 +13,7 @@
         android:layout_marginBottom="8dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/account"/>
+        android:src="@drawable/head_img"/>
     <TextView
         android:id="@+id/billiard_group_title"
         android:layout_width="wrap_content"

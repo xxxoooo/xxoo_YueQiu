@@ -24,6 +24,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -43,6 +45,7 @@ import com.yueqiu.adapter.SlideViewAdapter;
 import com.yueqiu.bean.ListItem;
 import com.yueqiu.bean.SlideAccountItem;
 import com.yueqiu.bean.SlideOtherItem;
+import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.search.BilliardsSearchAssistCoauchFragment;
@@ -101,6 +104,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
 
@@ -184,7 +188,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setHomeButtonEnabled(true);
         mActionBar.setIcon(R.drawable.slide_menu_icon);
-        mActionBar.setTitle(getString(R.string.billiard_search));
+        mActionBar.setTitle(getString(R.string.app_name));
 
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
@@ -319,10 +323,16 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        //ToDo:不起作用，得重新找方法
+        int search_mag_icon_id = searchView.getContext().getResources().getIdentifier("android:id/search_mag_icon", null, null);
+        ImageView  search_mag_icon = (ImageView)searchView.findViewById(search_mag_icon_id);//获取搜索图标
+        search_mag_icon.setImageResource(R.drawable.search);
+
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
 
         return true;
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
@@ -378,7 +388,6 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
             mItemList.add(otherItem);
         }
 
-        SlideViewAdapter adapter = new SlideViewAdapter(this, mItemList);
         mAdapter = new SlideViewAdapter(this, mItemList);
 
         mMenuList = (ListView) findViewById(R.id.menu_drawer_list);
@@ -472,9 +481,6 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
             }
         });
-//        mMenuDrawer.peekDrawer();
-
-
     }
 
     private Handler mHandler = new Handler()
@@ -497,7 +503,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private void logout()
     {
         Map<String, String> map = new HashMap<String, String>();
-        map.put(PublicConstant.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+        map.put(DatabaseConstant.UserTable.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
         String result = HttpUtil.urlClient(HttpConstants.LogoutConstant.URL,
                 map, HttpConstants.RequestMethod.GET);
         try {
@@ -520,10 +526,10 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         YueQiuApp.sUserInfo.setUser_id(0);
         YueQiuApp.sUserInfo.setPhone("");
 
-        mEditor.putString(PublicConstant.USER_NAME,getString(R.string.guest));
-        mEditor.putString(PublicConstant.USER_ID,"0");
-        mEditor.putString(PublicConstant.IMG_URL,"");
-        mEditor.putString(PublicConstant.PHONE,"");
+        mEditor.putString(DatabaseConstant.UserTable.ACCOUNT,getString(R.string.guest));
+        mEditor.putString(DatabaseConstant.UserTable.USER_ID,"0");
+        mEditor.putString(DatabaseConstant.UserTable.IMG_URL,"");
+        mEditor.putString(DatabaseConstant.UserTable.PHONE,"");
         mEditor.apply();
 
 

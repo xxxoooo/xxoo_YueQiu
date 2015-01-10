@@ -5,14 +5,19 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SearchView;
 
+import com.yueqiu.activity.ActivitiesDetail;
+import com.yueqiu.activity.ActivitiesIssueActivity;
+import com.yueqiu.activity.ActivityBusinessActivities;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.ActivitiesListViewAdapter;
 import com.yueqiu.bean.Activities;
@@ -46,8 +51,18 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
         initData();
         mAdapter = new ActivitiesListViewAdapter(mListData ,ActivitiesActivity.this);
         mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(itemClickListener);
 
     }
+
+
+    private AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            startActivity(new Intent(ActivitiesActivity.this, ActivitiesDetail.class));
+            overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+        }
+    };
 
     private void initData()
     {
@@ -80,13 +95,21 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
                 finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
+            case R.id.menu_activities:
+                startActivity(new Intent(this, ActivityBusinessActivities.class));
+                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                break;
+            case R.id.menu_issue_activities:
+                startActivity(new Intent(ActivitiesActivity.this, ActivitiesIssueActivity.class));
+                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                break;
         }
         return true;
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.billiard_search, menu);
+        getMenuInflater().inflate(R.menu.menu_activities, menu);
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();

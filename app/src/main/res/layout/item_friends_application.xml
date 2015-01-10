@@ -9,6 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="30dp">
     <TextView
+        android:textColor="@color/md__defaultBackground"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="10dp"
@@ -17,12 +18,12 @@
         android:textSize="17sp"
         android:text="@string/qiuyou_request"/>
     <TextView
+        android:textColor="@color/md__defaultBackground"
         android:id="@+id/friends_application_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="2014-12-12"
         android:paddingRight="10dp"
-        android:textColor="@color/gray_font"
         android:layout_alignParentRight="true"
         android:layout_centerInParent="true"/>
     </RelativeLayout>
@@ -48,7 +49,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_centerInParent="true"
-            android:src="@drawable/account"/>
+            android:src="@drawable/head_img"/>
 
         <LinearLayout
             android:layout_toRightOf="@id/friends_application_icon"
@@ -58,6 +59,7 @@
             android:layout_centerInParent="true">
 
             <TextView
+                android:textColor="@color/md__defaultBackground"
                 android:id="@+id/friends_application_username"
                 android:padding="5dp"
                 android:layout_width="wrap_content"
@@ -66,6 +68,7 @@
                 android:text="tangxin"/>
 
             <TextView
+                android:textColor="@color/md__defaultBackground"
                 android:id="@+id/friends_application_message"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

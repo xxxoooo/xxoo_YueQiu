@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/activity_type00"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="@string/groupactivity"
+            android:textSize="18sp" />
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/iv_activity_select_type_00"
+            android:layout_width="wrap_content"
+            android:src="@drawable/choose"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/devide_line" />
+
+    <RelativeLayout
+        android:id="@+id/activity_type01"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="@string/meetstar"
+            android:textSize="18sp" />
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/iv_activity_select_type_01"
+            android:layout_width="wrap_content"
+            android:src="@drawable/choose"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/devide_line" />
+
+    <RelativeLayout
+        android:id="@+id/activity_type02"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:gravity="center_vertical"
+            android:text="@string/taiqiuzhan"
+            android:textSize="18sp" />
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/iv_activity_select_type_02"
+            android:layout_width="wrap_content"
+            android:src="@drawable/choose"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/devide_line" />
+
+    <RelativeLayout
+        android:id="@+id/activity_type03"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="@string/complete"
+            android:textSize="18sp" />
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/iv_activity_select_type_03"
+            android:layout_width="wrap_content"
+            android:src="@drawable/choose"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/devide_line" />
+
+    <RelativeLayout
+        android:id="@+id/activity_type04"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.8"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="@string/billiard_other"
+            android:textSize="18sp" />
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/iv_activity_select_type_04"
+            android:layout_width="wrap_content"
+            android:src="@drawable/choose"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/devide_line" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="5">
+
+    </LinearLayout>
+</LinearLayout>

@@ -2,7 +2,13 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -19,18 +25,27 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.yueqiu.BilliardSearchActivity;
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
+import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.db.DBUtils;
+import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -45,10 +60,17 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
     private static final int CODE_WOMAN = 1;
     private EditText mEtUserName,mEtPwd,mEtNumber;
     private Button mBtnRegister;
-    private TextView mTvLogin,mReadArticle,mEtSex;
+    private TextView mTvLogin,mReadArticle,mEtSex,mPreText;
+    private ProgressBar mPreProgress;
+    private Drawable mProgressDrawable;
     private CheckBox mCheckBox;
     private Intent mIntent;
-    private Handler handler = new Handler()
+    private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
+    private String mAccount;
+    private String mPhone;
+    private String mPassword;
+    private Handler mHandler = new Handler()
     {
         @Override
         public void handleMessage(Message msg) {
@@ -60,6 +82,23 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                     break;
                 case REGISTER_SUCCESS:
                     toast(getString(R.string.register_success));
+                    Map<String,String> map = (Map<String, String>) msg.obj;
+
+                    YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(DatabaseConstant.UserTable.USER_ID)));
+                    YueQiuApp.sUserInfo.setPhone(map.get(DatabaseConstant.UserTable.PHONE));
+                    YueQiuApp.sUserInfo.setLogin_time(map.get(DatabaseConstant.UserTable.LOGIN_TIME));
+                    YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.ACCOUNT));
+
+                    Iterator iter = map.entrySet().iterator();
+                    while(iter.hasNext()){
+                        Map.Entry<String,String> entry = (Map.Entry<String, String>) iter.next();
+                        mEditor.putString(entry.getKey(), entry.getValue());
+                    }
+                    mEditor.apply();
+
+                    insertUserInfo(map);
+                    Intent intent = new Intent(RegisterActivity.this, BilliardSearchActivity.class);
+                    startActivity(intent);
                     RegisterActivity.this.finish();
                     overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);
                     break;
@@ -73,6 +112,9 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
         setContentView(R.layout.activity_register);
         initActionBar();
         initView();
+        mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
+
     }
 
     private void initActionBar(){
@@ -99,6 +141,15 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
         mCheckBox = (CheckBox) findViewById(R.id.register_agree_article_check);
         mReadArticle = (TextView) findViewById(R.id.register_read_and_agree_the_article);
 
+        mPreText = (TextView) findViewById(R.id.pre_text);
+        mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
+
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(this).build();
+        Rect bounds = mPreProgress.getIndeterminateDrawable().getBounds();
+        mPreProgress.setIndeterminateDrawable(mProgressDrawable);
+        mPreProgress.getIndeterminateDrawable().setBounds(bounds);
+        mPreText.setText(getString(R.string.pre_register_text));
+
         SpannableString spanStr = new SpannableString(getString(R.string.already_read_and_agree_the_article));
         spanStr.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.have_agree_and_read)), 0, 7,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanStr.setSpan(new URLSpan("http://www.baidu.com"),7,16,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -118,25 +169,25 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
         {
 
             case R.id.activity_register_btn_register:
-                String account = mEtUserName.getText().toString().trim();
-                if(TextUtils.isEmpty(account))
+                mAccount = mEtUserName.getText().toString().trim();
+                if(TextUtils.isEmpty(mAccount))
                 {
                     toast(getString(R.string.account_null));
                     return ;
                 }
-                String phone = mEtNumber.getText().toString().trim();
-                if(TextUtils.isEmpty(phone))
+                mPhone = mEtNumber.getText().toString().trim();
+                if(TextUtils.isEmpty(mPhone))
                 {
                     toast(getString(R.string.phone_null));
                     return ;
                 }
-                String password = mEtPwd.getText().toString().trim();
-                if(TextUtils.isEmpty(password))
+                mPassword = mEtPwd.getText().toString().trim();
+                if(TextUtils.isEmpty(mPassword))
                 {
                     toast(getString(R.string.password_null));
                     return ;
                 }
-                if(password.length() < 6 )
+                if(mPassword.length() < 6 )
                 {
                     toast(getString(R.string.please_input_password));
                     return ;
@@ -145,8 +196,19 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                     toast(getString(R.string.please_read_article));
                     return;
                 }
+
+                Map<String, String> requestMap = new HashMap<String, String>();
+                requestMap.put(HttpConstants.RegisterConstant.ACCOUNT, mAccount);
+                requestMap.put(HttpConstants.RegisterConstant.PHONE, mPhone);
+                requestMap.put(HttpConstants.RegisterConstant.SEX, mEtSex.getText().toString().trim().equals(
+                        getString(R.string.man)) ? String.valueOf(1) : String.valueOf(2));
+                requestMap.put(HttpConstants.RegisterConstant.PASSWORD, mPassword);
+
+                Map<String,String> paramMap = new HashMap<String, String>();
+                paramMap.put(PublicConstant.URL,HttpConstants.RegisterConstant.URL);
+                paramMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
                 if(Utils.networkAvaiable(RegisterActivity.this)) {
-                    register(account, phone, mEtSex.getText().toString().trim(), password);
+                    new RegisterAsyncTask(requestMap,mPreProgress,mPreText).execute(paramMap);
                 }else{
                     Toast.makeText(RegisterActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
                 }
@@ -197,43 +259,36 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
     }
 
 
-    private void register(final String account,final String phone,
-                          final String sex, final String pwd)
-    {
-        final Map<String, String> requestMap = new HashMap<String, String>();
-        requestMap.put(HttpConstants.RegisterConstant.ACCOUNT, account);
-        requestMap.put(HttpConstants.RegisterConstant.PHONE, phone);
-        requestMap.put(HttpConstants.RegisterConstant.SEX, sex.equals(
-                getString(R.string.man)) ? String.valueOf(1) : String.valueOf(2));
-        requestMap.put(HttpConstants.RegisterConstant.PASSWORD, pwd);
-        new Thread()
-        {
-            @Override
-            public void run() {
-                super.run();
-                String result = HttpUtil.urlClient(HttpConstants.RegisterConstant.URL,
-                        requestMap,HttpConstants.RequestMethod.POST);
-                try {
-                    JSONObject object = new JSONObject(result);
-                    Message msg = new Message();
-                    if(object.getInt("code") != HttpConstants.ResponseCode.NORMAL)
-                    {
-                        msg.what = REGISTER_ERROR;
-                        msg.obj = object.getString("msg");
-                    }
-                    else
-                    {
-                        msg.what = REGISTER_SUCCESS;
-                        msg.obj = object.getString("msg");
-                    }
-                    handler.sendMessage(msg);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+    private class RegisterAsyncTask extends AsyncTaskUtil<String>{
 
+        public RegisterAsyncTask(Map<String, String> map, ProgressBar progressBar, TextView textView) {
+            super(map, progressBar, textView);
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject object) {
+            super.onPostExecute(object);
+            try {
+                if(object.getInt("code") != HttpConstants.ResponseCode.NORMAL)
+                {
+                    mHandler.obtainMessage(REGISTER_ERROR,object.getString("msg")).sendToTarget();
+                }
+                else
+                {
+                    Map<String,String> map = new HashMap<String, String>();
+                    map.put(DatabaseConstant.UserTable.ACCOUNT,mAccount);
+                    map.put(DatabaseConstant.UserTable.USER_ID,object.getJSONObject("result").
+                            getString(DatabaseConstant.UserTable.USER_ID));
+                    map.put(DatabaseConstant.UserTable.PHONE, object.getJSONObject("result").getString(DatabaseConstant.UserTable.PHONE));
+                    map.put(DatabaseConstant.UserTable.LOGIN_TIME,object.getJSONObject("result").getString(DatabaseConstant.UserTable.LOGIN_TIME));
+                    mHandler.obtainMessage(REGISTER_SUCCESS,map).sendToTarget();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        }.start();
+        }
     }
+
 
 
     @Override
@@ -246,5 +301,37 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
         }
         return super.onKeyDown(keyCode, event);
     }
+
+    private void insertUserInfo(Map<String,String> map){
+        ContentValues values = new ContentValues();
+
+        values.put(DatabaseConstant.UserTable.USER_ID,map.get(DatabaseConstant.UserTable.USER_ID));
+        values.put(DatabaseConstant.UserTable.ACCOUNT,map.get(DatabaseConstant.UserTable.ACCOUNT));
+        values.put(DatabaseConstant.UserTable.PHONE, map.get(DatabaseConstant.UserTable.PHONE));
+        values.put(DatabaseConstant.UserTable.PASSWORD,"");
+        values.put(DatabaseConstant.UserTable.SEX,1);
+        values.put(DatabaseConstant.UserTable.TITLE,"");
+        values.put(DatabaseConstant.UserTable.IMG_URL,"");
+        values.put(DatabaseConstant.UserTable.IMG_REAL,"");
+        values.put(DatabaseConstant.UserTable.USERNAME,"");
+        values.put(DatabaseConstant.UserTable.DISTRICT,"");
+        values.put(DatabaseConstant.UserTable.LEVEL,1);
+        values.put(DatabaseConstant.UserTable.BALL_TYPE,1);
+        values.put(DatabaseConstant.UserTable.APPOINT_DATE,"");
+        values.put(DatabaseConstant.UserTable.BALLARM,1);
+        values.put(DatabaseConstant.UserTable.USERDTYPE,1);
+        values.put(DatabaseConstant.UserTable.BALLAGE, 3);
+        values.put(DatabaseConstant.UserTable.IDOL,"");
+        values.put(DatabaseConstant.UserTable.IDOL_NAME,"");
+        values.put(DatabaseConstant.UserTable.NEW_IMG,"");
+        values.put(DatabaseConstant.UserTable.NEW_IMG_REAL,"");
+        values.put(DatabaseConstant.UserTable.LOGIN_TIME,map.get(DatabaseConstant.UserTable.LOGIN_TIME));
+
+        DBUtils dbUtil = new DBUtils(this, DatabaseConstant.UserTable.CREATE_SQL);
+        SQLiteDatabase db = dbUtil.getWritableDatabase();
+        db.insert(DatabaseConstant.UserTable.TABLE,null,values);
+    }
+
+
 
 }

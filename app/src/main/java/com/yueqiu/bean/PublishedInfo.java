@@ -1,12 +1,30 @@
 package com.yueqiu.bean;
 
+import com.yueqiu.YueQiuApp;
+import com.yueqiu.util.JSONHelper;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by wangyun on 15/1/4.
  */
-public class PublishedInfo {
+public class PublishedInfo implements JSONHelper {
+
+    private static final String USER_ID     = "user_id";
+    private static final String STAR_NO     = "start_no";
+    private static final String END_NO      = "end_no";
+    private static final String COUNT       = "count";
+    private static final String LIST_DATA   = "list_data";
+    private static final String ID          = "id";
+    private static final String IMG_URL     = "img_url";
+    private static final String TITLE       = "title";
+    private static final String CONTENT     = "content";
+    private static final String CREATE_TIME = "create_time";
 
     private int user_id;
     private int type;/*发布类型*/
@@ -14,6 +32,27 @@ public class PublishedInfo {
     private int end_no;/*结束条数*/
     private int sumCount;/*总条数*/
     public List<PublishedItemInfo> mList = new ArrayList<PublishedItemInfo>();
+
+    @Override
+    public JSONObject toJSON() throws JSONException {
+        JSONObject object = new JSONObject();
+        object.put(USER_ID, getUser_id());
+        object.put(STAR_NO,getStart_no());
+        object.put(END_NO,getEnd_no());
+        object.put(COUNT,getSumCount());
+        JSONArray array = new JSONArray();
+        for(int i=0;i<mList.size();i++) {
+            JSONObject data = new JSONObject();
+            data.put(ID, mList.get(i).getTable_id());
+            data.put(IMG_URL,mList.get(i).getImage_url());
+            data.put(TITLE,mList.get(i).getTitle());
+            data.put(CONTENT,mList.get(i).getContent());
+            data.put(CREATE_TIME,mList.get(i).getDateTime());
+            array.put(data);
+        }
+        object.put(LIST_DATA,array);
+        return null;
+    }
 
 
     public class PublishedItemInfo{

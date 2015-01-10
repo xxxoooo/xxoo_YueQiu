@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="google_colors">
+        <item>@color/actionbar_color</item>
+        <item>@color/login_btn_normal</item>
+        <item>@color/light_blue</item>
+        <item>@color/login_btn_pressed</item>
+
+    </integer-array>
+</resources>
