@@ -217,6 +217,7 @@ public class SubFragmentsCommonUtils
             @Override
             public void onPageScrolled(int i, float v, int i2)
             {
+
             }
 
             @Override
@@ -225,6 +226,7 @@ public class SubFragmentsCommonUtils
                 Log.d(TAG, " the current page index are : " + i + ", and the selected index are : " + i % sPagerImgArr.length);
 //                setImgBackground(i % sPagerImgArr.length);
                 setImgBackground(i % size);
+
             }
 
             @Override

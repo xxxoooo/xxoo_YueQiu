@@ -10,13 +10,14 @@
         style="@style/PopupWindowTvStyle"
         android:id="@+id/search_mate_popupwindow_intro"
         android:text="@string/search_mate_popupmenu_item_filter_str"
-        android:textColor="@android:color/holo_red_light"
+        android:textColor="@color/login_btn_normal"
+        android:padding="5dp"
         />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/holo_red_light">
+        android:layout_height="1dp"
+        android:background="@color/login_btn_normal">
     </View>
 
     <!--我们将以下的窗口内容从button替换成listView来实现-->
@@ -25,8 +26,8 @@
         android:id="@+id/list_search_mate_distance_filter_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:dividerHeight="2dp"
-        android:divider="@android:color/darker_gray">
+        android:dividerHeight="0.5dp"
+        android:divider="@color/devide_line">
 
     </ListView>
 

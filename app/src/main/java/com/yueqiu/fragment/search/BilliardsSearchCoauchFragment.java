@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.adapter.SearchCoauchSubFragmentListAdapter;
+import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchCoauchSubFragmentCoauchBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
@@ -30,6 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -126,7 +128,7 @@ public class BilliardsSearchCoauchFragment extends Fragment
                     Button btnLevelNoFilter = (Button) levelPopupView.findViewById(R.id.btn_search_coauch_level_popup_no_filter);
                     btnLevelNoFilter.setOnClickListener(new CoauchFilterPopupInternalHandler());
                     ListView levelList = (ListView) levelPopupView.findViewById(R.id.list_search_coauch_level_filter_list);
-                    levelList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, levelStrList));
+                    levelList.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(levelStrList)));
                     SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnAbility, levelPopupView);
                     break;
                 case R.id.btn_coauch_kinds:
@@ -141,7 +143,7 @@ public class BilliardsSearchCoauchFragment extends Fragment
                     Button btnKindsNoFilter = (Button) kindsPopupView.findViewById(R.id.btn_search_coauch_kinds_popup_no_filter);
                     btnKindsNoFilter.setOnClickListener(new CoauchFilterPopupInternalHandler());
                     ListView kindsList = (ListView) kindsPopupView.findViewById(R.id.list_search_coauch_kinds_filter_list);
-                    kindsList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, kindsStrList));
+                    kindsList.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(kindsStrList)));
                     SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnKinds, kindsPopupView);
 
                     break;

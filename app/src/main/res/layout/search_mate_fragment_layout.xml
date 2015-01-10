@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/search_gallery_pager_test_str"
                 android:textStyle="normal"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/md__defaultBackground"
                 android:padding="2dp"
                 android:textSize="13sp"
                 />
@@ -80,14 +80,15 @@
             />
 
         <View
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="3dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:padding="5dp"
-            android:layout_width="3dp"
+            android:layout_width="0.5dp"
             android:layout_height="match_parent"
-            android:background="@color/light_gray"
+            android:layout_margin="5dp"
+            android:background="@color/search_distance_color"
             >
         </View>
 

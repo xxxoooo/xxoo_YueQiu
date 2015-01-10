@@ -18,6 +18,7 @@ import android.widget.PopupWindow;
 
 import com.yueqiu.R;
 import com.yueqiu.adapter.SearchAssistCoauchSubFragmentListAdapter;
+import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchAssistCoauchSubFragmentBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
@@ -28,6 +29,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -113,7 +116,7 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
                     Button btnDistanceNoFilter = (Button) distanceFilterView.findViewById(R.id.search_mate_popupwindow_intro);
                     btnDistanceNoFilter.setOnClickListener(new AssistCoauchPopupInternalHandler());
                     ListView distanList = (ListView) distanceFilterView.findViewById(R.id.list_search_mate_distance_filter_list);
-                    distanList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, disStrList));
+                    distanList.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(disStrList)));
 
                     popupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistance, distanceFilterView);
 

@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/img_mate_subfragment_listitem_photo"
         android:layout_alignParentLeft="true"
-        android:src="@drawable/head_img"
+        android:src="@drawable/default_head"
         android:layout_centerVertical="true"
         android:padding="2dp"
         />
@@ -30,7 +30,7 @@
         android:layout_marginLeft="15dp"
         android:textColor="@color/md__defaultBackground"
         android:textSize="18sp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="3dp"
         />
 
     <!-- 用于显示用户的性别 -->
@@ -38,7 +38,7 @@
         style="@style/ListItemTvStyle"
         android:id="@+id/tv_mate_subfragment_listitem_gender"
         android:background="@drawable/textview_withdrawable_bg"
-        android:layout_below="@id/tv_mate_subfragment_listitem_nickname"
+        android:layout_alignBottom="@+id/img_mate_subfragment_listitem_photo"
         android:text="@string/search_mate_popupmenu_item_male_str"
         android:layout_toRightOf="@id/img_mate_subfragment_listitem_photo"
         android:drawableRight="@drawable/male"
@@ -46,7 +46,7 @@
         android:paddingLeft="4dp"
         android:padding="4dp"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginBottom="3dp"
         android:textStyle="normal"/>
 
     <!-- 用于显示用户当前所在的区域 -->
