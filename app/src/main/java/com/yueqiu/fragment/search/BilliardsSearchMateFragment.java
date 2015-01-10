@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.yueqiu.R;
 import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
 import com.yueqiu.adapter.SearchMateSubFragmentListAdapter;
+import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
@@ -35,6 +36,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -175,7 +177,7 @@ public class BilliardsSearchMateFragment extends Fragment
                     Button btnDistanceNoFilter = (Button) distanceFilterView.findViewById(R.id.search_mate_popupwindow_intro);
                     btnDistanceNoFilter.setOnClickListener(new MatePopupInternalItemHandler());
                     ListView distanList = (ListView) distanceFilterView.findViewById(R.id.list_search_mate_distance_filter_list);
-                    distanList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, disStrList));
+                    distanList.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(disStrList)));
 
                     popupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistanceFilter, distanceFilterView);
 

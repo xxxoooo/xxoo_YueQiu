@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.activity.SearchBilliardRoomActivity;
+import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.adapter.SearchRoomSubFragmentListAdapter;
 import com.yueqiu.bean.SearchRoomSubFragmentRoomBean;
 import com.yueqiu.constant.HttpConstants;
@@ -27,6 +28,7 @@ import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -172,7 +174,7 @@ public class BilliardsSearchRoomFragment extends Fragment
                     View regionPopupView = layoutInflater.inflate(R.layout.search_room_subfragment_region_popupwindow, null);
                     TextView noFilter = (Button) regionPopupView.findViewById(R.id.btn_search_room_popup_no_filter);
                     ListView regionList = (ListView) regionPopupView.findViewById(R.id.list_search_room_region_filter_list);
-                    regionList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, regionStrList));
+                    regionList.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(regionStrList)));
 
                     mPopupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistrict, regionPopupView);
 
@@ -190,7 +192,7 @@ public class BilliardsSearchRoomFragment extends Fragment
                     Button btnDistanceNoFilter = (Button) distancePopupView.findViewById(R.id.search_mate_popupwindow_intro);
                     btnDistanceNoFilter.setOnClickListener(new PopupWindowInternalItemClickHandler());
                     ListView distanList = (ListView) distancePopupView.findViewById(R.id.list_search_mate_distance_filter_list);
-                    distanList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, disStrList));
+                    distanList.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(disStrList)));
 
                     mPopupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistan, distancePopupView);
 

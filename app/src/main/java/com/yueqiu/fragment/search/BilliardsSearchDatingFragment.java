@@ -21,12 +21,14 @@ import android.widget.Toast;
 import com.yueqiu.R;
 import com.yueqiu.activity.SearchBilliardsDatingActivity;
 import com.yueqiu.adapter.SearchDatingSubFragmentListAdapter;
+import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -134,7 +136,7 @@ public class BilliardsSearchDatingFragment extends Fragment
                     Button btnDistanceNoFilter = (Button) distanPopupView.findViewById(R.id.search_mate_popupwindow_intro);
                     btnDistanceNoFilter.setOnClickListener(new DatingPopupWindowInternalClickHandler());
                     ListView distanList = (ListView) distanPopupView.findViewById(R.id.list_search_mate_distance_filter_list);
-                    distanList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, disStrList));
+                    distanList.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(disStrList)));
 
                     SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistan, distanPopupView);
 
@@ -156,7 +158,7 @@ public class BilliardsSearchDatingFragment extends Fragment
                     Button btnDateNoFilter = (Button) datePopupView.findViewById(R.id.btn_search_dating_popup_no_filter);
                     btnDateNoFilter.setOnClickListener(new DatingPopupWindowInternalClickHandler());
                     ListView dateList = (ListView) datePopupView.findViewById(R.id.list_search_dating_date_filter_list);
-                    dateList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, dateStrList));
+                    dateList.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(dateStrList)));
 
                     popupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnPublishDate, datePopupView);
                     break;

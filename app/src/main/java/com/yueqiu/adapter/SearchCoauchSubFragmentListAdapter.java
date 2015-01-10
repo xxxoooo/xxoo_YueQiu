@@ -80,7 +80,7 @@ public class SearchCoauchSubFragmentListAdapter extends BaseAdapter
         viewHolder.mName.setText(bean.getUserName());
         // TODO: this is the static data, and we should change it to the dynamic data by using the VolleyImageView
         // TODO: or something else that has the same functionality
-        viewHolder.mPhoto.setImageResource(R.drawable.ic_launcher);
+        viewHolder.mPhoto.setImageResource(R.drawable.default_head);
 
         return convertView;
     }

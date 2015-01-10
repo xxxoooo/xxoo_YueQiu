@@ -38,7 +38,7 @@
 
     <style name="ActionBarTabTextStyle" parent="@android:style/Widget.Holo.Light.ActionBar.TabText">
         <item name="android:textColor">@color/md__defaultBackground</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
     </style>
 
@@ -59,12 +59,11 @@
     <!--用于SearchActivity定义PopupWindow当中的TextView的style-->
     <style name="PopupWindowTvStyle" parent="AppTheme">
         <item name="android:textStyle">normal</item>
-        <item name="android:textSize">19sp</item>
+        <item name="android:textSize">18sp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">left|center_vertical</item>
-        <item name="android:textColor">@android:color/darker_gray</item>
-        <item name="android:padding">1dp</item>
+        <item name="android:textColor">@color/login_btn_normal</item>
         <item name="android:background">@drawable/popup_window_item_bg</item>
     </style>
 
@@ -97,6 +96,7 @@
     <style name="SearchActivityRatingBarStyle" parent="@android:style/Widget.RatingBar">
         <item name="android:minHeight">15dp</item>
         <item name="android:maxHeight">15dp</item>
+        <item name="android:maxWidth">50dp</item>
         <item name="android:stepSize">0.5</item>
         <item name="android:isIndicator">true</item>
         <item name="android:progressDrawable">@drawable/rating_bar_drawable</item>
@@ -106,12 +106,11 @@
     <style name="SearchRoomActivityTvStyle" parent="AppTheme">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">19sp</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@android:color/darker_gray</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/md__defaultBackground</item>
         <item name="android:drawablePadding">4dp</item>
         <item name="android:layout_margin">5dp</item>
-        <item name="android:padding">3dp</item>
     </style>
 
     <!--用于约球详情分享的PopupWindow当中的TextView(这里我们采用TextView的Drawable
@@ -123,8 +122,8 @@
         <item name="android:drawablePadding">4dp</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:textColor">@android:color/darker_gray</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/md__defaultBackground</item>
+        <item name="android:textStyle">normal</item>
         <item name="android:clickable">true</item>
         <item name="android:background">@drawable/share_icon_bg</item>
     </style>
@@ -133,8 +132,8 @@
     <style name="SearchDatingBtn" parent="AppTheme">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">23sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">22sp</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_marginBottom">5dp</item>
         <item name="android:layout_marginTop">5dp</item>

@@ -1,33 +1,37 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-    android:id="@+id/search_room_detailed_whole_container">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/search_room_detailed_whole_container"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:weightSum="3">
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/img_search_room_detailed_photo_frame">
+        android:layout_height="0dp"
+        android:id="@+id/img_search_room_detailed_photo_frame"
+        android:layout_weight="1">
 
         <ImageView
-            android:scaleType="fitXY"
-            android:layout_gravity="top"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:id="@+id/img_search_room_detailed_photo"
             android:src="@drawable/test_pager_5"
+            android:scaleType="fitXY"
             />
 
         <RelativeLayout
             android:layout_gravity="bottom"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="#27272726">
+            android:background="#40272726"
+            android:layout_alignParentBottom="true">
 
             <TextView
                 android:id="@+id/tv_search_room_detailed_name"
-                android:textStyle="bold"
+                android:textStyle="normal"
                 android:textSize="17sp"
                 android:layout_centerVertical="true"
                 android:padding="4dp"
@@ -61,10 +65,12 @@
 
         </RelativeLayout>
 
-    </FrameLayout>
-
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.1">
     <TextView
-        android:layout_below="@id/img_search_room_detailed_photo_frame"
         style="@style/SearchRoomActivityTvStyle"
         android:id="@+id/tv_search_room_per_people_price_indi"
         android:drawableLeft="@drawable/price_indicator"
@@ -74,7 +80,6 @@
     <TextView
         android:id="@+id/tv_search_room_per_people_price"
         style="@style/SearchRoomActivityTvStyle"
-        android:layout_below="@id/img_search_room_detailed_photo_frame"
         android:layout_toRightOf="@id/tv_search_room_per_people_price_indi"
         android:text="@string/search_room_detailedactivity_price_test"/>
 
@@ -127,25 +132,25 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/darker_gray"
+        android:background="@color/devide_line"
         android:text="@string/search_room_detailedactivity_detailed_info_separator"
-        android:textStyle="bold"
-        android:textSize="19sp"
-        android:paddingLeft="13dp"
-        android:paddingBottom="7dp"
-        android:paddingTop="7dp"
-        android:paddingRight="7dp"
+        android:textStyle="normal"
+        android:textSize="18sp"
+        android:textColor="@color/md__defaultBackground"
+        android:padding="5dp"
         android:layout_margin="2dp"
         android:layout_below="@id/search_room_phone_indi"
         android:id="@+id/tv_separator"
         />
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/tv_search_room_detailed_info"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_below="@id/tv_separator"
+        android:layout_weight="0.9"
         />
 
 
-</RelativeLayout>
+</LinearLayout>

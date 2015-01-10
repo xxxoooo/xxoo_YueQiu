@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
 
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:src="@drawable/ic_launcher"
+        android:src="@drawable/default_head"
         android:layout_alignParentLeft="true"
         android:padding="2dp"
         android:layout_margin="1dp"
@@ -19,11 +21,11 @@
         android:id="@+id/tv_assistcoauch_subfragment_listitem_name"
         android:text="@string/search_coauch_sub_fragment_listitem_username"
         android:layout_toRightOf="@id/img_assistcoauch_subfragment_listitem_photo"
-        android:layout_marginTop="1dp"
-        android:layout_marginLeft="4dp"
-        android:textColor="@android:color/black"
-        android:padding="4dp"
-        android:textSize="17sp"
+        android:layout_alignTop="@+id/img_assistcoauch_subfragment_listitem_photo"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="15dp"
+        android:textColor="@color/md__defaultBackground"
+        android:textSize="18sp"
         />
 
     <TextView
@@ -32,13 +34,12 @@
         android:background="@drawable/textview_withdrawable_bg"
         android:drawableRight="@drawable/male"
         android:text="@string/search_mate_popupmenu_item_male_str"
-        android:layout_below="@id/tv_assistcoauch_subfragment_listitem_name"
-        android:layout_toRightOf="@id/img_assistcoauch_subfragment_listitem_photo"
+        android:layout_alignBottom="@+id/img_assistcoauch_subfragment_listitem_photo"
+        android:layout_toRightOf="@+id/img_assistcoauch_subfragment_listitem_photo"
         android:padding="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginLeft="4dp"
+        android:layout_marginLeft="15dp"
         android:drawablePadding="3dp"
-        android:textStyle="bold"
+        android:textStyle="normal"
         />
 
     <TextView
@@ -50,7 +51,7 @@
         android:layout_alignBottom="@id/tv_assistcoauch_subfragment_listitem_gender"
         android:padding="4dp"
         android:layout_marginLeft="7dp"
-        android:textStyle="bold"
+        android:textStyle="normal"
         />
 
 
@@ -65,9 +66,9 @@
         android:text="@string/search_assistcaouch_subfragment_listitem_price"
         android:layout_toRightOf="@id/tv_assistcoauch_subfragment_listitem_kinds"
         android:layout_alignBottom="@id/tv_assistcoauch_subfragment_listitem_kinds"
-        android:padding="6dp"
+        android:padding="4dp"
         android:layout_marginLeft="7dp"
-        android:textStyle="bold"
+        android:textStyle="normal"
         />
 
     <TextView
@@ -75,9 +76,10 @@
         android:id="@+id/tv_assistcoauch_subfragment_listitem_distance"
         android:textSize="12sp"
         android:text="@string/search_coauch_sub_fragment_listitem_userdistan"
-        android:layout_marginTop="20dp"
+        android:textColor="@color/search_distance_color"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="3dp"
+        android:layout_marginRight="10dp"
+        android:layout_centerVertical="true"
         />
 
 

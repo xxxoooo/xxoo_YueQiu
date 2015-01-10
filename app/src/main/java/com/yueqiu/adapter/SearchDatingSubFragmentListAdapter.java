@@ -76,7 +76,7 @@ public class SearchDatingSubFragmentListAdapter extends BaseAdapter
         SearchDatingSubFragmentDatingBean bean = mDatingBeanList.get(position);
         if (bean != null)
         {
-            viewHolder.mUserPhoto.setImageResource(R.drawable.ic_launcher);
+            viewHolder.mUserPhoto.setImageResource(R.drawable.default_head);
             viewHolder.mUserNickname.setText(bean.getUserName());
             viewHolder.mUserDistance.setText(bean.getUserDistance());
             viewHolder.mUserDeclareation.setText(bean.getUserDeclare());
