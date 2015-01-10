@@ -71,6 +71,46 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_gravity="center_vertical"
+                android:text="@string/activities_type"
+                android:textSize="18sp"
+                android:textColor="@color/md__defaultBackground"/>
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:background="@color/devide_line"
+                android:layout_gravity="center_vertical"/>
+            <EditText
+                android:id="@+id/activitie_title_edit_type"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColorHint="@color/edit_text_hint_color"
+                android:maxLength="30"
+
+                android:editable="false"
+                android:drawableRight="@drawable/arrow"
+                android:background="@drawable/basic_textview_bg"
+                android:layout_marginRight="5dp"
+                android:layout_gravity="center_vertical"
+                android:textSize="18sp"
+                android:textColor="@color/md__defaultBackground"
+                />
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/devide_line"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center_vertical"
                 android:text="@string/activities_site"
                 android:textSize="18sp"
                 android:textColor="@color/md__defaultBackground"/>
@@ -244,7 +284,6 @@
                 android:background="@null"
                 android:singleLine="true"
                 android:layout_gravity="center_vertical"
-                android:editable="false"
                 android:gravity="center"
                 android:textSize="18sp"
                 android:textColor="@color/md__defaultBackground"
@@ -281,7 +320,6 @@
                 android:background="@null"
                 android:singleLine="true"
                 android:layout_gravity="center_vertical"
-                android:editable="false"
                 android:gravity="center"
                 android:textSize="18sp"
                 android:textColor="@color/md__defaultBackground"
@@ -294,7 +332,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="4"
+            android:layout_weight="3"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
             <TextView
                 android:layout_width="wrap_content"
@@ -323,6 +362,40 @@
                 android:textColor="@color/md__defaultBackground"
                 />
         </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:background="@drawable/login_shape"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/activity_issues_expression"
+                android:layout_alignParentRight="true"
+                android:layout_width="wrap_content"
+                android:src="@drawable/expression"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_height="wrap_content" />
+            </RelativeLayout>
+
+
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="@color/devide_line"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:background="@drawable/login_shape"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="0.4"
+        android:gravity="center_vertical"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/activitiy_issues_iv_add_img"
+            android:src="@drawable/add_img"
+            android:layout_marginLeft="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
 </LinearLayout>

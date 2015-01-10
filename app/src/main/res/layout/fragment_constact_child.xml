@@ -26,6 +26,7 @@
         android:src="@drawable/status_online"
         android:contentDescription="@string/app_name"/>
     <TextView
+        android:textColor="@color/md__defaultBackground"
         android:id="@+id/contact_list_item_time"
         android:layout_width="wrap_content"
         android:layout_height="25dp"
@@ -33,7 +34,6 @@
         android:layout_marginRight="10dp"
         android:layout_alignParentRight="true"
         android:gravity="center_vertical"
-        android:textColor="@color/gray"
         android:text="12-19 23:12"/>
 
     <LinearLayout
@@ -44,6 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
+            android:textColor="@color/md__defaultBackground"
             android:id="@+id/contact_list_item_name"
             android:layout_width="match_parent"
             android:layout_height="25.0dip"
@@ -57,6 +58,7 @@
             android:textSize="21.0sp" />
 
         <TextView
+            android:textColor="@color/md__defaultBackground"
             android:id="@+id/cpntact_list_item_state"
             android:layout_width="match_parent"
             android:layout_height="25.0dip"
@@ -67,7 +69,6 @@
             android:includeFontPadding="false"
             android:padding="0.0dip"
             android:singleLine="true"
-            android:textColor="@color/gray"
             android:textSize="15.0sp" />
         </LinearLayout>
 

@@ -109,20 +109,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
 
     //初始化我的资料数据
     private void initData() {
-//        mJSONArray = Utils.getJSONFromLocal(this);
-//        try {
-//            mUserInfo = new UserInfo(mJSONArray.getJSONObject(0));
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        };
-//        if (mUserInfo != null) {
-//            //从本地获取我的资料
-//            Log.e(TAG, "从本地获取我的资料");
-//            updateUI(mUserInfo);
-//        } else {
-//            if (mUserId == 0) {
-//                return; //游客状态！！是否要显示我的资料界面
-//            }
+
         if (Utils.networkAvaiable(this)) {
 
             new Thread(new Runnable() {
@@ -140,7 +127,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                             message.what = DATA_ERROR;
                             message.obj = object.getString("msg");
                         } else {
-                            mUserInfo = new UserInfo(object.getJSONObject("result"));
+                            mUserInfo = Utils.mapingObject(UserInfo.class, object.getJSONObject("result"));
                             message.what = DATA_SUCCESS;
                             message.obj = mUserInfo;
                         }
@@ -150,13 +137,12 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     }
                 }
             }).start();
-        }else{
+        } else {
             mUserInfo = getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
-            mHandler.obtainMessage(DATA_SUCCESS,mUserInfo).sendToTarget();
+            mHandler.obtainMessage(DATA_SUCCESS, mUserInfo).sendToTarget();
         }
     }
     //}
-
 
 
     private Handler mHandler = new Handler() {
@@ -166,6 +152,8 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             switch (msg.what) {
                 case DATA_ERROR:
                     Log.i(TAG, "error to get profile from service");
+                    mUserInfo = getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+                    updateUI(mUserInfo);
                     break;
                 case DATA_SUCCESS:
                     updateUI((UserInfo) msg.obj);
@@ -177,18 +165,18 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     private void updateUI(UserInfo userInfo) {
         String unset = getString(R.string.unset);
 //        mPhotoImageView.setImageDrawable();
-        mAccountTextView.setText(userInfo.getAccount());
+        mAccountTextView.setText(userInfo.getUsername());
         mGenderTextView.setText(userInfo.getSex() == 1
                 ? getString(R.string.man) : getString(R.string.woman));
-        mNickNameTextView.setText("".equals(userInfo.getNickName())
-                ? unset : userInfo.getNickName());
+        mNickNameTextView.setText("".equals(userInfo.getNick())
+                ? unset : userInfo.getNick());
         mRegionTextView.setText("".equals(userInfo.getDistrict())
                 ? unset : userInfo.getDistrict());
         mLevelTextView.setText(1 == userInfo.getLevel()
                 ? getString(R.string.level_base) : ((2 == userInfo.getLevel()) ?
                 getString(R.string.level_middle) : getString(R.string.level_master)));
-        mBallTypeTextView.setText(1 == userInfo.getBall_class()
-                ? getString(R.string.ball_type_1) : (2 == userInfo.getBall_class() ?
+        mBallTypeTextView.setText(1 == userInfo.getBall_type()
+                ? getString(R.string.ball_type_1) : (2 == userInfo.getBall_type() ?
                 getString(R.string.ball_type_2) : getString(R.string.ball_type_3)));
         mBilliardsCueTextView.setText(1 == userInfo.getBallArm()
                 ? getString(R.string.cue_1) : getString(R.string.cue_2));
@@ -329,7 +317,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 break;
             case 3:
                 mNickNameTextView.setText(str);
-                mUserInfo.setNickName(str);
+                mUserInfo.setNick(str);
                 break;
             case 4:
                 mRegionTextView.setText(str);
@@ -365,25 +353,25 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         }
     }
 
-    private UserInfo getUserByUserId(String userId){
+    private UserInfo getUserByUserId(String userId) {
         DBUtils dbUtil = new DBUtils(this, DatabaseConstant.UserTable.CREATE_SQL);
         SQLiteDatabase db = dbUtil.getReadableDatabase();
         UserInfo info = new UserInfo();
         String sql = "select * from " + DatabaseConstant.UserTable.TABLE + " where " + DatabaseConstant.UserTable.USER_ID + "=?";
-        Cursor cursor = db.rawQuery(sql,new String[]{userId});
-        if(cursor != null || cursor.getCount() != 0){
+        Cursor cursor = db.rawQuery(sql, new String[]{userId});
+        if (cursor != null || cursor.getCount() != 0) {
             cursor.moveToFirst();
             info.setUser_id(Integer.valueOf(userId));
-            info.setAccount(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.ACCOUNT)));
+            info.setUsername(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.ACCOUNT)));
             info.setPhone(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.PHONE)));
             info.setPassword(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.PASSWORD)));
             info.setSex(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.SEX)));
             info.setTitle(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.TITLE)));
             info.setImg_url(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.IMG_URL)));
-            info.setNickName(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.USERNAME)));
+            info.setNick(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.USERNAME)));
             info.setDistrict(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.DISTRICT)));
             info.setLevel(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.LEVEL)));
-            info.setBall_class(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALL_CLASS)));
+            info.setBall_type(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALL_TYPE)));
             info.setAppoint_date(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.APPOINT_DATE)));
             info.setBallArm(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALLARM)));
             info.setUsedType(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.USERDTYPE)));

@@ -26,7 +26,7 @@ public class YueQiuApp extends Application {
 
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER,Context.MODE_PRIVATE);
 
-        sUserInfo.setAccount(mSharedPreferences.getString(DatabaseConstant.UserTable.ACCOUNT,getString(R.string.guest)));
+        sUserInfo.setUsername(mSharedPreferences.getString(DatabaseConstant.UserTable.ACCOUNT,getString(R.string.guest)));
         sUserInfo.setUser_id(Integer.valueOf(mSharedPreferences.getString(DatabaseConstant.UserTable.USER_ID,"0")));
         sUserInfo.setImg_url(mSharedPreferences.getString(DatabaseConstant.UserTable.IMG_URL,""));
         sUserInfo.setTitle(mSharedPreferences.getString(DatabaseConstant.UserTable.TITLE,getString(R.string.search_billiard_mate_str)));

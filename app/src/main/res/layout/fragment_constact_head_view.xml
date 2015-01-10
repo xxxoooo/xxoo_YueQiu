@@ -18,6 +18,7 @@
 
 
     <TextView
+        android:textColor="@color/md__defaultBackground"
         android:id="@+id/group_name"
         android:layout_width="wrap_content"
         android:layout_height="50.0dip"
@@ -31,10 +32,10 @@
         android:maxEms="11"
         android:maxLines="1"
         android:singleLine="true"
-        android:textColor="#ff333333"
         android:textSize="17.0sp" />
 
     <TextView
+        android:textColor="@color/md__defaultBackground"
         android:id="@+id/online_count"
         android:layout_width="50dip"
         android:layout_height="50.0dip"
@@ -42,7 +43,6 @@
         android:layout_marginRight="10.0dip"
         android:gravity="center"
         android:maxLines="1"
-        android:textColor="#ff929292"
         android:textSize="12.0sp" />
 
 </RelativeLayout>

@@ -191,6 +191,7 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
             holder = (ChildHolder) convertView.getTag();
         }
         holder.nameView.setText(groups[groupPosition]);
+        holder.nameView.setTextColor(mContext.getResources().getColor(R.color.md__defaultBackground));
         holder.onLineView.setText(getChildrenCount(groupPosition) + "/"
                 + getChildrenCount(groupPosition));
         if (isExpanded) {

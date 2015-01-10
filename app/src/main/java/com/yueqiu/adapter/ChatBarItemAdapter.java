@@ -28,7 +28,7 @@ public class ChatBarItemAdapter extends BaseAdapter {
     @Override
     public int getCount() {
         //TODO:need database data,
-        return 20;
+        return 10;
     }
 
     @Override
