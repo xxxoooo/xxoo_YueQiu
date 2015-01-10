@@ -77,7 +77,7 @@ public class Utils {
 
 
         YueQiuApp.sUserInfo.setImg_url(map.get(DatabaseConstant.UserTable.IMG_URL));
-        YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.ACCOUNT));
+        YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.USERNAME));
         YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(DatabaseConstant.UserTable.USER_ID)));
         YueQiuApp.sUserInfo.setPhone(map.get(DatabaseConstant.UserTable.PHONE));
 

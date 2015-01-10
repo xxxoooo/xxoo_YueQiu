@@ -87,7 +87,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                     YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(DatabaseConstant.UserTable.USER_ID)));
                     YueQiuApp.sUserInfo.setPhone(map.get(DatabaseConstant.UserTable.PHONE));
                     YueQiuApp.sUserInfo.setLogin_time(map.get(DatabaseConstant.UserTable.LOGIN_TIME));
-                    YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.ACCOUNT));
+                    YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.USERNAME));
 
                     Iterator iter = map.entrySet().iterator();
                     while(iter.hasNext()){
@@ -276,7 +276,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                 else
                 {
                     Map<String,String> map = new HashMap<String, String>();
-                    map.put(DatabaseConstant.UserTable.ACCOUNT,mAccount);
+                    map.put(DatabaseConstant.UserTable.USERNAME,mAccount);
                     map.put(DatabaseConstant.UserTable.USER_ID,object.getJSONObject("result").
                             getString(DatabaseConstant.UserTable.USER_ID));
                     map.put(DatabaseConstant.UserTable.PHONE, object.getJSONObject("result").getString(DatabaseConstant.UserTable.PHONE));
@@ -306,14 +306,14 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
         ContentValues values = new ContentValues();
 
         values.put(DatabaseConstant.UserTable.USER_ID,map.get(DatabaseConstant.UserTable.USER_ID));
-        values.put(DatabaseConstant.UserTable.ACCOUNT,map.get(DatabaseConstant.UserTable.ACCOUNT));
+        values.put(DatabaseConstant.UserTable.USERNAME,map.get(DatabaseConstant.UserTable.USERNAME));
         values.put(DatabaseConstant.UserTable.PHONE, map.get(DatabaseConstant.UserTable.PHONE));
         values.put(DatabaseConstant.UserTable.PASSWORD,"");
         values.put(DatabaseConstant.UserTable.SEX,1);
         values.put(DatabaseConstant.UserTable.TITLE,"");
         values.put(DatabaseConstant.UserTable.IMG_URL,"");
         values.put(DatabaseConstant.UserTable.IMG_REAL,"");
-        values.put(DatabaseConstant.UserTable.USERNAME,"");
+        values.put(DatabaseConstant.UserTable.NICK,"");
         values.put(DatabaseConstant.UserTable.DISTRICT,"");
         values.put(DatabaseConstant.UserTable.LEVEL,1);
         values.put(DatabaseConstant.UserTable.BALL_TYPE,1);

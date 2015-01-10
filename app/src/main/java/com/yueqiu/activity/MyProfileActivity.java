@@ -1,6 +1,7 @@
 package com.yueqiu.activity;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 
 import com.yueqiu.R;
@@ -26,12 +28,15 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -59,12 +64,14 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     private JSONArray mJSONArray;
     private static final int DATA_ERROR = 1;
     private static final int DATA_SUCCESS = 2;
+    private Map<String, String> mMap = new HashMap<String, String>();
+    private DBUtils mDBUtils = new DBUtils(this, DatabaseConstant.UserTable.CREATE_SQL);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_myprofile);
-
+        mMap.put(DatabaseConstant.UserTable.USER_ID, String.valueOf(mUserId));
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(getString(R.string.search_my_profile_str));
@@ -127,6 +134,35 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                             message.what = DATA_ERROR;
                             message.obj = object.getString("msg");
                         } else {
+                            mMap.put(DatabaseConstant.UserTable.SEX, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.SEX));
+                            mMap.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.IMG_URL));
+                            mMap.put(DatabaseConstant.UserTable.USERNAME, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.USERNAME));
+                            mMap.put(DatabaseConstant.UserTable.NICK, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.NICK));
+                            mMap.put(DatabaseConstant.UserTable.DISTRICT, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.DISTRICT));
+                            mMap.put(DatabaseConstant.UserTable.LEVEL, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.LEVEL));
+                            mMap.put(DatabaseConstant.UserTable.BALL_TYPE, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.BALL_TYPE));
+                            mMap.put(DatabaseConstant.UserTable.APPOINT_DATE, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.APPOINT_DATE));
+                            mMap.put(DatabaseConstant.UserTable.BALLARM, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.BALLARM));
+                            mMap.put(DatabaseConstant.UserTable.USERDTYPE, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.USERDTYPE));
+                            mMap.put(DatabaseConstant.UserTable.BALLAGE, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.BALLAGE));
+                            mMap.put(DatabaseConstant.UserTable.IDOL, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.IDOL));
+                            mMap.put(DatabaseConstant.UserTable.IDOL_NAME, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.IDOL_NAME));
+                            mMap.put(DatabaseConstant.UserTable.NEW_IMG, object.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.NEW_IMG));
+
                             mUserInfo = Utils.mapingObject(UserInfo.class, object.getJSONObject("result"));
                             message.what = DATA_SUCCESS;
                             message.obj = mUserInfo;
@@ -142,7 +178,6 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             mHandler.obtainMessage(DATA_SUCCESS, mUserInfo).sendToTarget();
         }
     }
-    //}
 
 
     private Handler mHandler = new Handler() {
@@ -156,6 +191,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     updateUI(mUserInfo);
                     break;
                 case DATA_SUCCESS:
+                    updateUserInfo(mMap);
                     updateUI((UserInfo) msg.obj);
                     break;
             }
@@ -194,17 +230,18 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     @Override
     protected void onPause() {
         super.onPause();
-//        //保存数据到本地
-//        if (mUserInfo != null) {
-//            try {
-//                Utils.updateJSONData(this, mUserInfo,Utils.USER_INFO_FILE_NAME);
-//            } catch (IOException e) {
-//                Log.e(TAG, "IOException: " + e.toString());
-//            } catch (JSONException e) {
-//                Log.e(TAG, "JSONException: " + e.toString());
-//            }
-//        }
+        //保存数据到本地
+    }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                updateUserInfo(mMap);
+                finish();
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private void setClickListener() {
@@ -230,6 +267,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
+                updateUserInfo(mMap);
                 finish();
                 break;
         }
@@ -318,34 +356,43 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             case 3:
                 mNickNameTextView.setText(str);
                 mUserInfo.setNick(str);
+                mMap.put(DatabaseConstant.UserTable.NICK, str);
                 break;
             case 4:
                 mRegionTextView.setText(str);
                 mUserInfo.setDistrict(str);
+                mMap.put(DatabaseConstant.UserTable.DISTRICT, str);
                 break;
             case 5:
                 mLevelTextView.setText(str);
+                mMap.put(DatabaseConstant.UserTable.LEVEL, str);
                 break;
             case 6:
                 mBallTypeTextView.setText(str);
+                mMap.put(DatabaseConstant.UserTable.BALL_TYPE, str);
                 break;
             case 7:
                 mBilliardsCueTextView.setText(str);
+                mMap.put(DatabaseConstant.UserTable.BALLARM, str);
                 break;
             case 8:
                 mCueHabitsTextView.setText(str);
+                mMap.put(DatabaseConstant.UserTable.USERDTYPE, str);
                 break;
             case 9:
                 mPlayAgeTextView.setText(str);
                 mUserInfo.setBallAge(str);
+                mMap.put(DatabaseConstant.UserTable.BALLAGE, str);
                 break;
             case 10:
                 mIdolTextView.setText(str);
                 mUserInfo.setIdol(str);
+                mMap.put(DatabaseConstant.UserTable.IDOL, str);
                 break;
             case 11:
                 mSignTextView.setText(str);
                 mUserInfo.setIdol_name(str);
+                mMap.put(DatabaseConstant.UserTable.IDOL_NAME, str);
                 break;
             case 12:
                 break;
@@ -354,15 +401,14 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     }
 
     private UserInfo getUserByUserId(String userId) {
-        DBUtils dbUtil = new DBUtils(this, DatabaseConstant.UserTable.CREATE_SQL);
-        SQLiteDatabase db = dbUtil.getReadableDatabase();
+        SQLiteDatabase db = mDBUtils.getReadableDatabase();
         UserInfo info = new UserInfo();
         String sql = "select * from " + DatabaseConstant.UserTable.TABLE + " where " + DatabaseConstant.UserTable.USER_ID + "=?";
         Cursor cursor = db.rawQuery(sql, new String[]{userId});
         if (cursor != null || cursor.getCount() != 0) {
             cursor.moveToFirst();
             info.setUser_id(Integer.valueOf(userId));
-            info.setUsername(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.ACCOUNT)));
+            info.setUsername(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.USERNAME)));
             info.setPhone(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.PHONE)));
             info.setPassword(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.PASSWORD)));
             info.setSex(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.SEX)));
@@ -383,6 +429,19 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         }
         cursor.close();
         return info;
+    }
+
+    private void updateUserInfo(Map<String, String> map) {
+        SQLiteDatabase db = mDBUtils.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        Iterator iterator = map.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator.next();
+            values.put(entry.getKey(), entry.getValue());
+        }
+        db.update(DatabaseConstant.UserTable.TABLE, values, DatabaseConstant.UserTable.USER_ID + "=?",
+                new String[]{map.get(DatabaseConstant.UserTable.USER_ID)});
+        //ToDo：更新服务端资料
     }
 
 }
