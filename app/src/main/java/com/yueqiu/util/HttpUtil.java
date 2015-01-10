@@ -138,15 +138,13 @@ public class HttpUtil
             response = client.execute(request);
             Log.d(TAG, "response->" + response.getStatusLine().getStatusCode());
             String result = EntityUtils.toString(response.getEntity());
-            JSONObject object = new JSONObject(result);
-            Log.d(TAG, "Wrong one : " + object.toString());
+
+            Log.d(TAG, "Wrong one : " + result);
+            return result;
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
-
-        return null;
+        return "";
     }
 
     /**

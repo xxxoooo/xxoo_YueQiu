@@ -472,7 +472,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
             }
         });
-        mMenuDrawer.peekDrawer();
+//        mMenuDrawer.peekDrawer();
 
 
     }

@@ -96,12 +96,12 @@
     <style name="SearchRoomActivityTvStyle" parent="AppTheme">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">19sp</item>
+        <item name="android:textSize">17sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@android:color/darker_gray</item>
+        <item name="android:textColor">@color/md__defaultBackground</item>
         <item name="android:drawablePadding">4dp</item>
-        <item name="android:layout_margin">5dp</item>
-        <item name="android:padding">3dp</item>
+        <item name="android:layout_margin">1dp</item>
+        <item name="android:padding">1dp</item>
     </style>
 
     <!--用于约球详情分享的PopupWindow当中的TextView(这里我们采用TextView的Drawable

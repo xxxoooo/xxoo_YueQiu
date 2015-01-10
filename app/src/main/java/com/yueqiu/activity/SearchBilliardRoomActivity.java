@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RatingBar;
@@ -41,6 +42,8 @@ public class SearchBilliardRoomActivity extends Activity
 
     private ActionBar mActionBar;
 
+    private FrameLayout mWindowRootElem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -59,6 +62,10 @@ public class SearchBilliardRoomActivity extends Activity
         mRoomPhone = (TextView) findViewById(R.id.tv_search_room_phone);
 
         mRoomDetailedInfo = (TextView) findViewById(R.id.tv_search_room_detailed_info);
+
+        // get the root element use to dimmer the activity background
+        mWindowRootElem = (FrameLayout) findViewById(R.id.window_root_elem);
+        mWindowRootElem.getForeground().setAlpha(0);
 
         // then, we need the data that transferred from the previous listView item to inflate
         // the detailed content of these TextView and ImageViews
@@ -119,9 +126,9 @@ public class SearchBilliardRoomActivity extends Activity
                 break;
             case R.id.search_room_detail_action_share:
                 popupShareWindow();
+
                 break;
         }
-
 
         return super.onOptionsItemSelected(item);
     }
@@ -142,7 +149,8 @@ public class SearchBilliardRoomActivity extends Activity
         mPopupWindow.setFocusable(true);
         // 我们是必须要为PopupWindow设置一个Background drawable才能使PopupWindow工作正常
         // 当时我们由于已经在layout当中设置了background，所以这里我们使用一个技巧就是设置background的Bitmap为null
-        mPopupWindow.setBackgroundDrawable(new BitmapDrawable(getResources(), (Bitmap) null));
+        // 为popupWindow设置背景是为了使popupWindow在点击popupWindow外部的时候可以自动dismiss掉
+//        mPopupWindow.setBackgroundDrawable(new BitmapDrawable(getResources(), (Bitmap) null));
 
         mPopupWindow.getContentView().setFocusableInTouchMode(true);
         mPopupWindow.getContentView().setFocusable(true);
@@ -159,11 +167,22 @@ public class SearchBilliardRoomActivity extends Activity
         (mTvSinaWeibo = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_sinaweibo)).setOnClickListener(new OnShareIconClickListener());
         (mTvRenren = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_renren)).setOnClickListener(new OnShareIconClickListener());
 
-        (mBtnCancel = (Button) popupWindowView.findViewById(R.id.btn_search_dating_detailed_cancel)).setOnClickListener(new OnShareIconClickListener());
+        (mBtnCancel = (Button) popupWindowView.findViewById(R.id.btn_search_dating_detailed_cancel)).setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                mPopupWindow.dismiss();
+                // while the popupWindow is dismissed from the current activity, make the background back to the normal state
+                mWindowRootElem.getForeground().setAlpha(0);
+                mWindowRootElem.forceLayout();
+            }
+        });
 
         // TODO: 当我们在后期代码压缩时，如果需要将popupWindow抽离出来的时候，需要将以下用于设置PopupWindow的显示
         // TODO: 位置的时候，我们就需要将popupWindow当前所在的Activity的准确的layout文件的根元素的指定，否则就会发生异常
         mPopupWindow.showAtLocation(findViewById(R.id.search_room_detailed_whole_container), Gravity.BOTTOM, 0, 0);
+        mWindowRootElem.getForeground().setAlpha(160);
     }
 
 
@@ -197,8 +216,6 @@ public class SearchBilliardRoomActivity extends Activity
                     break;
                 case R.id.img_search_dating_detail_share_renren:
                     Toast.makeText(SearchBilliardRoomActivity.this, "sharing to the qq renren", Toast.LENGTH_LONG).show();
-                    break;
-                case R.id.btn_search_dating_detailed_cancel:
                     break;
             }
         }

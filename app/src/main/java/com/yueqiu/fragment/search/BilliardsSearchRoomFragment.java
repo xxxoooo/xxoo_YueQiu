@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,10 @@ import com.yueqiu.bean.SearchRoomSubFragmentRoomBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -270,9 +275,47 @@ public class BilliardsSearchRoomFragment extends Fragment
 
         String rawResult = HttpUtil.dpUrlClient(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams);
         Log.d(TAG, " the raw result we get are : " + rawResult);
+        if (!TextUtils.isEmpty(rawResult))
+        {
+            try
+            {
+                JSONObject resultJsonObj = new JSONObject(rawResult);
+                String status = resultJsonObj.getString("status");
+                if (status.equals("OK")) {
+                    // TODO: 现阶段，由于返回的原始的Json包含了两个int值，一个是total_count,一个是count
+                    // TODO: 但是我们不确定究竟是哪一个代表的是我们获得的数据的条数，我们暂时先使用total_count这个值作为数据的条数
+                    final int count = resultJsonObj.getInt("total_count");
+                    JSONArray businessJsonArr = resultJsonObj.getJSONArray("businesses");
+                    final int size = businessJsonArr.length();
+                    int i;
+                    for (i = 0; i < size; ++i)
+                    {
+                        JSONObject businessObj = (JSONObject) businessJsonArr.get(i);
+                        String roomName = businessObj.getString("name");
+                        float level = businessObj.getInt("service_score");
+                        double price = businessObj.getDouble("avg_price");
+                        String address = businessObj.getString("address");
+                        String distance = String.valueOf(businessObj.getInt("distance"));
+                        String roomPhoto = businessObj.getString("photo_list_url");
+
+                        Log.d(TAG, " the parsed json data are : " + roomName + " , " + level + " , " + price + " , " + distance + " , " + roomPhoto + " , " + address);
+                        // String roomPhoto, String roomName, float level, double price, String address, String distance
+                        SearchRoomSubFragmentRoomBean roomBean = new SearchRoomSubFragmentRoomBean(roomPhoto, roomName, level, price, address, distance);
+                        // TODO: 将这条数据加入到roomList当中(现在由于数据不完整，所以暂时不添加，等数据完整性已经比较好的时候再进行添加)
+//                        mRoomList.add(roomBean);
+
+                        // TODO: 然后我们还需要本地缓存我们所获得到的这条数据
+
+                    }
 
 
-        // TODO: handle the result we get
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.d(TAG, " Exception happened in parsing the resulted json object we get, and the detailed reason are : " + e.toString());
+            }
+        }
+
 
     }
 
