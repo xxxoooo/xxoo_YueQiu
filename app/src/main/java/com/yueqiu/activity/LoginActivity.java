@@ -190,7 +190,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                         mHandler.obtainMessage(LOGIN_ERROR,object.getString("msg")).sendToTarget();
                     } else {
                         Map<String, String> successObj = new HashMap<String, String>();
-                        successObj.put(DatabaseConstant.UserTable.ACCOUNT, mUserName);
+                        successObj.put(DatabaseConstant.UserTable.USERNAME, mUserName);
                         successObj.put(DatabaseConstant.UserTable.PASSWORD, mPwd);
                         successObj.put(DatabaseConstant.UserTable.USER_ID, object.getJSONObject("result").
                                 getString(DatabaseConstant.UserTable.USER_ID));
@@ -239,7 +239,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         ContentValues values = new ContentValues();
 
         values.put(DatabaseConstant.UserTable.USER_ID,map.get(DatabaseConstant.UserTable.USER_ID));
-        values.put(DatabaseConstant.UserTable.ACCOUNT,map.get(DatabaseConstant.UserTable.ACCOUNT));
+        values.put(DatabaseConstant.UserTable.USERNAME,map.get(DatabaseConstant.UserTable.USERNAME));
         values.put(DatabaseConstant.UserTable.PHONE, map.get(DatabaseConstant.UserTable.PHONE));
         String password = map.get(DatabaseConstant.UserTable.PASSWORD);
         String sign = new String(Hex.encodeHex(DigestUtils.sha(password))).toUpperCase();
@@ -248,12 +248,12 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         values.put(DatabaseConstant.UserTable.TITLE,"");
         values.put(DatabaseConstant.UserTable.IMG_URL,map.get(DatabaseConstant.UserTable.IMG_URL));
         values.put(DatabaseConstant.UserTable.IMG_REAL,"");
-        values.put(DatabaseConstant.UserTable.USERNAME,"");
+        values.put(DatabaseConstant.UserTable.NICK,"");
         values.put(DatabaseConstant.UserTable.DISTRICT,"");
         values.put(DatabaseConstant.UserTable.LEVEL,1);
         values.put(DatabaseConstant.UserTable.BALL_TYPE,1);
         values.put(DatabaseConstant.UserTable.APPOINT_DATE,"");
-        values.put(DatabaseConstant.UserTable.BALLARM,1);
+        values.put(DatabaseConstant.UserTable.BALLARM,2);
         values.put(DatabaseConstant.UserTable.USERDTYPE,1);
         values.put(DatabaseConstant.UserTable.BALLAGE, 3);
         values.put(DatabaseConstant.UserTable.IDOL,"");

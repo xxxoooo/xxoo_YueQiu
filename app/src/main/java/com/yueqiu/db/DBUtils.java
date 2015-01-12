@@ -19,7 +19,6 @@ public class DBUtils extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
         db.execSQL(sCreateSQL);
         db.execSQL(DatabaseConstant.ActivitiesTable.SQL);
 //        db.execSQL(DatabaseConstant.RefreshTime.SQL);

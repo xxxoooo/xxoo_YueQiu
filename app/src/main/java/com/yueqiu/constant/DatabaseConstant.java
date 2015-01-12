@@ -16,7 +16,7 @@ public class DatabaseConstant {
 
         public static final String IMG_REAL = "img_real";
 
-        public static final String ACCOUNT = "account";
+        public static final String USERNAME      = "username";
 
         public static final String PHONE = "phone";
 
@@ -26,16 +26,16 @@ public class DatabaseConstant {
 
         public static final String TITLE = "title";
 
-        public static final String USERNAME = "username";
+
+        public static final String NICK         = "nick";
 
         public static final String DISTRICT = "district";
 
         public static final String LEVEL = "level";
 
-
         public static final String BALL_CLASS = "ball_class";
-       public static final String BALL_TYPE    = "ball_type";
 
+       public static final String BALL_TYPE    = "ball_type";
 
         public static final String APPOINT_DATE = "appoint_date";
 
@@ -57,15 +57,14 @@ public class DatabaseConstant {
 
         public static final String USER_ID = "user_id";
 
+
         public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + USER_ID + " INTEGER NOT NULL, " + ACCOUNT + " VARCHAR(255) NOT NULL, " + PHONE + " VARCHAR(50) NOT NULL, " + PASSWORD + " VARCHAR(100), " +
-                SEX + " INTEGER DEFAULT 1, " + TITLE + " VARCHAR(50), " + IMG_URL + " VARCHAR(255), " + IMG_REAL + " VARCHAR(255), " + USERNAME +
+                + USER_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + PHONE + " VARCHAR(50) NOT NULL, " + PASSWORD + " VARCHAR(100), " +
+                SEX + " INTEGER DEFAULT 1, " + TITLE + " VARCHAR(50), " + IMG_URL + " VARCHAR(255), " + IMG_REAL + " VARCHAR(255), " + NICK +
 
                 " VARCHAR(255), " + DISTRICT + " VARCHAR(255), " + LEVEL + " INTEGER DEFAULT 1, " + BALL_CLASS + " INTEGER DEFAULT 1, " + APPOINT_DATE +
-                " VARCHAR(255), " + BALLARM + " INTEGER DEFAULT 1, " + USERDTYPE + " INTEGER DEFAULT 1, " + BALLAGE + " INTEGER, " + IDOL + " VARCHAR(255), " +
+                " VARCHAR(255), " + BALLARM + " INTEGER DEFAULT 1, " + USERDTYPE + " INTEGER DEFAULT 1, " + BALLAGE + " INTEGER, " + IDOL + " VARCHAR(255), "
 
-                " VARCHAR(255), " + DISTRICT + " VARCHAR(255), " + LEVEL + " INTEGER DEFAULT 1, " + BALL_TYPE + " INTEGER DEFAULT 1, " + APPOINT_DATE +
-                " VARCHAR(255), " + BALLARM  + " INTEGER DEFAULT 1, " + USERDTYPE + " INTEGER DEFAULT 1, " + BALLAGE + " INTEGER, " + IDOL + " VARCHAR(255), "
 
                 + IDOL_NAME + " VARCHAR(255), " + NEW_IMG + " VARCHAR(255), " + NEW_IMG_REAL + " VARCHAR(255), " + LOGIN_TIME + " VARCHAR(255)" + ")";
 
@@ -122,6 +121,28 @@ public class DatabaseConstant {
 
     }
 
+    public final class ChatMessageTable {
+        public static final String TABLE        = "chat_msg_entity";
+
+        public static final String _ID          = "id";
+
+        public static final String USER_ID      = "user_id";
+
+        public static final String IMG_URL    = "image_url";
+
+        public static final String USERNAME     = "username";
+
+        public static final String MESSAGE_CONTENT = "message_content";
+
+        public static final String DATETIME     = "datetime";
+
+        public static final String IS_COME    = "isCome";
+
+        public static final String CREATE_SQL   =  "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + USER_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + IMG_URL + " VARCHAR(255), " + MESSAGE_CONTENT + " VARCHAR(255), "
+                + DATETIME + " VARCHAR(255), " + IS_COME + " INTEGER DEFAULT 0" + ")";
+    }
+
     public final class ActivitiesTable {
         public static final String TABLENAME = "activities";
 
@@ -175,7 +196,6 @@ public class DatabaseConstant {
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TABLE_NAME + " VARCHAR(20), " + REFRESH_TIME
                 + " VARCHAR(50) );";
     }
-
 
 
 
