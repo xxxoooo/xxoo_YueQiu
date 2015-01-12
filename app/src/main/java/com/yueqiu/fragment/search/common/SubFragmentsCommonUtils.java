@@ -109,23 +109,6 @@ public class SubFragmentsCommonUtils
         return popupWindow;
     }
 
-    private static void setImgBackground(int selectedItem)
-    {
-        int i;
-        final int size = sPagerIndicatorImgList.length;
-        for (i = 0; i < size; ++i)
-        {
-            if (i == selectedItem)
-            {
-                Log.d(TAG, " the method of changing the selected item background has been called !!! " + selectedItem);
-                sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_focused);
-            } else
-            {
-                Log.d(TAG, " set it as the initial background again, and the index are : " + i);
-                sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
-            }
-        }
-    }
 
     // TODO: 这里我们使用的是服务器端的同学开发的接口
     // TODO: 这里我们加载的是商家推荐的信息的列表，也就是显示在每一个Fragment当中的最上面的滚动的Image Gallery
@@ -147,15 +130,6 @@ public class SubFragmentsCommonUtils
 
     }
 
-    private static ImageView[] sPagerIndicatorImgList;
-    private static ImageView[] sPagerImgArr;
-
-    private static LinearLayout sGalleryIndicatorGroup;
-    private static SearchMateFragmentViewPagerImgAdapter sGalleryImgAdapter;
-
-    private static int[] sPagerImgResArr;
-    private static ViewPager sImgGalleryViewPager;
-
     /**
      *
      * @param context
@@ -165,6 +139,14 @@ public class SubFragmentsCommonUtils
      */
     public static void initViewPager(final Context context, View parentView, final int viewPagerId, final int galleryIndiGroupId)
     {
+        final ImageView[] sPagerIndicatorImgList;
+        final ImageView[] sPagerImgArr;
+        LinearLayout sGalleryIndicatorGroup;
+        SearchMateFragmentViewPagerImgAdapter sGalleryImgAdapter;
+        int[] sPagerImgResArr;
+
+        ViewPager sImgGalleryViewPager;
+
         // TODO: 以下仅仅是测试数据，在测试接口的时候就删除掉
         sPagerImgResArr = new int[]{R.drawable.test_pager_1, R.drawable.test_pager_2, R.drawable.test_pager_3, R.drawable.test_pager_4};
 
@@ -234,10 +216,18 @@ public class SubFragmentsCommonUtils
             public void onPageSelected(int i)
             {
                 Log.d(TAG, " the current page index are : " + i + ", and the selected index are : " + i % sPagerImgArr.length);
-//                setImgBackground(i % sPagerImgArr.length);
-                setImgBackground(i % size);
 
-
+                int j;
+                for (j = 0; j < size; ++j)
+                {
+                    if (j == (i % size))
+                    {
+                        sPagerIndicatorImgList[j].setBackgroundResource(R.drawable.page_indicator_focused);
+                    } else
+                    {
+                        sPagerIndicatorImgList[j].setBackgroundResource(R.drawable.page_indicator_unfocused);
+                    }
+                }
             }
 
             @Override
