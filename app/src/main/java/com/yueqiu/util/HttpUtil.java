@@ -205,6 +205,23 @@ public class HttpUtil
         return sign;
     }
 
+
+    public static InputStream getInputStream(String url)
+    {
+        try {
+            URL urls = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection)urls.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            return connection.getInputStream();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private static void log(String msg)
     {
         Log.i(TAG, msg);

@@ -6,6 +6,7 @@ package com.yueqiu.bean;
 public class Activities {
     private String id;
     private String username;
+    private String sex;//男1女2
     private String img_url;
     private String type;
     private String title;
@@ -14,6 +15,8 @@ public class Activities {
     private String end_time;
     private String model;
     private String content;
+    private String create_time;
+    private int look_num;
 
     public String getId() {
         return id;
@@ -93,5 +96,30 @@ public class Activities {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+
+    public String getCreate_time() {
+        return create_time;
+    }
+
+    public void setCreate_time(String create_time) {
+        this.create_time = create_time;
+    }
+
+    public String getSex() {
+        return sex;
+    }
+
+    public void setSex(String sex) {
+        this.sex = sex;
+    }
+
+    public int getLook_num() {
+        return look_num;
+    }
+
+    public void setLook_num(int look_num) {
+        this.look_num = look_num;
     }
 }

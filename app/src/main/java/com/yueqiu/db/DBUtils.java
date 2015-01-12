@@ -12,16 +12,19 @@ public class DBUtils extends SQLiteOpenHelper {
 
     private String sCreateSQL;
 
-    public DBUtils(Context context,String create) {
+    public DBUtils(Context context, String create) {
         super(context, DatabaseConstant.DATABASENAME, null, DatabaseConstant.VERSION);
         this.sCreateSQL = create;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(sCreateSQL);
-    }
 
+        db.execSQL(sCreateSQL);
+        db.execSQL(DatabaseConstant.ActivitiesTable.SQL);
+//        db.execSQL(DatabaseConstant.RefreshTime.SQL);
+
+    }
 
 
     @Override
