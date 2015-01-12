@@ -239,6 +239,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private static final String TAG_COAUCH_FRAGMENT = "searchCoauchFragment";
     private static final String TAG_ROOM_FRAGMENT = "searchRoomFragment";
 
+
     private class SectionPagerAdapter extends FragmentPagerAdapter
     {
         public SectionPagerAdapter(FragmentManager fm)
@@ -250,7 +251,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         public Fragment getItem(int index)
         {
             Log.d(TAG, " the current Fragment index are : " + index);
-            Fragment fragment = null;
+            Fragment fragment;
             Bundle args;
 
             switch (index) {
@@ -295,6 +296,11 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
                     break;
                 default:
+                    fragment = BilliardsSearchMateFragment.newInstance(mContext, "MateFragment");
+                    args = new Bundle();
+                    args.putString(SearchSubFragmentConstants.MATE_FRAGMENT_INIT, mTitles[index]);
+                    fragment.setArguments(args);
+                    Log.d(TAG, "mate fragment has been created ");
                     break;
             }
 

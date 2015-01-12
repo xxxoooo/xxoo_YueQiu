@@ -26,7 +26,9 @@ public class SearchDatingProvider extends ContentProvider
             + SearchBaseColumns.DatingColumnds.RANGE + " TEXT NOT NULL); ";
 
 
+
     public static final String AUTHORITY = SearchBaseColumns.AUTHORITY_PREFIX + "SearchDatingProvider";
+
     @Override
     public boolean onCreate()
     {

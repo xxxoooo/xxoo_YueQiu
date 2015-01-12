@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.yueqiu">
+          package="com.yueqiu">
 
 
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -120,6 +120,7 @@
             android:screenOrientation="portrait"/>
 
         <activity
+
             android:name=".activity.SearchBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating"
             android:screenOrientation="portrait"
@@ -130,6 +131,7 @@
             android:name=".activity.SearchBilliardRoomActivity"
             android:label="@string/title_activity_search_billiard_room"
             android:screenOrientation="portrait"
+            android:parentActivityName=".BilliardSearchActivity"
             />
         <activity
             android:name=".activity.GroupIssueTopic"

@@ -23,6 +23,15 @@ public class SearchDBHelper extends SQLiteOpenHelper
     private final String TABLE_NAME;
     private final String COLUMN_NAME;
 
+    /**
+     *
+     * @param context
+     * @param dbName 数据库的名字(Search数据库当中一共包含了5张表，分别是mateTable, datingTable, coauchTable, searchCoauchTable, roomTable)
+     * @param dbVersion 当前数据库的版本
+     * @param createSql 创建数据库当中的具体的表的sql语句
+     * @param tableName 所创建的数据库当中的表的名字
+     * @param columnName 说实话，这个字段目前还没有用到？？？
+     */
     public SearchDBHelper(Context context, String dbName, int dbVersion, String createSql, String tableName, String columnName)
     {
         super(context, dbName, null, dbVersion);
@@ -46,8 +55,9 @@ public class SearchDBHelper extends SQLiteOpenHelper
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
         if (oldVersion < newVersion)
-
         {
+            Log.d(TAG, " we need to execute the updating of the database we created ");
+
             db.execSQL("ALTER TABLE " + TABLE_NAME +
                     " ADD COLUMN" + COLUMN_NAME + " TEXT");
             // TODO: 在教程当中还提供了一个用于创建INDEX_SQL的部分，但是不知道具体的用法

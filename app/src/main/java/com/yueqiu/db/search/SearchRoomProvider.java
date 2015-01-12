@@ -18,6 +18,10 @@ public class SearchRoomProvider extends ContentProvider
     public static final String AUTHORITY = SearchBaseColumns.AUTHORITY_PREFIX + "SearchRoomProvider";
 
 
+    private static final String SQL_CREATE_TABLE = "";
+
+
+
     @Override
     public boolean onCreate()
     {

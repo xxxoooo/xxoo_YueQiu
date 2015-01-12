@@ -154,34 +154,34 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
     private static final int RETRIEVE_INFO_WITH_PRICE_FILTERED = 1 << 4;
     private static final int RETRIEVE_INFO_WITH_DISTANCE_FILTERED = 1 << 5;
 
-    // TODO: 以下这个方法将被不再使用，在准确确定之后，删掉这个方法，因为服务器端确定通过不传递任何参数来接受参数
 
-    /**
-     * @param userId
-     * @param range    助教的距离
-     * @param money    助教的费用，也就是price
-     * @param classes  助教的球种，也就是kinds
-     * @param level    助教的级别
-     * @param startNum 请求信息的开始的条数
-     * @param endNum   请求信息的结束条数
-     */
-    private void retrieveAssistCoauchRawInfo(final String userId, final String range, final int money, final int classes, final int level, final int startNum, final int endNum)
-    {
-        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
-        requestParams.put("user_id", userId);
-        requestParams.put("range", range);
-        requestParams.put("money", money + "");
-        requestParams.put("class", classes + "");
-        requestParams.put("start_no", startNum + "");
-        requestParams.put("end_no", endNum + "");
-
-        String rawResult = HttpUtil.urlClient(HttpConstants.SearchAssistCoauch.URL, requestParams, HttpConstants.RequestMethod.GET);
-        Log.d(TAG, " the rawResult we get are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult)) {
-
-        }
-
-    }
+//    // TODO: 以下这个方法将被不再使用，在准确确定之后，删掉这个方法，因为服务器端确定通过不传递任何参数来接受参数
+//    /**
+//     * @param userId
+//     * @param range    助教的距离
+//     * @param money    助教的费用，也就是price
+//     * @param classes  助教的球种，也就是kinds
+//     * @param level    助教的级别
+//     * @param startNum 请求信息的开始的条数
+//     * @param endNum   请求信息的结束条数
+//     */
+//    private void retrieveAssistCoauchRawInfo(final String userId, final String range, final int money, final int classes, final int level, final int startNum, final int endNum)
+//    {
+//        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
+//        requestParams.put("user_id", userId);
+//        requestParams.put("range", range);
+//        requestParams.put("money", money + "");
+//        requestParams.put("class", classes + "");
+//        requestParams.put("start_no", startNum + "");
+//        requestParams.put("end_no", endNum + "");
+//
+//        String rawResult = HttpUtil.urlClient(HttpConstants.SearchAssistCoauch.URL, requestParams, HttpConstants.RequestMethod.GET);
+//        Log.d(TAG, " the rawResult we get are : " + rawResult);
+//        if (!TextUtils.isEmpty(rawResult)) {
+//
+//        }
+//
+//    }
 
     private static void retrieveAllInitialAssistCoauchInfo()
     {

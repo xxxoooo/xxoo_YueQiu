@@ -2,10 +2,9 @@ package com.yueqiu.fragment.search.common;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,7 +16,8 @@ import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.HttpUtil;
 
-import java.awt.font.TextAttribute;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by scguo on 15/1/4.
@@ -117,14 +117,14 @@ public class SubFragmentsCommonUtils
         {
             if (i == selectedItem)
             {
-                Log.d(TAG, " the current selected item are : " + i + " and set the image resource here ");
+                Log.d(TAG, " the method of changing the selected item background has been called !!! " + selectedItem);
                 sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_focused);
             } else
             {
+                Log.d(TAG, " set it as the initial background again, and the index are : " + i);
                 sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
             }
         }
-
     }
 
     // TODO: 这里我们使用的是服务器端的同学开发的接口
@@ -133,8 +133,19 @@ public class SubFragmentsCommonUtils
     {
         String rawResult = HttpUtil.urlClient(HttpConstants.SearchRoomRecommendation.URL, null, HttpConstants.RequestMethod.GET);
         Log.d(TAG, " the recommendation info we get are : " + rawResult);
-    }
 
+        if (!TextUtils.isEmpty(rawResult))
+        {
+            try {
+                JSONObject initialJsonData = new JSONObject(rawResult);
+                Log.d(TAG, " the initial json data we get are : " + initialJsonData.toString());
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
 
     private static ImageView[] sPagerIndicatorImgList;
     private static ImageView[] sPagerImgArr;
@@ -152,20 +163,20 @@ public class SubFragmentsCommonUtils
      * @param viewPagerId ViewPager在parentView当中的id值
      * @param galleryIndiGroupId ViewPager底部的indicator所在的布局中的id值
      */
-    public static void initViewPager(Context context, View parentView, final int viewPagerId, final int galleryIndiGroupId)
+    public static void initViewPager(final Context context, View parentView, final int viewPagerId, final int galleryIndiGroupId)
     {
         // TODO: 以下仅仅是测试数据，在测试接口的时候就删除掉
         sPagerImgResArr = new int[]{R.drawable.test_pager_1, R.drawable.test_pager_2, R.drawable.test_pager_3, R.drawable.test_pager_4};
 
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                retrieveRecommdedRoomInfo();
-            }
-        }).start();
-
+//        new Thread(new Runnable()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                Log.d(TAG, " start retrieving the view pager data here ");
+//                retrieveRecommdedRoomInfo();
+//            }
+//        }).start();
 
         sImgGalleryViewPager = (ViewPager) parentView.findViewById(viewPagerId);
         sGalleryIndicatorGroup = (LinearLayout) parentView.findViewById(galleryIndiGroupId);
@@ -210,7 +221,6 @@ public class SubFragmentsCommonUtils
 
         sGalleryImgAdapter = new SearchMateFragmentViewPagerImgAdapter(sPagerImgArr);
         sImgGalleryViewPager.setAdapter(sGalleryImgAdapter);
-        sImgGalleryViewPager.setCurrentItem(sPagerImgArr.length * 100);
 
         sImgGalleryViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
@@ -226,6 +236,7 @@ public class SubFragmentsCommonUtils
                 Log.d(TAG, " the current page index are : " + i + ", and the selected index are : " + i % sPagerImgArr.length);
 //                setImgBackground(i % sPagerImgArr.length);
                 setImgBackground(i % size);
+
 
             }
 
