@@ -90,17 +90,12 @@
             android:name=".activity.MyParticipationActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".activity.MyProfileActivity"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".activity.ProfileSetupActivity"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name=".activity.MyfavorCollActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.PublishedInfoActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            />
 
 
 

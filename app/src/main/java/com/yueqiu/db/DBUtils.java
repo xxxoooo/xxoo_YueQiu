@@ -10,16 +10,19 @@ import com.yueqiu.constant.DatabaseConstant;
 
 public class DBUtils extends SQLiteOpenHelper {
 
-    private String sCreateSQL;
+    public static DBUtils mDBHelper;
+    public static DBUtils getInstance(Context context)
+    {
+        return (null == mDBHelper) ? mDBHelper = new DBUtils(context) : mDBHelper;
+    }
 
-    public DBUtils(Context context,String create) {
+    private DBUtils(Context context) {
         super(context, DatabaseConstant.DATABASENAME, null, DatabaseConstant.VERSION);
-        this.sCreateSQL = create;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(sCreateSQL);
+
     }
 
 
