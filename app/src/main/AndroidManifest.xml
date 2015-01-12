@@ -154,6 +154,8 @@
             android:screenOrientation="portrait">
         </activity>
 
+        <activity android:name=".activity.ChatActivity"
+                  android:screenOrientation="portrait"/>
 
     </application>
 

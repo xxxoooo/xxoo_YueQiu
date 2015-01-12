@@ -19,6 +19,7 @@ public class DBUtils extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        Log.e("ddd", "  " + sCreateSQL);
         db.execSQL(sCreateSQL);
     }
 

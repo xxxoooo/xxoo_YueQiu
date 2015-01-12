@@ -16,7 +16,9 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
+import com.yueqiu.ChatBarActivity;
 import com.yueqiu.R;
+import com.yueqiu.activity.ChatActivity;
 import com.yueqiu.activity.FriendsApplicationActivity;
 import com.yueqiu.adapter.ChatBarItemAdapter;
 
@@ -30,6 +32,8 @@ public class MessageFragment extends Fragment {
     private ListView mListView;
     private LinearLayout mSearch;
     private ActionBar mActionBar;
+    public static final String FRIEND_USER_ID = "com.yueqiu.fragment.chatbar.MessageFragment.friend_user_id";
+    public static final String FRIEND_USER_NAME = "com.yueqiu.fragment.chatbar.MessageFragment.friend_user_name";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,7 +50,7 @@ public class MessageFragment extends Fragment {
         }
         resources = getResources();
         mListView = (ListView) view.findViewById(R.id.chatbar_message_lv_account);
-        ChatBarItemAdapter adapter = new ChatBarItemAdapter(getActivity());
+        final ChatBarItemAdapter adapter = new ChatBarItemAdapter(getActivity());
         mListView.setAdapter(adapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -54,6 +58,13 @@ public class MessageFragment extends Fragment {
 
                 if (0 == position) {
                     startActivity(new Intent(getActivity(), FriendsApplicationActivity.class));
+                }else{
+                    //TODO:传入待聊天好友的userid
+                    Intent intent = new Intent(getActivity(), ChatActivity.class);
+                    adapter.getItem(position);
+                    intent.putExtra(FRIEND_USER_ID, 1);//fake date
+                    intent.putExtra(FRIEND_USER_NAME, "小明");
+                    startActivity(intent);
                 }
             }
         });

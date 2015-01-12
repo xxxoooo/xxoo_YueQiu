@@ -115,4 +115,26 @@ public class DatabaseConstant {
 
     }
 
+    public final class ChatMessageTable {
+        public static final String TABLE        = "chat_msg_entity";
+
+        public static final String _ID          = "id";
+
+        public static final String USER_ID      = "user_id";
+
+        public static final String IMG_URL    = "image_url";
+
+        public static final String USERNAME     = "username";
+
+        public static final String MESSAGE_CONTENT = "message_content";
+
+        public static final String DATETIME     = "datetime";
+
+        public static final String IS_COME    = "isCome";
+
+        public static final String CREATE_SQL   =  "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + USER_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + IMG_URL + " VARCHAR(255), " + MESSAGE_CONTENT + " VARCHAR(255), "
+                + DATETIME + " VARCHAR(255), " + IS_COME + " INTEGER DEFAULT 0" + ")";
+    }
+
 }
