@@ -108,6 +108,30 @@
     <string name="search_dating_detailed_action_collect">加入到我的收藏</string>
     <string name="search_dating_detailed_action_share">分享到朋友圈</string>
 
+    <!--约球当中的三种付费模式-->
+    <string name="search_dating_detailed_model_1">免费</string>
+    <string name="search_dating_detailed_model_2">收费</string>
+    <string name="search_dating_detailed_model_3">AA制</string>
+
+    <!--用于约球Activity当中的详情的信息的一些测试信息-->
+    <string name="search_dating_detailed_title_test">第三届我最喜欢的台球杯开始报名了，欢迎大家踊跃报名.</string>
+    <string name="search_dating_detailed_address_indi">活动地点:</string>
+    <string name="search_dating_detailed_starttime_indi">开始时间:</string>
+    <string name="search_dating_detailed_endtime_indi">结束时间:</string>
+    <string name="search_dating_detailed_model_indi">收费模式:</string>
+    <string name="search_dating_detailed_contact_indi">联系人:</string>
+    <string name="search_dating_detailed_phone_indi">联系电话:</string>
+    <string name="search_dating_detailed_activity_intro_indi">活动说明:</string>
+
+    <!--以下是一些测试数据-->
+    <string name="search_dating_detailed_address_indi_test">云川台球城(花园桥店)</string>
+    <string name="search_dating_detailed_starttime_indi_test">2014-01-09 00:00:00</string>
+    <string name="search_dating_detailed_endtime_indi_test">2015-09-10 00:00:00</string>
+    <string name="search_dating_detailed_model_indi_test">AA制</string>
+    <string name="search_dating_detailed_contact_indi_test">凤姐</string>
+    <string name="search_dating_detailed_phone_indi_test">110-110-119</string>
+    <string name="search_dating_detailed_activity_intro_indi_test">联系我时，就说是在约球上面看到的</string>
+
     <!-- 3.助教子Fragment的title -->
     <string name="search_assistcaouch_subfragment_title_distance">距离</string>
     <string name="search_assistcaouch_subfragment_title_cost">花费</string>
@@ -379,5 +403,5 @@
     <string name="pre_register_text">正在注册中...</string>
     <string name="title_activity_start">StartActivity</string>
     <string name="title_activity_test">TestActivity</string>
-
+    <string name="starmeet">球星汇</string>
 </resources>

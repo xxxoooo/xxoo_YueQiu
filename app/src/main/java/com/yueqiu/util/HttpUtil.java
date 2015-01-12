@@ -139,15 +139,13 @@ public class HttpUtil
             response = client.execute(request);
             Log.d(TAG, "response->" + response.getStatusLine().getStatusCode());
             String result = EntityUtils.toString(response.getEntity());
-            JSONObject object = new JSONObject(result);
-            Log.d(TAG, "Wrong one : " + object.toString());
+
+            Log.d(TAG, "Wrong one : " + result);
+            return result;
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
-
-        return null;
+        return "";
     }
 
     /**
@@ -203,6 +201,23 @@ public class HttpUtil
         String sign = new String(Hex.encodeHex(DigestUtils.sha(codec))).toUpperCase();
 
         return sign;
+    }
+
+
+    public static InputStream getInputStream(String url)
+    {
+        try {
+            URL urls = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection)urls.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            return connection.getInputStream();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static void log(String msg)

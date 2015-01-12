@@ -1,5 +1,8 @@
 package com.yueqiu.bean;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by scguo on 14/12/30.
  *
@@ -37,4 +40,16 @@ public class SearchDatingDetailedAlreadyBean
     {
         this.mUserName = name;
     }
+
+    // TODO: 当前服务器端还没有具体的定义每一个参加活动的人员的具体的需要具备的字段的定义的值
+    public SearchDatingDetailedAlreadyBean(JSONObject jsonObject)
+    {
+        try {
+            this.mUserName = jsonObject.getString("");
+            this.mUserPhoto = jsonObject.getString("");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

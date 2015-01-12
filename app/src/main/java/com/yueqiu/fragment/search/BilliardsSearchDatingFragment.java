@@ -21,12 +21,14 @@ import android.widget.Toast;
 import com.yueqiu.R;
 import com.yueqiu.activity.SearchBilliardsDatingActivity;
 import com.yueqiu.adapter.SearchDatingSubFragmentListAdapter;
+import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
@@ -134,7 +136,7 @@ public class BilliardsSearchDatingFragment extends Fragment
                     Button btnDistanceNoFilter = (Button) distanPopupView.findViewById(R.id.search_mate_popupwindow_intro);
                     btnDistanceNoFilter.setOnClickListener(new DatingPopupWindowInternalClickHandler());
                     ListView distanList = (ListView) distanPopupView.findViewById(R.id.list_search_mate_distance_filter_list);
-                    distanList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, disStrList));
+                    distanList.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(disStrList)));
 
                     SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistan, distanPopupView);
 
@@ -156,7 +158,7 @@ public class BilliardsSearchDatingFragment extends Fragment
                     Button btnDateNoFilter = (Button) datePopupView.findViewById(R.id.btn_search_dating_popup_no_filter);
                     btnDateNoFilter.setOnClickListener(new DatingPopupWindowInternalClickHandler());
                     ListView dateList = (ListView) datePopupView.findViewById(R.id.list_search_dating_date_filter_list);
-                    dateList.setAdapter(new ArrayAdapter<String>(sContext, android.R.layout.simple_list_item_1, dateStrList));
+                    dateList.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(dateStrList)));
 
                     popupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnPublishDate, datePopupView);
                     break;
@@ -186,11 +188,12 @@ public class BilliardsSearchDatingFragment extends Fragment
     /**
      *
      * @param userId
-     * @param range 发布约球信息的大致距离,距离范围。例如1000米以内
-     * @param date 发布日期
+     * @param range 发布约球信息的大致距离,距离范围。例如1000米以内,具体传递的形式例如range=100
+     * @param date 发布日期，例如date=2014-04-04
      * @param startNum 请求信息的开始的条数的数目(当我们进行分页请求的时候，我们就会用到这个特性，即每次当用户滑动到列表低端或者当用户滑动更新的时候，我们需要
      *                 通过更改startNum的值来进行分页加载的具体实现)
-     * @param endNum 请求列表信息的结束条目，例如我们可以一次只加载10条，当用户请求的时候再加载更多的数据
+     *                 例如start_no=0
+     * @param endNum 请求列表信息的结束条目，例如我们可以一次只加载10条，当用户请求的时候再加载更多的数据,例如end_no=9
      *
      */
     private static void retrieveDatingInfo(final String userId, final String range, final int date, final int startNum, final int endNum)

@@ -78,7 +78,7 @@ public class SearchAssistCoauchSubFragmentListAdapter extends BaseAdapter
 
         // the user photo should be the image resource that can be retrieved from the network dynamically
         // here we set it as static data
-        viewHolder.mPhoto.setImageResource(R.drawable.ic_launcher);
+        viewHolder.mPhoto.setImageResource(R.drawable.default_head);
         viewHolder.mNickname.setText(bean.getName());
         viewHolder.mGender.setText(bean.getGender());
         viewHolder.mKinds.setText(bean.getKinds());

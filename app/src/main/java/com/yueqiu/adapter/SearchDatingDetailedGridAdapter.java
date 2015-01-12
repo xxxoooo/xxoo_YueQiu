@@ -70,7 +70,7 @@ public class SearchDatingDetailedGridAdapter extends BaseAdapter
 
         // then, inflate the layout
         // TODO: the following user photo are the test data, and change them later
-        viewHolder.mPhoto.setImageResource(R.drawable.ic_launcher);
+        viewHolder.mPhoto.setImageResource(R.drawable.default_head);
         viewHolder.mName.setText(bean.getUserName());
 
         return convertView;

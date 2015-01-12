@@ -18,6 +18,7 @@ import android.widget.SearchView;
 import com.yueqiu.R;
 import com.yueqiu.adapter.ActivitiesListViewAdapter;
 import com.yueqiu.bean.Activities;
+import com.yueqiu.bean.ActivitiesList;
 
 import java.util.ArrayList;
 
