@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.activity.ActivitiesIssueActivity;
+import com.yueqiu.activity.ActivitiesMain;
 import com.yueqiu.activity.FeedbackActivity;
 import com.yueqiu.activity.LoginActivity;
 import com.yueqiu.activity.MyParticipationActivity;
@@ -143,7 +144,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
                     case R.id.first_title_activity:
-                        mIntent.setClass(BilliardSearchActivity.this, ActivitiesActivity.class);
+                        mIntent.setClass(BilliardSearchActivity.this, ActivitiesMain.class);
                         startActivity(mIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;

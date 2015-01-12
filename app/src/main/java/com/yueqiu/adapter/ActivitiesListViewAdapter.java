@@ -1,6 +1,8 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +14,16 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.bean.Activities;
+import com.yueqiu.bean.ActivitiesList;
+import com.yueqiu.util.HttpUtil;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -52,25 +63,49 @@ public class ActivitiesListViewAdapter extends BaseAdapter {
 
             holder = new Holder();
             view = LayoutInflater.from(mContext).inflate(R.layout.activities_listview_item,null);
-//            Holder.tv = (TextView)view.findViewById(R.id.activities_lv_item_title);
+            holder.tv_title = (TextView)view.findViewById(R.id.activities_lv_item_tv_title);
+            holder.tv_content = (TextView)view.findViewById(R.id.activities_lv_item_tv_activities_time);
+            holder.tv_time_day = (TextView)view.findViewById(R.id.activities_lv_item_tv_time_day);
+            holder.tv_time_hour = (TextView)view.findViewById(R.id.activities_lv_item_tv_time_hour);
+            holder.iv = (ImageView)view.findViewById(R.id.activities_lv_item_iv_head);
             view.setTag(holder);
         }
         else
         {
             holder = (Holder) view.getTag();
         }
-//        holder.tv.setText(mList.get(i).toString());
+        holder.tv_title.setText(mList.get(i).getTitle().toString().trim());
+        holder.tv_content.setText(mList.get(i).getContent().toString().trim());
+        if( null == mList.get(i).getImg_url() || mList.get(i).getImg_url().equals(""))
+        {
+            holder.iv.setImageDrawable(mContext.getResources().getDrawable(R.drawable.head_img));
+        }
+        else
+        {
+            holder.iv.setImageBitmap(bitmapFromInternet(mList.get(i).getImg_url()));
+        }
+        String times[] = mList.get(i).getCreate_time().split(" ");
+
+        holder.tv_time_day.setText(times[1].substring(0,5).toString());
+        holder.tv_time_hour.setText(times[0].substring(5, times[0].length()).toString());
         return view;
     }
 
 
+    private Bitmap bitmapFromInternet(String filepath)
+    {
+        InputStream in = HttpUtil.getInputStream(filepath);
+        Bitmap bp = BitmapFactory.decodeStream(in);
+        return bp;
+    }
+
 
     public static class Holder
     {
-        public static TextView tv_title;
-        public static TextView tv_activities_time;
-        public static TextView tv_time_day;
-        public static TextView tv_time_hour;
-        public static ImageView iv;
+        public  TextView tv_title;
+        public  TextView tv_content;
+        public  TextView tv_time_day;
+        public  TextView tv_time_hour;
+        public  ImageView iv;
     }
 }

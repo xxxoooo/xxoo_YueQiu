@@ -299,6 +299,8 @@ public class HttpConstants
     public static class Play
     {
         public static final String PUBLISH = "/play/publish";
+
+        public static final String GETLISTEE = "/play/getList";
     }
 
 

@@ -88,6 +88,7 @@
             android:name=".activity.MyfavorCollActivity"
             android:screenOrientation="portrait"/>
         <activity
+
             android:name=".activity.PublishedInfoActivity"
             android:screenOrientation="portrait"/>
 
@@ -143,7 +144,11 @@
             android:label="@string/title_activity_group_topic_detail"
             android:screenOrientation="portrait">
         </activity>
+        <activity
+            android:screenOrientation="portrait"
+            android:name=".activity.ActivitiesMain">
 
+        </activity>
 
     </application>
 
