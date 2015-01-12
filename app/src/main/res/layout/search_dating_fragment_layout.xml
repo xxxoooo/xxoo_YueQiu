@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/search_gallery_pager_test_str"
                 android:textStyle="normal"
-                android:textColor="@android:color/darker_gray"
+                android:textColor="@color/md__defaultBackground"
                 android:padding="2dp"
                 android:textSize="13sp"
                 />
@@ -71,47 +71,27 @@
         >
 
         <Button
-            android:layout_gravity="center"
-            android:textStyle="bold"
-            android:padding="1dp"
-            android:textSize="17sp"
-            android:background="@drawable/btn_bg"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"
+            style="@style/SearchSubFragmentFilterBtnStyle"
             android:id="@+id/btn_dating_distance"
             android:text="@string/search_dating_subfragment_title_distance"
-            android:drawableRight="@drawable/search_sub_fragment_btn_filter_img"
-            android:drawablePadding="2dp"
             />
 
         <View
-            android:layout_marginTop="3dp"
-            android:layout_marginBottom="3dp"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:padding="5dp"
-            android:layout_width="3dp"
+            android:layout_width="0.5dp"
             android:layout_height="match_parent"
-            android:background="@color/light_gray"
+            android:background="@color/search_distance_color"
             >
         </View>
 
         <Button
-            android:padding="1dp"
-            android:textSize="17sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:layout_height="wrap_content"
+            style="@style/SearchSubFragmentFilterBtnStyle"
             android:id="@+id/btn_dating_publichdate"
             android:text="@string/search_dating_subfragment_title_publishdata"
-            android:background="@drawable/btn_bg"
-            android:checked="true"
-            android:drawableRight="@drawable/search_sub_fragment_btn_filter_img"
-            android:drawablePadding="2dp"
             />
     </LinearLayout>
 

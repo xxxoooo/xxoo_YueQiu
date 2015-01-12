@@ -8,22 +8,23 @@
 
     <Button
         style="@style/PopupWindowTvStyle"
-        android:textColor="@android:color/holo_red_light"
+        android:textColor="@color/login_btn_normal"
         android:id="@+id/btn_search_coauch_kinds_popup_no_filter"
         android:text="@string/search_coauch_filter_kinds_no_filter"
+        android:padding="5dp"
         />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/holo_red_light"/>
+        android:layout_height="1dp"
+        android:background="@color/login_btn_normal"/>
 
     <ListView
         android:id="@+id/list_search_coauch_kinds_filter_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:dividerHeight="2dp"
-        android:divider="@android:color/darker_gray">
+        android:dividerHeight="0.5dp"
+        android:divider="@color/devide_line">
 
     </ListView>
 

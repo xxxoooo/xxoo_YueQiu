@@ -14,6 +14,8 @@ import android.widget.PopupWindow;
 
 import com.yueqiu.R;
 import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
+import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.util.HttpUtil;
 
 import java.awt.font.TextAttribute;
 
@@ -93,9 +95,6 @@ public class SubFragmentsCommonUtils
         final int popupWidth = LinearLayout.LayoutParams.MATCH_PARENT;
         final int popupHeight = LinearLayout.LayoutParams.WRAP_CONTENT;
 
-//        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        View popupWindowLayout = layoutInflater.inflate(layoutResId, null);
-
         final PopupWindow popupWindow = new PopupWindow(context);
         popupWindow.setContentView(popupLayoutView);
         popupWindow.setWidth(popupWidth);
@@ -130,10 +129,10 @@ public class SubFragmentsCommonUtils
 
     // TODO: 这里我们使用的是服务器端的同学开发的接口
     // TODO: 这里我们加载的是商家推荐的信息的列表，也就是显示在每一个Fragment当中的最上面的滚动的Image Gallery
-    private void retrieveRecommdedRoomInfo()
+    private static void retrieveRecommdedRoomInfo()
     {
-
-
+        String rawResult = HttpUtil.urlClient(HttpConstants.SearchRoomRecommendation.URL, null, HttpConstants.RequestMethod.GET);
+        Log.d(TAG, " the recommendation info we get are : " + rawResult);
     }
 
 
@@ -157,6 +156,16 @@ public class SubFragmentsCommonUtils
     {
         // TODO: 以下仅仅是测试数据，在测试接口的时候就删除掉
         sPagerImgResArr = new int[]{R.drawable.test_pager_1, R.drawable.test_pager_2, R.drawable.test_pager_3, R.drawable.test_pager_4};
+
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                retrieveRecommdedRoomInfo();
+            }
+        }).start();
+
 
         sImgGalleryViewPager = (ViewPager) parentView.findViewById(viewPagerId);
         sGalleryIndicatorGroup = (LinearLayout) parentView.findViewById(galleryIndiGroupId);
@@ -208,6 +217,7 @@ public class SubFragmentsCommonUtils
             @Override
             public void onPageScrolled(int i, float v, int i2)
             {
+
             }
 
             @Override
@@ -216,6 +226,7 @@ public class SubFragmentsCommonUtils
                 Log.d(TAG, " the current page index are : " + i + ", and the selected index are : " + i % sPagerImgArr.length);
 //                setImgBackground(i % sPagerImgArr.length);
                 setImgBackground(i % size);
+
             }
 
             @Override

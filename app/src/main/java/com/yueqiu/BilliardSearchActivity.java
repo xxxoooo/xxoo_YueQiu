@@ -360,7 +360,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     {
 
         mItemList.clear();
-        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getAccount(),
+        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
                 100, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(accountItem);
 
@@ -482,9 +482,6 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
             }
         });
-        //mMenuDrawer.peekDrawer();
-
-
     }
 
     private Handler mHandler = new Handler()
@@ -526,7 +523,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private void resetUSerInfo()
     {
         YueQiuApp.sUserInfo.setImg_url("");
-        YueQiuApp.sUserInfo.setAccount(getString(R.string.guest));
+        YueQiuApp.sUserInfo.setUsername(getString(R.string.guest));
         YueQiuApp.sUserInfo.setUser_id(0);
         YueQiuApp.sUserInfo.setPhone("");
 
@@ -538,7 +535,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
 
         mItemList.remove(0);
-        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getAccount(),
+        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
                 0, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(0, accountItem);
         mAdapter.notifyDataSetChanged();

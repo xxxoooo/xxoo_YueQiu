@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="8dp">
+    android:padding="10dp">
     <ImageView
         android:id="@+id/published_item_image"
         android:layout_width="wrap_content"
@@ -13,7 +13,7 @@
         android:layout_marginBottom="8dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/head_img"/>
+        android:src="@drawable/default_head"/>
     <TextView
         android:id="@+id/published_title"
         android:layout_width="wrap_content"
@@ -21,16 +21,19 @@
         android:layout_alignTop="@+id/published_item_image"
         android:layout_toRightOf="@+id/published_item_image"
         android:layout_marginLeft="10dp"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:textColor="@color/md__defaultBackground"/>
     <TextView
         android:id="@+id/published_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/published_title"
         android:layout_alignLeft="@+id/published_title"
-        android:layout_marginTop="20dp"
+        android:layout_alignBottom="@+id/published_item_image"
         android:ellipsize="end"
         android:textSize="16sp"
+        android:textColor="@color/md__defaultBackground"
+        android:singleLine="true"
         />
     <TextView
         android:id="@+id/published_time"
@@ -38,6 +41,8 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:textSize="12sp"/>
+        android:textSize="12sp"
+        android:textColor="@color/search_distance_color"
+        />
 
 </RelativeLayout>

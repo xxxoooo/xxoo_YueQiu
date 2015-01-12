@@ -51,6 +51,7 @@ import java.util.Map;
 public class AddPersonFragment extends Fragment implements LocationListener {
     private static final String TAG = "AddPersonFragment";
     private static final int GET_SUCCESS = 0;
+    private static final int GET_FAIL = 1;
     private ActionBar mActionBar;
     private LinearLayout mLinearLayout;
     private View mProgressBar;
@@ -89,6 +90,11 @@ public class AddPersonFragment extends Fragment implements LocationListener {
         return view;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+//        mLocationManager.removeUpdates(this);
+    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -146,6 +152,9 @@ public class AddPersonFragment extends Fragment implements LocationListener {
                         }
                     });
                     break;
+                case GET_FAIL:
+                    mProgressBar.setVisibility(View.GONE);
+                    Toast.makeText(getActivity(), "该位置暂无球友！", Toast.LENGTH_LONG).show();
                 default:
                     break;
             }
@@ -174,6 +183,8 @@ public class AddPersonFragment extends Fragment implements LocationListener {
                     searchPeople.mList.add(itemInfo);
                 }
                 mHandler.obtainMessage(GET_SUCCESS, searchPeople).sendToTarget();
+            } else {
+                mHandler.obtainMessage(GET_FAIL).sendToTarget();
             }
 
         } catch (JSONException e) {
@@ -194,6 +205,7 @@ public class AddPersonFragment extends Fragment implements LocationListener {
 
         } else {
             Toast.makeText(getActivity(), "请检查GPS和网络是否可用！", Toast.LENGTH_SHORT).show();
+            mProgressBar.setVisibility(View.GONE);
         }
     }
 
@@ -208,6 +220,7 @@ public class AddPersonFragment extends Fragment implements LocationListener {
                 searchFriendsByLocation(mLatitude, mLongitude);
             }
         }).start();
+        mLocationManager.removeUpdates(this);//停止定位
     }
 
     @Override

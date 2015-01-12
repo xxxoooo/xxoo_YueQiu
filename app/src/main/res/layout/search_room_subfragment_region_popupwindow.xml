@@ -13,22 +13,24 @@
 
     <Button
         style="@style/PopupWindowTvStyle"
-        android:textColor="@android:color/holo_red_light"
+        android:textColor="@color/login_btn_normal"
+        android:layout_marginLeft="5dp"
         android:id="@+id/btn_search_room_popup_no_filter"
         android:text="@string/search_room_popupwindow_do_notfilter"
         />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@android:color/holo_red_light"/>
+        android:layout_height="1dp"
+        android:background="@color/login_btn_normal"/>
 
     <ListView
         android:id="@+id/list_search_room_region_filter_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:dividerHeight="2dp"
-        android:divider="@android:color/darker_gray">
+        android:dividerHeight="0.5dp"
+        android:scrollbars="none"
+        android:divider="@color/devide_line">
 
     </ListView>
 

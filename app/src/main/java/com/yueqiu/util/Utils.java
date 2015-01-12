@@ -37,6 +37,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+
 import org.json.JSONTokener;
 
 import java.io.BufferedReader;
@@ -70,14 +71,14 @@ public class Utils {
         Iterator iterator = map.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator.next();
-            if(entry.getKey() != DatabaseConstant.UserTable.PASSWORD)
+            if (entry.getKey() != DatabaseConstant.UserTable.PASSWORD)
                 editor.putString(entry.getKey(), entry.getValue());
         }
         editor.commit();
 
 
         YueQiuApp.sUserInfo.setImg_url(map.get(DatabaseConstant.UserTable.IMG_URL));
-        YueQiuApp.sUserInfo.setAccount(map.get(DatabaseConstant.UserTable.ACCOUNT));
+        YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.ACCOUNT));
         YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(DatabaseConstant.UserTable.USER_ID)));
         YueQiuApp.sUserInfo.setPhone(map.get(DatabaseConstant.UserTable.PHONE));
 
@@ -97,14 +98,14 @@ public class Utils {
      */
     public static JSONObject parseJson(String result) {
         JSONObject object = null;
-        try{
-            if(result != null) {
+        try {
+            if (result != null) {
                 object = new JSONObject(result);
-            }else{
+            } else {
                 object = new JSONObject();
-                object.put("code",1010);
-                object.put("msg","error");
-                object.put("result",null);
+                object.put("code", 1010);
+                object.put("msg", "error");
+                object.put("result", null);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -142,25 +143,28 @@ public class Utils {
 
     /**
      * String类型转换为Date
+     *
      * @param currTime
      * @param formatType
      * @return
      */
-    public static Date stringToDate(String currTime, String formatType)throws ParseException {
+    public static Date stringToDate(String currTime, String formatType) throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat(formatType);
         Date date = formatter.parse(currTime);
         return date;
     }
+
     /**
      * Date类型转换为String
      */
     public static String dateToString(Date data, String formatType) {
         return new SimpleDateFormat(formatType).format(data);
     }
+
     /**
-     *long类型转换为Date类型
+     * long类型转换为Date类型
      */
-    public static Date longToDate(long currTime,String formatType) throws ParseException {
+    public static Date longToDate(long currTime, String formatType) throws ParseException {
         Date old = new Date(currTime);
         String time = dateToString(old, formatType);
         Date date = stringToDate(time, formatType);
@@ -170,7 +174,7 @@ public class Utils {
     /**
      * long类型时间转换为String类型
      */
-    public static String longToString(long currTime,String formatType) throws ParseException {
+    public static String longToString(long currTime, String formatType) throws ParseException {
         Date date = longToDate(currTime, formatType);
         String strTime = dateToString(date, formatType);
         return strTime;
@@ -182,6 +186,7 @@ public class Utils {
     public static long dateToLong(Date date) {
         return date.getTime();
     }
+
     /**
      * String类型转换为long
      */
@@ -195,10 +200,11 @@ public class Utils {
             return currentTime;
         }
     }
+
     /*
      * 更新我的资料
      */
-    public static void updateJSONData(Context context, JSONHelper jsonHelper,String path) throws IOException, JSONException {
+    public static void updateJSONData(Context context, JSONHelper jsonHelper, String path) throws IOException, JSONException {
         //JSONArray array = new JSONArray();
         //array.put(jsonHelper.toJSON());
 
@@ -208,17 +214,16 @@ public class Utils {
         try {
             //OutputStream out = context.openFileOutput(path, Context.MODE_PRIVATE);
             File file = context.getFileStreamPath(path);
-            RandomAccessFile randomFile = new RandomAccessFile(file,"rw");
+            RandomAccessFile randomFile = new RandomAccessFile(file, "rw");
             long randomLength = randomFile.length();
-            if(randomLength == 0 ){
+            if (randomLength == 0) {
                 randomFile.seek(randomLength);
                 randomFile.writeBytes("[");
-            }else if(randomLength == 1){
+            } else if (randomLength == 1) {
                 randomFile.seek(randomLength);
                 randomFile.writeBytes(object.toString() + "]");
-            }
-            else{
-                randomFile.seek(randomLength-1);
+            } else {
+                randomFile.seek(randomLength - 1);
                 randomFile.writeBytes(object.toString() + "]");
             }
 
@@ -232,6 +237,7 @@ public class Utils {
 
     /**
      * 直接保存RESTFUL获取的资料JSON数据到本地
+     *
      * @param context
      * @param array
      * @throws IOException
@@ -275,7 +281,7 @@ public class Utils {
             if (reader != null)
                 try {
                     reader.close();
-                }catch (IOException e) {
+                } catch (IOException e) {
                     Log.e(TAG, "IOException: " + e.toString());
                 }
         }
@@ -285,7 +291,7 @@ public class Utils {
     /**
      * 设置FragmentActivity的Menu文字的颜色为白色
      */
-    public static void setFragmentActivityMenuColor(FragmentActivity context){
+    public static void setFragmentActivityMenuColor(FragmentActivity context) {
         final LayoutInflater layoutInflater = context.getLayoutInflater();
         final LayoutInflater.Factory existingFactory = layoutInflater.getFactory();
         try {
@@ -296,7 +302,7 @@ public class Utils {
                 @Override
                 public View onCreateView(String name, final Context context, AttributeSet attrs) {
                     if (name.equalsIgnoreCase("com.android.internal.view.menu.IconMenuItemView")
-                            || name.equalsIgnoreCase("com.android.internal.view.menu.ActionMenuItemView")){
+                            || name.equalsIgnoreCase("com.android.internal.view.menu.ActionMenuItemView")) {
                         View view = null;
                         // if a factory was already set, we use the returned view
                         if (existingFactory != null) {
@@ -333,6 +339,7 @@ public class Utils {
             e.printStackTrace();
         }
     }
+
     /**
      * 设置普通Activity的Menu文字的颜色为白色
      */
@@ -369,21 +376,23 @@ public class Utils {
                 }
         );
     }
+
     /**
      * 在EditText中插入表情图片
+     *
      * @param sourceStr
      */
-    public static SpannableStringBuilder addImgIntoEditText(Context context,String sourceStr,String replaceStr,int drawableResId){
+    public static SpannableStringBuilder addImgIntoEditText(Context context, String sourceStr, String replaceStr, int drawableResId) {
         SpannableStringBuilder spannable = new SpannableStringBuilder(sourceStr);
         Pattern pattern = Pattern.compile(replaceStr);
         Matcher matcher = pattern.matcher(sourceStr);
 
         Drawable drawable = context.getResources().getDrawable(drawableResId);
-        drawable.setBounds(0,0,drawable.getIntrinsicWidth(),drawable.getIntrinsicHeight());
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
 
-        while(matcher.find()){
-            ImageSpan span = new ImageSpan(drawable,ImageSpan.ALIGN_BASELINE);
-            spannable.setSpan(span,matcher.start(),matcher.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        while (matcher.find()) {
+            ImageSpan span = new ImageSpan(drawable, ImageSpan.ALIGN_BASELINE);
+            spannable.setSpan(span, matcher.start(), matcher.end(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         return spannable;
     }
@@ -391,6 +400,7 @@ public class Utils {
     /**
      * 将JSONObject转换成相应对象
      * 如果有浮点型的数据，都使用double
+     *
      * @param clazz
      * @param object
      * @return
@@ -400,9 +410,8 @@ public class Utils {
         try {
             t = clazz.newInstance();
             Field[] fields = clazz.getDeclaredFields();
-            for(int i = 0; i < fields.length; i++)
-            {
 
+            for (int i = 0; i < fields.length; i++) {
                 if (!object.isNull(fields[i].getName())) {
                     Object o = object.get(fields[i].getName());
                     if (o != null) {
@@ -411,6 +420,7 @@ public class Utils {
                     }
                 }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -419,6 +429,7 @@ public class Utils {
 
     /**
      * 类型转换
+     *
      * @param o
      * @return
      */

@@ -14,7 +14,8 @@
 
         <Button
             android:id="@+id/update_assistant_btn"
-            android:layout_width="165dp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="44dp"
             android:background="@drawable/update_assistant_click"
             android:text="@string/update_to_assistant"
@@ -24,7 +25,8 @@
         <Button
             android:id="@+id/update_coach_btn"
             android:layout_marginLeft="10dp"
-            android:layout_width="165dp"
+            android:layout_weight="1"
+            android:layout_width="match_parent"
             android:layout_height="44dp"
             android:background="@drawable/update_coach_click"
             android:text="@string/update_to_coach"
@@ -67,7 +69,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/photo"/>
+                            android:text="@string/photo"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <ImageView
                             android:id="@+id/my_profile_photo_iv"
@@ -76,7 +79,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_alignParentRight="true"
                             android:layout_centerVertical="true"
-                            android:src="@drawable/head_img"/>
+                            android:src="@drawable/head_img"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
                     <View
@@ -96,7 +100,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/account"/>
+                            android:text="@string/account"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <TextView
                             android:id="@+id/my_profile_account_tv"
@@ -105,7 +110,7 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="dkijeoijiode"/>
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
                     <View
                         android:layout_width="match_parent"
@@ -124,7 +129,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/gender"/>
+                            android:text="@string/gender"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <TextView
                             android:id="@+id/my_profile_gender_tv"
@@ -133,7 +139,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="女"/>
+                            android:text="女"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
 
@@ -161,7 +168,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/nick_name"/>
+                            android:text="@string/nick_name"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <TextView
                             android:id="@+id/my_profile_nick_name_tv"
@@ -170,7 +178,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
                     <View
@@ -190,7 +199,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/region"/>
+                            android:text="@string/region"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <TextView
                             android:id="@+id/my_profile_region_tv"
@@ -199,7 +209,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
                     <View
@@ -219,7 +230,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/level"/>
+                            android:text="@string/level"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <TextView
                             android:id="@+id/my_profile_level_tv"
@@ -228,7 +240,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
                     <View
@@ -248,7 +261,9 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/ball_type"/>
+                            android:text="@string/ball_type"
+                            android:textColor="@color/md__defaultBackground"
+                            />
 
                         <TextView
                             android:id="@+id/my_profile_ball_type_tv"
@@ -257,7 +272,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
                     <View
@@ -277,7 +293,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/billiards_cue"/>
+                            android:text="@string/billiards_cue"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <TextView
                             android:id="@+id/my_profile_billiards_cue_tv"
@@ -286,7 +303,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
                     <View
@@ -306,7 +324,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/cue_habits"/>
+                            android:text="@string/cue_habits"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <TextView
                             android:id="@+id/my_profile_cue_habits_tv"
@@ -315,7 +334,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
                     <View
@@ -335,7 +355,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/play_age"/>
+                            android:text="@string/play_age"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <TextView
                             android:id="@+id/my_profile_play_age_tv"
@@ -344,7 +365,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
                     <View
@@ -364,7 +386,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/idol"/>
+                            android:text="@string/idol"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <TextView
                             android:id="@+id/my_profile_idol_tv"
@@ -373,7 +396,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
                     <View
@@ -393,7 +417,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/sign"/>
+                            android:text="@string/sign"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <TextView
                             android:id="@+id/my_profile_sign_tv"
@@ -402,7 +427,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
                     <View
@@ -422,7 +448,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/the_new_post"/>
+                            android:text="@string/the_new_post"
+                            android:textColor="@color/md__defaultBackground"/>
 
                         <ImageView
                             android:id="@+id/my_profile_the_new_post_im"
@@ -430,7 +457,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
-                            android:layout_alignParentRight="true"/>
+                            android:layout_alignParentRight="true"
+                            android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
                 </LinearLayout>

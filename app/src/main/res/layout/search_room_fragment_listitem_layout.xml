@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp">
 
     <!-- 这是用于SearchActivity当中的球厅Fragment下面的ListView当中的
         每一个Item的具体的布局layout文件 -->
@@ -14,11 +16,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/img_room_subfragment_listitem_photo"
-        android:src="@drawable/ic_launcher"
+        android:src="@drawable/default_head"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:padding="2dp"
-        android:layout_margin="1dp"
         />
 
     <TextView
@@ -26,11 +27,11 @@
         android:id="@+id/tv_room_subfragment_listitem_roomname"
         android:text="@string/search_room_sub_fragment_listitem_roomname"
         android:layout_toRightOf="@id/img_room_subfragment_listitem_photo"
-        android:layout_marginTop="1dp"
-        android:layout_marginLeft="4dp"
-        android:textColor="@android:color/black"
-        android:padding="4dp"
-        android:textSize="17sp"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="15dp"
+        android:textColor="@color/md__defaultBackground"
+        android:textSize="18sp"
+
         />
 
     <!--用于评级的ratingBar，这里我们默认显示的级别是4.5级-->
@@ -40,21 +41,34 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_room_subfragment_listitem_roomname"
         android:layout_toRightOf="@id/img_room_subfragment_listitem_photo"
+        android:layout_alignLeft="@+id/tv_room_subfragment_listitem_roomname"
         style="@style/SearchActivityRatingBarStyle"
         android:numStars="5"
         android:rating="4.5"
+        android:layout_marginTop="3dp"
         />
+    <View
+        android:id="@+id/search_room_divider"
+        android:layout_width="0.5dp"
+        android:layout_height="wrap_content"
+        android:background="@color/search_distance_color"
+        android:layout_toRightOf="@+id/rating_room_subfragment_listitem_rating"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_alignTop="@+id/rating_room_subfragment_listitem_rating"
+        android:layout_alignBottom="@+id/rating_room_subfragment_listitem_rating"/>
 
     <TextView
         android:id="@+id/tv_price_indi"
         style="@style/ListItemTvStyle"
-        android:layout_toRightOf="@id/rating_room_subfragment_listitem_rating"
+        android:layout_toRightOf="@+id/search_room_divider"
         android:text="@string/search_room_sub_fragment_price_indi"
         android:layout_below="@id/tv_room_subfragment_listitem_roomname"
-        android:layout_marginTop="3dp"
-        android:layout_marginLeft="2dp"
-
+        android:layout_marginLeft="4dp"
+        android:layout_alignTop="@+id/rating_room_subfragment_listitem_rating"
         />
+
+
 
     <TextView
         style="@style/ListItemTvStyle"
@@ -71,8 +85,9 @@
         android:text="@string/search_room_sub_fragment_listitem_roomaddress"
         android:layout_toRightOf="@id/img_room_subfragment_listitem_photo"
         android:layout_below="@id/rating_room_subfragment_listitem_rating"
-        android:padding="3dp"
+        android:layout_alignLeft="@+id/rating_room_subfragment_listitem_rating"
         android:layout_marginRight="40dp"
+        android:layout_marginTop="3dp"
         />
 
     <TextView
@@ -82,6 +97,8 @@
         android:layout_marginTop="30dp"
         android:layout_alignParentRight="true"
         android:text="@string/search_room_sub_fragment_listitem_roomdistance"
+        android:textColor="@color/search_distance_color"
+        android:layout_centerVertical="true"
         />
 
 

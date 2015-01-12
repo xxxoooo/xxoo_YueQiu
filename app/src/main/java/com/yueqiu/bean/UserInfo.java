@@ -1,5 +1,7 @@
 package com.yueqiu.bean;
 
+import android.util.Log;
+
 import com.yueqiu.util.JSONHelper;
 
 import org.json.JSONException;
@@ -13,26 +15,30 @@ public class UserInfo implements JSONHelper {
     private int id;
     private String img_url;//头像在网络中的地址
     private String img_real;//头像在本地的地址
-    private String account;//账号
+    private String username;//账号
     private String phone;//电话
     private String password;//密码
-    private int sex;//性别
+    private String sex;//性别
     private String title;//职称
-    private String nickName;//昵称
+    private String nick;//昵称
     private String district;//区域
-    private int level;//水平
+    private String level;//水平
     private String appoint_date;//约球时间
-    private int ballArm;//使用球杆
-    private int usedType;//使用习惯
+    private String ballArm;//使用球杆
+    private String usedType;//使用习惯
     private String ballAge;//球龄
     private String idol;//偶像
     private String idol_name;//签名
     private String new_img;//最新照片在网络中的位置
     private String new_img_real;//最新照片在本地的位置
+    private String ball_class;
+
+
+
+    private String ball_type;
     private String token;
-    private int user_id;
+    private String user_id;
     private String login_time;//登录时间
-    private int ball_class;
 
     private static final String JSON_USER_ID = "user_id";
     private static final String JSON_IMGREAL = "img_url";
@@ -50,8 +56,31 @@ public class UserInfo implements JSONHelper {
     private static final String JSON_CLASS = "class";
     private static final String JSON_APPOINT_DATE = "appoint_date";
 
+    public void setBall_type(int ball_type) {
+        this.ball_type = String.valueOf(ball_type);
+    }
+
+    public int getBall_type() {
+        return Integer.parseInt(ball_type);
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+
+        return username;
+    }
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
 
 
+    public String getNick() {
+
+        return nick;
+    }
 
 
     public String getImg_url() {
@@ -95,11 +124,11 @@ public class UserInfo implements JSONHelper {
     }
 
     public int getSex() {
-        return sex;
+        return Integer.parseInt(sex);
     }
 
     public void setSex(int sex) {
-        this.sex = sex;
+        this.sex = String.valueOf(sex);
     }
 
     public String getTitle() {
@@ -108,14 +137,6 @@ public class UserInfo implements JSONHelper {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
     }
 
     public String getDistrict() {
@@ -127,11 +148,11 @@ public class UserInfo implements JSONHelper {
     }
 
     public int getLevel() {
-        return level;
+        return Integer.parseInt(level);
     }
 
     public void setLevel(int level) {
-        this.level = level;
+        this.level = String.valueOf(level);
     }
 
     public String getAppoint_date() {
@@ -151,11 +172,11 @@ public class UserInfo implements JSONHelper {
     }
 
     public int getUser_id() {
-        return user_id;
+        return Integer.parseInt(user_id);
     }
 
     public void setUser_id(int user_id) {
-        this.user_id = user_id;
+        this.user_id = String.valueOf(user_id);
     }
 
     public String getLogin_time() {
@@ -168,19 +189,19 @@ public class UserInfo implements JSONHelper {
 
 
     public int getBallArm() {
-        return ballArm;
+        return Integer.parseInt(ballArm);
     }
 
     public void setBallArm(int ballArm) {
-        this.ballArm = ballArm;
+        this.ballArm = String.valueOf(ballArm);
     }
 
     public int getUsedType() {
-        return usedType;
+        return Integer.parseInt(usedType);
     }
 
     public void setUsedType(int usedType) {
-        this.usedType = usedType;
+        this.usedType = String.valueOf(usedType);
     }
 
     public String getBallAge() {
@@ -223,55 +244,23 @@ public class UserInfo implements JSONHelper {
         this.new_img_real = new_img_real;
     }
 
-    public int getBall_class() {
+    public String getBall_class() {
         return ball_class;
     }
 
-    public void setBall_class(int ball_class) {
+    public void setBall_class(String ball_class) {
         this.ball_class = ball_class;
     }
 
-    public String getAccount() {
-        return account;
-    }
-
-    public void setAccount(String account) {
-        this.account = account;
-    }
-
-    public UserInfo(JSONObject obj) throws JSONException {
-        user_id = obj.getInt(JSON_USER_ID);
-        img_url = String.valueOf(obj.getString(JSON_IMGREAL));
-        account = String.valueOf(obj.getString(JSON_ACCOUNT));
-        sex = obj.getInt(JSON_SEX);//接口数据含义未确定
-        nickName = String.valueOf(obj.getString(JSON_USERNAME));
-        district = obj.getString(JSON_DISTRICT);
-        level = obj.getInt(JSON_LEVEL);
-
-        ballArm = obj.getInt(JSON_BALL_ARM);
-        usedType = obj.getInt(JSON_USED_TYPE);
-        ballAge = "".equals(obj.getString(JSON_BALL_AGE)) ?
-                "0" : obj.getString(JSON_BALL_AGE);//
-        idol = String.valueOf(obj.getString(JSON_IDOL));
-        idol_name = obj.getString(JSON_SIGN);
-        new_img = obj.getString(JSON_NEW_IMG);
-
-        appoint_date = obj.getString(JSON_APPOINT_DATE);
-        ball_class = obj.getInt(JSON_CLASS);
-    }
-
-    public UserInfo() {
-
-    }
 
     @Override
-    public JSONObject toJSON() throws JSONException{
+    public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
         json.put(JSON_USER_ID, user_id);
         json.put(JSON_IMGREAL, img_url);
-        json.put(JSON_ACCOUNT, account);
+        json.put(JSON_ACCOUNT, username);
         json.put(JSON_SEX, String.valueOf(sex));
-        json.put(JSON_USERNAME, nickName);
+        json.put(JSON_USERNAME, nick);
         json.put(JSON_DISTRICT, district);
         json.put(JSON_LEVEL, level);
         json.put(JSON_BALL_ARM, ballArm);

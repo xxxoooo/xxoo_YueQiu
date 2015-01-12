@@ -87,7 +87,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                     YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(DatabaseConstant.UserTable.USER_ID)));
                     YueQiuApp.sUserInfo.setPhone(map.get(DatabaseConstant.UserTable.PHONE));
                     YueQiuApp.sUserInfo.setLogin_time(map.get(DatabaseConstant.UserTable.LOGIN_TIME));
-                    YueQiuApp.sUserInfo.setAccount(map.get(DatabaseConstant.UserTable.ACCOUNT));
+                    YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.ACCOUNT));
 
                     Iterator iter = map.entrySet().iterator();
                     while(iter.hasNext()){
@@ -316,7 +316,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
         values.put(DatabaseConstant.UserTable.USERNAME,"");
         values.put(DatabaseConstant.UserTable.DISTRICT,"");
         values.put(DatabaseConstant.UserTable.LEVEL,1);
-        values.put(DatabaseConstant.UserTable.BALL_CLASS,1);
+        values.put(DatabaseConstant.UserTable.BALL_TYPE,1);
         values.put(DatabaseConstant.UserTable.APPOINT_DATE,"");
         values.put(DatabaseConstant.UserTable.BALLARM,1);
         values.put(DatabaseConstant.UserTable.USERDTYPE,1);
