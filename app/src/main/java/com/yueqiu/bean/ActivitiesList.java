@@ -7,10 +7,10 @@ import java.util.List;
  */
 public class ActivitiesList {
     private String id;
+    private String title;
     private String img_url;
     private String content;
     private String create_time;
-    private List<Activities> list;
 
 
     public String getId() {
@@ -45,11 +45,22 @@ public class ActivitiesList {
         this.create_time = create_time;
     }
 
-    public List<Activities> getList() {
-        return list;
+    public String getTitle() {
+        return title;
     }
 
-    public void setList(List<Activities> list) {
-        this.list = list;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @Override
+    public String toString() {
+        return "ActivitiesList{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", img_url='" + img_url + '\'' +
+                ", content='" + content + '\'' +
+                ", create_time='" + create_time + '\'' +
+                '}';
     }
 }

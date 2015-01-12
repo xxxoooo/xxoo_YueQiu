@@ -1,31 +1,23 @@
-package com.yueqiu;
+package com.yueqiu.fragment.activities;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.SearchManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.Fragment;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.SearchView;
 
+import com.yueqiu.R;
 import com.yueqiu.activity.ActivitiesDetail;
-import com.yueqiu.activity.ActivitiesIssueActivity;
-import com.yueqiu.activity.ActivityBusinessActivities;
-import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.ActivitiesListViewAdapter;
 import com.yueqiu.bean.Activities;
-import com.yueqiu.bean.ActivitiesList;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.dao.ActivitiesDao;
 import com.yueqiu.dao.DaoFactory;
@@ -41,12 +33,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
- * Created by yinfeng on 14/12/18.
+ * Created by yinfeng on 15/1/12.
  */
-public class ActivitiesActivity extends Activity implements View.OnClickListener,
-        XListView.IXListViewListener {
+public class ExhibitionFragment extends Fragment implements XListView.IXListViewListener{
+
     private static final String TAG = "ActivitiesActivity";
     private ActionBar mActionBar;
     private XListView mListView;
@@ -66,6 +57,9 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
     private int mLocalEnd;
     private boolean isHead;
     private boolean mNetworkAvailable;
+    private Activity mActivity;
+    private View mView;
+    private int mType;
     private Handler handler = new Handler()
     {
         @Override
@@ -82,7 +76,7 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
                     mListData = (ArrayList<Activities>)msg.obj;
                     if(mAdapter == null)
                     {
-                        mAdapter = new ActivitiesListViewAdapter(mListData ,ActivitiesActivity.this);
+                        mAdapter = new ActivitiesListViewAdapter(mListData ,mActivity);
                         mListView.setAdapter(mAdapter);
 
                     }
@@ -103,40 +97,43 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_activites);
-        initActionBar();
+        mActivity = getActivity();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
+        mView = inflater.inflate(R.layout.activity_activites,null);
         mNetstart = 0;
         mNetend = 9;
         mLocalStart = 0;
         mLocalEnd = 10;
         mListData = new ArrayList<Activities>();
-        mDao = DaoFactory.getActivities(ActivitiesActivity.this);
+        mDao = DaoFactory.getActivities(mActivity);
         initView();
-        mNetworkAvailable = Utils.networkAvaiable(ActivitiesActivity.this);
+        mNetworkAvailable = Utils.networkAvaiable(mActivity);
 //        handler.post(getInternetDataThread);
         isHead = false;
+        mType = getArguments().getInt("type",3);
         new Thread(mNetworkAvailable ? getNetworkData : getLocalData).start();
+        return mView;
     }
-
-
-
-
 
     private void initView()
     {
-        mListView = (XListView)findViewById(R.id.activity_activities_lv);
-        mPb = (ProgressBar) findViewById(R.id.pb_loading);
+        mListView = (XListView)mView.findViewById(R.id.activity_activities_lv);
+        mPb = (ProgressBar) mView.findViewById(R.id.pb_loading);
         mListView.setVisibility(View.GONE);
         mPb.setVisibility(View.VISIBLE);
 
 
-        mPb = (ProgressBar) findViewById(R.id.pb_loading);
+        mPb = (ProgressBar) mView.findViewById(R.id.pb_loading);
         mListView.setOnItemClickListener(itemClickListener);
         mListView.setPullLoadEnable(true);
         mListView.setXListViewListener(this);
     }
+
 
     private Runnable getNetworkData = new Runnable() {
         @Override
@@ -173,6 +170,7 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
         Map<String,Object> map = new HashMap<String, Object>();
         map.put("start_no",mNetstart);
         map.put("end_no",mNetend);
+        map.put("type",mType);
         String retStr = HttpUtil.urlClient(
                 HttpConstants.Play.GETLISTEE, map, HttpConstants.RequestMethod.GET);
         JSONObject object = Utils.parseJson(retStr);
@@ -238,85 +236,28 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
     private AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            startActivity(new Intent(ActivitiesActivity.this, ActivitiesDetail.class));
-            overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+            startActivity(new Intent(mActivity, ActivitiesDetail.class));
+            mActivity.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
         }
     };
 
 
-    private void initActionBar(){
-        mActionBar = getActionBar();
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle(getString(R.string.tab_title_activity));
-    }
-
-    @Override
-    public void onClick(View view) {
-
-    }
-
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch(id){
-            case android.R.id.home:
-                finish();
-                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
-                break;
-//            case R.id.menu_activities:
-//                startActivity(new Intent(this, ActivityBusinessActivities.class));
-//                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
-//                break;
-//            case R.id.menu_issue_activities:
-//                startActivity(new Intent(ActivitiesActivity.this, ActivitiesIssueActivity.class));
-//                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
-//                break;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.billiard_search, menu);
-
-        SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
-        return true;
-    }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_BACK:
-                finish();
-                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
-                break;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
     @Override
     public void onRefresh() {
-        new Thread(Utils.networkAvaiable(ActivitiesActivity.this)
+        new Thread(Utils.networkAvaiable(mActivity)
                 ? getNetworkData : getLocalData).start();
         mNetstart = 0;
         mNetend = 9;
         isHead = true;
-
     }
 
     @Override
     public void onLoadMore() {
-        Log.i("Demo","onLoadMore");
-        new Thread(Utils.networkAvaiable(ActivitiesActivity.this)
+        new Thread(Utils.networkAvaiable(mActivity)
                 ? getNetworkData : getLocalData).start();
 
         isHead = false;
     }
-
 
     private void onLoad() {
         mListView.stopRefresh();

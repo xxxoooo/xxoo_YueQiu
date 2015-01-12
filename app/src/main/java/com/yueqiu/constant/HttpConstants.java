@@ -144,6 +144,12 @@ public class HttpConstants
     public static final class SearchDating
     {
         public static final String URL = "/home/appointBall";
+
+        // 用于实现约球详情页面的用户点击我要参加活动的url
+        public static final String URL_JOIN_ACTIVITY = "/home/join";
+
+        // 用于获取约球详情的信息列表的URL
+        public static final String URL_DATING_DETAILE = "/home/appointBllDetail";
     }
 
     /**
@@ -293,6 +299,8 @@ public class HttpConstants
     public static class Play
     {
         public static final String PUBLISH = "/play/publish";
+
+        public static final String GETLISTEE = "/play/getList";
     }
 
 

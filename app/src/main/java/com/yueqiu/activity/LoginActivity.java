@@ -101,7 +101,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         initView();
         initActionBar();
 
-        mDbUtil = new DBUtils(this, DatabaseConstant.UserTable.CREATE_SQL);
+        mDbUtil = DBUtils.getInstance(this);
 
     }
 

@@ -327,7 +327,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
         values.put(DatabaseConstant.UserTable.NEW_IMG_REAL,"");
         values.put(DatabaseConstant.UserTable.LOGIN_TIME,map.get(DatabaseConstant.UserTable.LOGIN_TIME));
 
-        DBUtils dbUtil = new DBUtils(this, DatabaseConstant.UserTable.CREATE_SQL);
+        DBUtils dbUtil = DBUtils.getInstance(this);
         SQLiteDatabase db = dbUtil.getWritableDatabase();
         db.insert(DatabaseConstant.UserTable.TABLE,null,values);
     }

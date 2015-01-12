@@ -35,6 +35,7 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 import org.json.JSONTokener;
@@ -408,7 +409,6 @@ public class Utils {
         T t = null;
         try {
             t = clazz.newInstance();
-            Method[] methods = clazz.getDeclaredMethods();
             Field[] fields = clazz.getDeclaredFields();
 
             for (int i = 0; i < fields.length; i++) {
@@ -464,5 +464,14 @@ public class Utils {
 //        }
 //    }
 
+    /**
+     * 获取当前时间，并将当前时间转化为yyyy-mm-dd hh-mm的格式
+     * @return
+     */
+    public static String getNowTime()
+    {
+        SimpleDateFormat sdp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+        return sdp.format(new Date());
+    }
 
 }

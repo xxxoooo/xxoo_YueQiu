@@ -211,6 +211,7 @@ public class BilliardsSearchMateFragment extends Fragment
      * @param range  这个是用于筛选的条件之一：距离，我们通过传送用户指定的距离的数据，即可以或得到指定的数据
      * @param sex    这也是用于筛选的条件之一：性别，我们通过FilterButton当中用户的选择来获得特定的列表数据
      */
+    @Deprecated
     private static void retrieveMateRawInfo(final String userId, final String range, final int sex, final int startNum, final int endNum)
     {
         // 我们采用ConcurrentHashMap来保存请求参数，因为我们为了加速请求过程会使用多线程，这样更安全一些
@@ -267,6 +268,40 @@ public class BilliardsSearchMateFragment extends Fragment
         }
     }
 
+    /**
+     * 用于请求首页当中的球友的信息列表
+     * 这里不需要任何请求参数
+     */
+    private static void retrieveInitialMateInfoList()
+    {
+        String rawResult = HttpUtil.urlClient(HttpConstants.SearchMate.URL, null, HttpConstants.RequestMethod.GET);
+        Log.d(TAG, " the raw result we get for the mate fragment are : " + rawResult);
+        if (! TextUtils.isEmpty(rawResult))
+        {
+            try
+            {
+                JSONObject initialObj = new JSONObject(rawResult);
+
+                final int dataCount = initialObj.getInt("count");
+                JSONArray dataList = initialObj.getJSONArray("list_data");
+                int i;
+                for (i = 0; i < dataCount; ++i)
+                {
+                    JSONObject dataObj = (JSONObject) dataList.get(i);
+                    String imgUrl = dataObj.getString("img_url");
+                    // TODO: 这个字段很奇怪，在原型图当中是没有这个字段的。而且也没必要有这个字段。我们需要同服务器端进一步确定一下？？？
+//                    String money = dataObj.getString("money");
+
+                }
+
+                Log.d(TAG, " the initial json object we need to parse are : " + initialObj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     private static final int START_RETRIEVE_ALL_DATA = 1 << 1;
     private static final int DATA_RETRIEVE_SUCCESS = 1 << 2;
     private static final int DATA_RETRIEVE_FAILED = 1 << 3;
@@ -285,7 +320,8 @@ public class BilliardsSearchMateFragment extends Fragment
                         @Override
                         public void run()
                         {
-                            retrieveMateRawInfo("1", "200", 1, 0, 9);
+                            Log.d(TAG, "start retrieving the list info ");
+                            retrieveInitialMateInfoList();
                         }
                     }).start();
                     break;

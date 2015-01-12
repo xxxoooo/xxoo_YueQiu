@@ -102,6 +102,8 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
         mPreProgress.setIndeterminateDrawable(mProgressDrawable);
         mPreProgress.getIndeterminateDrawable().setBounds(bounds);
 
+        mDBUtils = DBUtils.getInstance(getActivity());
+
         isExistPublished = isExistPublishedInfo();
 
         if(Utils.networkAvaiable(getActivity())){
@@ -340,18 +342,14 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
         values.put(DatabaseConstant.PublishInfoTable.END_NO,info.getEnd_no());
         values.put(DatabaseConstant.PublishInfoTable.COUNT,info.getSumCount());
 
-        mDBUtils = new DBUtils(getActivity(),DatabaseConstant.PublishInfoTable.CRAETE_SQL);
         mDB = mDBUtils.getWritableDatabase();
-        mDBUtils.onUpgrade(mDB,DatabaseConstant.VERSION,DatabaseConstant.VERSION);
         mDB.insert(DatabaseConstant.PublishInfoTable.TABLE, null, values);
 
         insertPublishItemInfo(info);
     }
 
     private void insertPublishItemInfo(PublishedInfo info){
-        mDBUtils = new DBUtils(getActivity(),DatabaseConstant.PublishInfoItemTable.CREATE_URL);
         mDB = mDBUtils.getWritableDatabase();
-        mDBUtils.onUpgrade(mDB,DatabaseConstant.VERSION,DatabaseConstant.VERSION);
         for(int i=0;i<info.mList.size();i++) {
             ContentValues values = new ContentValues();
             PublishedInfo.PublishedItemInfo itemInfo = info.mList.get(i);
@@ -367,9 +365,7 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
     }
 
     private void updatePublishInfo(PublishedInfo info){
-        mDBUtils = new DBUtils(getActivity(),DatabaseConstant.PublishInfoItemTable.CREATE_URL);
         mDB = mDBUtils.getWritableDatabase();
-        mDBUtils.onUpgrade(mDB,DatabaseConstant.VERSION,DatabaseConstant.VERSION);
 
         ContentValues values = new ContentValues();
         values.put(DatabaseConstant.PublishInfoTable.START_NO,info.getStart_no());
@@ -391,10 +387,7 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
 
     }
     private void updatePublishedItemInfo(PublishedInfo info){
-        mDBUtils = new DBUtils(getActivity(),DatabaseConstant.PublishInfoItemTable.CREATE_URL);
         mDB = mDBUtils.getWritableDatabase();
-        mDBUtils.onUpgrade(mDB,DatabaseConstant.VERSION,DatabaseConstant.VERSION);
-
         for(int i=0;i<info.mList.size();i++) {
             ContentValues values = new ContentValues();
             PublishedInfo.PublishedItemInfo itemInfo = info.mList.get(i);
@@ -409,9 +402,7 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
         }
     }
     private boolean isExistPublishedInfo(){
-        mDBUtils = new DBUtils(getActivity(),DatabaseConstant.PublishInfoTable.CRAETE_SQL);
         mDB = mDBUtils.getReadableDatabase();
-        mDBUtils.onUpgrade(mDB,DatabaseConstant.VERSION,DatabaseConstant.VERSION);
         Cursor cursor = mDB.query(DatabaseConstant.PublishInfoTable.TABLE,null,DatabaseConstant.PublishInfoTable.USER_ID + "=? and "
                             + DatabaseConstant.PublishInfoTable.TYPE + "=?",new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),
                             String.valueOf(mType)},null,null,null);
@@ -423,9 +414,7 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
         return true;
     }
     private boolean isExistPublishedItemInfo(int tableId){
-        mDBUtils = new DBUtils(getActivity(),DatabaseConstant.PublishInfoItemTable.CREATE_URL);
         mDB = mDBUtils.getReadableDatabase();
-        mDBUtils.onUpgrade(mDB,DatabaseConstant.VERSION,DatabaseConstant.VERSION);
         Cursor cursor = mDB.query(DatabaseConstant.PublishInfoItemTable.TABLE,null,DatabaseConstant.PublishInfoItemTable.USER_ID + "=? and " +
                 DatabaseConstant.PublishInfoItemTable.TABLE_ID + "=?",new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),String.valueOf(tableId)},
                 null,null,null);
@@ -437,7 +426,6 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
         return true;
     }
     private PublishedInfo getPublishedInfo(String userId,int type){
-        mDBUtils = new DBUtils(getActivity(),DatabaseConstant.PublishInfoTable.CRAETE_SQL);
         mDB = mDBUtils.getReadableDatabase();
         PublishedInfo info = new PublishedInfo();
         String infoSql = "SELECT * FROM " + DatabaseConstant.PublishInfoTable.TABLE + " where " + DatabaseConstant.PublishInfoTable.USER_ID + "=?"

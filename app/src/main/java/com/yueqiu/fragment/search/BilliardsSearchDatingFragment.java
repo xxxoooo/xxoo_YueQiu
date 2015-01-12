@@ -188,11 +188,12 @@ public class BilliardsSearchDatingFragment extends Fragment
     /**
      *
      * @param userId
-     * @param range 发布约球信息的大致距离,距离范围。例如1000米以内
-     * @param date 发布日期
+     * @param range 发布约球信息的大致距离,距离范围。例如1000米以内,具体传递的形式例如range=100
+     * @param date 发布日期，例如date=2014-04-04
      * @param startNum 请求信息的开始的条数的数目(当我们进行分页请求的时候，我们就会用到这个特性，即每次当用户滑动到列表低端或者当用户滑动更新的时候，我们需要
      *                 通过更改startNum的值来进行分页加载的具体实现)
-     * @param endNum 请求列表信息的结束条目，例如我们可以一次只加载10条，当用户请求的时候再加载更多的数据
+     *                 例如start_no=0
+     * @param endNum 请求列表信息的结束条目，例如我们可以一次只加载10条，当用户请求的时候再加载更多的数据,例如end_no=9
      *
      */
     private static void retrieveDatingInfo(final String userId, final String range, final int date, final int startNum, final int endNum)

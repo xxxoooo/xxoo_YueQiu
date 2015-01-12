@@ -354,7 +354,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     }
 
     private UserInfo getUserByUserId(String userId) {
-        DBUtils dbUtil = new DBUtils(this, DatabaseConstant.UserTable.CREATE_SQL);
+        DBUtils dbUtil = DBUtils.getInstance(this);
         SQLiteDatabase db = dbUtil.getReadableDatabase();
         UserInfo info = new UserInfo();
         String sql = "select * from " + DatabaseConstant.UserTable.TABLE + " where " + DatabaseConstant.UserTable.USER_ID + "=?";
