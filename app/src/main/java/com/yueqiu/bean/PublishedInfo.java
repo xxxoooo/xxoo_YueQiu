@@ -62,6 +62,7 @@ public class PublishedInfo implements JSONHelper {
         private String title;/*标题*/
         private String content;/*内容*/
         private String dateTime;/*时间*/
+        private boolean checked;
 
         public String getTable_id() {
             return table_id;
@@ -109,6 +110,14 @@ public class PublishedInfo implements JSONHelper {
 
         public void setDateTime(String dateTime) {
             this.dateTime = dateTime;
+        }
+
+        public boolean isChecked() {
+            return checked;
+        }
+
+        public void setChecked(boolean checked) {
+            this.checked = checked;
         }
     }
 

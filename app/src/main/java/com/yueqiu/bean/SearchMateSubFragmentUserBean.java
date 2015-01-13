@@ -121,9 +121,6 @@ public class SearchMateSubFragmentUserBean
         Log.d("search_mate_bean", " the name : " + mUserNickName);
         mUserDistance = jsonObject.getString(JSON_RANGE);
         Log.d("search_mate_bean", " the range are : " + mUserDistance);
-
-
-
     }
 
     @Override

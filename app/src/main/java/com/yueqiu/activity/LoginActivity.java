@@ -31,6 +31,8 @@ import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.UserDao;
 import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
@@ -70,6 +72,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private String mUserName;
     private String mPwd;
     private DBUtils mDbUtil;
+    private UserDao mUserDao;
 
     private static final int LOGIN_SUCCESS = 0x01;
     private static final int LOGIN_ERROR = 0x02;
@@ -85,8 +88,11 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     break;
                 case LOGIN_SUCCESS:
                     Toast.makeText(LoginActivity.this, getString(R.string.login_success),Toast.LENGTH_SHORT).show();
-                    Utils.getOrUpdateUserBaseInfo(LoginActivity.this,(Map<String, String>) msg.obj);
-                    queryUserId((Map<String, String>) msg.obj);
+                    Map<String,String> map = (Map<String, String>) msg.obj;
+                    Utils.getOrUpdateUserBaseInfo(LoginActivity.this,map);
+                    if(!mUserDao.queryUserId(map)){
+                        mUserDao.insertUserInfo(map);
+                    }
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                     break;
@@ -101,7 +107,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         initView();
         initActionBar();
 
-        mDbUtil = new DBUtils(this, DatabaseConstant.UserTable.CREATE_SQL);
+        mDbUtil = DBUtils.getInstance(this);
+        mUserDao = DaoFactory.getUser(this);
 
     }
 
@@ -235,58 +242,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         return super.onKeyDown(keyCode, event);
     }
 
-    private void insertUserInfo(Map<String,String> map){
-        ContentValues values = new ContentValues();
-
-        values.put(DatabaseConstant.UserTable.USER_ID,map.get(DatabaseConstant.UserTable.USER_ID));
-        values.put(DatabaseConstant.UserTable.USERNAME,map.get(DatabaseConstant.UserTable.USERNAME));
-        values.put(DatabaseConstant.UserTable.PHONE, map.get(DatabaseConstant.UserTable.PHONE));
-        String password = map.get(DatabaseConstant.UserTable.PASSWORD);
-        String sign = new String(Hex.encodeHex(DigestUtils.sha(password))).toUpperCase();
-        values.put(DatabaseConstant.UserTable.PASSWORD,sign);
-        values.put(DatabaseConstant.UserTable.SEX,1);
-        values.put(DatabaseConstant.UserTable.TITLE,"");
-        values.put(DatabaseConstant.UserTable.IMG_URL,map.get(DatabaseConstant.UserTable.IMG_URL));
-        values.put(DatabaseConstant.UserTable.IMG_REAL,"");
-        values.put(DatabaseConstant.UserTable.NICK,"");
-        values.put(DatabaseConstant.UserTable.DISTRICT,"");
-        values.put(DatabaseConstant.UserTable.LEVEL,1);
-        values.put(DatabaseConstant.UserTable.BALL_TYPE,1);
-        values.put(DatabaseConstant.UserTable.APPOINT_DATE,"");
-        values.put(DatabaseConstant.UserTable.BALLARM,2);
-        values.put(DatabaseConstant.UserTable.USERDTYPE,1);
-        values.put(DatabaseConstant.UserTable.BALLAGE, 3);
-        values.put(DatabaseConstant.UserTable.IDOL,"");
-        values.put(DatabaseConstant.UserTable.IDOL_NAME,"");
-        values.put(DatabaseConstant.UserTable.NEW_IMG,"");
-        values.put(DatabaseConstant.UserTable.NEW_IMG_REAL,"");
-        values.put(DatabaseConstant.UserTable.LOGIN_TIME,map.get(DatabaseConstant.UserTable.LOGIN_TIME));
-
-        SQLiteDatabase db = mDbUtil.getWritableDatabase();
-        db.insert(DatabaseConstant.UserTable.TABLE,null,values);
-    }
-    //ToDo://在其他地方更新
-    private void updateUserInfo(Map<String,String> map){
-        SQLiteDatabase db = mDbUtil.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        Iterator iterator = map.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator.next();
-            values.put(entry.getKey(), entry.getValue());
-        }
-        db.update(DatabaseConstant.UserTable.TABLE, values, DatabaseConstant.UserTable.USER_ID + "=?",
-                new String[]{map.get(DatabaseConstant.UserTable.USER_ID)});
-    }
-
-    private void queryUserId(Map<String,String> map){
-        SQLiteDatabase db = mDbUtil.getReadableDatabase();
-        Cursor cursor = db.query(DatabaseConstant.UserTable.TABLE,null,DatabaseConstant.UserTable.USER_ID + "=?",
-                new String[]{map.get(DatabaseConstant.UserTable.USER_ID)},null,null,null);
-        if(cursor == null || cursor.getCount() == 0){
-            insertUserInfo(map);
-        }
-        cursor.close();
-    }
 
 
 

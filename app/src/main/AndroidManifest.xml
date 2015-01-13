@@ -90,7 +90,8 @@
         <activity
 
             android:name=".activity.PublishedInfoActivity"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            />
 
 
 
@@ -126,7 +127,6 @@
             android:label="@string/title_activity_billiards_dating"
             android:screenOrientation="portrait"
             android:parentActivityName=".BilliardSearchActivity">
-
         </activity>
         <activity
             android:name=".activity.SearchBilliardRoomActivity"
@@ -146,13 +146,10 @@
         </activity>
         <activity
             android:screenOrientation="portrait"
-            android:name=".activity.ActivitiesMain">
-
+            android:name=".activity.ActivitiesMain"/>
 
         <activity android:name=".activity.ChatActivity"
                   android:screenOrientation="portrait"/>
-
-        </activity>
 
 
     </application>

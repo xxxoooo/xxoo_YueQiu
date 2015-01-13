@@ -39,11 +39,11 @@ public class DatabaseConstant {
 
         public static final String APPOINT_DATE = "appoint_date";
 
-        public static final String BALLARM = "ballarm";
+        public static final String BALLARM = "ballArm";
 
-        public static final String USERDTYPE = "usedtype";
+        public static final String USERDTYPE = "usedType";
 
-        public static final String BALLAGE = "ballage";
+        public static final String BALLAGE = "ballAge";
 
         public static final String IDOL = "idol";
 
@@ -58,15 +58,13 @@ public class DatabaseConstant {
         public static final String USER_ID = "user_id";
 
 
-        public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+        public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + PHONE + " VARCHAR(50) NOT NULL, " + PASSWORD + " VARCHAR(100), " +
                 SEX + " INTEGER DEFAULT 1, " + TITLE + " VARCHAR(50), " + IMG_URL + " VARCHAR(255), " + IMG_REAL + " VARCHAR(255), " + NICK +
-
-                " VARCHAR(255), " + DISTRICT + " VARCHAR(255), " + LEVEL + " INTEGER DEFAULT 1, " + BALL_CLASS + " INTEGER DEFAULT 1, " + APPOINT_DATE +
+                " VARCHAR(255), " + DISTRICT + " VARCHAR(255), " + LEVEL + " INTEGER DEFAULT 1, " + BALL_TYPE + " INTEGER DEFAULT 1, " + APPOINT_DATE +
                 " VARCHAR(255), " + BALLARM + " INTEGER DEFAULT 1, " + USERDTYPE + " INTEGER DEFAULT 1, " + BALLAGE + " INTEGER, " + IDOL + " VARCHAR(255), "
-
-
                 + IDOL_NAME + " VARCHAR(255), " + NEW_IMG + " VARCHAR(255), " + NEW_IMG_REAL + " VARCHAR(255), " + LOGIN_TIME + " VARCHAR(255)" + ")";
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
 
     }
@@ -87,9 +85,10 @@ public class DatabaseConstant {
 
         public static final String COUNT = "count";
 
-        public static final String CRAETE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+        public static final String CRAETE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + TYPE + " INTEGER NOT NULL DEFAULT 1, " + START_NO + " INTEGER DEFAULT 0, " +
                 END_NO + " INTEGER DEFAULT 9, " + COUNT + " INTEGER" + ")";
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
 
     }
@@ -114,9 +113,10 @@ public class DatabaseConstant {
 
         public static final String DATETIME = "datetime";
 
-        public static final String CREATE_URL = "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+        public static final String CREATE_URL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + TABLE_ID + " INTEGER, " + TYPE + " INTEGER DEFAULT 1, " + IMAGE_URL + " VARCHAR(255), "
                 + TITLE + " VARCHAR(255), " + CONTENT + " VARCHAR(500), " + DATETIME + " VARCHAR(50)" + ")";
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
 
     }
@@ -138,9 +138,10 @@ public class DatabaseConstant {
 
         public static final String IS_COME    = "isCome";
 
-        public static final String CREATE_SQL   =  "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+        public static final String CREATE_SQL   =  "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + IMG_URL + " VARCHAR(255), " + MESSAGE_CONTENT + " VARCHAR(255), "
                 + DATETIME + " VARCHAR(255), " + IS_COME + " INTEGER DEFAULT 0" + ")";
+        public static final String DROP_SQL   = "DROP TABLE IF EXISTS " + TABLE;
     }
 
     public final class ActivitiesTable {
@@ -180,6 +181,7 @@ public class DatabaseConstant {
                 TYPE + " VARCHAR(2), " + TITLE + " VARCHAR(50), " + ADDRESS + " VARCHAR(100), " +
                 BEGIN_TIME + " VARCHAR(20), " + END_TIME + " VARCHAR(20)," +
                 MODEL + " VARCHAR(2), " + CONTENT + " VARCHAR(500) ," + CREATE_TIME + " VARCHAR(20));";
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLENAME;
     }
 
     public final class RefreshTime
@@ -195,6 +197,142 @@ public class DatabaseConstant {
         public static final String SQL = "CREATE TABLE IF NOT EXISTS " + REFRESH_TIME_TABLE + " ( " +
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TABLE_NAME + " VARCHAR(20), " + REFRESH_TIME
                 + " VARCHAR(50) );";
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE_NAME;
+    }
+
+
+    // 以下是用于创建SearchActivity当中的5张表的SQL语句
+    // 1. 球友Fragment的table
+    public final class SearchMateTable
+    {
+        public static final String _ID = "_id";
+        public static final String USER_ID = "user_id";
+        public static final String NAME = "name";
+        public static final String PHOTO_URL = "photo_url";
+        public static final String SEX = "sex";
+        public static final String DISTRICT = "district"; // 球友的地区
+        public static final String RANGE = "range";
+
+        public static final String MATE_TABLE = "mate_table";
+
+        public static final String CREATE_SQL = " CREATE TABLE IF NOT EXISTS "
+                + MATE_TABLE + " ( "
+                + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + USER_ID + " VARCHAR(20) NOT NULL, "
+                + NAME + " VARCHAR(50) NOT NULL, "
+                + PHOTO_URL + " VARCHAR(50) NOT NULL, "
+                + SEX + " VARCHAR(2) NOT NULL, "
+                + DISTRICT + " VARCHAR(100) NOT NULL, "
+                + RANGE + " VARCHAR(20) NOT NULL); ";
+
+        public static final String DROP_SQL = "DTOP TABLE IF EXISTS " + MATE_TABLE;
+
+    }
+    // 2. 约球Fragment的table
+    public final class SearchDatingTable
+    {
+        public static final String _ID = "_id";
+        public static final String USER_ID = "user_id";
+        public static final String NAME = "username";
+        public static final String PHOTO_URL = "photo_url";
+        public static final String TITLE = "title"; // 当前所发布的约球的主题内容(例如"大奖赛开幕了，一起参加"的形式的字符串)
+        public static final String RANGE = "range";
+
+        public static final String DATING_TABLE_NAME = "dating_table";
+
+        public static final String CREATE_SQL = " CREATE TABLE IF NOT EXISTS"
+                + DATING_TABLE_NAME + " ( "
+                + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + USER_ID + " VARCHAR(20) NOT NULL, "
+                + NAME + " VARCHAR(100) NOT NULL, "
+                + PHOTO_URL + " VARCHAR(50) NOT NULL, "
+                + TITLE + " VARCHAR(200) NOT NULL, "
+                + RANGE + " VARCHAR(20) NOT NULL); ";
+
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + DATING_TABLE_NAME;
+
+    }
+    // 3. 助教Fragment的table
+    public final class SearchAssistCoauchTable
+    {
+        public static final String _ID = "_id";
+        public static final String USER_ID = "user_id";
+        public static final String NAME = "username";
+        public static final String PHOTO_URL = "photo_url";
+        public static final String CLASS = "class"; // 球种
+        public static final String MONEY = "money"; // 助教的费用
+        public static final String RANGE = "range";
+        public static final String SEX = "sex";
+
+        public static final String ASSISTCOAUCH_TABLE_NAME = "assist_coauch_table";
+
+        public static final String CREATE_SQL = " CREATE TABLE IF NOT EXISTS "
+                + ASSISTCOAUCH_TABLE_NAME + " ( "
+                + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + USER_ID + " VARCHAR(20) NOT NULL, "
+                + NAME + " VARCHAR(50) NOT NULL, "
+                + PHOTO_URL + " VARCHAR(50) NOT NULL, "
+                + SEX + " VARCHAR(2) NOT NULL, "
+                + CLASS + " VARCHAR(50) NOT NULL, "
+                + MONEY + " VARCHAR(20) NOT NULL, "
+                + RANGE + " VARCHAR(50) NOT NULL); ";
+
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + ASSISTCOAUCH_TABLE_NAME;
+    }
+    // 4. 教练Fragment的table
+    public final class SearchCoauchTable
+    {
+        public static final String _ID = "_id";
+        public static final String USER_ID = "user_id";
+        public static final String NAME = "username";
+        public static final String PHOTO_URL = "photo_url";
+        public static final String CLASS = "class"; // 球种(例如九球，斯诺克等)
+        public static final String LEVEL = "level"; // 教练的资质(例如国家队还是北京队)
+        public static final String RANGE = "range";
+        public static final String SEX = "sex";
+
+        public static final String COAUCH_TABLE_NAME = "coauch_table";
+
+        public static final String CREATE_SQL = " CREATE TABLE IF NOT EXISTS "
+                + COAUCH_TABLE_NAME + " ( "
+                + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + USER_ID + " VARCHAR(20) NOT NULL , "
+                + NAME + " VARCHAR(50) NOT NULL , "
+                + PHOTO_URL + " VARCHAR(50) NOT NULL, "
+                + SEX + " VARCHAR(2) NOT NULL , "
+                + CLASS + " VARCHAR(50) NOT NULL , "
+                + LEVEL + " VARCHAR(50) NOT NULL, "
+                + RANGE + " VARCHAR(50) NOT NULL); ";
+
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + COAUCH_TABLE_NAME;
+
+    }
+    // 5. 球厅Fragment的table
+    public final class SearchRoomTable
+    {
+        public static final String _ID = "_id";
+        public static final String ROOM_ID = "room_id";
+        public static final String NAME = "room_name";
+        public static final String ROOM_URL = "room_url";
+        public static final String DETAILED_ADDRESS = "detailed_address";
+        public static final String ROOM_LEVEL = "room_level"; // 球厅的星级
+        public static final String RANGE = "range";
+
+        public static final String ROOM_TABLE_NAME = "room_table";
+        // TODO: 球厅Fragment当中的List暂时还没有确定最终的数据格式
+
+        public static final String CREATE_SQL = " CREATE TABLE IF NOT EXISTS "
+                + ROOM_TABLE_NAME + " ( "
+                + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT , "
+                + ROOM_ID + " VARCHAR(20) NOT NULL , "
+                + NAME + " VARCHAR(50) NOT NULL , "
+                + ROOM_URL + " VARCHAR(50) NOT NULL, "
+                + DETAILED_ADDRESS + " VARCHAR(250) NOT NULL, "
+                + ROOM_LEVEL + "VARCHAR(20) NOT NULL, "
+                + RANGE + "VARCHAR(50) NOT NULL); ";
+
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + ROOM_TABLE_NAME;
+
     }
 
 

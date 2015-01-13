@@ -26,7 +26,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
 
     public ActivitiesDaoImpl(Context context) {
         this.mContext = context;
-        dbUtils = new DBUtils(mContext, DatabaseConstant.ActivitiesTable.SQL);
+        dbUtils = DBUtils.getInstance(mContext);
     }
 
 
@@ -71,12 +71,12 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
                         append("');");
                 db.execSQL(sb.toString());
             }
+            db.setTransactionSuccessful();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
 
         } finally {
-            db.setTransactionSuccessful();
             db.endTransaction();
             db.close();
         }

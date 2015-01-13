@@ -173,7 +173,7 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
     }
 
     private ArrayList<ChatMsgEntity> getLocalData(String userId) {
-        mDBUtils = new DBUtils(this, DatabaseConstant.ChatMessageTable.CREATE_SQL);
+        mDBUtils = DBUtils.getInstance(this);
         Log.e("ddd","==>" + DatabaseConstant.ChatMessageTable.CREATE_SQL);
         ArrayList<ChatMsgEntity> list = new ArrayList<ChatMsgEntity>();
         SQLiteDatabase db = mDBUtils.getReadableDatabase();
@@ -193,7 +193,7 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
     }
 
     private void insertLocalData(ChatMsgEntity data) {
-        mDBUtils = new DBUtils(this, DatabaseConstant.ChatMessageTable.CREATE_SQL);
+        mDBUtils = DBUtils.getInstance(this);
         SQLiteDatabase db = mDBUtils.getWritableDatabase();
 
         ContentValues values = new ContentValues();

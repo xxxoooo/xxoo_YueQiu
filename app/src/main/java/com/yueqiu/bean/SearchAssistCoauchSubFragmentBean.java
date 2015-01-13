@@ -20,6 +20,8 @@ public class SearchAssistCoauchSubFragmentBean
 
     private String mPrice;
 
+    public SearchAssistCoauchSubFragmentBean(){}
+
     public SearchAssistCoauchSubFragmentBean(String photo, String name, String gender, String kinds, String price, String distan)
     {
         this.mPhoto = photo;

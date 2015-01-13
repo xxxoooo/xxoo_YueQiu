@@ -31,6 +31,7 @@ public class AsyncTaskUtil<T> extends AsyncTask<Map<String,String>,Void,JSONObje
     @Override
     protected void onPostExecute(JSONObject jsonObject) {
         super.onPostExecute(jsonObject);
+
         mProgressBar.setVisibility(View.GONE);
         mTextView.setVisibility(View.GONE);
     }

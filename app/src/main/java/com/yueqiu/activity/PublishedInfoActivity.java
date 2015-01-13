@@ -5,7 +5,10 @@ import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.UserHandle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -13,6 +16,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.SearchView;
 
 import com.yueqiu.R;
@@ -43,9 +48,10 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
                 getString(R.string.billiard_group)
         };
         mViewPager = (ViewPager) findViewById(R.id.favor_coll_pager);
-
+       // mViewPager = $(R.id.favor_coll_pager);
 
     }
+
 
     @Override
     protected void onResume() {

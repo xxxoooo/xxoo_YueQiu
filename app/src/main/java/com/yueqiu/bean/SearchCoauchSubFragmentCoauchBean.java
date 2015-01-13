@@ -2,6 +2,7 @@ package com.yueqiu.bean;
 
 import android.widget.BaseExpandableListAdapter;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,6 +19,8 @@ public class SearchCoauchSubFragmentCoauchBean
     private String mUserDistance;
     private String mUserLevel;
     private String mBilliardKind;
+
+    public SearchCoauchSubFragmentCoauchBean(){}
 
     public SearchCoauchSubFragmentCoauchBean(String photo, String name, String gender, String distance, String level, String kind)
     {
@@ -102,6 +105,8 @@ public class SearchCoauchSubFragmentCoauchBean
 
     public JSONObject toJson() throws JSONException
     {
+        JSONArray
+
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(JSON_USERNAME, mUserName);
         jsonObject.put(JSON_SEX, mUserGender);

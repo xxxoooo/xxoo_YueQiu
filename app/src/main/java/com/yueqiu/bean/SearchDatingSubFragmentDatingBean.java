@@ -17,6 +17,8 @@ public class SearchDatingSubFragmentDatingBean
     private String mUserDeclare;
     private String mUserDistance;
 
+    public SearchDatingSubFragmentDatingBean(){}
+
     public SearchDatingSubFragmentDatingBean(String photo, String name, String declare, String distance)
     {
         this.mUserDeclare = declare;
