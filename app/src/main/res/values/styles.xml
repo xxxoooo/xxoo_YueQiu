@@ -7,6 +7,11 @@
         <item name="android:actionBarTabStyle">@style/ActionBarTab</item>
         <item name="android:actionMenuTextAppearance">@style/MenuTextStyle</item>
         <item name="android:actionBarTabTextStyle">@style/ActionBarTabTextStyle</item>
+        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Example</item>
+        <item name="android:actionModeBackground">@drawable/cab_background_top_example</item>
+        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_example</item>
+        <item name="android:actionModeCloseDrawable">@drawable/ic_menu_done_holo_dark</item>
+        <item name="android:actionMenuTextColor">@android:color/white</item>
     </style>
 
 
@@ -44,7 +49,12 @@
 
     <style name="ActionBar.TitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
         <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">19sp</item>
+    </style>
+
+    <style name="ActionButton.CloseMode.Example" parent="@android:style/Widget.Holo.Light.ActionButton.CloseMode">
+        <item name="android:background">@drawable/btn_cab_done_example</item>
+
     </style>
 
     <!--用于SearchActivity-->

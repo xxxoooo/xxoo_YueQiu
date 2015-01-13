@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yueqiu.R;
@@ -53,9 +54,16 @@ public class FavorBasicAdapter extends BaseAdapter {
             holder.title = (TextView) convertView.findViewById(R.id.published_title);
             holder.content = (TextView) convertView.findViewById(R.id.published_content);
             holder.dateTime = (TextView) convertView.findViewById(R.id.published_time);
+            holder.whole_bg = (RelativeLayout) convertView.findViewById(R.id.published_item_bg_view);
             convertView.setTag(holder);
         }else{
             holder = (ViewHolder) convertView.getTag();
+        }
+        PublishedInfo.PublishedItemInfo itemInfo = (PublishedInfo.PublishedItemInfo) getItem(position);
+        if(itemInfo.isChecked()){
+            holder.whole_bg.setBackgroundColor(mContext.getResources().getColor(R.color.actionbar_color));
+        }else{
+            holder.whole_bg.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.published_item_bg));
         }
         holder.title.setText(mList.get(position).getTitle());
         holder.content.setText(mList.get(position).getContent());
@@ -68,5 +76,14 @@ public class FavorBasicAdapter extends BaseAdapter {
         TextView  title;
         TextView  content;
         TextView  dateTime;
+        RelativeLayout whole_bg;
+    }
+
+    public void unCheckAll(){
+        for(int i=0;i<getCount();i++){
+            PublishedInfo.PublishedItemInfo item = (PublishedInfo.PublishedItemInfo) getItem(i);
+            item.setChecked(false);
+        }
+
     }
 }

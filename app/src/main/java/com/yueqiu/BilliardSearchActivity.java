@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -212,9 +214,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
             mActionBar.addTab(tab);
         }
 
-
     }
-
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
@@ -325,10 +325,12 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         //ToDo:不起作用，得重新找方法
-        int search_mag_icon_id = searchView.getContext().getResources().getIdentifier("android:id/search_mag_icon", null, null);
-        ImageView  search_mag_icon = (ImageView)searchView.findViewById(search_mag_icon_id);//获取搜索图标
-        search_mag_icon.setImageResource(R.drawable.search);
 
+        int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
+        EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
+        searchEditText.setTextColor(Color.WHITE);
+        searchEditText.setHintTextColor(Color.LTGRAY);
+//
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
 
         return true;

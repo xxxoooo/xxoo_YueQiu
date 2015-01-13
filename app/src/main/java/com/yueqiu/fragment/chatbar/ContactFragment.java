@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
@@ -24,8 +26,12 @@ import com.yueqiu.bean.RecentChat;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.ContactsDao;
+import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.AsyncTaskBase;
+import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.Utils;
 import com.yueqiu.view.contacts.IphoneTreeView;
 import com.yueqiu.view.contacts.LoadingView;
 
@@ -33,7 +39,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -51,12 +59,15 @@ public class ContactFragment extends Fragment {
     private IphoneTreeView mIphoneTreeView;
     private ExpAdapter mExpAdapter;
     private HashMap<Integer, List<ContactsList.Contacts>> mMaps;
+    private Map<String, String> mMapArgument = new HashMap<String, String>();
     private static final int GET_SUCCESS = 0;
-    private List<ContactsList.Contacts> mList;
+    private List<ContactsList.Contacts> mContactsList = new ArrayList<ContactsList.Contacts>();
+    private ContactsDao mContactsDao;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContactsDao = DaoFactory.getContacts(getActivity());
     }
 
     @Override
@@ -91,7 +102,7 @@ public class ContactFragment extends Fragment {
                 Toast.makeText(getActivity(),
                         "你点击了" + mExpAdapter.getChild(groupPosition, childPosition),
                         Toast.LENGTH_SHORT).show();
-                ContactsList.Contacts contacts = (ContactsList.Contacts)mExpAdapter.getChild(groupPosition, childPosition);
+                ContactsList.Contacts contacts = (ContactsList.Contacts) mExpAdapter.getChild(groupPosition, childPosition);
                 //TODO:传入待聊天好友的userid
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
                 intent.putExtra(MessageFragment.FRIEND_USER_ID, contacts.getUser_id());//fake date
@@ -103,6 +114,14 @@ public class ContactFragment extends Fragment {
     }
 
     private void initData() {
+        if (!Utils.networkAvaiable(getActivity())) {
+            //本地获取联系人列表
+            mMaps = mContactsDao.getContactList();
+            mExpAdapter.setData(mMaps);
+            mExpAdapter.notifyDataSetChanged();
+            Toast.makeText(getActivity(), getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
+            return;
+        }
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -162,6 +181,13 @@ public class ContactFragment extends Fragment {
 //                    contactsList.setCount(jsonResult.getJSONObject("result").getInt("count"));
                     JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
                     for (int j = 0; j < list_data.length(); j++) {
+                        mMapArgument.put(DatabaseConstant.FriendsTable.USER_ID, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.USER_ID));
+                        mMapArgument.put(DatabaseConstant.FriendsTable.GROUP_ID, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.GROUP_ID));
+                        mMapArgument.put(DatabaseConstant.FriendsTable.USERNAME, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.USERNAME));
+                        mMapArgument.put(DatabaseConstant.FriendsTable.IMG_URL, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.IMG_URL));
+                        mMapArgument.put(DatabaseConstant.FriendsTable.LAST_MESSAGE, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.LAST_MESSAGE));
+                        mMapArgument.put(DatabaseConstant.FriendsTable.DATETIME, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.DATETIME));
+                        mContactsDao.insertContact(mMapArgument);
                         ContactsList.Contacts contacts = contactsList.new Contacts();
                         contacts.setUser_id(list_data.getJSONObject(j).getInt("user_id"));
                         contacts.setGroup_id(list_data.getJSONObject(j).getInt("group_id"));
@@ -178,7 +204,6 @@ public class ContactFragment extends Fragment {
             }
             mHandler.obtainMessage(GET_SUCCESS, maps).sendToTarget();
         }
-
     }
 
     private Handler mHandler = new Handler() {
@@ -187,12 +212,10 @@ public class ContactFragment extends Fragment {
             switch (msg.what) {
                 case GET_SUCCESS:
                     mMaps = (HashMap<Integer, List<ContactsList.Contacts>>) msg.obj;
-//                    mExpAdapter = new ExpAdapter(mContext, mMaps, mIphoneTreeView);
                     mExpAdapter.setData(mMaps);
                     mExpAdapter.notifyDataSetChanged();
                     break;
                 default:
-
                     break;
             }
 

@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/published_item_bg_view"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:background="@drawable/published_item_bg"
+    android:layout_weight="4">
     <ImageView
         android:id="@+id/published_item_image"
         android:layout_width="wrap_content"
@@ -44,5 +48,4 @@
         android:textSize="12sp"
         android:textColor="@color/search_distance_color"
         />
-
 </RelativeLayout>

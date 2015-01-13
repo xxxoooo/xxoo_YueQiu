@@ -58,12 +58,15 @@ public class DatabaseConstant {
         public static final String USER_ID = "user_id";
 
 
-        public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+        public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + PHONE + " VARCHAR(50) NOT NULL, " + PASSWORD + " VARCHAR(100), " +
                 SEX + " INTEGER DEFAULT 1, " + TITLE + " VARCHAR(50), " + IMG_URL + " VARCHAR(255), " + IMG_REAL + " VARCHAR(255), " + NICK +
                 " VARCHAR(255), " + DISTRICT + " VARCHAR(255), " + LEVEL + " INTEGER DEFAULT 1, " + BALL_TYPE + " INTEGER DEFAULT 1, " + APPOINT_DATE +
                 " VARCHAR(255), " + BALLARM + " INTEGER DEFAULT 1, " + USERDTYPE + " INTEGER DEFAULT 1, " + BALLAGE + " INTEGER, " + IDOL + " VARCHAR(255), "
                 + IDOL_NAME + " VARCHAR(255), " + NEW_IMG + " VARCHAR(255), " + NEW_IMG_REAL + " VARCHAR(255), " + LOGIN_TIME + " VARCHAR(255)" + ")";
+
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
+
     }
 
     public final class PublishInfoTable {
@@ -82,9 +85,10 @@ public class DatabaseConstant {
 
         public static final String COUNT = "count";
 
-        public static final String CRAETE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+        public static final String CRAETE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + TYPE + " INTEGER NOT NULL DEFAULT 1, " + START_NO + " INTEGER DEFAULT 0, " +
                 END_NO + " INTEGER DEFAULT 9, " + COUNT + " INTEGER" + ")";
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
 
     }
@@ -109,9 +113,10 @@ public class DatabaseConstant {
 
         public static final String DATETIME = "datetime";
 
-        public static final String CREATE_URL = "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+        public static final String CREATE_URL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + TABLE_ID + " INTEGER, " + TYPE + " INTEGER DEFAULT 1, " + IMAGE_URL + " VARCHAR(255), "
                 + TITLE + " VARCHAR(255), " + CONTENT + " VARCHAR(500), " + DATETIME + " VARCHAR(50)" + ")";
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
 
     }
@@ -133,9 +138,33 @@ public class DatabaseConstant {
 
         public static final String IS_COME    = "isCome";
 
-        public static final String CREATE_SQL   =  "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+        public static final String CREATE_SQL   =  "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + IMG_URL + " VARCHAR(255), " + MESSAGE_CONTENT + " VARCHAR(255), "
                 + DATETIME + " VARCHAR(255), " + IS_COME + " INTEGER DEFAULT 0" + ")";
+        public static final String DROP_SQL   = "DROP TABLE IF EXISTS " + TABLE;
+    }
+
+    public final class FriendsTable {
+        public static final String TABLE        = "friends";
+
+        public static final String _ID          = "id";
+
+        public static final String USER_ID      = "user_id";
+
+        public static final String GROUP_ID      = "group_id";
+
+        public static final String IMG_URL    = "img_url";
+
+        public static final String USERNAME     = "username";
+
+        public static final String LAST_MESSAGE = "content";
+
+        public static final String DATETIME     = "create_time";
+
+        public static final String CREATE_SQL   =  "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + USER_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + IMG_URL + " VARCHAR(255), " + LAST_MESSAGE + " VARCHAR(255), "
+                + DATETIME + " VARCHAR(255), " + GROUP_ID + " INTEGER NOT NULL" + ")";
+        public static final String DROP_SQL   = "DROP TABLE IF EXISTS " + TABLE;
     }
 
     public final class ActivitiesTable {
@@ -175,6 +204,7 @@ public class DatabaseConstant {
                 TYPE + " VARCHAR(2), " + TITLE + " VARCHAR(50), " + ADDRESS + " VARCHAR(100), " +
                 BEGIN_TIME + " VARCHAR(20), " + END_TIME + " VARCHAR(20)," +
                 MODEL + " VARCHAR(2), " + CONTENT + " VARCHAR(500) ," + CREATE_TIME + " VARCHAR(20));";
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLENAME;
     }
 
     public final class RefreshTime
@@ -190,6 +220,7 @@ public class DatabaseConstant {
         public static final String SQL = "CREATE TABLE IF NOT EXISTS " + REFRESH_TIME_TABLE + " ( " +
                 _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TABLE_NAME + " VARCHAR(20), " + REFRESH_TIME
                 + " VARCHAR(50) );";
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
 

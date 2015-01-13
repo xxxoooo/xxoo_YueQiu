@@ -17,6 +17,8 @@ import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.UserDao;
 import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
@@ -65,12 +67,13 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     private static final int DATA_ERROR = 1;
     private static final int DATA_SUCCESS = 2;
     private Map<String, String> mMap = new HashMap<String, String>();
-    private DBUtils mDBUtils = new DBUtils(this, DatabaseConstant.UserTable.CREATE_SQL);
+    private UserDao mUserDao;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_myprofile);
+        mUserDao = DaoFactory.getUser(this);
         mMap.put(DatabaseConstant.UserTable.USER_ID, String.valueOf(mUserId));
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -174,7 +177,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 }
             }).start();
         } else {
-            mUserInfo = getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+            mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
             mHandler.obtainMessage(DATA_SUCCESS, mUserInfo).sendToTarget();
         }
     }
@@ -187,11 +190,11 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             switch (msg.what) {
                 case DATA_ERROR:
                     Log.i(TAG, "error to get profile from service");
-                    mUserInfo = getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+                    mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
                     updateUI(mUserInfo);
                     break;
                 case DATA_SUCCESS:
-                    updateUserInfo(mMap);
+                    mUserDao.updateUserInfo(mMap);
                     updateUI((UserInfo) msg.obj);
                     break;
             }
@@ -237,7 +240,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                updateUserInfo(mMap);
+                mUserDao.updateUserInfo(mMap);
                 finish();
                 break;
         }
@@ -267,7 +270,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                updateUserInfo(mMap);
+                mUserDao.updateUserInfo(mMap);
                 finish();
                 break;
         }
@@ -400,48 +403,5 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         }
     }
 
-    private UserInfo getUserByUserId(String userId) {
-        SQLiteDatabase db = mDBUtils.getReadableDatabase();
-        UserInfo info = new UserInfo();
-        String sql = "select * from " + DatabaseConstant.UserTable.TABLE + " where " + DatabaseConstant.UserTable.USER_ID + "=?";
-        Cursor cursor = db.rawQuery(sql, new String[]{userId});
-        if (cursor != null || cursor.getCount() != 0) {
-            cursor.moveToFirst();
-            info.setUser_id(Integer.valueOf(userId));
-            info.setUsername(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.USERNAME)));
-            info.setPhone(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.PHONE)));
-            info.setPassword(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.PASSWORD)));
-            info.setSex(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.SEX)));
-            info.setTitle(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.TITLE)));
-            info.setImg_url(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.IMG_URL)));
-            info.setNick(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.USERNAME)));
-            info.setDistrict(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.DISTRICT)));
-            info.setLevel(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.LEVEL)));
-            info.setBall_type(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALL_TYPE)));
-            info.setAppoint_date(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.APPOINT_DATE)));
-            info.setBallArm(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALLARM)));
-            info.setUsedType(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.USERDTYPE)));
-            info.setBallAge(String.valueOf(cursor.getInt(cursor.getColumnIndex(DatabaseConstant.UserTable.BALLAGE))));
-            info.setIdol(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.IDOL)));
-            info.setIdol_name(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.IDOL_NAME)));
-            info.setNew_img(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.NEW_IMG)));
-            info.setLogin_time(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.LOGIN_TIME)));
-        }
-        cursor.close();
-        return info;
-    }
-
-    private void updateUserInfo(Map<String, String> map) {
-        SQLiteDatabase db = mDBUtils.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        Iterator iterator = map.entrySet().iterator();
-        while (iterator.hasNext()) {
-            Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator.next();
-            values.put(entry.getKey(), entry.getValue());
-        }
-        db.update(DatabaseConstant.UserTable.TABLE, values, DatabaseConstant.UserTable.USER_ID + "=?",
-                new String[]{map.get(DatabaseConstant.UserTable.USER_ID)});
-        //ToDo：更新服务端资料
-    }
 
 }
