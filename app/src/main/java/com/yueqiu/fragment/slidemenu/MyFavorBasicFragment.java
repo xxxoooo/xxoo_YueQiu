@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +34,8 @@ import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.PublishedDao;
 import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
@@ -60,7 +63,6 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
     private TextView mEmptyView,mPreText;
     private ProgressBar mPreProgress;
     private Drawable mProgressDrawable;
-    private SearchView mSearchView;
     private FavorBasicAdapter mAdapter;
     private int mType;
     private DBUtils mDBUtils;
@@ -71,6 +73,7 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
     private Map<String,Integer> mResultMap = new HashMap<String, Integer>();
     private Map<String,String> mRequestParamMap = new HashMap<String, String>();
     private boolean isExistPublished;
+    private PublishedDao mPublishedDao;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,6 +87,7 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
         Bundle mArgs = getArguments();
         mType = mArgs.getInt("type");
 
+        mPublishedDao = DaoFactory.getPublished(getActivity());
 
         mListView = (XListView) mView.findViewById(R.id.favor_basic_listView);
         mListView.setPullLoadEnable(true);
@@ -104,7 +108,8 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
 
         mDBUtils = DBUtils.getInstance(getActivity());
 
-        isExistPublished = isExistPublishedInfo();
+        isExistPublished = mPublishedDao.isExistPublishedInfo(mType);
+        Log.d("wy","isExsist->" + isExistPublished);
 
         if(Utils.networkAvaiable(getActivity())){
             requestPublishedInfo();
@@ -113,11 +118,10 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        mPublishedInfo = getPublishedInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()),mType);
+                        mPublishedInfo = mPublishedDao.getPublishedInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()),mType);
                         mHandler.obtainMessage(GET_SUCCESS, mPublishedInfo).sendToTarget();
                     }
                 }).start();
-
             }else{
                 mHandler.obtainMessage(NO_RESULT).sendToTarget();
             }
@@ -153,9 +157,19 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
                         @Override
                         public void run() {
                             if(isExistPublished){
-                                updatePublishInfo(mPublishedInfo);
+                                if(mPublishedDao.updatePublishInfo(mPublishedInfo) != -1){
+                                    for(int i=0;i<mPublishedInfo.mList.size();i++){
+                                        PublishedInfo.PublishedItemInfo item =  mPublishedInfo.mList.get(i);
+                                        if(mPublishedDao.isExistPublishedItemInfo(Integer.valueOf(item.getTable_id()),mType)){
+                                            mPublishedDao.updatePublishedItemInfo(mPublishedInfo);
+                                        }else{
+                                            mPublishedDao.insertPublishItemInfo(mPublishedInfo);
+                                        }
+                                    }
+                                }
                             }else {
-                                insertPublishInfo(mPublishedInfo);
+                                mPublishedDao.insertPublishInfo(mPublishedInfo);
+                                mPublishedDao.insertPublishItemInfo(mPublishedInfo);
                             }
                         }
                     }).start();
@@ -214,6 +228,7 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
                     if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
                         PublishedInfo published = new PublishedInfo();
                         if (jsonResult.getJSONObject("result") != null) {
+                            published.setType(mType);
                             published.setStart_no(jsonResult.getJSONObject("result").getInt("start_no"));
                             published.setEnd_no(jsonResult.getJSONObject("result").getInt("end_no"));
                             published.setSumCount(jsonResult.getJSONObject("result").getInt("count"));
@@ -234,6 +249,8 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
                     }else{
                         mHandler.obtainMessage(NO_RESULT).sendToTarget();
                     }
+                }else{
+                    mHandler.obtainMessage(NO_RESULT).sendToTarget();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -334,133 +351,133 @@ public class MyFavorBasicFragment extends Fragment implements XListView.IXListVi
         }
     }
 
-    private void insertPublishInfo(PublishedInfo info){
-        ContentValues values = new ContentValues();
-        values.put(DatabaseConstant.PublishInfoTable.USER_ID,YueQiuApp.sUserInfo.getUser_id());
-        values.put(DatabaseConstant.PublishInfoTable.TYPE,mType);
-        values.put(DatabaseConstant.PublishInfoTable.START_NO,info.getStart_no());
-        values.put(DatabaseConstant.PublishInfoTable.END_NO,info.getEnd_no());
-        values.put(DatabaseConstant.PublishInfoTable.COUNT,info.getSumCount());
-
-        mDB = mDBUtils.getWritableDatabase();
-        mDB.insert(DatabaseConstant.PublishInfoTable.TABLE, null, values);
-
-        insertPublishItemInfo(info);
-    }
-
-    private void insertPublishItemInfo(PublishedInfo info){
-        mDB = mDBUtils.getWritableDatabase();
-        for(int i=0;i<info.mList.size();i++) {
-            ContentValues values = new ContentValues();
-            PublishedInfo.PublishedItemInfo itemInfo = info.mList.get(i);
-            values.put(DatabaseConstant.PublishInfoItemTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
-            values.put(DatabaseConstant.PublishInfoItemTable.TABLE_ID, itemInfo.getTable_id());
-            values.put(DatabaseConstant.PublishInfoItemTable.TYPE, mType);
-            values.put(DatabaseConstant.PublishInfoItemTable.IMAGE_URL, itemInfo.getImage_url());
-            values.put(DatabaseConstant.PublishInfoItemTable.TITLE, itemInfo.getTitle());
-            values.put(DatabaseConstant.PublishInfoItemTable.CONTENT, itemInfo.getContent());
-            values.put(DatabaseConstant.PublishInfoItemTable.DATETIME, itemInfo.getDateTime());
-            mDB.insert(DatabaseConstant.PublishInfoItemTable.TABLE,null,values);
-        }
-    }
-
-    private void updatePublishInfo(PublishedInfo info){
-        mDB = mDBUtils.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(DatabaseConstant.PublishInfoTable.START_NO,info.getStart_no());
-        values.put(DatabaseConstant.PublishInfoTable.END_NO,info.getEnd_no());
-        values.put(DatabaseConstant.PublishInfoTable.COUNT,info.getSumCount());
-
-        mDB.update(DatabaseConstant.PublishInfoTable.TABLE,values, DatabaseConstant.PublishInfoTable.USER_ID + "=? and " +
-                DatabaseConstant.PublishInfoTable.TYPE + "=?",
-                new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),String.valueOf(info.getType())});
-
-        for(int i=0;i<info.mList.size();i++){
-            PublishedInfo.PublishedItemInfo item =  info.mList.get(i);
-            if(isExistPublishedItemInfo(Integer.valueOf(item.getTable_id()))){
-                updatePublishedItemInfo(info);
-            }else{
-                insertPublishItemInfo(info);
-            }
-        }
-
-    }
-    private void updatePublishedItemInfo(PublishedInfo info){
-        mDB = mDBUtils.getWritableDatabase();
-        for(int i=0;i<info.mList.size();i++) {
-            ContentValues values = new ContentValues();
-            PublishedInfo.PublishedItemInfo itemInfo = info.mList.get(i);
-            values.put(DatabaseConstant.PublishInfoItemTable.TABLE_ID, itemInfo.getTable_id());
-            values.put(DatabaseConstant.PublishInfoItemTable.IMAGE_URL, itemInfo.getImage_url());
-            values.put(DatabaseConstant.PublishInfoItemTable.TITLE, itemInfo.getTitle());
-            values.put(DatabaseConstant.PublishInfoItemTable.CONTENT, itemInfo.getContent());
-            values.put(DatabaseConstant.PublishInfoItemTable.DATETIME, itemInfo.getDateTime());
-            mDB.update(DatabaseConstant.PublishInfoItemTable.TABLE,values,DatabaseConstant.PublishInfoItemTable.USER_ID + "=? and " +
-                DatabaseConstant.PublishInfoItemTable.TABLE_ID + "=?",
-                    new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),String.valueOf(itemInfo.getTable_id())});
-        }
-    }
-    private boolean isExistPublishedInfo(){
-        mDB = mDBUtils.getReadableDatabase();
-        Cursor cursor = mDB.query(DatabaseConstant.PublishInfoTable.TABLE,null,DatabaseConstant.PublishInfoTable.USER_ID + "=? and "
-                            + DatabaseConstant.PublishInfoTable.TYPE + "=?",new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),
-                            String.valueOf(mType)},null,null,null);
-        if(cursor == null || cursor.getCount() == 0) {
-            cursor.close();
-            return false;
-        }
-        cursor.close();
-        return true;
-    }
-    private boolean isExistPublishedItemInfo(int tableId){
-        mDB = mDBUtils.getReadableDatabase();
-        Cursor cursor = mDB.query(DatabaseConstant.PublishInfoItemTable.TABLE,null,DatabaseConstant.PublishInfoItemTable.USER_ID + "=? and " +
-                DatabaseConstant.PublishInfoItemTable.TABLE_ID + "=?",new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),String.valueOf(tableId)},
-                null,null,null);
-        if(cursor == null || cursor.getCount() == 0) {
-            cursor.close();
-            return false;
-        }
-        cursor.close();
-        return true;
-    }
-    private PublishedInfo getPublishedInfo(String userId,int type){
-        mDB = mDBUtils.getReadableDatabase();
-        PublishedInfo info = new PublishedInfo();
-        String infoSql = "SELECT * FROM " + DatabaseConstant.PublishInfoTable.TABLE + " where " + DatabaseConstant.PublishInfoTable.USER_ID + "=?"
-                + " and " + DatabaseConstant.PublishInfoTable.TYPE + "=?";
-        Cursor infoCursor = mDB.rawQuery(infoSql,new String[]{userId,String.valueOf(type)});
-        if(infoCursor != null && infoCursor.getCount() != 0){
-            infoCursor.moveToFirst();
-            do{
-                info.setUser_id(YueQiuApp.sUserInfo.getUser_id());
-                info.setStart_no(infoCursor.getInt(infoCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.START_NO)));
-                info.setEnd_no(infoCursor.getInt(infoCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.END_NO)));
-                info.setType(infoCursor.getInt(infoCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.TYPE)));
-                info.setSumCount(infoCursor.getInt(infoCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.COUNT)));
-            }while(infoCursor.moveToNext());
-        }
-        infoCursor.close();
-
-
-        String itemSql = "SELECT * FROM " + DatabaseConstant.PublishInfoItemTable.TABLE + " where " + DatabaseConstant.PublishInfoItemTable.USER_ID + "=?"
-                + " and " +  DatabaseConstant.PublishInfoItemTable.TYPE + "=?" ;
-        Cursor itemCursor = mDB.rawQuery(itemSql,new String[]{userId,String.valueOf(type)});
-        if(itemCursor != null || itemCursor.getCount() != 0 ){
-            itemCursor.moveToFirst();
-            do{
-                PublishedInfo.PublishedItemInfo item = info.new PublishedItemInfo();
-                item.setType(itemCursor.getInt(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.TYPE)));
-                item.setTitle(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.TITLE)));
-                item.setContent(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.CONTENT)));
-                item.setDateTime(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.DATETIME)));
-                item.setImage_url(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.IMAGE_URL)));
-                item.setTable_id(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.TABLE_ID)));
-                info.mList.add(item);
-            }while(itemCursor.moveToNext());
-        }
-        itemCursor.close();
-        return info;
-    }
+//    private void insertPublishInfo(PublishedInfo info){
+//        ContentValues values = new ContentValues();
+//        values.put(DatabaseConstant.PublishInfoTable.USER_ID,YueQiuApp.sUserInfo.getUser_id());
+//        values.put(DatabaseConstant.PublishInfoTable.TYPE,mType);
+//        values.put(DatabaseConstant.PublishInfoTable.START_NO,info.getStart_no());
+//        values.put(DatabaseConstant.PublishInfoTable.END_NO,info.getEnd_no());
+//        values.put(DatabaseConstant.PublishInfoTable.COUNT,info.getSumCount());
+//
+//        mDB = mDBUtils.getWritableDatabase();
+//        mDB.insert(DatabaseConstant.PublishInfoTable.TABLE, null, values);
+//
+//        insertPublishItemInfo(info);
+//    }
+//
+//    private void insertPublishItemInfo(PublishedInfo info){
+//        mDB = mDBUtils.getWritableDatabase();
+//        for(int i=0;i<info.mList.size();i++) {
+//            ContentValues values = new ContentValues();
+//            PublishedInfo.PublishedItemInfo itemInfo = info.mList.get(i);
+//            values.put(DatabaseConstant.PublishInfoItemTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
+//            values.put(DatabaseConstant.PublishInfoItemTable.TABLE_ID, itemInfo.getTable_id());
+//            values.put(DatabaseConstant.PublishInfoItemTable.TYPE, mType);
+//            values.put(DatabaseConstant.PublishInfoItemTable.IMAGE_URL, itemInfo.getImage_url());
+//            values.put(DatabaseConstant.PublishInfoItemTable.TITLE, itemInfo.getTitle());
+//            values.put(DatabaseConstant.PublishInfoItemTable.CONTENT, itemInfo.getContent());
+//            values.put(DatabaseConstant.PublishInfoItemTable.DATETIME, itemInfo.getDateTime());
+//            mDB.insert(DatabaseConstant.PublishInfoItemTable.TABLE,null,values);
+//        }
+//    }
+//
+//    private void updatePublishInfo(PublishedInfo info){
+//        mDB = mDBUtils.getWritableDatabase();
+//
+//        ContentValues values = new ContentValues();
+//        values.put(DatabaseConstant.PublishInfoTable.START_NO,info.getStart_no());
+//        values.put(DatabaseConstant.PublishInfoTable.END_NO,info.getEnd_no());
+//        values.put(DatabaseConstant.PublishInfoTable.COUNT,info.getSumCount());
+//
+//        mDB.update(DatabaseConstant.PublishInfoTable.TABLE,values, DatabaseConstant.PublishInfoTable.USER_ID + "=? and " +
+//                DatabaseConstant.PublishInfoTable.TYPE + "=?",
+//                new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),String.valueOf(info.getType())});
+//
+//        for(int i=0;i<info.mList.size();i++){
+//            PublishedInfo.PublishedItemInfo item =  info.mList.get(i);
+//            if(isExistPublishedItemInfo(Integer.valueOf(item.getTable_id()))){
+//                updatePublishedItemInfo(info);
+//            }else{
+//                insertPublishItemInfo(info);
+//            }
+//        }
+//
+//    }
+//    private void updatePublishedItemInfo(PublishedInfo info){
+//        mDB = mDBUtils.getWritableDatabase();
+//        for(int i=0;i<info.mList.size();i++) {
+//            ContentValues values = new ContentValues();
+//            PublishedInfo.PublishedItemInfo itemInfo = info.mList.get(i);
+//            values.put(DatabaseConstant.PublishInfoItemTable.TABLE_ID, itemInfo.getTable_id());
+//            values.put(DatabaseConstant.PublishInfoItemTable.IMAGE_URL, itemInfo.getImage_url());
+//            values.put(DatabaseConstant.PublishInfoItemTable.TITLE, itemInfo.getTitle());
+//            values.put(DatabaseConstant.PublishInfoItemTable.CONTENT, itemInfo.getContent());
+//            values.put(DatabaseConstant.PublishInfoItemTable.DATETIME, itemInfo.getDateTime());
+//            mDB.update(DatabaseConstant.PublishInfoItemTable.TABLE,values,DatabaseConstant.PublishInfoItemTable.USER_ID + "=? and " +
+//                DatabaseConstant.PublishInfoItemTable.TABLE_ID + "=?",
+//                    new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),String.valueOf(itemInfo.getTable_id())});
+//        }
+//    }
+//    private boolean isExistPublishedInfo(){
+//        mDB = mDBUtils.getReadableDatabase();
+//        Cursor cursor = mDB.query(DatabaseConstant.PublishInfoTable.TABLE,null,DatabaseConstant.PublishInfoTable.USER_ID + "=? and "
+//                            + DatabaseConstant.PublishInfoTable.TYPE + "=?",new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),
+//                            String.valueOf(mType)},null,null,null);
+//        if(cursor == null || cursor.getCount() == 0) {
+//            cursor.close();
+//            return false;
+//        }
+//        cursor.close();
+//        return true;
+//    }
+//    private boolean isExistPublishedItemInfo(int tableId){
+//        mDB = mDBUtils.getReadableDatabase();
+//        Cursor cursor = mDB.query(DatabaseConstant.PublishInfoItemTable.TABLE,null,DatabaseConstant.PublishInfoItemTable.USER_ID + "=? and " +
+//                DatabaseConstant.PublishInfoItemTable.TABLE_ID + "=?",new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),String.valueOf(tableId)},
+//                null,null,null);
+//        if(cursor == null || cursor.getCount() == 0) {
+//            cursor.close();
+//            return false;
+//        }
+//        cursor.close();
+//        return true;
+//    }
+//    private PublishedInfo getPublishedInfo(String userId,int type){
+//        mDB = mDBUtils.getReadableDatabase();
+//        PublishedInfo info = new PublishedInfo();
+//        String infoSql = "SELECT * FROM " + DatabaseConstant.PublishInfoTable.TABLE + " where " + DatabaseConstant.PublishInfoTable.USER_ID + "=?"
+//                + " and " + DatabaseConstant.PublishInfoTable.TYPE + "=?";
+//        Cursor infoCursor = mDB.rawQuery(infoSql,new String[]{userId,String.valueOf(type)});
+//        if(infoCursor != null && infoCursor.getCount() != 0){
+//            infoCursor.moveToFirst();
+//            do{
+//                info.setUser_id(YueQiuApp.sUserInfo.getUser_id());
+//                info.setStart_no(infoCursor.getInt(infoCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.START_NO)));
+//                info.setEnd_no(infoCursor.getInt(infoCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.END_NO)));
+//                info.setType(infoCursor.getInt(infoCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.TYPE)));
+//                info.setSumCount(infoCursor.getInt(infoCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.COUNT)));
+//            }while(infoCursor.moveToNext());
+//        }
+//        infoCursor.close();
+//
+//
+//        String itemSql = "SELECT * FROM " + DatabaseConstant.PublishInfoItemTable.TABLE + " where " + DatabaseConstant.PublishInfoItemTable.USER_ID + "=?"
+//                + " and " +  DatabaseConstant.PublishInfoItemTable.TYPE + "=?" ;
+//        Cursor itemCursor = mDB.rawQuery(itemSql,new String[]{userId,String.valueOf(type)});
+//        if(itemCursor != null || itemCursor.getCount() != 0 ){
+//            itemCursor.moveToFirst();
+//            do{
+//                PublishedInfo.PublishedItemInfo item = info.new PublishedItemInfo();
+//                item.setType(itemCursor.getInt(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.TYPE)));
+//                item.setTitle(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.TITLE)));
+//                item.setContent(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.CONTENT)));
+//                item.setDateTime(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.DATETIME)));
+//                item.setImage_url(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.IMAGE_URL)));
+//                item.setTable_id(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.TABLE_ID)));
+//                info.mList.add(item);
+//            }while(itemCursor.moveToNext());
+//        }
+//        itemCursor.close();
+//        return info;
+//    }
 }

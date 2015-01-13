@@ -25,9 +25,11 @@ public class DBUtils extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
 
 
+
         db.execSQL(DatabaseConstant.UserTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.PublishInfoTable.CRAETE_SQL);
         db.execSQL(DatabaseConstant.PublishInfoItemTable.CREATE_URL);
+        db.execSQL(DatabaseConstant.ChatMessageTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.ActivitiesTable.SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
 
@@ -42,6 +44,7 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.PublishInfoItemTable.DROP_SQL);
         db.execSQL(DatabaseConstant.ActivitiesTable.DROP_SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
+        db.execSQL(DatabaseConstant.ChatMessageTable.DROP_SQL);
         onCreate(db);
     }
 

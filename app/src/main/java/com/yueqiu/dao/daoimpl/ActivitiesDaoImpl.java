@@ -71,12 +71,12 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
                         append("');");
                 db.execSQL(sb.toString());
             }
+            db.setTransactionSuccessful();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
 
         } finally {
-            db.setTransactionSuccessful();
             db.endTransaction();
             db.close();
         }
