@@ -39,11 +39,11 @@ public class DatabaseConstant {
 
         public static final String APPOINT_DATE = "appoint_date";
 
-        public static final String BALLARM = "ballarm";
+        public static final String BALLARM = "ballArm";
 
-        public static final String USERDTYPE = "usedtype";
+        public static final String USERDTYPE = "usedType";
 
-        public static final String BALLAGE = "ballage";
+        public static final String BALLAGE = "ballAge";
 
         public static final String IDOL = "idol";
 
@@ -61,14 +61,9 @@ public class DatabaseConstant {
         public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + "(" + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + PHONE + " VARCHAR(50) NOT NULL, " + PASSWORD + " VARCHAR(100), " +
                 SEX + " INTEGER DEFAULT 1, " + TITLE + " VARCHAR(50), " + IMG_URL + " VARCHAR(255), " + IMG_REAL + " VARCHAR(255), " + NICK +
-
-                " VARCHAR(255), " + DISTRICT + " VARCHAR(255), " + LEVEL + " INTEGER DEFAULT 1, " + BALL_CLASS + " INTEGER DEFAULT 1, " + APPOINT_DATE +
+                " VARCHAR(255), " + DISTRICT + " VARCHAR(255), " + LEVEL + " INTEGER DEFAULT 1, " + BALL_TYPE + " INTEGER DEFAULT 1, " + APPOINT_DATE +
                 " VARCHAR(255), " + BALLARM + " INTEGER DEFAULT 1, " + USERDTYPE + " INTEGER DEFAULT 1, " + BALLAGE + " INTEGER, " + IDOL + " VARCHAR(255), "
-
-
                 + IDOL_NAME + " VARCHAR(255), " + NEW_IMG + " VARCHAR(255), " + NEW_IMG_REAL + " VARCHAR(255), " + LOGIN_TIME + " VARCHAR(255)" + ")";
-
-
     }
 
     public final class PublishInfoTable {

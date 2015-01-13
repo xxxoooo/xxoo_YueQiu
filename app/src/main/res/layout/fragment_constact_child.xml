@@ -26,7 +26,8 @@
         android:src="@drawable/status_online"
         android:contentDescription="@string/app_name"/>
     <TextView
-        android:textColor="@color/md__defaultBackground"
+        android:textColor="@color/search_distance_color"
+        android:textSize="12sp"
         android:id="@+id/contact_list_item_time"
         android:layout_width="wrap_content"
         android:layout_height="25dp"

@@ -46,6 +46,7 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
     private DBUtils mDBUtils;
     private int mFriendUserId;
     private String mUserName;
+    private View mMessageMore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,7 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
         mEditText = $(R.id.chat_container_text_ed);
         mSend = $(R.id.chat_container_send_btn);
         mListView = $(R.id.chat_container_list_item);
+        mMessageMore = $(R.id.chat_container_message_more);
     }
 
     private void setListener() {
@@ -78,11 +80,12 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
         mEditText.setOnFocusChangeListener(this);
         mEditText.setOnClickListener(this);
         mSend.setOnClickListener(this);
+        mMessageMore.setOnClickListener(this);
     }
 
     private void initData() {
         //从本地读取聊天记录
-        mDataArrays = getLocalData(String.valueOf(mFriendUserId));
+//        mDataArrays = getLocalData(String.valueOf(mFriendUserId));
 
         mAdapter = new ChatMsgViewAdapter(this, mDataArrays);
         mListView.setAdapter(mAdapter);
@@ -96,7 +99,7 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
             entity.setMessage(content);
             entity.setComMsg(false);
             //TODO:本地存一份
-            insertLocalData(entity);
+//            insertLocalData(entity);
             mDataArrays.add(entity);
             mAdapter.notifyDataSetChanged();
             mEditText.setText("");
@@ -125,6 +128,9 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
                 break;
             case R.id.chat_container_send_btn:
                 sendMessage();
+                break;
+            case R.id.chat_container_message_more:
+                //查看更多消息
                 break;
             default:
                 break;

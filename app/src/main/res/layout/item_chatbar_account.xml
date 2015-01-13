@@ -75,7 +75,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        style="@style/ListItemTvStyle"
+        android:textColor="@color/search_distance_color"
+        android:textSize="12sp"
         android:text="12-19 12:12"/>
 
 </RelativeLayout>

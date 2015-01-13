@@ -2,6 +2,7 @@ package com.yueqiu.fragment.chatbar;
 
 import android.app.ActionBar;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,9 +11,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.activity.ChatActivity;
 import com.yueqiu.adapter.ExpAdapter;
 import com.yueqiu.bean.ContactsList;
 import com.yueqiu.bean.RecentChat;
@@ -78,6 +83,23 @@ public class ContactFragment extends Fragment {
         mExpAdapter = new ExpAdapter(mContext, mIphoneTreeView);
         mIphoneTreeView.setAdapter(mExpAdapter);
 //		new AsyncTaskLoading(mLoadingView).execute(0);
+
+
+        mIphoneTreeView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+            @Override
+            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
+                Toast.makeText(getActivity(),
+                        "你点击了" + mExpAdapter.getChild(groupPosition, childPosition),
+                        Toast.LENGTH_SHORT).show();
+                ContactsList.Contacts contacts = (ContactsList.Contacts)mExpAdapter.getChild(groupPosition, childPosition);
+                //TODO:传入待聊天好友的userid
+                Intent intent = new Intent(getActivity(), ChatActivity.class);
+                intent.putExtra(MessageFragment.FRIEND_USER_ID, contacts.getUser_id());//fake date
+                intent.putExtra(MessageFragment.FRIEND_USER_NAME, contacts.getUsername());
+                startActivity(intent);
+                return true;
+            }
+        });
     }
 
     private void initData() {

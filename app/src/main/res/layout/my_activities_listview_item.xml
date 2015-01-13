@@ -55,7 +55,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
-            android:textColor="@color/md__defaultBackground"
+            android:textColor="@color/search_distance_color"
             android:layout_height="wrap_content" />
 
     </RelativeLayout>
