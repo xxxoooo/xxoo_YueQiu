@@ -87,6 +87,7 @@
         android:background="@drawable/list_corner_round_bg">
 
         <EditText
+            android:id="@+id/verification_news_ed"
             android:padding="10dp"
             android:layout_width="match_parent"
             android:gravity="top"

@@ -292,6 +292,35 @@ public class HttpConstants
         public static final String GROUP_ID = "group_id";
     }
 
+    /**
+     * 聊吧中添加好友身份验证下一步
+     * post
+     */
+    public static final class FrendManage
+    {
+        public static final String URL = "/friend/manage";
+
+        //请求参数：位置坐标
+        public static final String MY_ID = "my_id";
+        public static final String ASK_ID = "ask_id";
+        public static final String GROUP_ID = "group_id";
+        public static final String REMARK = "remark";
+        public static final String TAG = "tag";
+    }
+
+    /**
+     * 聊吧中添加好友身份验证
+     * post
+     */
+    public static final class FrendSendAsk
+    {
+        public static final String URL = "/friend/sendAsk";
+
+        //请求参数：位置坐标
+        public static final String MY_ID = "my_id";
+        public static final String ASK_ID = "ask_id";
+        public static final String NEWS = "news";
+    }
 
     /**
      * 活动接口
