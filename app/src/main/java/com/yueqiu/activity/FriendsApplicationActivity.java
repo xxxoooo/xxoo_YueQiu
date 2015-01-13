@@ -11,6 +11,7 @@ import com.yueqiu.util.SingleFragmentActivity;
 
 /**
  * Created by doushuqi on 15/1/7.
+ * 好友申请处理
  */
 public class FriendsApplicationActivity extends SingleFragmentActivity {
 

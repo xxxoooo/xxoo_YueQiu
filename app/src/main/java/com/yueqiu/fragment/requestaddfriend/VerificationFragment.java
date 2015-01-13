@@ -132,12 +132,12 @@ public class VerificationFragment extends Fragment {
      */
     private void sendRequest() {
         Map<String, String> requestMap = new HashMap<String, String>();
-        requestMap.put(HttpConstants.FrendSendAsk.MY_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));//
-        requestMap.put(HttpConstants.FrendSendAsk.ASK_ID, mFriendUserId);
-        requestMap.put(HttpConstants.FrendSendAsk.NEWS, mNews);
+        requestMap.put(HttpConstants.FriendSendAsk.MY_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));//
+        requestMap.put(HttpConstants.FriendSendAsk.ASK_ID, mFriendUserId);
+        requestMap.put(HttpConstants.FriendSendAsk.NEWS, mNews);
 
         Map<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put(PublicConstant.URL, HttpConstants.FrendSendAsk.URL);
+        paramMap.put(PublicConstant.URL, HttpConstants.FriendSendAsk.URL);
         paramMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.POST);
         if (Utils.networkAvaiable(getActivity())) {
             new VerificationAsyncTask(requestMap, null, null).execute(paramMap);

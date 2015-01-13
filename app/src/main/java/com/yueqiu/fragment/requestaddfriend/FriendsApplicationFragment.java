@@ -112,6 +112,7 @@ public class FriendsApplicationFragment extends Fragment {
                         //点击同意按钮
                         Bundle args = new Bundle();
                         args.putInt(VerificationFragment.ARGUMENTS_KEY, 0);
+                        args.putString(FriendProfileFragment.FRIEND_USER_ID,String.valueOf(1));//TODO：好友的user_id, data fake
                         Fragment fragment = new FriendManageFragment();
                         fragment.setArguments(args);
                         ((FriendsApplicationActivity)getActivity()).switchFragment(fragment);

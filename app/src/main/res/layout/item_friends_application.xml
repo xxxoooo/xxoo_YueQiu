@@ -18,7 +18,7 @@
         android:textSize="17sp"
         android:text="@string/qiuyou_request"/>
     <TextView
-        android:textColor="@color/md__defaultBackground"
+        android:textColor="@color/devide_line"
         android:id="@+id/friends_application_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

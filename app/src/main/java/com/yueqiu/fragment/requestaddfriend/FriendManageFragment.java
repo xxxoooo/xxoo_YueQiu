@@ -156,6 +156,8 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
                 //TODO:
 //                mFragmentManager.beginTransaction().replace(R.id.fragment_container, FriendsApplicationActivity.sCurrentFragment).commit();
                 ((FriendsApplicationActivity) getActivity()).switchFragment(FriendsApplicationActivity.sFriendsApplication);
+                //处理好友请求
+                handleRequest();
                 return true;
             case R.id.send:
                 //发送好友请求
@@ -172,14 +174,34 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
      */
     private void sendRequest() {
         Map<String, String> requestMap = new HashMap<String, String>();
-        requestMap.put(HttpConstants.FrendManage.MY_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));//
-        requestMap.put(HttpConstants.FrendManage.ASK_ID, mFriendUserId);
-        requestMap.put(HttpConstants.FrendManage.GROUP_ID, String.valueOf(mGroupId + 1));
-        requestMap.put(HttpConstants.FrendManage.REMARK, mComment);
-        requestMap.put(HttpConstants.FrendManage.TAG, String.valueOf(mLabel));
+        requestMap.put(HttpConstants.FriendManage.MY_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));//
+        requestMap.put(HttpConstants.FriendManage.ASK_ID, mFriendUserId);
+        requestMap.put(HttpConstants.FriendManage.GROUP_ID, String.valueOf(mGroupId + 1));
+        requestMap.put(HttpConstants.FriendManage.REMARK, mComment);
+        requestMap.put(HttpConstants.FriendManage.TAG, String.valueOf(mLabel));
 
         Map<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put(PublicConstant.URL, HttpConstants.FrendManage.URL);
+        paramMap.put(PublicConstant.URL, HttpConstants.FriendManage.URL);
+        paramMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.POST);
+        if (Utils.networkAvaiable(getActivity())) {
+            new FriendManageAsyncTask(requestMap, null, null).execute(paramMap);
+        } else {
+            Toast.makeText(getActivity(), getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * post请求
+     */
+    private void handleRequest() {
+        Map<String, String> requestMap = new HashMap<String, String>();
+        requestMap.put(HttpConstants.AskManage.ASK_ID, mFriendUserId);
+        requestMap.put(HttpConstants.AskManage.GROUP_ID, String.valueOf(mGroupId + 1));
+        requestMap.put(HttpConstants.AskManage.REMARK, mComment);
+        requestMap.put(HttpConstants.AskManage.TAG, String.valueOf(mLabel));
+
+        Map<String, String> paramMap = new HashMap<String, String>();
+        paramMap.put(PublicConstant.URL, HttpConstants.AskManage.URL);
         paramMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.POST);
         if (Utils.networkAvaiable(getActivity())) {
             new FriendManageAsyncTask(requestMap, null, null).execute(paramMap);
