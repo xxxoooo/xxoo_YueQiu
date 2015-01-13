@@ -3,6 +3,8 @@ package com.yueqiu.fragment.activities;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -25,6 +27,7 @@ import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.XListView;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,6 +64,7 @@ public class CompleteFragment extends Fragment implements XListView.IXListViewLi
     private Activity mActivity;
     private View mView;
     private int mType;
+    private Drawable mProgressDrawable;
     private Handler handler = new Handler()
     {
         @Override
@@ -138,9 +142,10 @@ public class CompleteFragment extends Fragment implements XListView.IXListViewLi
         mPb = (ProgressBar) mView.findViewById(R.id.pb_loading);
         mListView.setVisibility(View.GONE);
         mPb.setVisibility(View.VISIBLE);
-
-
-        mPb = (ProgressBar) mView.findViewById(R.id.pb_loading);
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(mActivity).build();
+        Rect bounds = mPb.getIndeterminateDrawable().getBounds();
+        mPb.setIndeterminateDrawable(mProgressDrawable);
+        mPb.getIndeterminateDrawable().setBounds(bounds);
         mListView.setOnItemClickListener(itemClickListener);
         mListView.setPullLoadEnable(true);
         mListView.setXListViewListener(this);
