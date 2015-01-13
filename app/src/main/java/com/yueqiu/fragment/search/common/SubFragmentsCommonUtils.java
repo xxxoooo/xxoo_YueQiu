@@ -19,6 +19,8 @@ import com.yueqiu.util.HttpUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Created by scguo on 15/1/4.
  * <p/>
@@ -130,6 +132,11 @@ public class SubFragmentsCommonUtils
 
     }
 
+    private static ImageView[] sPagerImgArr;
+    private static LinearLayout sGalleryIndicatorGroup;
+    private static SearchMateFragmentViewPagerImgAdapter sGalleryImgAdapter;
+    private static int[] sPagerImgResArr;
+    private static ViewPager sImgGalleryViewPager;
     /**
      *
      * @param context
@@ -140,25 +147,19 @@ public class SubFragmentsCommonUtils
     public static void initViewPager(final Context context, View parentView, final int viewPagerId, final int galleryIndiGroupId)
     {
         final ImageView[] sPagerIndicatorImgList;
-        final ImageView[] sPagerImgArr;
-        LinearLayout sGalleryIndicatorGroup;
-        SearchMateFragmentViewPagerImgAdapter sGalleryImgAdapter;
-        int[] sPagerImgResArr;
-
-        ViewPager sImgGalleryViewPager;
 
         // TODO: 以下仅仅是测试数据，在测试接口的时候就删除掉
         sPagerImgResArr = new int[]{R.drawable.test_pager_1, R.drawable.test_pager_2, R.drawable.test_pager_3, R.drawable.test_pager_4};
 
-//        new Thread(new Runnable()
-//        {
-//            @Override
-//            public void run()
-//            {
-//                Log.d(TAG, " start retrieving the view pager data here ");
-//                retrieveRecommdedRoomInfo();
-//            }
-//        }).start();
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Log.d(TAG, " start retrieving the view pager data here ");
+                retrieveRecommdedRoomInfo();
+            }
+        }).start();
 
         sImgGalleryViewPager = (ViewPager) parentView.findViewById(viewPagerId);
         sGalleryIndicatorGroup = (LinearLayout) parentView.findViewById(galleryIndiGroupId);
@@ -209,7 +210,6 @@ public class SubFragmentsCommonUtils
             @Override
             public void onPageScrolled(int i, float v, int i2)
             {
-
             }
 
             @Override

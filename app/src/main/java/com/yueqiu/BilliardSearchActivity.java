@@ -183,6 +183,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         mContext = null;
     }
 
+    private static int sPosition = 0;
     private void setupTabs()
     {
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
@@ -211,7 +212,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                     .setTabListener(this);
             mActionBar.addTab(tab);
         }
-
+        mViewPager.setCurrentItem(sPosition);
 
     }
 
@@ -219,6 +220,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     @Override
     public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
     {
+        sPosition = tab.getPosition();
         mViewPager.setCurrentItem(tab.getPosition());
     }
 
