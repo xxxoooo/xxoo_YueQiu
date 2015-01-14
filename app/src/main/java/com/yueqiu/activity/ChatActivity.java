@@ -178,39 +178,4 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
         return false;
     }
 
-    private ArrayList<ChatMsgEntity> getLocalData(String userId) {
-        mDBUtils = DBUtils.getInstance(this);
-        Log.e("ddd","==>" + DatabaseConstant.ChatMessageTable.CREATE_SQL);
-        ArrayList<ChatMsgEntity> list = new ArrayList<ChatMsgEntity>();
-        SQLiteDatabase db = mDBUtils.getReadableDatabase();
-        String sql = "select * from " + DatabaseConstant.ChatMessageTable.TABLE + " where " + DatabaseConstant.ChatMessageTable.USER_ID + "=?";
-        Cursor cursor = db.rawQuery(sql, new String[]{userId});
-        if (cursor != null && cursor.getCount() != 0) {
-            for (cursor.moveToFirst(); cursor.isAfterLast(); cursor.moveToNext()) {
-                String message = cursor.getString(cursor.getColumnIndex(DatabaseConstant.ChatMessageTable.MESSAGE_CONTENT));
-                String date = cursor.getString(cursor.getColumnIndex(DatabaseConstant.ChatMessageTable.DATETIME));
-                boolean isCome = !"0".equals(cursor.getString(cursor.getColumnIndex(DatabaseConstant.ChatMessageTable.IS_COME)));
-                ChatMsgEntity entity = new ChatMsgEntity(message, date, isCome);
-                list.add(entity);
-            }
-            cursor.close();
-        }
-        return list;
-    }
-
-    private void insertLocalData(ChatMsgEntity data) {
-        mDBUtils = DBUtils.getInstance(this);
-        SQLiteDatabase db = mDBUtils.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-
-        values.put(DatabaseConstant.ChatMessageTable.USER_ID, mFriendUserId);
-        values.put(DatabaseConstant.ChatMessageTable.IMG_URL, "");
-        values.put(DatabaseConstant.ChatMessageTable.USERNAME, mUserName);
-        values.put(DatabaseConstant.ChatMessageTable.MESSAGE_CONTENT, data.getMessage());
-        values.put(DatabaseConstant.ChatMessageTable.DATETIME, "");
-        values.put(DatabaseConstant.ChatMessageTable.IS_COME, data.isComMsg());
-
-        db.insert(DatabaseConstant.ChatMessageTable.TABLE, null, values);
-    }
 }

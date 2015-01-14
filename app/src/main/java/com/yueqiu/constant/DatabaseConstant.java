@@ -167,6 +167,30 @@ public class DatabaseConstant {
         public static final String DROP_SQL   = "DROP TABLE IF EXISTS " + TABLE;
     }
 
+    public final class FriendsApplication {
+        public static final String TABLE        = "application";//好友申请表
+
+        public static final String _ID          = "id";
+
+        public static final String APPLICATION_ID = "application_id";
+
+        public static final String USERNAME     = "username";
+
+        public static final String NICK         = "nick";
+
+        public static final String CREATE_TIME  = "create_time";
+
+        public static final String IMG_URL      = "img_url";
+
+        public static final String IS_AGREE     = "is_agree";
+
+        public static final String CREATE_SQL   = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + APPLICATION_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + IMG_URL + " VARCHAR(255), " + NICK + " VARCHAR(255), "
+                + CREATE_TIME + " VARCHAR(255), " + IS_AGREE + " INTEGER NOT NULL" + ")";
+
+        public static final String DROP_SQL     = "DROP TABLE IF EXISTS " + TABLE;
+    }
+
     public final class ActivitiesTable {
         public static final String TABLENAME = "activities";
 

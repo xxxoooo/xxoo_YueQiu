@@ -3,6 +3,7 @@ package com.yueqiu.dao;
 import android.content.Context;
 
 import com.yueqiu.dao.daoimpl.ActivitiesDaoImpl;
+import com.yueqiu.dao.daoimpl.ApplicationDaoImpl;
 import com.yueqiu.dao.daoimpl.ContactsDaoImpl;
 import com.yueqiu.dao.daoimpl.PublishedImpl;
 import com.yueqiu.dao.daoimpl.UserDaoImpl;
@@ -30,6 +31,10 @@ public class DaoFactory {
     public static ContactsDao getContacts(Context context) {
 
         return new ContactsDaoImpl(context);
+    }
+
+    public static ApplicationDao getApplication(Context context) {
+        return new ApplicationDaoImpl(context);
     }
 
 }

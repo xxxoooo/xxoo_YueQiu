@@ -11,10 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ExpandableListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
@@ -22,14 +19,11 @@ import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.ChatActivity;
 import com.yueqiu.adapter.ExpAdapter;
 import com.yueqiu.bean.ContactsList;
-import com.yueqiu.bean.RecentChat;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
-import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.ContactsDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.AsyncTaskBase;
-import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.contacts.IphoneTreeView;
@@ -41,7 +35,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 

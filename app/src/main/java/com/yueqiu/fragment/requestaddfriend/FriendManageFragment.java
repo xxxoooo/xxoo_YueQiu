@@ -28,6 +28,8 @@ import com.yueqiu.activity.FriendsApplicationActivity;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.ApplicationDao;
+import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
@@ -47,16 +49,18 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
     private ActionBar mActionBar;
     private FragmentManager mFragmentManager;
     private Fragment mFragment;
-    private int whoCreate;
+    private int whoCreate;//0:处理请求；1：发送请求
     private TextView mTextView;
     private EditText mEditText;
     private int mGroupId;//分组id
     private String mComment = "";//备注
     private int mLabel;//标签:1师傅2徒弟3高手4菜鸟
     private static final int REQUEST_CODE = 0;
-    private String mFriendUserId;
-    private View mMasterIndicator, mStudentIndicator, mExpertIndicator, mBeginnerIndictor,
+    private String mFriendUserId;//处理好友申请时该字段为申请id;发送好友验证下一步时该字段为ask_id被请求添加的好友id
+    private View mMasterIndicator, mStudentIndicator, mExpertIndicator, mBeginnerIndicator,
             mMaster, mStudent, mExpert, mBeginner;
+
+    private ApplicationDao mApplicationDao;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,6 +71,8 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
         mFragmentManager = getActivity().getSupportFragmentManager();
         whoCreate = getArguments().getInt(VerificationFragment.ARGUMENTS_KEY);
         mFriendUserId = getArguments().getString(FriendProfileFragment.FRIEND_USER_ID);
+        if (whoCreate == 0)
+            mApplicationDao = DaoFactory.getApplication(getActivity());
     }
 
     @Override
@@ -109,7 +115,7 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
         mMasterIndicator = v.findViewById(R.id.label_indicator_master);
         mStudentIndicator = v.findViewById(R.id.label_indicator_student);
         mExpertIndicator = v.findViewById(R.id.label_indicator_expert);
-        mBeginnerIndictor = v.findViewById(R.id.label_indicator_beginner);
+        mBeginnerIndicator = v.findViewById(R.id.label_indicator_beginner);
         mMaster.setOnClickListener(this);
         mStudent.setOnClickListener(this);
         mExpert.setOnClickListener(this);
@@ -148,14 +154,16 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (whoCreate == 0)
-                    ((FriendsApplicationActivity) getActivity()).switchFragment(FriendsApplicationActivity.sFriendsApplication);
-                else getActivity().finish();
+//                if (whoCreate == 0)
+//                    ((FriendsApplicationActivity) getActivity()).switchFragment(FriendsApplicationActivity.sFriendsApplication);
+//                else getActivity().finish();
+                getActivity().finish();
                 return true;
             case R.id.qiuyou_manage_finish:
                 //TODO:
-//                mFragmentManager.beginTransaction().replace(R.id.fragment_container, FriendsApplicationActivity.sCurrentFragment).commit();
-                ((FriendsApplicationActivity) getActivity()).switchFragment(FriendsApplicationActivity.sFriendsApplication);
+                mApplicationDao.updateFriendsApplication(mFriendUserId, 1);
+                mFragmentManager.beginTransaction().
+                        replace(R.id.fragment_container, new FriendsApplicationFragment()).commit();
                 //处理好友请求
                 handleRequest();
                 return true;
@@ -218,28 +226,28 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
                 mMasterIndicator.setVisibility(View.VISIBLE);
                 mStudentIndicator.setVisibility(View.GONE);
                 mExpertIndicator.setVisibility(View.GONE);
-                mBeginnerIndictor.setVisibility(View.GONE);
+                mBeginnerIndicator.setVisibility(View.GONE);
                 break;
             case R.id.label_student:
                 mLabel = 2;
                 mMasterIndicator.setVisibility(View.GONE);
                 mStudentIndicator.setVisibility(View.VISIBLE);
                 mExpertIndicator.setVisibility(View.GONE);
-                mBeginnerIndictor.setVisibility(View.GONE);
+                mBeginnerIndicator.setVisibility(View.GONE);
                 break;
             case R.id.label_expert:
                 mLabel = 3;
                 mMasterIndicator.setVisibility(View.GONE);
                 mStudentIndicator.setVisibility(View.GONE);
                 mExpertIndicator.setVisibility(View.VISIBLE);
-                mBeginnerIndictor.setVisibility(View.GONE);
+                mBeginnerIndicator.setVisibility(View.GONE);
                 break;
             case R.id.label_beginner:
                 mLabel = 4;
                 mMasterIndicator.setVisibility(View.GONE);
                 mStudentIndicator.setVisibility(View.GONE);
                 mExpertIndicator.setVisibility(View.GONE);
-                mBeginnerIndictor.setVisibility(View.VISIBLE);
+                mBeginnerIndicator.setVisibility(View.VISIBLE);
                 break;
             default:
                 break;
