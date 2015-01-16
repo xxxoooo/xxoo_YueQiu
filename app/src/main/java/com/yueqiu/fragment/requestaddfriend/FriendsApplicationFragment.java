@@ -10,6 +10,7 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -230,8 +231,9 @@ public class FriendsApplicationFragment extends Fragment {
                         Fragment fragment = new FriendManageFragment();
                         fragment.setArguments(args);
 //                        ((FriendsApplicationActivity) getActivity()).switchFragment(fragment);
-                        mFragmentManager.beginTransaction().
-                                replace(R.id.fragment_container, fragment).commit();
+                        FragmentTransaction ft = mFragmentManager.beginTransaction();
+//                        ft.addToBackStack("FriendsApplicationActivity");
+                        ft.replace(R.id.fragment_container, fragment).commit();
                     }
                 });
                 convertView.setTag(viewHolder);
