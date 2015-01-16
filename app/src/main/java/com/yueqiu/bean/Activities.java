@@ -16,7 +16,7 @@ public class Activities {
     private String model;
     private String content;
     private String create_time;
-    private String look_num;
+    private int look_num;
 
     public String getId() {
         return id;
@@ -115,11 +115,11 @@ public class Activities {
         this.sex = sex;
     }
 
-    public String getLook_num() {
+    public int getLook_num() {
         return look_num;
     }
 
-    public void setLook_num(String look_num) {
+    public void setLook_num(int look_num) {
         this.look_num = look_num;
     }
 

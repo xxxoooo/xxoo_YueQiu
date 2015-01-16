@@ -220,7 +220,7 @@ public class ActivitiesDetail extends Activity {
         mLinearLayout.setVisibility(View.GONE);
         mPb = (ProgressBar) findViewById(R.id.pb_detail);
         mgetDataError = (TextView) findViewById(R.id.detail_error);
-        mgetDataError.setVisibility(View.VISIBLE);
+        mgetDataError.setVisibility(View.INVISIBLE);
         mPb.setVisibility(View.VISIBLE);
         mProgressDrawable = new FoldingCirclesDrawable.Builder(ActivitiesDetail.this).build();
         Rect bounds = mPb.getIndeterminateDrawable().getBounds();
