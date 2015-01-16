@@ -154,7 +154,6 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
     private Runnable getLocalData = new Runnable() {
         @Override
         public void run() {
-            Log.i("Demo", String.valueOf(mLocalStart) + "-----" + String.valueOf(mLocalEnd));
             ArrayList<Activities> list = mDao.getActivities(mLocalStart, mLocalEnd);
             mLocalStart += LENGTH;
             mLocalEnd += LENGTH;
@@ -316,7 +315,6 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
 
     @Override
     public void onLoadMore() {
-        Log.i("Demo","onLoadMore");
         new Thread(Utils.networkAvaiable(ActivitiesActivity.this)
                 ? getNetworkData : getLocalData).start();
 

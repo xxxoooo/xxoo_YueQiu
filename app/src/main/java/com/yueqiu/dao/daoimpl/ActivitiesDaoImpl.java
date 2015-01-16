@@ -26,7 +26,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
 
     public ActivitiesDaoImpl(Context context) {
         this.mContext = context;
-        dbUtils = new DBUtils(mContext, DatabaseConstant.ActivitiesTable.SQL);
+        dbUtils = DBUtils.getInstance(mContext);
     }
 
 
@@ -60,9 +60,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
                         .append(" values (").append(list.get(i).getId()).append(",");
                 if (list.get(i).getImg_url().equals("") || list.get(i).getImg_url() == null) {
                     sb.append("null");
-                }
-                else
-                {
+                } else {
                     sb.append("'");
                     sb.append(list.get(i).getImg_url()).append("'");
                 }
@@ -71,16 +69,16 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
                         append("');");
                 db.execSQL(sb.toString());
             }
+            db.setTransactionSuccessful();
             return true;
         } catch (Exception e) {
             e.printStackTrace();
 
         } finally {
-            db.setTransactionSuccessful();
             db.endTransaction();
-            db.close();
+//            db.close();
         }
-        db.close();
+//        db.close();
         return false;
     }
 
@@ -121,7 +119,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
             try {
                 Method method = activities.getClass().getMethod("get" +
                         fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1), null);
-                Object o = method.invoke(activities.getClass());
+                Object o = method.invoke(activities);
                 if (o != null) {
                     if (o instanceof String) {
                         values.put(fieldName, (String) o);
@@ -148,7 +146,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
         long ret = db.update(DatabaseConstant.ActivitiesTable.TABLENAME,
                 values, DatabaseConstant.ActivitiesTable._ID + "=?",
                 new String[]{String.valueOf(activities.getId())});
-        db.close();
+//        db.close();
         return ret == -1 ? false : true;
     }
 
@@ -157,7 +155,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
         SQLiteDatabase db = dbUtils.getReadableDatabase();
         String sql = "select * from " + DatabaseConstant.ActivitiesTable.TABLENAME +
                 " order by " + DatabaseConstant.ActivitiesTable._ID + " DESC " + " limit "
-                + start + "," + end;
+                + start + "," + 10;
         Cursor cursor = db.rawQuery(sql, null);
         int count = cursor.getColumnCount();
         ArrayList<Activities> list = new ArrayList<Activities>();
@@ -172,8 +170,56 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
                 list.add(activities);
             }
         }
-        db.close();
+        cursor.close();
+//        db.close();
         return count == 0 ? null : list;
+    }
+
+    @Override
+    public Activities getActivities(int id) {
+        SQLiteDatabase db = dbUtils.getReadableDatabase();
+        String sql = "SELECT * FROM " + DatabaseConstant.ActivitiesTable.TABLENAME + " WHERE " +
+                DatabaseConstant.ActivitiesTable._ID + "=?";
+        try {
+            Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(id)});
+//            while (cursor.moveToNext()) {
+//
+//            }
+            return getActivitesByCursor(cursor);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+//            db.close();
+
+        }
+        return null;
+    }
+
+
+    private Activities getActivitesByCursor(Cursor cursor) {
+        try {
+            Activities activities = Activities.class.newInstance();
+            Field[] fields = Activities.class.getDeclaredFields();
+            int length = fields.length;
+            if(cursor.moveToNext())
+            {
+                for (int i = 0; i < length; i++) {
+                    fields[i].setAccessible(true);
+                    Object obj = fields[i].getType();
+                    fields[i].set(activities, cursor.getString(
+                        cursor.getColumnIndex(fields[i].getName())) );
+                }
+            }
+            return activities;
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }finally {
+            cursor.close();
+        }
+
+        return null;
     }
 
     @Override

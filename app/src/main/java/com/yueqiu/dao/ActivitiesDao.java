@@ -18,6 +18,9 @@ public interface ActivitiesDao {
 
     public ArrayList<Activities> getActivities(int start, int end);
 
+    public Activities getActivities(int id);
+
+
     public String getRefreshTime();
 
     public boolean UpdateRefreshTime(String time);

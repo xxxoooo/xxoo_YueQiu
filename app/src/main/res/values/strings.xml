@@ -19,6 +19,7 @@
     <string name="billiard_key_serach">关键字搜索</string>
     <string name="billiard_post">发表</string>
     <string name="billiard_back">返回</string>
+    <string name="action_delete">删除</string>
     <string name="billiard_group_issue_article">发表话题</string>
     <string name="billiard_topic_type">话题类型</string>
     <string name="title_activity_my">MyActivity</string>
@@ -258,6 +259,10 @@
     <string name="slide_account_golden">金币:</string>
     <string name="md__drawerOpenIndicatorDesc">Close drawer</string>
     <string name="md__drawerClosedIndicatorDesc">Open drawer</string>
+    <string name="published_action_mode_title">选择活动</string>
+    <string name="published_confirm_str">确认</string>
+    <string name="published_cancel_str">取消</string>
+    <string name="published_delete_content">确定要删除所选的<xliff:g id="number" example="15">%1$s</xliff:g>条活动记录吗？</string>
 
     <!-- 聊吧 -->
     <string name="btn_liaoba_message">消息</string>
@@ -404,4 +409,6 @@
     <string name="title_activity_start">StartActivity</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="starmeet">球星汇</string>
+    <string name="contact">联系人</string>
+
 </resources>

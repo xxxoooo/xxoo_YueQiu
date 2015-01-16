@@ -39,7 +39,7 @@ import java.util.Map;
 /**
  * Created by yinfeng on 15/1/12.
  */
-public class GroupActvitiesFragment extends Fragment implements XListView.IXListViewListener{
+public class GroupActvitiesFragment extends Fragment implements XListView.IXListViewListener {
 
     private static final String TAG = "ActivitiesActivity";
     private ActionBar mActionBar;
@@ -64,28 +64,23 @@ public class GroupActvitiesFragment extends Fragment implements XListView.IXList
     private View mView;
     private int mType;
     private Drawable mProgressDrawable;
-    private Handler handler = new Handler()
-    {
+    private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             mPb.setVisibility(View.INVISIBLE);
-            switch (msg.what)
-            {
+            switch (msg.what) {
                 case GET_DATA_ERROR:
                     onLoad();
                     break;
                 case GET_DATA_SUCCESS:
 
-                    mListData = (ArrayList<Activities>)msg.obj;
-                    if(mAdapter == null)
-                    {
-                        mAdapter = new ActivitiesListViewAdapter(mListData ,mActivity);
+                    ArrayList<Activities> list = (ArrayList<Activities>) msg.obj;
+                    if (mAdapter == null) {
+                        mAdapter = new ActivitiesListViewAdapter(list, mActivity);
                         mListView.setAdapter(mAdapter);
 
-                    }
-                    else
-                    {
+                    } else {
                         mAdapter.notifyDataSetChanged();
                     }
 
@@ -107,8 +102,8 @@ public class GroupActvitiesFragment extends Fragment implements XListView.IXList
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.activity_activites,null);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mView = inflater.inflate(R.layout.activity_activites, null);
         mNetstart = 0;
         mNetend = 9;
         mLocalStart = 0;
@@ -119,14 +114,13 @@ public class GroupActvitiesFragment extends Fragment implements XListView.IXList
         mNetworkAvailable = Utils.networkAvaiable(mActivity);
 //        handler.post(getInternetDataThread);
         isHead = false;
-        mType = getArguments().getInt("type",1);
+        mType = getArguments().getInt("type", 1);
         new Thread(mNetworkAvailable ? getNetworkData : getLocalData).start();
         return mView;
     }
 
-    private void initView()
-    {
-        mListView = (XListView)mView.findViewById(R.id.activity_activities_lv);
+    private void initView() {
+        mListView = (XListView) mView.findViewById(R.id.activity_activities_lv);
         mPb = (ProgressBar) mView.findViewById(R.id.pb_loading);
         mListView.setVisibility(View.GONE);
         mPb.setVisibility(View.VISIBLE);
@@ -151,17 +145,13 @@ public class GroupActvitiesFragment extends Fragment implements XListView.IXList
     private Runnable getLocalData = new Runnable() {
         @Override
         public void run() {
-            Log.i("Demo", String.valueOf(mLocalStart) + "-----" + String.valueOf(mLocalEnd));
             ArrayList<Activities> list = mDao.getActivities(mLocalStart, mLocalEnd);
             mLocalStart += LENGTH;
             mLocalEnd += LENGTH;
             Message msg = new Message();
-            if(list == null)
-            {
+            if (list == null) {
                 msg.what = GET_DATE_EMPTY;
-            }
-            else
-            {
+            } else {
                 msg.what = GET_DATA_SUCCESS;
                 mListData.addAll(list);
                 msg.obj = mListData;
@@ -171,62 +161,49 @@ public class GroupActvitiesFragment extends Fragment implements XListView.IXList
         }
     };
 
-    private void getDatafromInternet()
-    {
-        Map<String,Object> map = new HashMap<String, Object>();
-        map.put("start_no",mNetstart);
-        map.put("end_no",mNetend);
-        map.put("type",mType);
+    private void getDatafromInternet() {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("start_no", mNetstart);
+        map.put("end_no", mNetend);
+        map.put("type", mType);
         String retStr = HttpUtil.urlClient(
                 HttpConstants.Play.GETLISTEE, map, HttpConstants.RequestMethod.GET);
         JSONObject object = Utils.parseJson(retStr);
         try {
             Message msg = new Message();
-            if(object.getInt("code") != REQUEST_CODE_SUCCESS)
-            {
+            if (object.getInt("code") != REQUEST_CODE_SUCCESS) {
                 msg.what = GET_DATA_ERROR;
-            }
-            else
-            {
+            } else {
                 JSONObject result = object.getJSONObject("result");
                 JSONArray array = result.getJSONArray("list_data");
                 int length = array.length();
-                if(length == 0)
-                {
+                if (length == 0) {
                     msg.what = GET_DATE_EMPTY;
-                }
-                else
-                {
+                } else {
                     ArrayList<Activities> list = new ArrayList<Activities>();
-                    for(int i = 0; i < length; i++)
-                    {
+                    for (int i = 0; i < length; i++) {
 
                         JSONObject item = array.getJSONObject(i);
                         Activities activityItem = Utils.mapingObject(Activities.class, item);
                         boolean flag = false;
-                        for(int j = 0; j < mListData.size(); j++)
-                        {
-                            if(mListData.get(j).getId().equals(activityItem.getId()))
-                            {
+                        for (int j = 0; j < mListData.size(); j++) {
+                            if (mListData.get(j).getId().equals(activityItem.getId())) {
                                 flag = true;
                             }
                         }
 
-                        if(!flag)
-                        {
+                        if (!flag) {
                             list.add(activityItem);
                         }
                     }
-                    mDao.insertActiviesList(mListData);
+
                     msg.what = GET_DATA_SUCCESS;
-                    if(!isHead)
-                    {
+                    if (!isHead) {
                         mListData.addAll(list);
+                    } else {
+                        mListData.addAll(0, list);
                     }
-                    else
-                    {
-                        mListData.addAll(0,list);
-                    }
+                    mDao.insertActiviesList(mListData);
                     msg.obj = mListData;
                     mNetstart += LENGTH;
                     mNetend += LENGTH;
@@ -242,8 +219,14 @@ public class GroupActvitiesFragment extends Fragment implements XListView.IXList
     private AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            startActivity(new Intent(mActivity, ActivitiesDetail.class));
-            mActivity.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+            Intent intent = new Intent();
+            intent.setClass(mActivity, ActivitiesDetail.class);
+            Bundle bundle = new Bundle();
+            bundle.putInt("id", Integer.valueOf(mListData.get(position - 1).getId()));
+            bundle.putString("create_time", mListData.get(position - 1).getCreate_time());
+            intent.putExtras(bundle);
+            startActivity(intent);
+            mActivity.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         }
     };
 

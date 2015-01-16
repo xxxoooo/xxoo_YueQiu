@@ -150,7 +150,6 @@ public class ExhibitionFragment extends Fragment implements XListView.IXListView
     private Runnable getLocalData = new Runnable() {
         @Override
         public void run() {
-            Log.i("Demo", String.valueOf(mLocalStart) + "-----" + String.valueOf(mLocalEnd));
             ArrayList<Activities> list = mDao.getActivities(mLocalStart, mLocalEnd);
             mLocalStart += LENGTH;
             mLocalEnd += LENGTH;
@@ -241,8 +240,14 @@ public class ExhibitionFragment extends Fragment implements XListView.IXListView
     private AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            startActivity(new Intent(mActivity, ActivitiesDetail.class));
-            mActivity.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+            Intent intent = new Intent();
+            intent.setClass(mActivity, ActivitiesDetail.class);
+            Bundle bundle = new Bundle();
+            bundle.putInt("id", Integer.valueOf(mListData.get(position - 1).getId()));
+            bundle.putString("create_time", mListData.get(position - 1).getCreate_time());
+            intent.putExtras(bundle);
+            startActivity(intent);
+            mActivity.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         }
     };
 

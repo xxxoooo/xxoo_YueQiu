@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -102,7 +101,7 @@ public class CompleteFragment extends Fragment implements XListView.IXListViewLi
     };
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onActivityCreated( Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -162,7 +161,7 @@ public class CompleteFragment extends Fragment implements XListView.IXListViewLi
     private Runnable getLocalData = new Runnable() {
         @Override
         public void run() {
-            Log.i("Demo", String.valueOf(mLocalStart) + "-----" + String.valueOf(mLocalEnd));
+//            Log.i("Demo", String.valueOf(mLocalStart) + "-----" + String.valueOf(mLocalEnd));
             ArrayList<Activities> list = mDao.getActivities(mLocalStart, mLocalEnd);
             mLocalStart += LENGTH;
             mLocalEnd += LENGTH;
@@ -253,8 +252,14 @@ public class CompleteFragment extends Fragment implements XListView.IXListViewLi
     private AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            startActivity(new Intent(mActivity, ActivitiesDetail.class));
-            mActivity.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+            Intent intent = new Intent();
+            intent.setClass(mActivity, ActivitiesDetail.class);
+            Bundle bundle = new Bundle();
+            bundle.putInt("id", Integer.valueOf(mListData.get(position - 1).getId()));
+            bundle.putString("create_time", mListData.get(position - 1).getCreate_time());
+            intent.putExtras(bundle);
+            startActivity(intent);
+            mActivity.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         }
     };
 

@@ -35,6 +35,8 @@ import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.UserDao;
+import com.yueqiu.dao.daoimpl.UserDaoImpl;
 import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
@@ -70,6 +72,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
     private String mAccount;
     private String mPhone;
     private String mPassword;
+    private UserDao mUserDao;
     private Handler mHandler = new Handler()
     {
         @Override
@@ -87,7 +90,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                     YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(DatabaseConstant.UserTable.USER_ID)));
                     YueQiuApp.sUserInfo.setPhone(map.get(DatabaseConstant.UserTable.PHONE));
                     YueQiuApp.sUserInfo.setLogin_time(map.get(DatabaseConstant.UserTable.LOGIN_TIME));
-                    YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.ACCOUNT));
+                    YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.USERNAME));
 
                     Iterator iter = map.entrySet().iterator();
                     while(iter.hasNext()){
@@ -96,7 +99,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                     }
                     mEditor.apply();
 
-                    insertUserInfo(map);
+                    mUserDao.insertUserInfo(map);
                     Intent intent = new Intent(RegisterActivity.this, BilliardSearchActivity.class);
                     startActivity(intent);
                     RegisterActivity.this.finish();
@@ -114,6 +117,8 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
         initView();
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
+
+        mUserDao = new UserDaoImpl(this);
 
     }
 
@@ -276,7 +281,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                 else
                 {
                     Map<String,String> map = new HashMap<String, String>();
-                    map.put(DatabaseConstant.UserTable.ACCOUNT,mAccount);
+                    map.put(DatabaseConstant.UserTable.USERNAME,mAccount);
                     map.put(DatabaseConstant.UserTable.USER_ID,object.getJSONObject("result").
                             getString(DatabaseConstant.UserTable.USER_ID));
                     map.put(DatabaseConstant.UserTable.PHONE, object.getJSONObject("result").getString(DatabaseConstant.UserTable.PHONE));
@@ -302,35 +307,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
         return super.onKeyDown(keyCode, event);
     }
 
-    private void insertUserInfo(Map<String,String> map){
-        ContentValues values = new ContentValues();
 
-        values.put(DatabaseConstant.UserTable.USER_ID,map.get(DatabaseConstant.UserTable.USER_ID));
-        values.put(DatabaseConstant.UserTable.ACCOUNT,map.get(DatabaseConstant.UserTable.ACCOUNT));
-        values.put(DatabaseConstant.UserTable.PHONE, map.get(DatabaseConstant.UserTable.PHONE));
-        values.put(DatabaseConstant.UserTable.PASSWORD,"");
-        values.put(DatabaseConstant.UserTable.SEX,1);
-        values.put(DatabaseConstant.UserTable.TITLE,"");
-        values.put(DatabaseConstant.UserTable.IMG_URL,"");
-        values.put(DatabaseConstant.UserTable.IMG_REAL,"");
-        values.put(DatabaseConstant.UserTable.USERNAME,"");
-        values.put(DatabaseConstant.UserTable.DISTRICT,"");
-        values.put(DatabaseConstant.UserTable.LEVEL,1);
-        values.put(DatabaseConstant.UserTable.BALL_TYPE,1);
-        values.put(DatabaseConstant.UserTable.APPOINT_DATE,"");
-        values.put(DatabaseConstant.UserTable.BALLARM,1);
-        values.put(DatabaseConstant.UserTable.USERDTYPE,1);
-        values.put(DatabaseConstant.UserTable.BALLAGE, 3);
-        values.put(DatabaseConstant.UserTable.IDOL,"");
-        values.put(DatabaseConstant.UserTable.IDOL_NAME,"");
-        values.put(DatabaseConstant.UserTable.NEW_IMG,"");
-        values.put(DatabaseConstant.UserTable.NEW_IMG_REAL,"");
-        values.put(DatabaseConstant.UserTable.LOGIN_TIME,map.get(DatabaseConstant.UserTable.LOGIN_TIME));
-
-        DBUtils dbUtil = new DBUtils(this, DatabaseConstant.UserTable.CREATE_SQL);
-        SQLiteDatabase db = dbUtil.getWritableDatabase();
-        db.insert(DatabaseConstant.UserTable.TABLE,null,values);
-    }
 
 
 

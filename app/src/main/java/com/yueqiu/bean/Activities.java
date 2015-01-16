@@ -16,7 +16,7 @@ public class Activities {
     private String model;
     private String content;
     private String create_time;
-    private int look_num;
+    private String look_num;
 
     public String getId() {
         return id;
@@ -115,11 +115,31 @@ public class Activities {
         this.sex = sex;
     }
 
-    public int getLook_num() {
+    public String getLook_num() {
         return look_num;
     }
 
-    public void setLook_num(int look_num) {
+    public void setLook_num(String look_num) {
         this.look_num = look_num;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Activities{" +
+                "id='" + id + '\'' +
+                ", username='" + username + '\'' +
+                ", sex='" + sex + '\'' +
+                ", img_url='" + img_url + '\'' +
+                ", type='" + type + '\'' +
+                ", title='" + title + '\'' +
+                ", address='" + address + '\'' +
+                ", begin_time='" + begin_time + '\'' +
+                ", end_time='" + end_time + '\'' +
+                ", model='" + model + '\'' +
+                ", content='" + content + '\'' +
+                ", create_time='" + create_time + '\'' +
+                ", look_num=" + look_num +
+                '}';
     }
 }

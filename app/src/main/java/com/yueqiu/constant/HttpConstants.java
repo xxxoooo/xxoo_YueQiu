@@ -301,6 +301,8 @@ public class HttpConstants
         public static final String PUBLISH = "/play/publish";
 
         public static final String GETLISTEE = "/play/getList";
+
+        public static final String GETDETAIL = "/play/deatil";
     }
 
 
