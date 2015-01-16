@@ -17,6 +17,10 @@
     <color name="login_btn_normal">#f17935</color>
     <color name="login_btn_pressed">#ce4a00</color>
     <color name="have_agree_and_read">#5e6e80</color>
+    <color name="billiard_detail_bottom">#eeeeee</color>
+    <color name="billiard_bottom_stroke">#cccccc</color>
+    <color name="transparent">#00000000</color>
+    <color name="chatbar_contact_up">#adadad</color>
     <!--侧滑-->
     <color name="actionbar_color">#2ad0b9</color>
     <color name="slide_account_bg_normal_color">#5e6e82</color>

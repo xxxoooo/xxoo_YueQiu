@@ -14,7 +14,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1.1">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -35,13 +35,12 @@
             android:layout_toRightOf="@id/img_search_dating_detail_photo"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="4dp"
-            android:textColor="@color/md__defaultBackground"
-            android:textSize="17sp"
+            android:textSize="18sp"
             />
 
         <!-- 用于显示用户的性别 -->
         <TextView
-            style="@style/ListItemTvStyle"
+            style="@style/TimeTextStyle"
             android:id="@+id/tv_search_dating_detail_gender"
             android:background="@drawable/textview_withdrawable_bg"
             android:layout_below="@id/tv_search_dating_detail_nickname"
@@ -52,8 +51,7 @@
             android:paddingLeft="4dp"
             android:padding="4dp"
             android:layout_marginLeft="4dp"
-            android:layout_marginTop="2dp"
-            android:textStyle="normal"/>
+            android:layout_marginTop="2dp"/>
 
         <!--这里还应该有另一图案，就是每一个用户的受关注的数目，
             具体包括一个眼睛的ImageView以及另一用于显示具体的被follow的数目的TextView
@@ -61,7 +59,7 @@
             但是考虑到眼睛的图片是固定的，所以我们直接采用一个TextView来进行实现，
             即采用TextView当中的Drawable left来直接加载-->
         <TextView
-            style="@style/ListItemTvStyle"
+            style="@style/TimeTextStyle"
             android:id="@+id/tv_search_dating_detail_follow_num"
             android:layout_toRightOf="@id/tv_search_dating_detail_gender"
             android:text="221"
@@ -71,8 +69,6 @@
             android:paddingLeft="4dp"
             android:layout_marginLeft="9dp"
             android:layout_marginTop="4dp"
-            android:textStyle="normal"
-            android:textColor="@color/search_distance_color"
             />
 
 
@@ -81,10 +77,8 @@
             android:padding="4dp"
             android:layout_alignTop="@id/tv_search_dating_detail_nickname"
             android:layout_alignParentRight="true"
-            style="@style/ListItemTvStyle"
-            android:textSize="12sp"
+            style="@style/TimeTextStyle"
             android:text="@string/search_dating_detailed_activity_time_1"
-            android:textColor="@color/search_distance_color"
             android:layout_marginTop="10dp"
             android:layout_marginRight="7dp"
             />
@@ -94,21 +88,17 @@
             android:padding="4dp"
             android:layout_alignTop="@id/tv_search_dating_detail_nickname"
             android:layout_toLeftOf="@id/tv_search_dating_detailed_time_1"
-            style="@style/ListItemTvStyle"
-            android:textSize="12sp"
+            style="@style/TimeTextStyle"
             android:text="@string/search_dating_detailed_activity_time"
-            android:textColor="@color/search_distance_color"
             android:layout_marginTop="10dp"
             android:layout_marginRight="7dp"
             />
 
-
         <View
             android:id="@+id/search_dating_separator"
-            android:layout_below="@id/img_search_dating_detail_photo"
+            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:layout_marginTop="5dp"
+            android:layout_height="1.5dp"
             android:layout_marginLeft="3dp"
             android:layout_marginRight="3dp"
             android:background="@color/devide_line"
@@ -116,12 +106,16 @@
     </RelativeLayout>
 
     <!--用于约球详情的介绍内容-->
-    <RelativeLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_weight="3.9"
+        android:fillViewport="true">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_below="@id/search_dating_separator"
-        android:layout_weight="3">
-
+        >
         <TextView
             style="@style/SearchRoomActivityTvStyle"
             android:id="@+id/tv_search_dating_info_title"
@@ -240,26 +234,26 @@
             android:layout_marginTop="7dp"
             />
     </RelativeLayout>
+    </ScrollView>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3">
+        android:layout_weight="2"
+        >
 
         <TextView
             android:id="@+id/tv_indicator"
+            style="@style/ListItemTvStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:gravity="left"
             android:background="@color/devide_line"
             android:layout_margin="2dp"
-            android:textColor="@color/md__defaultBackground"
             android:text="@string/search_dating_detailed_tv_already_in"
             android:textSize="18sp"
             android:paddingLeft="15dp"
             android:paddingBottom="7dp"
             android:paddingTop="7dp"
-            android:textStyle="normal"
             />
 
         <!--以下应该列出来的是所有已经参加的用户的头像，这里我们应该使用一个GridView，

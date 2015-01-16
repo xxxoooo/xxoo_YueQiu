@@ -60,7 +60,7 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
 
         if (id == android.R.id.home) {
             this.finish();
-            //overridePendingTransition(R.anim.push_up_out, R.anim.push_up_in);
+            overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
         }
 
         return super.onOptionsItemSelected(item);

@@ -176,57 +176,48 @@ public class GroupActvitiesFragment extends Fragment implements XListView.IXList
         JSONObject object = Utils.parseJson(retStr);
         try {
             Message msg = new Message();
-            if(object.getInt("code") != REQUEST_CODE_SUCCESS)
-            {
-                msg.what = GET_DATA_ERROR;
-            }
-            else
-            {
-                JSONObject result = object.getJSONObject("result");
-                JSONArray array = result.getJSONArray("list_data");
-                int length = array.length();
-                if(length == 0)
-                {
-                    msg.what = GET_DATE_EMPTY;
-                }
-                else
-                {
-                    ArrayList<Activities> list = new ArrayList<Activities>();
-                    for(int i = 0; i < length; i++)
-                    {
+            if(!object.isNull("code")) {
+                if (object.getInt("code") != REQUEST_CODE_SUCCESS) {
+                    msg.what = GET_DATA_ERROR;
+                } else {
+                    JSONObject result = object.getJSONObject("result");
+                    JSONArray array = result.getJSONArray("list_data");
+                    int length = array.length();
+                    if (length == 0) {
+                        msg.what = GET_DATE_EMPTY;
+                    } else {
+                        ArrayList<Activities> list = new ArrayList<Activities>();
+                        for (int i = 0; i < length; i++) {
 
-                        JSONObject item = array.getJSONObject(i);
-                        Activities activityItem = Utils.mapingObject(Activities.class, item);
-                        boolean flag = false;
-                        for(int j = 0; j < mListData.size(); j++)
-                        {
-                            if(mListData.get(j).getId().equals(activityItem.getId()))
-                            {
-                                flag = true;
+                            JSONObject item = array.getJSONObject(i);
+                            Activities activityItem = Utils.mapingObject(Activities.class, item);
+                            boolean flag = false;
+                            for (int j = 0; j < mListData.size(); j++) {
+                                if (mListData.get(j).getId().equals(activityItem.getId())) {
+                                    flag = true;
+                                }
+                            }
+
+                            if (!flag) {
+                                list.add(activityItem);
                             }
                         }
-
-                        if(!flag)
-                        {
-                            list.add(activityItem);
+                        mDao.insertActiviesList(mListData);
+                        msg.what = GET_DATA_SUCCESS;
+                        if (!isHead) {
+                            mListData.addAll(list);
+                        } else {
+                            mListData.addAll(0, list);
                         }
+                        msg.obj = mListData;
+                        mNetstart += LENGTH;
+                        mNetend += LENGTH;
                     }
-                    mDao.insertActiviesList(mListData);
-                    msg.what = GET_DATA_SUCCESS;
-                    if(!isHead)
-                    {
-                        mListData.addAll(list);
-                    }
-                    else
-                    {
-                        mListData.addAll(0,list);
-                    }
-                    msg.obj = mListData;
-                    mNetstart += LENGTH;
-                    mNetend += LENGTH;
                 }
+                handler.sendMessage(msg);
+            }else{
+                handler.sendEmptyMessage(GET_DATA_ERROR);
             }
-            handler.sendMessage(msg);
 
         } catch (JSONException e) {
             e.printStackTrace();

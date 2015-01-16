@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
     <LinearLayout
         android:gravity="center_vertical"
@@ -24,15 +26,15 @@
             android:layout_margin="15dp"
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/devide_line"/>
+            android:background="@color/billiard_bottom_stroke"/>
 
         <EditText
             android:id="@+id/add_friend_comment_et"
             android:lines="@null"
             android:background="@null"
             style="?android:attr/textViewStyle"
-            android:textColorHint="#9ea7b3"
-            android:textSize="17sp"
+            android:textColorHint="@color/edit_text_hint_color"
+            android:textSize="18sp"
             android:layout_width="match_parent"
             android:layout_height="25dp"/>
     </LinearLayout>
@@ -59,7 +61,7 @@
             android:layout_margin="15dp"
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="@color/devide_line"/>
+            android:background="@color/billiard_bottom_stroke"/>
 
         <RelativeLayout
             android:id="@+id/friend_manage_set_group"

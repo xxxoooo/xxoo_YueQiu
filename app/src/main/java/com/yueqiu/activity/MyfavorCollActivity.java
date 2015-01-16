@@ -16,8 +16,8 @@ import android.view.MenuItem;
 import android.widget.SearchView;
 
 import com.yueqiu.R;
-import com.yueqiu.activity.SearchResultActivity;
-import com.yueqiu.fragment.slidemenu.MyFavorBasicFragment;
+import com.yueqiu.fragment.slidemenu.MyCollectionBasicFragment;
+import com.yueqiu.fragment.slidemenu.PublishBasicFragment;
 
 
 public class MyfavorCollActivity extends FragmentActivity implements ActionBar.TabListener{
@@ -94,7 +94,7 @@ public class MyfavorCollActivity extends FragmentActivity implements ActionBar.T
         @Override
         public Fragment getItem(int i) {
 
-            Fragment fragment = new MyFavorBasicFragment();
+            Fragment fragment = new MyCollectionBasicFragment();
             Bundle args = new Bundle();
             args.putInt("type",i);
             fragment.setArguments(args);

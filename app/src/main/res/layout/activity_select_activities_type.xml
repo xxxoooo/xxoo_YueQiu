@@ -13,8 +13,7 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
             android:text="@string/groupactivity"
             android:textSize="18sp" />
@@ -41,8 +40,7 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
             android:text="@string/meetstar"
             android:textSize="18sp" />
@@ -69,8 +67,7 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
             android:gravity="center_vertical"
             android:text="@string/taiqiuzhan"
@@ -98,8 +95,7 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
             android:text="@string/complete"
             android:textSize="18sp" />
@@ -126,8 +122,7 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
             android:text="@string/billiard_other"
             android:textSize="18sp" />

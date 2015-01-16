@@ -29,14 +29,12 @@
             android:layout_weight="1"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/ListItemTvStyle"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_gravity="center_vertical"
                 android:text="@string/activities_title"
-                android:textSize="18sp"
-                android:textColor="@color/md__defaultBackground"/>
+                android:textSize="18sp"/>
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
@@ -66,14 +64,13 @@
             android:layout_weight="1"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/ListItemTvStyle"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_gravity="center_vertical"
                 android:text="@string/activities_type"
                 android:textSize="18sp"
-                android:textColor="@color/md__defaultBackground"/>
+                />
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
@@ -106,14 +103,13 @@
             android:layout_weight="1"
             android:orientation="horizontal">
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/ListItemTvStyle"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_gravity="center_vertical"
                 android:text="@string/activities_site"
                 android:textSize="18sp"
-                android:textColor="@color/md__defaultBackground"/>
+                />
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"

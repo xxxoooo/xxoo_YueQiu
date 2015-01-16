@@ -78,9 +78,9 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
 
         } finally {
             db.endTransaction();
-            db.close();
+            //db.close();
         }
-        db.close();
+        //db.close();
         return false;
     }
 
@@ -148,7 +148,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
         long ret = db.update(DatabaseConstant.ActivitiesTable.TABLENAME,
                 values, DatabaseConstant.ActivitiesTable._ID + "=?",
                 new String[]{String.valueOf(activities.getId())});
-        db.close();
+        //db.close();
         return ret == -1 ? false : true;
     }
 
@@ -172,7 +172,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
                 list.add(activities);
             }
         }
-        db.close();
+        //db.close();
         return count == 0 ? null : list;
     }
 
@@ -187,7 +187,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
         while (cur.moveToNext()) {
             ret = cur.getString(cur.getColumnIndex(DatabaseConstant.RefreshTime.REFRESH_TIME));
         }
-        db.close();
+        //db.close();
         return ret == null ? null : ret;
     }
 
@@ -200,7 +200,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
         ret = db.update(DatabaseConstant.RefreshTime.REFRESH_TIME_TABLE,
                 values, DatabaseConstant.RefreshTime.TABLE_NAME,
                 new String[]{DatabaseConstant.ActivitiesTable.TABLENAME});
-        db.close();
+        //db.close();
         return ret == -1 ? false : true;
     }
 
@@ -214,7 +214,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
         values.put(DatabaseConstant.RefreshTime.REFRESH_TIME_TABLE,
                 time);
         ret = db.insert(DatabaseConstant.RefreshTime.REFRESH_TIME_TABLE, null, values);
-        db.close();
+        //db.close();
         return ret == -1 ? false : true;
     }
 }

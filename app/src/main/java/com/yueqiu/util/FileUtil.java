@@ -29,6 +29,27 @@ public class FileUtil {
 		}
 		return path+"/WaterPhoto/";
 	}
+
+    /**
+     * 得到sd卡真实路径
+     *
+     * @return
+     */
+    public static String getSDCardPath() {
+        return Environment.getExternalStorageDirectory().getAbsolutePath();
+    }
+    /**
+     * 判断SD卡是否有效
+     */
+    public static boolean isSDCardReady() {
+        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+    }
+    /**
+     * 得到SD卡路径
+     */
+    public static String getSdDirectory() {
+        return Environment.getExternalStorageDirectory().getPath();
+    }
 	
 	
 //	////////////////////////////////////////////////////////////
@@ -36,9 +57,7 @@ public class FileUtil {
 //
 //    private static final String LOG_TAG = "Util";
 //
-//    public static boolean isSDCardReady() {
-//        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
-//    }
+
 //
 //    // if path1 contains path2
 //    public static boolean containsPath(String path1, String path2) {
@@ -62,9 +81,7 @@ public class FileUtil {
 //        return path1 + File.separator + path2;
 //    }
 //
-//    public static String getSdDirectory() {
-//        return Environment.getExternalStorageDirectory().getPath();
-//    }
+
 //
 //    public static boolean isNormalFile(String fullName) {
 //        return !fullName.equals(ANDROID_SECURE);

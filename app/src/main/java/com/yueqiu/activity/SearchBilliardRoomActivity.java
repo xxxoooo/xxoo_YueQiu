@@ -2,6 +2,7 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
+import com.yueqiu.util.Utils;
 
 /**
  * @author scguo
@@ -42,7 +44,7 @@ public class SearchBilliardRoomActivity extends Activity
 
     private ActionBar mActionBar;
 
-    private FrameLayout mWindowRootElem;
+//    private FrameLayout mWindowRootElem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -64,8 +66,8 @@ public class SearchBilliardRoomActivity extends Activity
         mRoomDetailedInfo = (TextView) findViewById(R.id.tv_search_room_detailed_info);
 
         // get the root element use to dimmer the activity background
-        mWindowRootElem = (FrameLayout) findViewById(R.id.window_root_elem);
-        mWindowRootElem.getForeground().setAlpha(0);
+//        mWindowRootElem = (FrameLayout) findViewById(R.id.window_root_elem);
+//        mWindowRootElem.getForeground().setAlpha(0);
 
         // then, we need the data that transferred from the previous listView item to inflate
         // the detailed content of these TextView and ImageViews
@@ -125,7 +127,8 @@ public class SearchBilliardRoomActivity extends Activity
                 Toast.makeText(SearchBilliardRoomActivity.this, SearchBilliardRoomActivity.this.getResources().getString(R.string.search_room_collect_success_indicator), Toast.LENGTH_LONG).show();
                 break;
             case R.id.search_room_detail_action_share:
-                popupShareWindow();
+                Dialog dlg = Utils.showSheet(this);
+                dlg.show();
 
                 break;
         }
@@ -174,15 +177,15 @@ public class SearchBilliardRoomActivity extends Activity
             {
                 mPopupWindow.dismiss();
                 // while the popupWindow is dismissed from the current activity, make the background back to the normal state
-                mWindowRootElem.getForeground().setAlpha(0);
-                mWindowRootElem.forceLayout();
+//                mWindowRootElem.getForeground().setAlpha(0);
+//                mWindowRootElem.forceLayout();
             }
         });
 
         // TODO: 当我们在后期代码压缩时，如果需要将popupWindow抽离出来的时候，需要将以下用于设置PopupWindow的显示
         // TODO: 位置的时候，我们就需要将popupWindow当前所在的Activity的准确的layout文件的根元素的指定，否则就会发生异常
         mPopupWindow.showAtLocation(findViewById(R.id.search_room_detailed_whole_container), Gravity.BOTTOM, 0, 0);
-        mWindowRootElem.getForeground().setAlpha(160);
+//        mWindowRootElem.getForeground().setAlpha(160);
     }
 
 

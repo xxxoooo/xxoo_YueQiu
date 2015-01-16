@@ -14,11 +14,9 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:id="@+id/group_get_master_tv"
-            android:layout_width="wrap_content"
+            style="@style/ListItemTvStyle"
             android:textSize="20sp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/md__defaultBackground"/>
+            android:gravity="center"/>
         <ImageView
             android:id="@+id/group_get_master_iv"
             android:layout_centerVertical="true"
@@ -45,11 +43,10 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:id="@+id/group_be_master_tv"
-            android:layout_width="wrap_content"
+            style="@style/ListItemTvStyle"
             android:textSize="20sp"
-            android:layout_height="wrap_content"
             android:gravity="center"
-            android:textColor="@color/md__defaultBackground"/>
+            />
         <ImageView
             android:id="@+id/group_be_master_iv"
             android:layout_centerVertical="true"
@@ -75,11 +72,9 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:id="@+id/group_fin_friend_tv"
-            android:layout_width="wrap_content"
             android:textSize="20sp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/md__defaultBackground"/>
+            style="@style/ListItemTvStyle"
+            android:gravity="center"/>
         <ImageView
             android:id="@+id/group_fin_friend_iv"
             android:layout_centerVertical="true"
@@ -105,11 +100,10 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:id="@+id/group_equipment_tv"
-            android:layout_width="wrap_content"
             android:textSize="20sp"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:gravity="center"
-            android:textColor="@color/md__defaultBackground"/>
+            />
         <ImageView
             android:id="@+id/group_equipment_iv"
             android:layout_centerVertical="true"
@@ -135,11 +129,9 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:id="@+id/group_other_tv"
-            android:layout_width="wrap_content"
             android:textSize="20sp"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/md__defaultBackground"/>
+            style="@style/ListItemTvStyle"
+            android:gravity="center"/>
         <ImageView
             android:id="@+id/group_other_iv"
             android:layout_centerVertical="true"

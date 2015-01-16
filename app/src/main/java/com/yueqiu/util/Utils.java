@@ -2,8 +2,10 @@ package com.yueqiu.util;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.os.Build;
@@ -15,9 +17,15 @@ import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yueqiu.R;
@@ -58,9 +66,6 @@ import java.util.regex.Pattern;
 public class Utils {
 
     private static final String TAG = "Utils";
-
-    //user info local data serializer file name
-    public static final String USER_INFO_FILE_NAME = "userInfo.json";
     private static SharedPreferences mSharedPreferences;
 
 
@@ -75,7 +80,6 @@ public class Utils {
                 editor.putString(entry.getKey(), entry.getValue());
         }
         editor.commit();
-
 
         YueQiuApp.sUserInfo.setImg_url(map.get(DatabaseConstant.UserTable.IMG_URL));
         YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.USERNAME));
@@ -93,11 +97,11 @@ public class Utils {
     }
 
 
-    /*
+    /**
      * 解析json
      */
     public static JSONObject parseJson(String result) {
-        JSONObject object = null;
+        JSONObject object ;
         try {
             if (result != null) {
                 object = new JSONObject(result);
@@ -108,23 +112,11 @@ public class Utils {
                 object.put("result", null);
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            object = new JSONObject();
         }
         return object;
     }
 
-    /**
-     * 得到sd卡真实路径
-     *
-     * @return
-     */
-    public static String getSDCardPath() {
-        return Environment.getExternalStorageDirectory().getAbsolutePath();
-    }
-
-    private static void log(String msg) {
-        Log.i(TAG, "----" + msg + "----");
-    }
 
 
     /**
@@ -201,92 +193,6 @@ public class Utils {
         }
     }
 
-    /*
-     * 更新我的资料
-     */
-    public static void updateJSONData(Context context, JSONHelper jsonHelper, String path) throws IOException, JSONException {
-        //JSONArray array = new JSONArray();
-        //array.put(jsonHelper.toJSON());
-
-        JSONObject object = jsonHelper.toJSON();
-
-        FileWriter writer = null;
-        try {
-            //OutputStream out = context.openFileOutput(path, Context.MODE_PRIVATE);
-            File file = context.getFileStreamPath(path);
-            RandomAccessFile randomFile = new RandomAccessFile(file, "rw");
-            long randomLength = randomFile.length();
-            if (randomLength == 0) {
-                randomFile.seek(randomLength);
-                randomFile.writeBytes("[");
-            } else if (randomLength == 1) {
-                randomFile.seek(randomLength);
-                randomFile.writeBytes(object.toString() + "]");
-            } else {
-                randomFile.seek(randomLength - 1);
-                randomFile.writeBytes(object.toString() + "]");
-            }
-
-            randomFile.close();
-
-        } finally {
-            if (writer != null)
-                writer.close();
-        }
-    }
-
-    /**
-     * 直接保存RESTFUL获取的资料JSON数据到本地
-     *
-     * @param context
-     * @param array
-     * @throws IOException
-     * @throws JSONException
-     */
-    public static void saveMyProfileJSONFromService(Context context, JSONArray array) throws IOException, JSONException {
-
-        Writer writer = null;
-        try {
-            OutputStream out = context.openFileOutput(USER_INFO_FILE_NAME, Context.MODE_PRIVATE);
-            writer = new OutputStreamWriter(out);
-            writer.write(array.toString());
-        } finally {
-            if (writer != null)
-                writer.close();
-        }
-    }
-
-    /**
-     * 从本地获取我的资料
-     *
-     * @return
-     */
-    public static JSONArray getJSONFromLocal(Context context) {
-        BufferedReader reader = null;
-        JSONArray array = null;
-        try {
-            InputStream is = context.openFileInput(USER_INFO_FILE_NAME);
-            reader = new BufferedReader(new InputStreamReader(is));
-            StringBuilder jsonString = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                jsonString.append(line);
-            }
-            array = (JSONArray) new JSONTokener(jsonString.toString()).nextValue();
-
-
-        } catch (Exception e) {
-            Log.e(TAG, "Exception: " + e.toString());
-        } finally {
-            if (reader != null)
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "IOException: " + e.toString());
-                }
-        }
-        return array;
-    }
 
     /**
      * 设置FragmentActivity的Menu文字的颜色为白色
@@ -473,5 +379,108 @@ public class Utils {
         SimpleDateFormat sdp = new SimpleDateFormat("yyyy-MM-dd hh:mm");
         return sdp.format(new Date());
     }
+
+    /**
+     * 弹出底部对话框,并初始化所有view
+     * @param context
+     * @return
+     */
+    public static Dialog showSheet(Context context) {
+        final Dialog dlg = new Dialog(context, R.style.ActionSheet);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.search_dating_detail_popupwindow, null);
+        final int cFullFillWidth = 10000;
+        layout.setMinimumWidth(cFullFillWidth);
+
+
+        Window window = dlg.getWindow();
+        WindowManager.LayoutParams lp = window.getAttributes();
+        lp.x = 0;
+        final int cMakeBottom = -1000;
+        lp.y = cMakeBottom;
+        lp.gravity = Gravity.BOTTOM;
+        dlg.onWindowAttributesChanged(lp);
+        //dlg.setCanceledOnTouchOutside(false);
+
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = wm.getDefaultDisplay();
+        Point point = new Point();
+        display.getSize(point);
+
+        int width = point.x;
+        int height = point.y;
+        dlg.setContentView(layout);
+        dlg.getWindow().setLayout(width, height/2);
+
+        TextView tvYueqiu = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_yuqeiufirend);
+        TextView tvYueqiuCircle = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_yueqiucircle);
+        TextView tvFriendCircle = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_friendcircle);
+        TextView tvWeichat = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_weichat);
+        TextView tvQQZone = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_qqzone);
+        TextView tvTencentWeibo = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_qqweibo);
+        TextView tvSinaWeibo = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_sinaweibo);
+        TextView tvRenren = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_renren);
+        TextView btnCancel = (Button) dlg.findViewById(R.id.btn_search_dating_detailed_cancel);
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch(v.getId()){
+                    case R.id.btn_search_dating_detailed_cancel:
+                        dlg.dismiss();
+                        break;
+                    case R.id.img_search_dating_detail_share_yuqeiufirend:
+                        break;
+                    case R.id.img_search_dating_detail_share_yueqiucircle:
+                        break;
+                    case R.id.img_search_dating_detail_share_weichat:
+                        break;
+                    case R.id.img_search_dating_detail_share_qqzone:
+                        break;
+                    case R.id.img_search_dating_detail_share_qqweibo:
+                        break;
+                    case R.id.img_search_dating_detail_share_sinaweibo:
+                        break;
+                    case R.id.img_search_dating_detail_share_renren:
+                        break;
+                }
+            }
+        };
+        tvYueqiu.setOnClickListener(listener);
+        tvYueqiuCircle.setOnClickListener(listener);
+        tvFriendCircle.setOnClickListener(listener);
+        tvFriendCircle.setOnClickListener(listener);
+        tvWeichat.setOnClickListener(listener);
+        tvQQZone.setOnClickListener(listener);
+        tvRenren.setOnClickListener(listener);
+        tvSinaWeibo.setOnClickListener(listener);
+        tvTencentWeibo.setOnClickListener(listener);
+        btnCancel.setOnClickListener(listener);
+
+        return dlg;
+    }
+
+    /**
+     * dp转px
+     * @param context
+     * @param value
+     * @return
+     */
+    public static int dip2px(Context context,float value){
+        float scaleing=context.getResources().getDisplayMetrics().density;
+        return (int) (value*scaleing+0.5f);
+    }
+
+    /**
+     * px转dp
+     * @param context
+     * @param value
+     * @return
+     */
+    public static int px2dip(Context context,float value){
+        float scaling=context.getResources().getDisplayMetrics().density;
+        return (int) (value/scaling+0.5f);
+    }
+
 
 }

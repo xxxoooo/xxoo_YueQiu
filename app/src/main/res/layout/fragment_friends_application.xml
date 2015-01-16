@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
-    <ListView
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/devide_line">
+<ListView
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/friends_application_container"
-        android:layout_margin="10dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@null"
+        android:divider="@color/devide_line"
         android:dividerHeight="10dp"
-        android:scrollbars="none"></ListView>
-
+        android:scrollbars="none"
+        android:background="@color/white"
+        />
 </LinearLayout>
+

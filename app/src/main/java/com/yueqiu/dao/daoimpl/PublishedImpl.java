@@ -53,7 +53,6 @@ public class PublishedImpl implements PublishedDao{
                 values.put(DatabaseConstant.PublishInfoItemTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
                 values.put(DatabaseConstant.PublishInfoItemTable.TABLE_ID, itemInfo.getTable_id());
                 values.put(DatabaseConstant.PublishInfoItemTable.TYPE, info.getType());
-                values.put(DatabaseConstant.PublishInfoItemTable.IMAGE_URL, itemInfo.getImage_url());
                 values.put(DatabaseConstant.PublishInfoItemTable.TITLE, itemInfo.getTitle());
                 values.put(DatabaseConstant.PublishInfoItemTable.CONTENT, itemInfo.getContent());
                 values.put(DatabaseConstant.PublishInfoItemTable.DATETIME, itemInfo.getDateTime());
@@ -92,9 +91,8 @@ public class PublishedImpl implements PublishedDao{
         try {
             for (int i = 0; i < info.mList.size(); i++) {
                 ContentValues values = new ContentValues();
-                PublishedInfo.PublishedItemInfo itemInfo = info.mList.get(i);
+                PublishedInfo.PublishedItemInfo itemInfo =  info.mList.get(i);
                 values.put(DatabaseConstant.PublishInfoItemTable.TABLE_ID, itemInfo.getTable_id());
-                values.put(DatabaseConstant.PublishInfoItemTable.IMAGE_URL, itemInfo.getImage_url());
                 values.put(DatabaseConstant.PublishInfoItemTable.TITLE, itemInfo.getTitle());
                 values.put(DatabaseConstant.PublishInfoItemTable.CONTENT, itemInfo.getContent());
                 values.put(DatabaseConstant.PublishInfoItemTable.DATETIME, itemInfo.getDateTime());
@@ -104,13 +102,13 @@ public class PublishedImpl implements PublishedDao{
                 list.add(result);
             }
             mDB.setTransactionSuccessful();
-            return list;
+
         }catch(Exception e){
             e.printStackTrace();
         }finally {
             mDB.endTransaction();
         }
-        return null;
+        return list;
 
     }
 
@@ -144,8 +142,9 @@ public class PublishedImpl implements PublishedDao{
     }
 
     @Override
-    public PublishedInfo getPublishedInfo(String userId, int type) {
+    public PublishedInfo getPublishedInfo(String userId, int type,int start,int number) {
         mDB = mDBUtils.getReadableDatabase();
+
         PublishedInfo info = new PublishedInfo();
         String infoSql = "SELECT * FROM " + DatabaseConstant.PublishInfoTable.TABLE + " where " + DatabaseConstant.PublishInfoTable.USER_ID + "=?"
                 + " and " + DatabaseConstant.PublishInfoTable.TYPE + "=?";
@@ -164,9 +163,10 @@ public class PublishedImpl implements PublishedDao{
 
 
         String itemSql = "SELECT * FROM " + DatabaseConstant.PublishInfoItemTable.TABLE + " where " + DatabaseConstant.PublishInfoItemTable.USER_ID + "=?"
-                + " and " +  DatabaseConstant.PublishInfoItemTable.TYPE + "=?" ;
+                + " and " +  DatabaseConstant.PublishInfoItemTable.TYPE + "=?"  + " order by " + DatabaseConstant.PublishInfoItemTable.TABLE_ID + " desc limit " +
+                start + "," + number;
         Cursor itemCursor = mDB.rawQuery(itemSql,new String[]{userId,String.valueOf(type)});
-        if(itemCursor != null || itemCursor.getCount() != 0 ){
+        if(itemCursor != null && itemCursor.getCount() != 0 ){
             itemCursor.moveToFirst();
             do{
                 PublishedInfo.PublishedItemInfo item = info.new PublishedItemInfo();
@@ -174,7 +174,6 @@ public class PublishedImpl implements PublishedDao{
                 item.setTitle(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.TITLE)));
                 item.setContent(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.CONTENT)));
                 item.setDateTime(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.DATETIME)));
-                item.setImage_url(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.IMAGE_URL)));
                 item.setTable_id(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoItemTable.TABLE_ID)));
                 info.mList.add(item);
             }while(itemCursor.moveToNext());

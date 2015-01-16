@@ -2,6 +2,7 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -48,6 +49,8 @@ public class ActivitiesDetail extends Activity {
             case R.id.menu_activities_collect:
                 break;
             case R.id.menu_activities_share:
+                Dialog dlg = Utils.showSheet(this);
+                dlg.show();
                 break;
         }
         return super.onOptionsItemSelected(item);

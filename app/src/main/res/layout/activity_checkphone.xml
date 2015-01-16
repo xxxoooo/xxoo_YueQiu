@@ -45,8 +45,7 @@
                 android:layout_alignParentRight="true"
                 android:textSize="15sp"
                 android:layout_marginRight="13dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                style="@style/ListItemTvStyle" />
             </RelativeLayout>
 
         <LinearLayout
@@ -106,8 +105,7 @@
             android:background="@drawable/register_agree_article_bg"/>
         <TextView
             android:id="@+id/checkphone_read_and_agree_the_article"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:textSize="16sp"
             android:layout_marginLeft="10dp"
             />
@@ -126,10 +124,8 @@
         android:layout_width="match_parent">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:textSize="18sp"
-            android:textColor="@color/md__defaultBackground"
             android:text="@string/already_have_account" />
         <TextView
             android:id="@+id/activity_checkphone_tv_login"

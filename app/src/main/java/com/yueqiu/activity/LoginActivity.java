@@ -2,19 +2,14 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
-
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,10 +19,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.yueqiu.R;
-import com.yueqiu.YueQiuApp;
-import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -37,20 +29,13 @@ import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
-
-import org.apache.commons.codec.digest.DigestUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Hex;
 
 
 
@@ -71,7 +56,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private InputMethodManager mImm;
     private String mUserName;
     private String mPwd;
-    private DBUtils mDbUtil;
     private UserDao mUserDao;
 
     private static final int LOGIN_SUCCESS = 0x01;
@@ -106,9 +90,9 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_login);
         initView();
         initActionBar();
-
-        mDbUtil = DBUtils.getInstance(this);
         mUserDao = DaoFactory.getUser(this);
+
+
 
     }
 
@@ -135,7 +119,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         mPreText.setText(getString(R.string.pre_login_text));
 ////
         mBtnLogin.setOnClickListener(this);
-       mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mTvRegister.setOnClickListener(this);
     }
 
@@ -166,7 +150,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 paramMap.put(PublicConstant.URL,HttpConstants.LoginConstant.URL);
                 paramMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
                 if(Utils.networkAvaiable(LoginActivity.this)) {
-                    new LoginAsyncTask(requestMap, mPreProgress, mPreText).execute(paramMap);
+                    new LoginAsyncTask(requestMap).execute(paramMap);
                 }else{
                     Toast.makeText(LoginActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
                 }
@@ -184,20 +168,30 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     private class LoginAsyncTask extends AsyncTaskUtil<String>{
 
-        public LoginAsyncTask(Map<String, String> map, ProgressBar progressBar, TextView textView) {
-            super(map, progressBar, textView);
+        public LoginAsyncTask(Map<String, String> map) {
+            super(map);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mPreProgress.setVisibility(View.VISIBLE);
+            mPreText.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected void onPostExecute(JSONObject object) {
             super.onPostExecute(object);
+            mPreProgress.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
             try {
                 if (!object.isNull("code")){
                     if (object.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
                         mHandler.obtainMessage(LOGIN_ERROR,object.getString("msg")).sendToTarget();
                     } else {
                         Map<String, String> successObj = new HashMap<String, String>();
-                        successObj.put(DatabaseConstant.UserTable.USERNAME, mUserName);
+                        successObj.put(DatabaseConstant.UserTable.USERNAME, object.getJSONObject("result").
+                                getString(DatabaseConstant.UserTable.USERNAME));
                         successObj.put(DatabaseConstant.UserTable.PASSWORD, mPwd);
                         successObj.put(DatabaseConstant.UserTable.USER_ID, object.getJSONObject("result").
                                 getString(DatabaseConstant.UserTable.USER_ID));

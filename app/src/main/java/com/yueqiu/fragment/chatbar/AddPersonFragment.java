@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -24,6 +26,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +37,7 @@ import com.yueqiu.activity.RequestAddFriendActivity;
 import com.yueqiu.bean.SearchPeopleInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,10 +58,11 @@ public class AddPersonFragment extends Fragment implements LocationListener {
     private static final int GET_FAIL = 1;
     private ActionBar mActionBar;
     private LinearLayout mLinearLayout;
-    private View mProgressBar;
+    private ProgressBar mProgressBar;
     private List<SearchPeopleInfo.SearchPeopleItemInfo> mList;
     private ListView mListView;
     private LocationManager mLocationManager;
+    private Drawable mProgressDrawable;
     private double mLatitude, mLongitude;
     public static final String FRIEND_INFO_USER_ID = "com.yueqiu.fragment.chatbar.friend_info.user_id";
     public static final String FRIEND_INFO_USERNAME = "com.yueqiu.fragment.chatbar.friend_info.username";
@@ -76,7 +81,11 @@ public class AddPersonFragment extends Fragment implements LocationListener {
             mActionBar = getActivity().getActionBar();
         }
         mListView = (ListView) view.findViewById(R.id.search_result_container);
-        mProgressBar = view.findViewById(R.id.chatbar_search_progressbar_container);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.pre_progress);
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(getActivity()).build();
+        Rect bounds = mProgressBar.getIndeterminateDrawable().getBounds();
+        mProgressBar.setIndeterminateDrawable(mProgressDrawable);
+        mProgressBar.getIndeterminateDrawable().setBounds(bounds);
         mLinearLayout = (LinearLayout) view.findViewById(R.id.search_friend_nearby);
         mLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override

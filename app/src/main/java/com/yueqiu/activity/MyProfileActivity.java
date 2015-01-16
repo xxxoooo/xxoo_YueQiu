@@ -134,44 +134,49 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     JSONObject object = Utils.parseJson(result);
                     Message message = new Message();
                     try {
-                        if (object.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
-                            message.what = DATA_ERROR;
-                            message.obj = object.getString("msg");
-                        } else {
-                            mMap.put(DatabaseConstant.UserTable.SEX, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.SEX));
-                            mMap.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.IMG_URL));
-                            mMap.put(DatabaseConstant.UserTable.USERNAME, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.USERNAME));
-                            mMap.put(DatabaseConstant.UserTable.NICK, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.NICK));
-                            mMap.put(DatabaseConstant.UserTable.DISTRICT, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.DISTRICT));
-                            mMap.put(DatabaseConstant.UserTable.LEVEL, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.LEVEL));
-                            mMap.put(DatabaseConstant.UserTable.BALL_TYPE, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.BALL_TYPE));
-                            mMap.put(DatabaseConstant.UserTable.APPOINT_DATE, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.APPOINT_DATE));
-                            mMap.put(DatabaseConstant.UserTable.BALLARM, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.BALLARM));
-                            mMap.put(DatabaseConstant.UserTable.USERDTYPE, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.USERDTYPE));
-                            mMap.put(DatabaseConstant.UserTable.BALLAGE, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.BALLAGE));
-                            mMap.put(DatabaseConstant.UserTable.IDOL, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.IDOL));
-                            mMap.put(DatabaseConstant.UserTable.IDOL_NAME, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.IDOL_NAME));
-                            mMap.put(DatabaseConstant.UserTable.NEW_IMG, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.NEW_IMG));
+                        if(object.has("code")) {
+                            if (object.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
+                                message.what = DATA_ERROR;
+                                message.obj = object.getString("msg");
+                            } else {
+                                mMap.put(DatabaseConstant.UserTable.SEX, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.SEX));
+                                mMap.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.IMG_URL));
+                                mMap.put(DatabaseConstant.UserTable.USERNAME, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.USERNAME));
+                                mMap.put(DatabaseConstant.UserTable.NICK, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.NICK));
+                                mMap.put(DatabaseConstant.UserTable.DISTRICT, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.DISTRICT));
+                                mMap.put(DatabaseConstant.UserTable.LEVEL, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.LEVEL));
+                                mMap.put(DatabaseConstant.UserTable.BALL_TYPE, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.BALL_TYPE));
+                                mMap.put(DatabaseConstant.UserTable.APPOINT_DATE, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.APPOINT_DATE));
+                                mMap.put(DatabaseConstant.UserTable.BALLARM, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.BALLARM));
+                                mMap.put(DatabaseConstant.UserTable.USERDTYPE, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.USERDTYPE));
+                                mMap.put(DatabaseConstant.UserTable.BALLAGE, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.BALLAGE));
+                                mMap.put(DatabaseConstant.UserTable.IDOL, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.IDOL));
+                                mMap.put(DatabaseConstant.UserTable.IDOL_NAME, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.IDOL_NAME));
+                                mMap.put(DatabaseConstant.UserTable.NEW_IMG, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.NEW_IMG));
 
-                            mUserInfo = Utils.mapingObject(UserInfo.class, object.getJSONObject("result"));
-                            message.what = DATA_SUCCESS;
-                            message.obj = mUserInfo;
+                                mUserInfo = Utils.mapingObject(UserInfo.class, object.getJSONObject("result"));
+                                message.what = DATA_SUCCESS;
+                                message.obj = mUserInfo;
+                            }
+                            mHandler.sendMessage(message);
+                        }else{
+                            message.what = DATA_ERROR;
+                            mHandler.sendMessage(message);
                         }
-                        mHandler.sendMessage(message);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

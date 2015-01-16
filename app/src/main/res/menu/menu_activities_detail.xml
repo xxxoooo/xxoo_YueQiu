@@ -3,11 +3,14 @@
     <item
         android:title="@string/activities_collect"
         android:id="@+id/menu_activities_collect"
-        android:showAsAction="ifRoom"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:icon="@drawable/actionbar_title_collect"/>
 
-        />
     <item
         android:id="@+id/menu_activities_share"
+        android:orderInCategory="100"
+        android:icon="@drawable/actionbar_title_share"
         android:title="@string/activities_share"
         android:showAsAction="ifRoom"
         />

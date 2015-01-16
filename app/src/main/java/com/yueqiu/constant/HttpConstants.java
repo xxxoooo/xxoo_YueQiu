@@ -100,6 +100,20 @@ public class HttpConstants
     }
 
     /**
+     * 我的收藏
+     */
+    public static final class MyCollection{
+
+        public static final String URL = "/store/getStore";
+
+        public static final String TYPE = "type";
+
+        public static final String START_NO = "start_no";
+
+        public static final String END_NO = "end_no";
+    }
+
+    /**
      * 我的发布
      */
     public static final class Published
@@ -109,7 +123,7 @@ public class HttpConstants
 
         public static final String TYPE = "type";
 
-        public static final String STAR_NO = "start_no";
+        public static final String START_NO = "start_no";
 
         public static final String END_NO = "end_no";
     }
@@ -334,7 +348,7 @@ public class HttpConstants
         /*
          * 找不到记录
          */
-        public static final int a4 = 1005;
+        public static final int NO_RESULT = 1005;
 
         /*
          * 服务器内部错误
@@ -355,6 +369,14 @@ public class HttpConstants
          * 数据库错误
          */
         public static final int a8 = 1009;
+        /*
+        *
+        */
+        public static final int RESULT_NULL = 1010;
+        /*
+         * 请求超时
+         */
+        public static final int TIME_OUT = 1011;
     }
 
 

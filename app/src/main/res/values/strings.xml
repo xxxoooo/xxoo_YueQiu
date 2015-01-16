@@ -20,6 +20,7 @@
     <string name="billiard_post">发表</string>
     <string name="billiard_back">返回</string>
     <string name="action_delete">删除</string>
+    <string name="billiard_group_detail">详情</string>
     <string name="billiard_group_issue_article">发表话题</string>
     <string name="billiard_topic_type">话题类型</string>
     <string name="title_activity_my">MyActivity</string>
@@ -81,7 +82,7 @@
     <string name="search_dating_detailed_btn_i_want_in_failed">抱歉，您的请求失败了</string>
     <string name="search_dating_detailed_tv_already_in">已参加人员</string>
 
-    <!--约球当中的popupWindow中的string资源-->
+    <!-- 约球当中的popupWindow中的string资源 -->
     <string name="search_dating_popupwindow_no_filter">约球时间(智能排序)</string>
     <string name="search_dating_popupwindow_one">1天内</string>
     <string name="search_dating_popupwindow_two">2天内</string>
@@ -92,29 +93,28 @@
     <string name="search_dating_popupwindow_seven">7天内</string>
     <string name="search_dating_popupwindow_other">其他</string>
 
-
     <!-- 约球详情Activity的标题 -->
     <string name="search_dating_detailed_actionbar_title">约球详情</string>
     <string name="search_dating_detailed_btn_copylink_str">复制详情连接</string>
     <string name="search_dating_detailed_btn_cancel_str">取消</string>
     <!-- 约球详情当中的分享的ImageView当中的title -->
     <string name="search_dating_detailed_title_yueqiufriend">约求好友</string>
+    <string name="search_dating_detailed_title_yueqiugroup">约球群组</string>
     <string name="search_dating_detailed_title_friendcircle">微信朋友圈</string>
     <string name="search_dating_detailed_title_weichat">微信好友</string>
     <string name="search_dating_detailed_title_qqzone">QQ空间</string>
     <string name="search_dating_detailed_title_tecentweibo">腾讯微博</string>
     <string name="search_dating_detailed_title_sinaweibo">新浪微博</string>
     <string name="search_dating_detailed_title_renren">人人网</string>
-
     <string name="search_dating_detailed_action_collect">加入到我的收藏</string>
     <string name="search_dating_detailed_action_share">分享到朋友圈</string>
 
-    <!--约球当中的三种付费模式-->
+    <!-- 约球当中的三种付费模式 -->
     <string name="search_dating_detailed_model_1">免费</string>
     <string name="search_dating_detailed_model_2">收费</string>
     <string name="search_dating_detailed_model_3">AA制</string>
 
-    <!--用于约球Activity当中的详情的信息的一些测试信息-->
+    <!-- 用于约球Activity当中的详情的信息的一些测试信息 -->
     <string name="search_dating_detailed_title_test">第三届我最喜欢的台球杯开始报名了，欢迎大家踊跃报名.</string>
     <string name="search_dating_detailed_address_indi">活动地点:</string>
     <string name="search_dating_detailed_starttime_indi">开始时间:</string>
@@ -124,7 +124,7 @@
     <string name="search_dating_detailed_phone_indi">联系电话:</string>
     <string name="search_dating_detailed_activity_intro_indi">活动说明:</string>
 
-    <!--以下是一些测试数据-->
+    <!-- 以下是一些测试数据 -->
     <string name="search_dating_detailed_address_indi_test">云川台球城(花园桥店)</string>
     <string name="search_dating_detailed_starttime_indi_test">2014-01-09 00:00:00</string>
     <string name="search_dating_detailed_endtime_indi_test">2015-09-10 00:00:00</string>
@@ -162,9 +162,8 @@
     <string name="search_room_subfragment_title_distance">距离</string>
     <string name="search_room_subfragment_title_price">价格</string>
     <string name="search_room_subfragment_title_review">好评</string>
-
     <string name="search_room_popupwindow_do_notfilter">区域(不限)</string>
-    <!--球厅当中的popupWindow的用于筛选的各个区域的名字-->
+    <!-- 球厅当中的popupWindow的用于筛选的各个区域的名字 -->
     <string name="search_room_popupwindow_region_chaoyang">朝阳区</string>
     <string name="search_room_popupwindow_region_haidian">海地区</string>
     <string name="search_room_popupwindow_region_dongcheng">通州区</string>
@@ -174,9 +173,7 @@
     <string name="search_room_popupwindow_region_tongzhou">通州区</string>
     <string name="search_room_popupwindow_region_daxing">大兴区</string>
     <string name="search_room_popupwindow_region_shijingshan">石景山区</string>
-
     <string name="search_room_collect_success_indicator">您已经成功的收集了该球厅的信息</string>
-
 
     <!-- 球厅Activity当中的一些关键字段 -->
     <string name="search_room_detailedactivity_detailed_info_separator">详细信息</string>
@@ -225,7 +222,6 @@
     <string name="search_mate_popupmenu_item_1000_str">1000米以内</string>
     <string name="search_mate_popupmenu_item_2000_str">2000米以内</string>
     <string name="search_mate_popupmenu_item_5000_str">5000米以内</string>
-
     <string name="search_room_price_popupwindow_no_filter">价格(智能筛选)</string>
     <string name="search_room_price_popupwindow_lowtohigh">价格从低到高</string>
     <string name="search_room_price_popupwindow_hightolow">价格从高到低</string>
@@ -260,9 +256,17 @@
     <string name="md__drawerOpenIndicatorDesc">Close drawer</string>
     <string name="md__drawerClosedIndicatorDesc">Open drawer</string>
     <string name="published_action_mode_title">选择活动</string>
+    <string name="my_colloec_action_mode_title">选择收藏</string>
     <string name="published_confirm_str">确认</string>
     <string name="published_cancel_str">取消</string>
-    <string name="published_delete_content">确定要删除所选的<xliff:g id="number" example="15">%1$s</xliff:g>条活动记录吗？</string>
+    <string name="published_delete_content">确定要删除所选的<xliff:g id="number" example="15">%1$s</xliff:g>条记录吗？</string>
+    <string name="your_published_info_is_empty">你还没有发布任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
+    <string name="http_request_error">网络请求错误</string>
+    <string name="http_request_time_out">网络请求超时，请稍后再试</string>
+    <string name="no_published_info">网络请求发生错误，未获取发布信息</string>
+    <string name="no_store_info">网络请求错误，未获取收藏信息</string>
+    <string name="your_favor_is_empty">你还没有收藏任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
+    <string name="no_more_info">没有更多<xliff:g id="number" example="15">%1$s</xliff:g>信息了</string>
 
     <!-- 聊吧 -->
     <string name="btn_liaoba_message">消息</string>
@@ -293,7 +297,6 @@
     <string name="next">下一步</string>
     <string name="send">发送</string>
     <string name="set_group">移至分组</string>
-
 
     <!-- 活动 -->
     <string name="xlistview_header_hint_normal">下拉刷新</string>
@@ -388,7 +391,6 @@
     <string name="please_login_first">请先登录，登录后才可使用全部功能</string>
     <string name="title_activity_group_select_topic_type">GroupSelectTopicTypeActivity</string>
     <string name="title_activity_group_topic_detail">GroupTopicDetailActivity</string>
-
     <string name="activities_detail">活动详情</string>
     <string name="activities_collect">收藏</string>
     <string name="activities_share">分享</string>
@@ -401,12 +403,17 @@
     <string name="checknum">验证码</string>
     <string name="phonenum">手机</string>
     <string name="join">我要参加</string>
-
-    <string name="your_published_info_is_empty">你还没有发布任何活动</string>
     <string name="pre_request_text">正在加载中...</string>
     <string name="pre_login_text">正在登录中...</string>
     <string name="pre_register_text">正在注册中...</string>
     <string name="title_activity_start">StartActivity</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="starmeet">球星汇</string>
+    <string name="title_activity_billiard_group_detail">BilliardGroupDetailActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main_activity2">MainActivity2</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
 </resources>

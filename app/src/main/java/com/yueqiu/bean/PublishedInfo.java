@@ -1,11 +1,6 @@
 package com.yueqiu.bean;
 
-import com.yueqiu.YueQiuApp;
-import com.yueqiu.util.JSONHelper;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +8,7 @@ import java.util.List;
 /**
  * Created by wangyun on 15/1/4.
  */
-public class PublishedInfo implements JSONHelper {
+public class PublishedInfo {
 
     private static final String USER_ID     = "user_id";
     private static final String STAR_NO     = "start_no";
@@ -33,32 +28,10 @@ public class PublishedInfo implements JSONHelper {
     private int sumCount;/*总条数*/
     public List<PublishedItemInfo> mList = new ArrayList<PublishedItemInfo>();
 
-    @Override
-    public JSONObject toJSON() throws JSONException {
-        JSONObject object = new JSONObject();
-        object.put(USER_ID, getUser_id());
-        object.put(STAR_NO,getStart_no());
-        object.put(END_NO,getEnd_no());
-        object.put(COUNT,getSumCount());
-        JSONArray array = new JSONArray();
-        for(int i=0;i<mList.size();i++) {
-            JSONObject data = new JSONObject();
-            data.put(ID, mList.get(i).getTable_id());
-            data.put(IMG_URL,mList.get(i).getImage_url());
-            data.put(TITLE,mList.get(i).getTitle());
-            data.put(CONTENT,mList.get(i).getContent());
-            data.put(CREATE_TIME,mList.get(i).getDateTime());
-            array.put(data);
-        }
-        object.put(LIST_DATA,array);
-        return null;
-    }
 
-
-    public class PublishedItemInfo{
+    public class PublishedItemInfo {
         private String table_id;/*表Id*/
         private int type;
-        private String image_url;/*头像*/
         private String title;/*标题*/
         private String content;/*内容*/
         private String dateTime;/*时间*/
@@ -78,14 +51,6 @@ public class PublishedInfo implements JSONHelper {
 
         public void setType(int type) {
             this.type = type;
-        }
-
-        public String getImage_url() {
-            return image_url;
-        }
-
-        public void setImage_url(String image_url) {
-            this.image_url = image_url;
         }
 
         public String getTitle() {
@@ -119,6 +84,8 @@ public class PublishedInfo implements JSONHelper {
         public void setChecked(boolean checked) {
             this.checked = checked;
         }
+
+
     }
 
 

@@ -5,10 +5,7 @@ import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.UserHandle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -16,13 +13,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.SearchView;
 
 import com.yueqiu.R;
-import com.yueqiu.activity.SearchResultActivity;
-import com.yueqiu.fragment.slidemenu.MyFavorBasicFragment;
+import com.yueqiu.fragment.slidemenu.PublishBasicFragment;
+import com.yueqiu.fragment.slidemenu.PublishedFragment;
 
 
 public class PublishedInfoActivity extends FragmentActivity implements ActionBar.TabListener
@@ -101,9 +96,10 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
 
         @Override
         public Fragment getItem(int i) {
-            Fragment fragment = new MyFavorBasicFragment();
+            //Fragment fragment = new PublishBasicFragment();
+            Fragment fragment = new PublishedFragment();
             Bundle args = new Bundle();
-            args.putInt("type",i);
+            args.putInt("type",i+1);
             fragment.setArguments(args);
             return fragment;
 

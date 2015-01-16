@@ -13,9 +13,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:id="@+id/activity_select_sex_tv_man"
-            android:layout_width="wrap_content"
             android:textSize="20sp"
-            android:layout_height="wrap_content" />
+            style="@style/ListItemTvStyle" />
         <ImageView
             android:id="@+id/activity_select_sex_iv_man"
             android:layout_centerVertical="true"
@@ -41,9 +40,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:id="@+id/activity_select_sex_tv_woman"
-            android:layout_width="wrap_content"
             android:textSize="20sp"
-            android:layout_height="wrap_content" />
+            style="@style/ListItemTvStyle" />
         <ImageView
             android:id="@+id/activity_select_sex_iv_woman"
             android:layout_centerVertical="true"

@@ -34,6 +34,7 @@ import com.yueqiu.adapter.SearchDatingDetailedGridAdapter;
 import com.yueqiu.bean.SearchDatingDetailedAlreadyBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -373,92 +374,15 @@ public class SearchBilliardsDatingActivity extends Activity
             case R.id.search_room_action_collect:
                 return true;
             case R.id.search_room_action_share:
-                Log.d(TAG, "the popupWindow has been clicked on ");
-                popupShareWindow();
+                Dialog dlg = Utils.showSheet(this);
+                dlg.show();
                 return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private PopupWindow mPopupWindow;
-    private TextView mTvYueqiu, mTvYueqiuFriend, mTvFriendCircle, mTvWeichat, mTvQQZone, mTvTencentWeibo, mTvSinaWeibo, mTvRenren;
-    private Button mBtnCancel;
-    // 弹出约球详情分享的popupWindow
-    private void popupShareWindow()
-    {
-        View popupWindowView = getLayoutInflater().inflate(R.layout.search_dating_detail_popupwindow, null);
-        mPopupWindow = new PopupWindow(popupWindowView, RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT, true);
-        mPopupWindow.setTouchable(true);
-        mPopupWindow.setOutsideTouchable(true);
-        mPopupWindow.setFocusable(true);
-        // 我们是必须要为PopupWindow设置一个Background drawable才能使PopupWindow工作正常
-        // 当时我们由于已经在layout当中设置了background，所以这里我们使用一个技巧就是设置background的Bitmap为null
-        mPopupWindow.setBackgroundDrawable(new BitmapDrawable(getResources(), (Bitmap) null));
-
-        mPopupWindow.getContentView().setFocusableInTouchMode(true);
-        mPopupWindow.getContentView().setFocusable(true);
-
-        mPopupWindow.setAnimationStyle(R.style.SearchDatingDetailedPopupWindowStyle);
-
-        // TODO: 处理PopupWindow当中的TextView被点击之后的处理事件
-        // TODO: 当前PopupWindow中的TextView和Button是可以响应点击事件的，例如点击之后可以弹出Toast，但是却不可以使用selector，这是一个很严重的问题
-        (mTvYueqiu = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_yuqeiufirend)).setOnClickListener(new OnShareIconClickListener());
-        (mTvYueqiuFriend = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_yueqiucircle)).setOnClickListener(new OnShareIconClickListener());
-        (mTvFriendCircle = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_friendcircle)).setOnClickListener(new OnShareIconClickListener());
-        (mTvWeichat = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_weichat)).setOnClickListener(new OnShareIconClickListener());
-
-        (mTvQQZone = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_qqzone)).setOnClickListener(new OnShareIconClickListener());
-        (mTvTencentWeibo = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_qqweibo)).setOnClickListener(new OnShareIconClickListener());
-        (mTvSinaWeibo = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_sinaweibo)).setOnClickListener(new OnShareIconClickListener());
-        (mTvRenren = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_renren)).setOnClickListener(new OnShareIconClickListener());
-
-        (mBtnCancel = (Button) popupWindowView.findViewById(R.id.btn_search_dating_detailed_cancel)).setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                mPopupWindow.dismiss();
-            }
-        });
-
-        mPopupWindow.showAtLocation(findViewById(R.id.search_dating_detailed_activity_main), Gravity.BOTTOM, 0, 0);
-    }
 
 
-    private class OnShareIconClickListener implements View.OnClickListener
-    {
-        @Override
-        public void onClick(View v)
-        {
-            switch (v.getId())
-            {
-                case R.id.img_search_dating_detail_share_yuqeiufirend:
-                    showToast("sharing to yueqiu");
-                    break;
-                case R.id.img_search_dating_detail_share_yueqiucircle:
-                    showToast("share to yueqiuCircle ");
-                    break;
-                case R.id.img_search_dating_detail_share_friendcircle:
-                    showToast("share to Friend circle ");
-                    break;
-                case R.id.img_search_dating_detail_share_weichat:
-                    showToast("share to weichat");
-                    break;
-                case R.id.img_search_dating_detail_share_qqzone:
-                    showToast("share to qq zone");
-                    break;
-                case R.id.img_search_dating_detail_share_qqweibo:
-                    showToast("share to qq weibo");
-                    break;
-                case R.id.img_search_dating_detail_share_sinaweibo:
-                    showToast("share to sina weibo");
-                    break;
-                case R.id.img_search_dating_detail_share_renren:
-                    showToast("share to renren site");
-                    break;
-            }
-        }
-    }
 
     // TODO: 用于完成台球厅分享的网络的请求处理过程
     private void shareBilliardsRoomRequest(String shareTarget)
