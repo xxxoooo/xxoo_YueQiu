@@ -67,7 +67,6 @@ public class ActivitiesDetail extends Activity {
                     break;
                 case GET_DATA_SUCCESS:
                     Activities activities = ((Activities) msg.obj);
-                    Log.i("Demo", activities.toString());
                     if(activities.getType().equals("1"))
                     {
                         mType.setText("群活动");
@@ -137,7 +136,6 @@ public class ActivitiesDetail extends Activity {
         mIntent = getIntent();
         bundle = mIntent.getExtras();
         mId = bundle.getInt("id");
-        Log.i("Demo", String.valueOf(mId));
         mCreateTime = bundle.getString("create_time");
         mDao = DaoFactory.getActivities(ActivitiesDetail.this);
         initActionBar();
@@ -191,13 +189,10 @@ public class ActivitiesDetail extends Activity {
         @Override
         public void run() {
             Activities activities = mDao.getActivities(mId);
-            Log.i("Demo", "Id is" + mId);
             Message msg = new Message();
             if (null == activities || activities.getModel() == null) {
-                Log.i("Demo", "get no data");
                 msg.what = GET_DATA_ERROR;
             } else {
-                Log.i("Demo", "get data success");
                 msg.what = GET_DATA_SUCCESS;
                 msg.obj = activities;
             }

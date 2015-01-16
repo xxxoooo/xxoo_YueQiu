@@ -270,7 +270,6 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
             Toast.makeText(ActivitiesIssueActivity.this,"请选择活动结束时间",Toast.LENGTH_SHORT).show();
             return null;
         }
-        Log.i("Demo",mEndTimeStr.toString());
         map.put("datetime",datetime);
 
         if(mModel == 0)
