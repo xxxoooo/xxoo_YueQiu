@@ -410,4 +410,6 @@
     <string name="title_activity_start">StartActivity</string>
     <string name="title_activity_test">TestActivity</string>
     <string name="starmeet">球星汇</string>
+    <string name="contact">联系人</string>
+
 </resources>

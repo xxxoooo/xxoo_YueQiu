@@ -58,6 +58,8 @@ public class DatabaseConstant {
         public static final String USER_ID = "user_id";
 
 
+
+
         public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + PHONE + " VARCHAR(50) NOT NULL, " + PASSWORD + " VARCHAR(100), " +
                 SEX + " INTEGER DEFAULT 1, " + TITLE + " VARCHAR(50), " + IMG_URL + " VARCHAR(255), " + IMG_REAL + " VARCHAR(255), " + NICK +
@@ -224,7 +226,7 @@ public class DatabaseConstant {
 
         public static final String SQL = "CREATE TABLE IF NOT EXISTS " + TABLENAME + " ( " +
                 _ID + " INTEGERR PRIMARY KEY UNIQUE, " +
-                USERNAME + " VARCHAR(50) ," + SEX + " VARCHAR(2)," + IMG_URL + " VARCHAR(100), " + LOOK_NUM + " INTEGER" +
+                USERNAME + " VARCHAR(50) ," + SEX + " VARCHAR(2)," + IMG_URL + " VARCHAR(100), " + LOOK_NUM + " INTEGER," +
                 TYPE + " VARCHAR(2), " + TITLE + " VARCHAR(50), " + ADDRESS + " VARCHAR(100), " +
                 BEGIN_TIME + " VARCHAR(20), " + END_TIME + " VARCHAR(20)," +
                 MODEL + " VARCHAR(2), " + CONTENT + " VARCHAR(500) ," + CREATE_TIME + " VARCHAR(20));";
