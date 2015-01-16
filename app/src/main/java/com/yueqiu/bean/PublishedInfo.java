@@ -85,7 +85,14 @@ public class PublishedInfo {
             this.checked = checked;
         }
 
-
+        @Override
+        public boolean equals(Object o) {
+            PublishedItemInfo item = (PublishedItemInfo) o;
+            if(this.getTable_id().equals(item.getTable_id())){
+                return true;
+            }
+            return false;
+        }
     }
 
 

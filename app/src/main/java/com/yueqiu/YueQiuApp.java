@@ -27,11 +27,6 @@ public class YueQiuApp extends Application {
     public static UserInfo sUserInfo = new UserInfo();
     public static GroupNoteInfo sGroupInfo = new GroupNoteInfo();
     private SharedPreferences mSharedPreferences;
-    public static  PublishedInfo sPublishedInfo;
-    public static PublishedDao sPublishedDao;
-    public static FutureTask<PublishedInfo> sDatePublishedTask;
-    public static FutureTask<PublishedInfo> sActivityPublishedTask;
-    public static FutureTask<PublishedInfo> sGroupPublishedTask;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -44,46 +39,8 @@ public class YueQiuApp extends Application {
         sUserInfo.setTitle(mSharedPreferences.getString(DatabaseConstant.UserTable.TITLE,getString(R.string.search_billiard_mate_str)));
         sUserInfo.setPhone(mSharedPreferences.getString(DatabaseConstant.UserTable.PHONE,""));
 
-        sPublishedDao = DaoFactory.getPublished(this);
-        sDatePublishedTask = getDatePublishedInfo();
-        sActivityPublishedTask = getActivityPublishedInfo();
-        sGroupPublishedTask = getGroupPublishedInfo();
 
     }
 
-    public static FutureTask<PublishedInfo> getDatePublishedInfo(){
-        FutureTask<PublishedInfo> task = new FutureTask<PublishedInfo>(new Callable<PublishedInfo>() {
-            @Override
-            public PublishedInfo call() throws Exception {
-                PublishedInfo info = sPublishedDao.getPublishedInfo(String.valueOf(sUserInfo.getUser_id()),PublicConstant.PUBLISHED_DATE_TYPE,0,10);
-                return info;
-            }
-        });
-        new Thread(task).start();
-        return task;
-    }
 
-    public static FutureTask<PublishedInfo> getActivityPublishedInfo(){
-        FutureTask<PublishedInfo> task = new FutureTask<PublishedInfo>(new Callable<PublishedInfo>() {
-            @Override
-            public PublishedInfo call() throws Exception {
-                PublishedInfo info = sPublishedDao.getPublishedInfo(String.valueOf(sUserInfo.getUser_id()),PublicConstant.PUBLISHED_ACTIVITY_TYPE,0,10);
-                return info;
-            }
-        });
-        new Thread(task).start();
-        return task;
-    }
-
-    public static FutureTask<PublishedInfo> getGroupPublishedInfo(){
-        FutureTask<PublishedInfo> task = new FutureTask<PublishedInfo>(new Callable<PublishedInfo>() {
-            @Override
-            public PublishedInfo call() throws Exception {
-                PublishedInfo info = sPublishedDao.getPublishedInfo(String.valueOf(sUserInfo.getUser_id()),PublicConstant.PUBLISHED_GROUP_TYPE,0,10);
-                return info;
-            }
-        });
-        new Thread(task).start();
-        return task;
-    }
 }

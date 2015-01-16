@@ -1,10 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
 
+<item android:state_pressed="true">
+    <shape android:shape="rectangle">
     <!-- 描边 -->
+    <stroke android:width="0.5dp" android:color="@color/billiard_bottom_stroke" />
+
+    <!-- 实心填充 -->
+    <solid android:color="@color/devide_line" />
+    <corners android:radius="3dp"/>
+    </shape>
+</item>
+<!-- the default state -->
+<item>
+    <!-- 描边 -->
+    <shape android:shape="rectangle">
     <stroke android:width="0.5dp" android:color="@color/billiard_bottom_stroke" />
 
     <!-- 实心填充 -->
     <solid android:color="@color/white" />
     <corners android:radius="3dp"/>
-</shape>
+    </shape>
+</item>
+
+</selector>
+

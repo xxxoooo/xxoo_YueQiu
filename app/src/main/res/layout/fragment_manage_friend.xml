@@ -40,6 +40,7 @@
     </LinearLayout>
 
     <LinearLayout
+
         android:gravity="center_vertical"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
@@ -67,7 +68,10 @@
             android:id="@+id/friend_manage_set_group"
             android:clickable="true"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@drawable/basic_textview_bg"
+            android:layout_margin="3dp"
+            >
 
             <TextView
                 android:textColor="@color/md__defaultBackground"

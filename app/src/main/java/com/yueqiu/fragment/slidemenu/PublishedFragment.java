@@ -46,6 +46,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -75,6 +76,7 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
     private Map<String,Integer> mParamsMap = new HashMap<String, Integer>();
     private Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
 
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -87,19 +89,7 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
         mPublishedDao = DaoFactory.getPublished(mActivity);
         Bundle args = getArguments();
         mPublishedType = args.getInt("type");
-        try {
-            if(mPublishedType == PublicConstant.PUBLISHED_DATE_TYPE){
-               YueQiuApp.sPublishedInfo = YueQiuApp.sDatePublishedTask.get();
-            }else if(mPublishedType == PublicConstant.PUBLISHED_ACTIVITY_TYPE){
-               YueQiuApp.sPublishedInfo = YueQiuApp.sActivityPublishedTask.get();
-            }else if(mPublishedType == PublicConstant.PUBLISHED_GROUP_TYPE){
-               YueQiuApp.sPublishedInfo = YueQiuApp.sGroupPublishedTask.get();
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
+
         mIsExsitsPublished = mPublishedDao.isExistPublishedInfo(mPublishedType);
     }
 
@@ -109,8 +99,9 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
         initView();
         setEmptyViewText();
 
-        if(!YueQiuApp.sPublishedInfo.mList.isEmpty()){
-            mHandler.obtainMessage(PublicConstant.USE_CACHE,YueQiuApp.sPublishedInfo).sendToTarget();
+        if(mIsExsitsPublished){
+            mPublishedInfo = mPublishedDao.getPublishedInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()),mPublishedType,start_no,end_no+1);
+            mHandler.obtainMessage(PublicConstant.USE_CACHE,mPublishedInfo).sendToTarget();
         }
 
         if(Utils.networkAvaiable(mActivity)){
@@ -204,6 +195,12 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
                     mList.addAll(((PublishedInfo)msg.obj).mList);
                     break;
                 case PublicConstant.GET_SUCCESS:
+                    PublishedInfo info = (PublishedInfo) msg.obj;
+                    for(int i=0;i<info.mList.size();i++){
+                        if(!mList.contains(info.mList.get(i))){
+                            mList.add(info.mList.get(i));
+                        }
+                    }
                     updatePublishedDB((PublishedInfo) msg.obj);
                     if(mList.isEmpty()){
                         setEmptyViewVisible();
