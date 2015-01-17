@@ -3,10 +3,11 @@ package com.yueqiu.fragment.activities;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.XListView;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,6 +63,7 @@ public class CompleteFragment extends Fragment implements XListView.IXListViewLi
     private Activity mActivity;
     private View mView;
     private int mType;
+    private Drawable mProgressDrawable;
     private Handler handler = new Handler()
     {
         @Override
@@ -98,7 +101,7 @@ public class CompleteFragment extends Fragment implements XListView.IXListViewLi
     };
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    public void onActivityCreated( Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -138,9 +141,10 @@ public class CompleteFragment extends Fragment implements XListView.IXListViewLi
         mPb = (ProgressBar) mView.findViewById(R.id.pb_loading);
         mListView.setVisibility(View.GONE);
         mPb.setVisibility(View.VISIBLE);
-
-
-        mPb = (ProgressBar) mView.findViewById(R.id.pb_loading);
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(mActivity).build();
+        Rect bounds = mPb.getIndeterminateDrawable().getBounds();
+        mPb.setIndeterminateDrawable(mProgressDrawable);
+        mPb.getIndeterminateDrawable().setBounds(bounds);
         mListView.setOnItemClickListener(itemClickListener);
         mListView.setPullLoadEnable(true);
         mListView.setXListViewListener(this);
@@ -157,7 +161,7 @@ public class CompleteFragment extends Fragment implements XListView.IXListViewLi
     private Runnable getLocalData = new Runnable() {
         @Override
         public void run() {
-            Log.i("Demo", String.valueOf(mLocalStart) + "-----" + String.valueOf(mLocalEnd));
+//            Log.i("Demo", String.valueOf(mLocalStart) + "-----" + String.valueOf(mLocalEnd));
             ArrayList<Activities> list = mDao.getActivities(mLocalStart, mLocalEnd);
             mLocalStart += LENGTH;
             mLocalEnd += LENGTH;
@@ -248,8 +252,14 @@ public class CompleteFragment extends Fragment implements XListView.IXListViewLi
     private AdapterView.OnItemClickListener itemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            startActivity(new Intent(mActivity, ActivitiesDetail.class));
-            mActivity.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+            Intent intent = new Intent();
+            intent.setClass(mActivity, ActivitiesDetail.class);
+            Bundle bundle = new Bundle();
+            bundle.putInt("id", Integer.valueOf(mListData.get(position - 1).getId()));
+            bundle.putString("create_time", mListData.get(position - 1).getCreate_time());
+            intent.putExtras(bundle);
+            startActivity(intent);
+            mActivity.overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         }
     };
 

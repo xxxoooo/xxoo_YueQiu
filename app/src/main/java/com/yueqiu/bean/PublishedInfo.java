@@ -93,6 +93,13 @@ public class PublishedInfo {
             }
             return false;
         }
+
+        @Override
+        public String toString() {
+            String str = "table_id->" + table_id + " type->" + type + " title->" + title
+                    + " content->" + content + " dateTime->" + dateTime;
+            return str;
+        }
     }
 
 

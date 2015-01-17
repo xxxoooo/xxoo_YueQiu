@@ -28,7 +28,7 @@ public class PublishedImpl implements PublishedDao{
         mDBUtils = DBUtils.getInstance(mContext);
     }
     @Override
-    public long insertPublishInfo(PublishedInfo info) {
+    public synchronized long insertPublishInfo(PublishedInfo info) {
         ContentValues values = new ContentValues();
         values.put(DatabaseConstant.PublishInfoTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
         values.put(DatabaseConstant.PublishInfoTable.TYPE,info.getType());
@@ -42,7 +42,7 @@ public class PublishedImpl implements PublishedDao{
     }
 
     @Override
-    public long insertPublishItemInfo(PublishedInfo info) {
+    public synchronized long insertPublishItemInfo(PublishedInfo info) {
         mDB = mDBUtils.getWritableDatabase();
         long result = 0;
         mDB.beginTransaction();
@@ -69,12 +69,13 @@ public class PublishedImpl implements PublishedDao{
     }
 
     @Override
-    public long updatePublishInfo(PublishedInfo info) {
+    public synchronized long updatePublishInfo(PublishedInfo info) {
         mDB = mDBUtils.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DatabaseConstant.PublishInfoTable.START_NO,info.getStart_no());
         values.put(DatabaseConstant.PublishInfoTable.END_NO,info.getEnd_no());
         values.put(DatabaseConstant.PublishInfoTable.COUNT,info.getSumCount());
+        values.put(DatabaseConstant.PublishInfoTable.TYPE,info.getType());
 
         long result = mDB.update(DatabaseConstant.PublishInfoTable.TABLE,values, DatabaseConstant.PublishInfoTable.USER_ID + "=? and " +
                         DatabaseConstant.PublishInfoTable.TYPE + "=?",
@@ -84,7 +85,7 @@ public class PublishedImpl implements PublishedDao{
     }
 
     @Override
-    public List<Long> updatePublishedItemInfo(PublishedInfo info) {
+    public synchronized List<Long> updatePublishedItemInfo(PublishedInfo info) {
         mDB = mDBUtils.getWritableDatabase();
         List<Long> list = new ArrayList<Long>();
         mDB.beginTransaction();
@@ -96,9 +97,11 @@ public class PublishedImpl implements PublishedDao{
                 values.put(DatabaseConstant.PublishInfoItemTable.TITLE, itemInfo.getTitle());
                 values.put(DatabaseConstant.PublishInfoItemTable.CONTENT, itemInfo.getContent());
                 values.put(DatabaseConstant.PublishInfoItemTable.DATETIME, itemInfo.getDateTime());
+                values.put(DatabaseConstant.PublishInfoItemTable.TYPE,itemInfo.getType());
+
                 long result = mDB.update(DatabaseConstant.PublishInfoItemTable.TABLE, values, DatabaseConstant.PublishInfoItemTable.USER_ID + "=? and " +
-                                DatabaseConstant.PublishInfoItemTable.TABLE_ID + "=?",
-                        new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()), String.valueOf(itemInfo.getTable_id())});
+                                DatabaseConstant.PublishInfoItemTable.TABLE_ID + "=? and " + DatabaseConstant.PublishInfoTable.TYPE + "=?",
+                        new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()), String.valueOf(itemInfo.getTable_id()),String.valueOf(itemInfo.getType())});
                 list.add(result);
             }
             mDB.setTransactionSuccessful();
@@ -127,7 +130,7 @@ public class PublishedImpl implements PublishedDao{
     }
 
     @Override
-    public boolean isExistPublishedItemInfo(int tableId,int type) {
+    public synchronized boolean isExistPublishedItemInfo(int tableId,int type) {
         mDB = mDBUtils.getReadableDatabase();
         Cursor cursor = mDB.query(DatabaseConstant.PublishInfoItemTable.TABLE,null,DatabaseConstant.PublishInfoItemTable.USER_ID + "=? and " +
                         DatabaseConstant.PublishInfoItemTable.TABLE_ID + "=? and " + DatabaseConstant.PublishInfoItemTable.TYPE + "=?",
@@ -142,7 +145,7 @@ public class PublishedImpl implements PublishedDao{
     }
 
     @Override
-    public PublishedInfo getPublishedInfo(String userId, int type,int start,int number) {
+    public synchronized PublishedInfo getPublishedInfo(String userId, int type,int start,int number) {
         mDB = mDBUtils.getReadableDatabase();
 
         PublishedInfo info = new PublishedInfo();

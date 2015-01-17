@@ -9,7 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yueqiu.R;
-import com.yueqiu.bean.MyCollectionInfo;
+import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.PublishedInfo;
 
 import java.util.List;
@@ -18,11 +18,11 @@ import java.util.List;
  * Created by wangyun on 15/1/4.
  */
 public class FavorBasicAdapter extends BaseAdapter {
-    private List<MyCollectionInfo.CollectionItemInfo> mList;
+    private List<FavorInfo.FavorItemInfo> mList;
     private Context mContext;
     private LayoutInflater mInflater;
 
-    public FavorBasicAdapter(Context context,List<MyCollectionInfo.CollectionItemInfo> list){
+    public FavorBasicAdapter(Context context,List<FavorInfo.FavorItemInfo> list){
         this.mContext = context;
         this.mList = list;
         mInflater = LayoutInflater.from(mContext);

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -270,6 +271,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
             return null;
         }
         map.put("datetime",datetime);
+
         if(mModel == 0)
         {
             Toast.makeText(ActivitiesIssueActivity.this,"请选择消费方式",Toast.LENGTH_SHORT).show();
@@ -375,6 +377,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         }else if(mTimeFlag == END_FLAG){
             mEndTimeStr.append(" ").append(hourStr).append("-").append(minuteStr);
             mEndTimeTv.setText(mEndTimeStr.toString());
+
         }
     }
 

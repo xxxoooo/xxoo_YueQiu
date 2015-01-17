@@ -7,14 +7,14 @@ import java.util.List;
 /**
  * Created by wangyun on 15/1/13.
  */
-public class MyCollectionInfo {
+public class FavorInfo {
 
     private int user_id;
     private int start_no;
     private int end_no;
     private int count;
     private int type;
-    public List<CollectionItemInfo> mList = new ArrayList<CollectionItemInfo>();
+    public List<FavorItemInfo> mList = new ArrayList<FavorItemInfo>();
 
     public int getUser_id() {
         return user_id;
@@ -56,7 +56,7 @@ public class MyCollectionInfo {
         this.type = type;
     }
 
-    public class CollectionItemInfo {
+    public class FavorItemInfo {
 
         private String table_id;
         private int type;

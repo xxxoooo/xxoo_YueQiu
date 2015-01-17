@@ -23,17 +23,14 @@ public class DBUtils extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
-
-
         db.execSQL(DatabaseConstant.UserTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.PublishInfoTable.CRAETE_SQL);
         db.execSQL(DatabaseConstant.PublishInfoItemTable.CREATE_URL);
         db.execSQL(DatabaseConstant.ChatMessageTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.ActivitiesTable.SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
-        db.execSQL(DatabaseConstant.MyCollectionInfoTable.CRAETE_SQL);
-        db.execSQL(DatabaseConstant.MyCollectionInfoItemTable.CREATE_URL);
+        db.execSQL(DatabaseConstant.FavorInfoTable.CRAETE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.CREATE_SQL);
 
 
     }
@@ -47,8 +44,8 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.ActivitiesTable.DROP_SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
         db.execSQL(DatabaseConstant.ChatMessageTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.MyCollectionInfoTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.MyCollectionInfoItemTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.DROP_SQL);
         onCreate(db);
     }
 

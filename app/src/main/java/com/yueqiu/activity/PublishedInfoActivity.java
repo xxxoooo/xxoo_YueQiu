@@ -10,13 +10,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
 import com.yueqiu.R;
-import com.yueqiu.fragment.slidemenu.PublishBasicFragment;
 import com.yueqiu.fragment.slidemenu.PublishedFragment;
 
 
@@ -43,7 +44,6 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
                 getString(R.string.billiard_group)
         };
         mViewPager = (ViewPager) findViewById(R.id.favor_coll_pager);
-       // mViewPager = $(R.id.favor_coll_pager);
 
     }
 
@@ -87,7 +87,7 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
     }
 
 
-    public class SectionPagerAdapter extends FragmentPagerAdapter {
+    public class SectionPagerAdapter extends FragmentStatePagerAdapter {
 
 
         public SectionPagerAdapter(FragmentManager fm) {
@@ -133,6 +133,7 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
         switch(id){
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
                 break;
         }
         return true;

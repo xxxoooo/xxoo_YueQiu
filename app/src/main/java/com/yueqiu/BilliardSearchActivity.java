@@ -440,6 +440,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         if(checkUserId()) {
                             intent.setClass(BilliardSearchActivity.this, PublishedInfoActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
                         }else{
                             Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }

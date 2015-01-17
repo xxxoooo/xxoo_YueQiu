@@ -21,7 +21,6 @@ public class AsyncTaskUtil<T> extends AsyncTask<Map<String,String>,Void,JSONObje
     protected JSONObject doInBackground(Map<String,String>... params) {
         String result = HttpUtil.urlClient(params[0].get(PublicConstant.URL),mMap, params[0].get(PublicConstant.METHOD));
         JSONObject jsonResult = Utils.parseJson(result);
-        Log.d("wy","json->" + jsonResult);
         return jsonResult;
     }
 }

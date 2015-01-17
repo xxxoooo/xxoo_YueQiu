@@ -6,6 +6,8 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -32,6 +34,7 @@ import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.XListView;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,6 +68,7 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
     private int mLocalStart;
     private int mLocalEnd;
     private boolean isHead;
+    private Drawable mProgressDrawable;
     private boolean mNetworkAvailable;
     private Handler handler = new Handler()
     {
@@ -130,9 +134,11 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
         mPb = (ProgressBar) findViewById(R.id.pb_loading);
         mListView.setVisibility(View.GONE);
         mPb.setVisibility(View.VISIBLE);
-
-
-        mPb = (ProgressBar) findViewById(R.id.pb_loading);
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(this).build();
+        Rect bounds = mPb.getIndeterminateDrawable().getBounds();
+        mPb.setIndeterminateDrawable(mProgressDrawable);
+        mPb.getIndeterminateDrawable().setBounds(bounds);
+//        mPb = (ProgressBar) findViewById(R.id.pb_loading);
         mListView.setOnItemClickListener(itemClickListener);
         mListView.setPullLoadEnable(true);
         mListView.setXListViewListener(this);
@@ -148,7 +154,6 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
     private Runnable getLocalData = new Runnable() {
         @Override
         public void run() {
-            Log.i("Demo", String.valueOf(mLocalStart) + "-----" + String.valueOf(mLocalEnd));
             ArrayList<Activities> list = mDao.getActivities(mLocalStart, mLocalEnd);
             mLocalStart += LENGTH;
             mLocalEnd += LENGTH;
@@ -310,7 +315,6 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
 
     @Override
     public void onLoadMore() {
-        Log.i("Demo","onLoadMore");
         new Thread(Utils.networkAvaiable(ActivitiesActivity.this)
                 ? getNetworkData : getLocalData).start();
 
