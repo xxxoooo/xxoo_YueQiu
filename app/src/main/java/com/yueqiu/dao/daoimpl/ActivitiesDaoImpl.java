@@ -206,9 +206,28 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
             {
                 for (int i = 0; i < length; i++) {
                     fields[i].setAccessible(true);
-                    Object obj = fields[i].getType();
-                    fields[i].set(activities, cursor.getString(
-                        cursor.getColumnIndex(fields[i].getName())) );
+//                    Object obj = fields[i].getType();
+//
+//
+//                    if (obj != null) {
+//                        if (obj instanceof String) {
+//                            fields[i].set(activities, cursor.getString(
+//                                    cursor.getColumnIndex(fields[i].getName())) );
+//                        } else if (obj instanceof Integer) {
+//                            fields[i].set(activities, cursor.getInt(
+//                                    cursor.getColumnIndex(fields[i].getName())) );
+//                        }
+//                    }
+                    if(!fields[i].getName().equals("look_num"))
+                    {
+                        fields[i].set(activities, cursor.getString(
+                                    cursor.getColumnIndex(fields[i].getName())) );
+                    }
+                    else
+                    {
+                        fields[i].set(activities, cursor.getInt(
+                                    cursor.getColumnIndex(fields[i].getName())) );
+                    }
                 }
             }
             return activities;
