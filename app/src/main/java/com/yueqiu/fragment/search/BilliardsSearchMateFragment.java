@@ -350,10 +350,12 @@ public class BilliardsSearchMateFragment extends Fragment implements XListView.I
                         sMateDaoIns.insertMateItem(mateUserBean);
                         sUserList.add(mateUserBean);
 
-                        // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
-                        sUIEventsHandler.sendEmptyMessage(DATA_RETRIEVE_SUCCESS);
-                        sUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+
+                        sUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                     }
+                    // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
+                    sUIEventsHandler.sendEmptyMessage(DATA_RETRIEVE_SUCCESS);
+                    sUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                 }
 
             } catch (JSONException e) {
@@ -362,6 +364,8 @@ public class BilliardsSearchMateFragment extends Fragment implements XListView.I
             }
         }
     }
+
+    private static final int DATA_HAS_BEEN_UPDATED = 1 << 8;
 
     private static final String KEY_REQUEST_RANGE_FILTERED = "keyRequestRangeFiltered";
     private static final String KEY_REQUEST_GENDER_FILTERED = "keyRequestGenderFiltered";
@@ -417,6 +421,11 @@ public class BilliardsSearchMateFragment extends Fragment implements XListView.I
 
                     break;
 
+                case DATA_HAS_BEEN_UPDATED:
+
+                    sMateListAdapter.notifyDataSetChanged();
+                    Log.d(TAG, " the adapter has been notified ");
+                    break;
             }
         }
     };

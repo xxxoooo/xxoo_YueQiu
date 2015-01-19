@@ -176,7 +176,7 @@ public class SubFragmentsCommonUtils
             public void run()
             {
                 Log.d(TAG, " start retrieving the view pager data here ");
-                retrieveRecommdedRoomInfo();
+//                retrieveRecommdedRoomInfo();
             }
         }).start();
 

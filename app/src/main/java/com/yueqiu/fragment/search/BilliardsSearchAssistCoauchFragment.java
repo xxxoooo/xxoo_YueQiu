@@ -105,6 +105,7 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment implements XLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
+
         mView = inflater.inflate(R.layout.search_assistcoauch_fragment_layout, container, false);
 
         SubFragmentsCommonUtils.initViewPager(sContext, mView, R.id.assistcoauch_fragment_gallery_pager, R.id.assistcoauch_fragment_gallery_pager_indicator_group);
@@ -152,7 +153,6 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment implements XLi
     @Override
     public void onDestroy()
     {
-        sWorker.quit();
         super.onDestroy();
     }
 
@@ -393,7 +393,9 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment implements XLi
                         sAssistCoauchList.add(assistCoauchBean);
 
                         // TODO: 我们需要将我们在这里解析得到的完整的数据插入到数据库当中
+                        // TODO: ????????????????? 将数据插入到SQLite当中
 
+                        sUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                     }
 
                     // TODO: 到这里，我们基本上就已经完成了数据检索的工作了，现在我们需要的就是通知用户已经完成数据检索工作，我们可以取消ProgressDialog的显示了
@@ -406,6 +408,8 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment implements XLi
             }
         }
     }
+
+    private static final int DATA_HAS_BEEN_UPDATED = 1 << 10;
 
     private static final String KEY_REQUEST_LEVEL_FILTERED = "keyRequestLevelFiltered";
     private static final String KEY_REQUEST_PRICE_FILTERED = "keyRequestPriceFiltered";
@@ -483,6 +487,11 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment implements XLi
                     sWorker.fetchDataWithClazzFilter(clazz);
                     break;
 
+                case DATA_HAS_BEEN_UPDATED:
+
+                    sAssistCoauchListAdapter.notifyDataSetChanged();
+                    Log.d(TAG, " the data set has been updated ");
+                    break;
                 default:
                     break;
 

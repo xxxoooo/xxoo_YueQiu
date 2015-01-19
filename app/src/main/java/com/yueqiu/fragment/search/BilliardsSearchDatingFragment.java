@@ -172,7 +172,6 @@ public class BilliardsSearchDatingFragment extends Fragment implements XListView
     @Override
     public void onDestroy()
     {
-        sBackgroundHandler.quit();
         super.onDestroy();
     }
 
@@ -358,10 +357,13 @@ public class BilliardsSearchDatingFragment extends Fragment implements XListView
 
                             // 将我们解析得到的datingBean插入到我们创建的数据库当中
                             sDatingList.add(datingBean);
-                            // TODO: 我们应该在这里通知UI主线程数据请求工作已经全部完成了，停止显示ProgressBar或者显示一个Toast全部数据已经加载完的提示
-                            sUIEventsHandler.sendEmptyMessage(FETCH_DATA_SUCCESSED);
-                            sUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+
+                            sUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                         }
+
+                        // TODO: 我们应该在这里通知UI主线程数据请求工作已经全部完成了，停止显示ProgressBar或者显示一个Toast全部数据已经加载完的提示
+                        sUIEventsHandler.sendEmptyMessage(FETCH_DATA_SUCCESSED);
+                        sUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
 
                     }
                 }
@@ -372,6 +374,9 @@ public class BilliardsSearchDatingFragment extends Fragment implements XListView
             }
         }
     }
+
+    private static final int DATA_HAS_BEEN_UPDATED = 1 << 8;
+
 
     private static final String KEY_REQUEST_RANGE_STR = "keyRequestRangeStr";
     private static final String KEY_REQUEST_DATE_STR = "keyRequestDateStr";
@@ -427,6 +432,12 @@ public class BilliardsSearchDatingFragment extends Fragment implements XListView
                     String publishDate = publishDateData.getString(KEY_REQUEST_DATE_STR);
                     sBackgroundHandler.fetchDatingWithPublishDateFilter(publishDate);
 
+                    break;
+
+                case DATA_HAS_BEEN_UPDATED:
+
+                    sDatingListAdapter.notifyDataSetChanged();
+                    Log.d(TAG, " the adapter eof the DatingFragment has been updated ");
                     break;
 
             }

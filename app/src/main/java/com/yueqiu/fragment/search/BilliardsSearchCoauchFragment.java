@@ -335,6 +335,10 @@ public class BilliardsSearchCoauchFragment extends Fragment implements XListView
                         // TODO: 数据库的transaction业务进行操作，即批量的插入数据和检索数据，这样可以加快我们的插入过程
                         // TODO: 这是十分需要注意的！！！
 
+
+                        // TODO: 我们暂时还不确定，是否是需要每增加一条数据，就要通过Adapter我们进行了数据源的更新，
+                        // TODO: 还是在我们已经获取完所有的数据之后在进行这个操作？？？？
+                        sUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                     }
 
                     // TODO: 这时，数据已经完全检索完毕，我们可以取消dialog的显示了
@@ -350,6 +354,8 @@ public class BilliardsSearchCoauchFragment extends Fragment implements XListView
             }
         }
     }
+
+    private static final int DATA_HAS_BEEN_UPDATED = 1 << 8;
 
     private static final String KEY_REQUEST_LEVEL_FILTER = "keyRequestLevelFiltered";
     private static final String KEY_REQUEST_CLAZZ_FILTER = "keyRequestClazzFiltered";
@@ -408,6 +414,12 @@ public class BilliardsSearchCoauchFragment extends Fragment implements XListView
 
                     sWorker.fetchDataWithClazzFiltered(clazz);
 
+                    break;
+
+                case DATA_HAS_BEEN_UPDATED:
+
+                    sCoauchListAdapter.notifyDataSetChanged();
+                    Log.d(TAG, " the adapter has been updated ");
                     break;
 
             }

@@ -123,6 +123,8 @@ public class BilliardsSearchRoomFragment extends Fragment implements XListView.I
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
+
+
         mView = inflater.inflate(R.layout.search_room_fragment_layout, container, false);
 
         SubFragmentsCommonUtils.initViewPager(sContext, mView, R.id.room_fragment_gallery_pager, R.id.room_fragment_gallery_pager_indicator_group);
@@ -182,7 +184,10 @@ public class BilliardsSearchRoomFragment extends Fragment implements XListView.I
             }
         });
 
+
         return mView;
+
+
     }
 
 
@@ -502,6 +507,8 @@ public class BilliardsSearchRoomFragment extends Fragment implements XListView.I
 
                         // TODO: 然后我们还需要本地缓存我们所获得到的这条数据
 
+                        // TODO: 我们这里需要进行数据的更新(因为数据的更新必须在主线程当中进行，所以我们就通过Handler发送到MainUiThread当中)
+                        sUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                     }
                     // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
                     sUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
@@ -575,7 +582,9 @@ public class BilliardsSearchRoomFragment extends Fragment implements XListView.I
     private static final int REQUEST_ROOM_INFO_PRICE_FILTERED = 1 << 4;
     private static final int REQUEST_ROOM_INFO_APPRISAL_FILTERED = 1 << 5;
 
-
+    // TODO: 因为我们总是需要在主线程当中进行关于Adapter的更新操作，因此我们将所有的涉及到Adapter的更新就
+    // TODO: 发送到sUIEventsHandler当中执行
+    private static final int DATA_HAS_BEEN_UPDATED = 1 << 10;
 
     private static Handler sUIEventsHandler = new Handler()
     {
@@ -635,6 +644,12 @@ public class BilliardsSearchRoomFragment extends Fragment implements XListView.I
                     Log.d(TAG, " the region str we get are : " + regionStr);
                     break;
 
+                case DATA_HAS_BEEN_UPDATED:
+
+                    // TODO: 这里需要进一步验证可操作性
+                    sSearchRoomAdapter.notifyDataSetChanged();
+                    Log.d(TAG, " the adapter has been updated ");
+                    break;
                 default:
                     break;
             }
