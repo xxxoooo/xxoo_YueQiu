@@ -20,6 +20,9 @@ public class YueQiuApp extends Application {
     public static GroupNoteInfo sGroupInfo = new GroupNoteInfo();
     private SharedPreferences mSharedPreferences;
 
+    // 由于Volley的官方推荐构建方式是定义成全局的Singleton模式，用于保存唯一的RequestQueue来加速图片的加载，所以我们在这里创建了全局的Context
+    private static Context sAppContext;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -32,6 +35,12 @@ public class YueQiuApp extends Application {
         sUserInfo.setTitle(mSharedPreferences.getString(DatabaseConstant.UserTable.TITLE,getString(R.string.search_billiard_mate_str)));
         sUserInfo.setPhone(mSharedPreferences.getString(DatabaseConstant.UserTable.PHONE,""));
 
+        sAppContext = getApplicationContext();
+    }
+
+    public static Context getAppContext()
+    {
+        return sAppContext;
     }
 
 }

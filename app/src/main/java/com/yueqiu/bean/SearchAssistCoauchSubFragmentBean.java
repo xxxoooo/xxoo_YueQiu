@@ -11,6 +11,7 @@ import org.json.JSONObject;
  */
 public class SearchAssistCoauchSubFragmentBean
 {
+    private String mUserId;
     private String mPhoto;
     private String mName;
     private String mGender;
@@ -22,8 +23,9 @@ public class SearchAssistCoauchSubFragmentBean
 
     public SearchAssistCoauchSubFragmentBean(){}
 
-    public SearchAssistCoauchSubFragmentBean(String photo, String name, String gender, String kinds, String price, String distan)
+    public SearchAssistCoauchSubFragmentBean(String userId, String photo, String name, String gender, String kinds, String price, String distan)
     {
+        this.mUserId = userId;
         this.mPhoto = photo;
         this.mName = name;
         this.mGender = gender;
@@ -117,6 +119,7 @@ public class SearchAssistCoauchSubFragmentBean
     public SearchAssistCoauchSubFragmentBean parseJson(JSONObject jsonObject) throws JSONException
     {
         // String photo, String name, String gender, String kinds, String price, String distan
+        mUserId = String.valueOf(jsonObject.get(JSON_USER_ID));
         mPhoto = String.valueOf(jsonObject.get(JSON_IMG_URL));
         mName = String.valueOf(jsonObject.get(JSON_USER_NAME));
         mGender = String.valueOf(jsonObject.get(JSON_SEX));
@@ -124,8 +127,17 @@ public class SearchAssistCoauchSubFragmentBean
         mPrice = String.valueOf(jsonObject.get(JSON_MONEY));
         mDistance = String.valueOf(jsonObject.get(JSON_RANGE));
 
-        return new SearchAssistCoauchSubFragmentBean(mPhoto, mName, mGender, mKinds, mPrice, mDistance);
+        return new SearchAssistCoauchSubFragmentBean(mUserId, mPhoto, mName, mGender, mKinds, mPrice, mDistance);
     }
 
 
+    public String getUserId()
+    {
+        return mUserId;
+    }
+
+    public void setUserId(String userId)
+    {
+        this.mUserId = userId;
+    }
 }

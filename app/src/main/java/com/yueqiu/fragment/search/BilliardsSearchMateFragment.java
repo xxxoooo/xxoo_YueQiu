@@ -2,9 +2,10 @@ package com.yueqiu.fragment.search;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.os.*;
+import android.os.Process;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
@@ -13,12 +14,15 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
@@ -27,9 +31,12 @@ import com.yueqiu.adapter.SearchMateSubFragmentListAdapter;
 import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.dao.daoimpl.SearchMateDaoImpl;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.view.XListView;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +57,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 使用RadioButton来进行控制了。
  */
 @SuppressLint("ValidFragment")
-public class BilliardsSearchMateFragment extends Fragment
+public class BilliardsSearchMateFragment extends Fragment implements XListView.IXListViewListener
 {
     private static final String TAG = "DeskBallFragment";
 
@@ -59,7 +66,7 @@ public class BilliardsSearchMateFragment extends Fragment
     private String mArgs;
     private static Context sContext;
 
-    private ListView mSubFragmentList;
+    private XListView mSubFragmentList;
 
     private static Button sBtnDistanceFilter, sBtnGenderFilter;
 
@@ -81,11 +88,31 @@ public class BilliardsSearchMateFragment extends Fragment
         return fragment;
     }
 
+    private static SearchMateDaoImpl sMateDaoIns;
+
+    // mIsHead用于控制数据的加载到List当中的方向(即加载到头部还是加载到尾部)
+    private boolean mIsHead;
+    private boolean mIsNetworkAvailable;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        sWorker = new BackgroundWorker();
+
+        sMateDaoIns = new SearchMateDaoImpl(sContext);
+
+        mIsHead = false;
+        mIsNetworkAvailable = Utils.networkAvaiable(sContext);
+
     }
+
+    private static ProgressBar sPreProgress;
+    private static TextView sPreTextView;
+    private static Drawable sProgressDrawable;
+    private static List<SearchMateSubFragmentUserBean> sUserList = new ArrayList<SearchMateSubFragmentUserBean>();
+
+    private static SearchMateSubFragmentListAdapter sMateListAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -94,7 +121,15 @@ public class BilliardsSearchMateFragment extends Fragment
         // then, inflate the image view pager
         SubFragmentsCommonUtils.initViewPager(sContext, mView, R.id.mate_fragment_gallery_pager, R.id.mate_fragment_gallery_pager_indicator_group);
 
-        mSubFragmentList = (ListView) mView.findViewById(R.id.search_sub_fragment_list);
+        mSubFragmentList = (XListView) mView.findViewById(R.id.search_sub_fragment_list);
+        mSubFragmentList.setXListViewListener(this);
+
+        sPreProgress = (ProgressBar) mView.findViewById(R.id.pre_progress);
+        sPreTextView = (TextView) mView.findViewById(R.id.pre_text);
+        sProgressDrawable = new FoldingCirclesDrawable.Builder(getActivity()).build();
+        Rect bounds = sPreProgress.getIndeterminateDrawable().getBounds();
+        sPreProgress.setIndeterminateDrawable(sProgressDrawable);
+        sPreProgress.getIndeterminateDrawable().setBounds(bounds);
 
         (sBtnDistanceFilter = (Button) mView.findViewById(R.id.btn_mate_distance)).setOnClickListener(new BtnFilterClickListener());
         (sBtnGenderFilter = (Button) mView.findViewById(R.id.btn_mate_gender)).setOnClickListener(new BtnFilterClickListener());
@@ -102,11 +137,12 @@ public class BilliardsSearchMateFragment extends Fragment
         Bundle args = getArguments();
         mArgs = args.getString(BILLIARD_SEARCH_TAB_NAME);
 
+        // TODO: 以下加载是测试数据，暂时不能删除(因为现在的数据不完整，我们还需要这些测试数据来查看数据加载完整的具体的具体的UI效果)
+//        initListViewDataSrc();
 
-        sHandler.sendEmptyMessage(START_RETRIEVE_ALL_DATA);
-
-        initListViewDataSrc();
-        mSubFragmentList.setAdapter(new SearchMateSubFragmentListAdapter(sContext, (ArrayList<SearchMateSubFragmentUserBean>) mUserList));
+        sMateListAdapter = new SearchMateSubFragmentListAdapter(sContext, (ArrayList<SearchMateSubFragmentUserBean>) sUserList);
+        mSubFragmentList.setAdapter(sMateListAdapter);
+        sMateListAdapter.notifyDataSetChanged();
 
         return mView;
     }
@@ -121,6 +157,12 @@ public class BilliardsSearchMateFragment extends Fragment
     public void onResume()
     {
         super.onResume();
+
+        if (sWorker != null && sWorker.getState() == Thread.State.NEW)
+        {
+            Log.d(TAG, " the sWorker has started ");
+            sWorker.start();
+        }
     }
 
     @Override
@@ -142,6 +184,23 @@ public class BilliardsSearchMateFragment extends Fragment
         super.onStop();
     }
 
+    // TODO: 我们需要在这里实现下拉刷新加载更多的事件处理
+    // TODO: 这个是向下拉加载更过
+    @Override
+    public void onRefresh()
+    {
+
+        mIsHead = true;
+    }
+
+    // TODO: 这个是向上拉加载更多
+    @Override
+    public void onLoadMore()
+    {
+
+        mIsHead = false;
+    }
+
     /**
      * the button on click listener for the button to filter out the
      * list item we need
@@ -150,23 +209,43 @@ public class BilliardsSearchMateFragment extends Fragment
     {
         private LayoutInflater inflater = (LayoutInflater) sContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         private PopupWindow popupWindow;
+
         @Override
         public void onClick(View v)
         {
             switch (v.getId()) {
                 case R.id.btn_mate_gender:
+                    final String[] genderStrList = {
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_female_str),
+                            sContext.getResources().getString(R.string.search_mate_popupmenu_item_male_str)
+                    };
                     View genderFilerView = inflater.inflate(R.layout.search_mate_subfragment_gender_popupwindow, null);
 
-                    Button btnMaleFilter = (Button) genderFilerView.findViewById(R.id.search_mate_popupwindow_male);
-                    Button btnFemaleFilter = (Button) genderFilerView.findViewById(R.id.search_mate_popupwindow_female);
+                    Button btnGenderNoFilter = (Button) genderFilerView.findViewById(R.id.btn_search_mate_gender_no_filter);
 
-                    btnMaleFilter.setOnClickListener(new MatePopupInternalItemHandler());
-                    btnFemaleFilter.setOnClickListener(new MatePopupInternalItemHandler());
+                    btnGenderNoFilter.setOnClickListener(new MatePopupInternalItemHandler());
+                    ListView genderListView = (ListView) genderFilerView.findViewById(R.id.list_search_mate_gender_filter_list);
+                    genderListView.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(genderStrList)));
 
                     popupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnGenderFilter, genderFilerView);
+                    genderListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                    {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                        {
+                            final String gender = genderStrList[position];
+                            Message msg = sUIEventsHandler.obtainMessage(START_RETRIEVE_DATA_WITH_GENDER_FILTER);
+                            Bundle data = new Bundle();
+                            data.putString(KEY_REQUEST_GENDER_FILTERED, gender);
+                            msg.setData(data);
+                            sUIEventsHandler.sendMessage(msg);
+                            popupWindow.dismiss();
+
+                        }
+                    });
                     break;
                 case R.id.btn_mate_distance:
-                    String[] disStrList = {
+                    final String[] disStrList = {
                             sContext.getResources().getString(R.string.search_mate_popupmenu_item_500_str),
                             sContext.getResources().getString(R.string.search_mate_popupmenu_item_1000_str),
                             sContext.getResources().getString(R.string.search_mate_popupmenu_item_2000_str),
@@ -181,6 +260,22 @@ public class BilliardsSearchMateFragment extends Fragment
 
                     popupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistanceFilter, distanceFilterView);
 
+                    distanList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                    {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                        {
+                            final String distance = disStrList[position];
+                            Message msg = sUIEventsHandler.obtainMessage(START_RETRIEVE_DATA_WITH_RANGE_FILTER);
+                            Bundle data = new Bundle();
+                            data.putString(KEY_REQUEST_RANGE_FILTERED, distance);
+                            msg.setData(data);
+                            sUIEventsHandler.sendMessage(msg);
+
+                            popupWindow.dismiss();
+                        }
+                    });
+
                     break;
                 default:
                     break;
@@ -190,7 +285,6 @@ public class BilliardsSearchMateFragment extends Fragment
 
     private static final class MatePopupInternalItemHandler implements View.OnClickListener
     {
-
         @Override
         public void onClick(View v)
         {
@@ -199,151 +293,250 @@ public class BilliardsSearchMateFragment extends Fragment
     }
 
 
-
-
-    // TODO: 以下我们暂时采用的默认数据是1000米，筛选性别为女性作为默认的条件(需要同服务器端进一步确定默认的条件)
-
-    /**
-     * 在以下的选择当中，我们需要指定默认的情况，即默认情况下我们应该获取的是多少距离范围内的数据，还有
-     * 默认情况下我们指定的应该是女性还是男性
-     *
-     * @param userId
-     * @param range  这个是用于筛选的条件之一：距离，我们通过传送用户指定的距离的数据，即可以或得到指定的数据
-     * @param sex    这也是用于筛选的条件之一：性别，我们通过FilterButton当中用户的选择来获得特定的列表数据
-     */
-    @Deprecated
-    private static void retrieveMateRawInfo(final String userId, final String range, final int sex, final int startNum, final int endNum)
-    {
-        // 我们采用ConcurrentHashMap来保存请求参数，因为我们为了加速请求过程会使用多线程，这样更安全一些
-        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
-        requestParams.put("user_id", userId);
-        requestParams.put("range", range);
-        requestParams.put("sex", sex + "");
-        requestParams.put("start_no", startNum + "");
-        requestParams.put("end_no", endNum + "");
-        String rawResult = HttpUtil.urlClient(HttpConstants.SearchMate.URL, requestParams, HttpConstants.RequestMethod.GET);
-        Log.d(TAG, " the raw result we get are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult))
-        {
-            JSONObject resultJson = Utils.parseJson(rawResult);
-            if (!TextUtils.isEmpty(String.valueOf(resultJson)))
-            {
-                try
-                {   if(!resultJson.isNull("code"))
-                    {
-                        final int retCode = resultJson.getInt("code");
-                        if (retCode == HttpConstants.ResponseCode.NORMAL) {
-                            Log.d(TAG, "we have retrieved the data successfully");
-                            JSONObject rawSrcData = resultJson.getJSONObject("result");
-                            JSONArray srcDataList = rawSrcData.getJSONArray("list_data");
-                            final int dataSize = srcDataList.length();
-                            Log.d(TAG, " the data size are : " + dataSize);
-                            int i;
-                            for (i = 0; i < dataSize; ++i) {
-                                JSONObject dataUnit = srcDataList.getJSONObject(i);
-                                Log.d(TAG, "dataUnit we get are : " + dataUnit.toString());
-    //                        String name = String.valueOf(dataUnit.get("username"));
-    //                        String distance = String.valueOf(dataUnit.get("range"));
-    //                        String gender = dataUnit.getString("sex");
-    //                        String userDistrict = dataUnit.getString("district");
-
-                                SearchMateSubFragmentUserBean beanData = new SearchMateSubFragmentUserBean(dataUnit);
-                                Log.d(TAG, " after converted, the bean data are : " + beanData);
-
-                                // TODO: 然后就是把这个解析后的bean文件添加到mUserList
-
-                            }
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else {
-            // TODO: 添加一些容错处理，我们不能使程序在这里直接崩溃，而是添加一些措施，
-            // TODO: 例如提醒用户网络不好，或者用户需要登录之后才能查看最新的数据。或者只是单纯的现实以前加载的数据
-
-
-            return;
-        }
-    }
-
     /**
      * 用于请求首页当中的球友的信息列表
      * 这里不需要任何请求参数
      */
-    private static void retrieveInitialMateInfoList()
+    private static void retrieveInitialMateInfoList(final int startNo, final int endNo)
     {
-        String rawResult = HttpUtil.urlClient(HttpConstants.SearchMate.URL, null, HttpConstants.RequestMethod.GET);
+        if (! Utils.networkAvaiable(sContext))
+        {
+            Toast.makeText(sContext, sContext.getResources().getString(R.string.network_unavailable_hint_info_str), Toast.LENGTH_LONG).show();
+            sUIEventsHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
+            sUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+            return;
+        }
+
+        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
+        requestParams.put("start_no", startNo + "");
+        requestParams.put("end_no", endNo + "");
+
+        String rawResult = HttpUtil.urlClient(HttpConstants.SearchMate.URL, requestParams, HttpConstants.RequestMethod.GET);
+
         Log.d(TAG, " the raw result we get for the mate fragment are : " + rawResult);
         if (! TextUtils.isEmpty(rawResult))
         {
             try
             {
+                // initialObj当中包含的是最原始的JSON data，这个Json对象当中还包含了一些包含我们的请求状态的字段值
+                // 我们还需要从initialObj当中解析出我们真正需要的Json对象
                 JSONObject initialObj = new JSONObject(rawResult);
-
-                final int dataCount = initialObj.getInt("count");
-                JSONArray dataList = initialObj.getJSONArray("list_data");
-                int i;
-                for (i = 0; i < dataCount; ++i)
+                final int statusCode = initialObj.getInt("code");
+                JSONObject resultJson = initialObj.getJSONObject("result");
+                Log.d(TAG, " the initial json object we get are : " + initialObj + " ; and the result are : " + resultJson);
+                if (statusCode == HttpConstants.ResponseCode.NORMAL)
                 {
-                    JSONObject dataObj = (JSONObject) dataList.get(i);
-                    String imgUrl = dataObj.getString("img_url");
-                    // TODO: 这个字段很奇怪，在原型图当中是没有这个字段的。而且也没必要有这个字段。我们需要同服务器端进一步确定一下？？？
-//                    String money = dataObj.getString("money");
+                    Log.d(TAG, " all are ok in for now ");
+                    final int dataCount = resultJson.getInt("count");
+                    Log.d(TAG, " the dataCount we get are : " + dataCount);
+                    JSONArray dataList = resultJson.getJSONArray("list_data");
+                    int i;
+                    for (i = 0; i < dataCount; ++i)
+                    {
+                        JSONObject dataObj = (JSONObject) dataList.get(i);
+                        String imgUrl = dataObj.getString("img_url");
+                        String sex = dataObj.getString("sex");
+                        String userName = dataObj.getString("username");
+                        String userId = dataObj.getString("user_id");
+                        int range = dataObj.getInt("range");
+                        String district = dataObj.getString("district");
+                        SearchMateSubFragmentUserBean mateUserBean = new SearchMateSubFragmentUserBean(userId, imgUrl, userName, SubFragmentsCommonUtils.parseGenderStr(sContext, sex), district, String.valueOf(range));
 
+                        // TODO: 这里有一个不确定的地方，就是我们在向表当中插入数据时，是一次性插入，还是分批插入
+                        // TODO: 还是就是我们获取数据的时候的先后顺序，是先将数据保存到本地，还是直接将从网络上面获取到的数据直接插入？？？？
+                        // TODO: 我们在这里将解析成功的Json data存储到我们创建的MateTable当中
+                        // TODO: 在这里jsonData同MateTable之间的交互过程是通过SearchMateDaoImpl来完成的
+                        // TODO: MateDaoImpl当中直接接受所插入的数据就是SearchMateBean对象
+                        sMateDaoIns.insertMateItem(mateUserBean);
+                        sUserList.add(mateUserBean);
+
+                        // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
+                        sUIEventsHandler.sendEmptyMessage(DATA_RETRIEVE_SUCCESS);
+                        sUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                    }
                 }
 
-                Log.d(TAG, " the initial json object we need to parse are : " + initialObj);
             } catch (JSONException e) {
                 e.printStackTrace();
+                Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
             }
         }
-
     }
+
+    private static final String KEY_REQUEST_RANGE_FILTERED = "keyRequestRangeFiltered";
+    private static final String KEY_REQUEST_GENDER_FILTERED = "keyRequestGenderFiltered";
 
     private static final int START_RETRIEVE_ALL_DATA = 1 << 1;
     private static final int DATA_RETRIEVE_SUCCESS = 1 << 2;
     private static final int DATA_RETRIEVE_FAILED = 1 << 3;
+
     private static final int START_RETRIEVE_DATA_WITH_RANGE_FILTER = 1 << 4;
     private static final int START_RETRIEVE_DATA_WITH_GENDER_FILTER = 1 << 5;
 
-    private static Handler sHandler = new Handler()
+    // 同UI相关的事件的两个消息
+    private static final int SHOW_PROGRESSBAR = 1 << 6;
+    private static final int HIDE_PROGRESSBAR = 1 << 7;
+
+
+    // 这个Handler主要是用于处理UI相关的事件,例如涉及到UI的事件的直接处理，例如Toast或者ProgressBar的显示控制
+    private static Handler sUIEventsHandler = new Handler()
     {
         @Override
         public void handleMessage(Message msg)
         {
-            switch (msg.what) {
-                case START_RETRIEVE_ALL_DATA:
-                    new Thread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            Log.d(TAG, "start retrieving the list info ");
-                            retrieveInitialMateInfoList();
-                        }
-                    }).start();
-                    break;
-                case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
-//                    msg.obj
-                    break;
-                case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
-
-                    break;
+            switch (msg.what)
+            {
                 case DATA_RETRIEVE_FAILED:
-                    Toast.makeText(sContext, "", Toast.LENGTH_LONG).show();
+                    Toast.makeText(sContext, sContext.getResources().getString(R.string.network_unavailable_hint_info_str), Toast.LENGTH_SHORT).show();
                     break;
                 case DATA_RETRIEVE_SUCCESS:
-                    Toast.makeText(sContext, "", Toast.LENGTH_LONG).show();
-                    break;
-            }
 
+                    break;
+                case SHOW_PROGRESSBAR:
+                    showProgress();
+                    Log.d(TAG, " start showing the progress bar ");
+
+                    break;
+                case HIDE_PROGRESSBAR:
+                    sMateListAdapter.notifyDataSetChanged();
+                    hideProgress();
+                    Log.d(TAG, " hiding the progress bar ");
+                    break;
+
+                case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
+                    Bundle genderData = msg.getData();
+                    String gender = genderData.getString(KEY_REQUEST_GENDER_FILTERED);
+                    sWorker.fetchDataWithGenderFiltered(gender);
+
+                    break;
+
+                case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
+                    Bundle rangeData = msg.getData();
+                    String range = rangeData.getString(KEY_REQUEST_RANGE_FILTERED);
+                    sWorker.fetchDataWithRangeFilter(range);
+
+                    break;
+
+            }
         }
     };
 
+    private static void showProgress()
+    {
+        Log.d(TAG, " showing the progress bar ");
+        sPreProgress.setVisibility(View.VISIBLE);
+        sPreTextView.setVisibility(View.VISIBLE);
+    }
 
-    private List<SearchMateSubFragmentUserBean> mUserList = new ArrayList<SearchMateSubFragmentUserBean>();
+    private static void hideProgress()
+    {
+        Log.d(TAG, " hiding the progress bar ");
+        sPreProgress.setVisibility(View.GONE);
+        sPreTextView.setVisibility(View.GONE);
+    }
+
+    private static final String WORKER_NAME = "BackgroundWorker";
+    private static BackgroundWorker sWorker;
+
+    // 这个Handler是真正在后台当中控制所有繁重任务的Handler，包括基本的网络请求和从数据库当中检索数据
+    private static class BackgroundWorker extends HandlerThread
+    {
+        private Handler mBackgroundHandler;
+
+        public BackgroundWorker()
+        {
+            super(WORKER_NAME, Process.THREAD_PRIORITY_BACKGROUND);
+        }
+
+        @Override
+        protected void onLooperPrepared()
+        {
+            super.onLooperPrepared();
+            mBackgroundHandler = new Handler()
+            {
+                @Override
+                public void handleMessage(Message msg)
+                {
+                    switch (msg.what)
+                    {
+                        case START_RETRIEVE_ALL_DATA:
+                            Log.d(TAG, " have received the message to retrieving all the list data  ");
+                            // 开始获取数据，我们首先将我们的ProgressBar显示出来
+                            sUIEventsHandler.sendEmptyMessage(SHOW_PROGRESSBAR);
+                            retrieveInitialMateInfoList(0, 9);
+
+                            break;
+                        case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
+                            Bundle rangeData = msg.getData();
+                            String range = rangeData.getString(KEY_REQUEST_RANGE_FILTERED);
+                            Log.d(TAG, " inside the workThread --> start filtering the mate list based on the range of the current user " + range);
+
+                            sUIEventsHandler.sendEmptyMessage(SHOW_PROGRESSBAR);
+
+                            // TODO: 在这里进行本地的数据库检索操作，将检索到的数据插入到我们的sList当中，然后还需要更新一下
+                            // TODO: list当中的Adapter(一定要注意更新Adapter的操作是只能在MainUIThread当中进行的，
+                            // TODO: 也就是说我们需要经更新Adapter的操作发送给sUIEventsHandler 才可以)
+
+                            sUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                            break;
+                        case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
+                            Bundle genderData = msg.getData();
+                            String gender = genderData.getString(KEY_REQUEST_GENDER_FILTERED);
+                            Log.d(TAG, " inside the wokkThread --> start filtering the mate list based on the gender of the current user " + gender);
+                            sUIEventsHandler.sendEmptyMessage(SHOW_PROGRESSBAR);
+
+
+                            sUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                            break;
+                    }
+                }
+            };
+            fetchAllData();
+        }
+
+        public void fetchAllData()
+        {
+            mBackgroundHandler.sendEmptyMessage(START_RETRIEVE_ALL_DATA);
+        }
+
+        public void fetchDataWithRangeFilter(String range)
+        {
+            Message msg = mBackgroundHandler.obtainMessage(START_RETRIEVE_DATA_WITH_RANGE_FILTER);
+            Bundle data = msg.getData();
+            data.putString(KEY_REQUEST_RANGE_FILTERED, range);
+            msg.setData(data);
+
+            mBackgroundHandler.sendMessage(msg);
+        }
+
+        public void fetchDataWithGenderFiltered(String gender)
+        {
+            Message msg = mBackgroundHandler.obtainMessage(START_RETRIEVE_DATA_WITH_GENDER_FILTER);
+            Bundle data = msg.getData();
+            data.putString(KEY_REQUEST_GENDER_FILTERED, gender);
+            msg.setData(data);
+
+            mBackgroundHandler.sendMessage(msg);
+        }
+
+        public void exit()
+        {
+            mBackgroundHandler.getLooper().quit();
+        }
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        if (null != sWorker)
+        {
+            sWorker.exit();
+        }
+
+
+        super.onDestroy();
+    }
+
 
     // TODO: the following are just for testing
     // TODO: and remove all of them out with the true data we retrieved from RESTful WebService
@@ -351,7 +544,7 @@ public class BilliardsSearchMateFragment extends Fragment
     {
         int i;
         for (i = 0; i < 100; ++i) {
-            mUserList.add(new SearchMateSubFragmentUserBean("", "月夜流沙", "男", "昌平区", "20000米以内"));
+            sUserList.add(new SearchMateSubFragmentUserBean("", "", "月夜流沙", "男", "昌平区", "20000米以内"));
         }
     }
 }

@@ -53,8 +53,6 @@
     </LinearLayout>
 
 
-
-
     <!-- 以下是控制ListView筛选显示的Button组合-->
     <!-- 在SearchActivity当中，RadioButton只是用于添加额外的选项的，不是用于
          展示不同的ListView的，每一个Fragment都只是单独的对应于同一个ListView，
@@ -95,13 +93,16 @@
             />
     </LinearLayout>
 
-    <ListView
+    <com.yueqiu.view.XListView
         android:layout_below="@id/dating_filter_group"
         android:id="@+id/search_dating_subfragment_list"
         style="@style/SearchSubActivityListViewStyle"
-        >
+        ></com.yueqiu.view.XListView>
 
-    </ListView>
-
+    <include
+        layout="@layout/pre_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"/>
 
 </RelativeLayout>

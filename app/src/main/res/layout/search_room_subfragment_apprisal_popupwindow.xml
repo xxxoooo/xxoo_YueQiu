@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+    android:padding="5dp">
+
+    <Button
+        style="@style/PopupWindowTvStyle"
+        android:id="@+id/btn_search_room_apprisal_no_filter"
+        android:text="@string/search_room_filter_no_filter"
+        android:textColor="@color/login_btn_normal"
+        android:padding="5dp"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/login_btn_normal">
+    </View>
+
+    <!--我们将以下的窗口内容从button替换成listView来实现-->
+
+    <ListView
+        android:id="@+id/list_search_room_apprisal_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:dividerHeight="0.5dp"
+        android:divider="@color/devide_line">
+
+    </ListView>
+</LinearLayout>

@@ -240,7 +240,7 @@ public class DatabaseConstant {
 
         public static final String DATING_TABLE_NAME = "dating_table";
 
-        public static final String CREATE_SQL = " CREATE TABLE IF NOT EXISTS"
+        public static final String CREATE_SQL = " CREATE TABLE IF NOT EXISTS "
                 + DATING_TABLE_NAME + " ( "
                 + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " VARCHAR(20) NOT NULL, "
@@ -317,10 +317,15 @@ public class DatabaseConstant {
         public static final String DETAILED_ADDRESS = "detailed_address";
         public static final String ROOM_LEVEL = "room_level"; // 球厅的星级
         public static final String RANGE = "range";
+        // 以下的新增的字段是为球厅详情Activity所存储的(这样可以减少我们进行Http请求的次数，我们仅需请求一次然后保存下来,毕竟本地的数据库获取比网络请求要快很多)
+        public static final String PHONE_NUM = "phone_num";
+        public static final String TAG = "tag";
+        public static final String DETAILED_INFO = "room_info";
+
 
         public static final String ROOM_TABLE_NAME = "room_table";
-        // TODO: 球厅Fragment当中的List暂时还没有确定最终的数据格式
 
+        // TODO: 球厅Fragment当中的List暂时还没有确定最终的数据格式
         public static final String CREATE_SQL = " CREATE TABLE IF NOT EXISTS "
                 + ROOM_TABLE_NAME + " ( "
                 + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT , "
@@ -328,8 +333,11 @@ public class DatabaseConstant {
                 + NAME + " VARCHAR(50) NOT NULL , "
                 + ROOM_URL + " VARCHAR(50) NOT NULL, "
                 + DETAILED_ADDRESS + " VARCHAR(250) NOT NULL, "
-                + ROOM_LEVEL + "VARCHAR(20) NOT NULL, "
-                + RANGE + "VARCHAR(50) NOT NULL); ";
+                + ROOM_LEVEL + " VARCHAR(20) NOT NULL, "
+                + RANGE + " VARCHAR(50) NOT NULL, "
+                + PHONE_NUM + " VARCHAR(60) NOT NULL, "
+                + TAG + " VARCHAR(200) NOT NULL, "
+                + DETAILED_INFO + " VARCHAR(500) NOT NULL); ";
 
         public static final String DROP_SQL = "DROP TABLE IF EXISTS " + ROOM_TABLE_NAME;
 

@@ -75,8 +75,6 @@ public class SearchRoomDaoImpl implements SearchRoomDao
     @Override
     public List<SearchRoomSubFragmentRoomBean> getRoomList(String district, String distance, String price, String level)
     {
-
-
         List<SearchRoomSubFragmentRoomBean> roomList = new ArrayList<SearchRoomSubFragmentRoomBean>();
         String[] allColumns = {
                 DatabaseConstant.SearchRoomTable._ID,
@@ -85,6 +83,8 @@ public class SearchRoomDaoImpl implements SearchRoomDao
                 DatabaseConstant.SearchRoomTable.ROOM_URL,
                 DatabaseConstant.SearchRoomTable.ROOM_LEVEL,
                 DatabaseConstant.SearchRoomTable.RANGE,
+                DatabaseConstant.SearchRoomTable.PHONE_NUM,
+                DatabaseConstant.SearchRoomTable.TAG,
                 DatabaseConstant.SearchRoomTable.DETAILED_ADDRESS
         };
 
@@ -125,6 +125,9 @@ public class SearchRoomDaoImpl implements SearchRoomDao
      * 4. public static final String DETAILED_ADDRESS = "detailed_address";
      * 5. public static final String ROOM_LEVEL = "room_level"; // 球厅的星级
      * 6. public static final String RANGE = "range";
+     * 7. public static final String PHONE_NUM = "phone_num";
+     * 8. public static final String TAG = "tag";
+     * 9. public static final String DETAILED_INFO = "room_info";
      *
      * @param cursor
      *
@@ -138,6 +141,9 @@ public class SearchRoomDaoImpl implements SearchRoomDao
         roomBean.setDetailedAddress(cursor.getString(4));
         roomBean.setLevel(Integer.parseInt(cursor.getString(5)));
         roomBean.setDistance(cursor.getString(6));
+        roomBean.setRoomPhone(cursor.getString(7));
+        roomBean.setRoomTag(cursor.getString(8));
+        roomBean.setDetailedAddress(cursor.getString(9));
 
         return roomBean;
     }

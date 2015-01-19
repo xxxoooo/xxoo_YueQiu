@@ -12,6 +12,7 @@ import org.json.JSONObject;
  */
 public class SearchDatingSubFragmentDatingBean
 {
+    private String mId;
     private String mUserPhoto;
     private String mUserName;
     private String mUserDeclare;
@@ -19,14 +20,25 @@ public class SearchDatingSubFragmentDatingBean
 
     public SearchDatingSubFragmentDatingBean(){}
 
-    public SearchDatingSubFragmentDatingBean(String photo, String name, String declare, String distance)
+    public SearchDatingSubFragmentDatingBean(String id, String photo, String name, String declare, String distance)
     {
+        this.mId = id;
         this.mUserDeclare = declare;
         this.mUserPhoto = photo;
         this.mUserDistance = distance;
         this.mUserName = name;
     }
 
+
+    public String getId()
+    {
+        return mId;
+    }
+
+    public void setId(String id)
+    {
+        this.mId = id;
+    }
 
     public String getUserPhoto()
     {
@@ -69,9 +81,9 @@ public class SearchDatingSubFragmentDatingBean
     }
 
 
-    private static final String JSON_USER_ID = "user_id";
+    private static final String JSON_USER_ID = "id";
     private static final String JSON_USERNAME = "username";
-    private static final String JSON_CONTENT = "content";
+    private static final String JSON_CONTENT = "title";
     private static final String JSON_RANGE = "range";
     private static final String JSON_IMG_URL = "img_url";
 
@@ -88,12 +100,13 @@ public class SearchDatingSubFragmentDatingBean
 
     public SearchDatingSubFragmentDatingBean parseJson(JSONObject jsonObject) throws JSONException
     {
+        mId = String.valueOf(jsonObject.get(JSON_USER_ID));
         mUserPhoto = String.valueOf(jsonObject.get(JSON_IMG_URL));
         mUserName = String.valueOf(jsonObject.get(JSON_USERNAME));
         mUserDeclare = String.valueOf(jsonObject.get(JSON_CONTENT));
         mUserDistance = String.valueOf(jsonObject.get(JSON_RANGE));
 
-        return new SearchDatingSubFragmentDatingBean(mUserPhoto, mUserName, mUserDeclare, mUserDistance);
+        return new SearchDatingSubFragmentDatingBean(mId, mUserPhoto, mUserName, mUserDeclare, mUserDistance);
     }
 
 

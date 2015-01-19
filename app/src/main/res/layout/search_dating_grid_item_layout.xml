@@ -6,7 +6,7 @@
     android:padding="5dp">
 
     <!--用于约球详细Activity当中的GridView当中的item的布局文件-->
-    <ImageView
+    <com.android.volley.toolbox.NetworkImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/default_head"

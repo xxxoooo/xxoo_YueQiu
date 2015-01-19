@@ -57,8 +57,6 @@
     </LinearLayout>
 
 
-
-
     <!--用于SearchActivity当中的助教子Fragment的布局文件-->
     <LinearLayout
         android:layout_below="@id/assistcoauch_gallery_view_pager_zone"
@@ -134,11 +132,19 @@
             android:text="@string/search_assistcaouch_subfragment_title_level"/>
     </LinearLayout>
 
-    <ListView
+    <com.yueqiu.view.XListView
         android:layout_below="@id/assistcoauch_filter_group"
         style="@style/SearchSubActivityListViewStyle"
         android:id="@+id/search_assistcoauch_subfragment_listview">
 
-    </ListView>
+    </com.yueqiu.view.XListView>
+
+    <include
+        layout="@layout/pre_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        ></include>
+
 
 </RelativeLayout>
