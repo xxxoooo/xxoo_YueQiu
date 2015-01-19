@@ -36,6 +36,8 @@ public class HttpConstants
         public static final String TOKEN = "token";
     }
 
+
+
     /**
      * 用户注册请求参数
      * 发送Post请求
@@ -48,6 +50,14 @@ public class HttpConstants
          * 接口
          */
         public static final String URL = "/user/register";
+
+        public static final String CODEURL = "/user/sendCode";
+
+
+        public static final String ACTION_TYPE = "action_type";
+
+        public static final String VERFICATION_CODE = "verfication_code";
+
         /*
          * 账号
          */
@@ -319,6 +329,21 @@ public class HttpConstants
         public static final String GETDETAIL = "/play/deatil";
     }
 
+    /**
+     * 发表话题
+     */
+    public static class GroupIssue{
+
+        public static final String URL = "/cricle/publish";
+
+        public static final String TYPE     = "type";
+
+        public static final String USER_ID  = "user_id";
+
+        public static final String TITLE    = "title";
+
+        public static final String CONTENT  = "content";
+    }
 
     /**
      * Json 状态码

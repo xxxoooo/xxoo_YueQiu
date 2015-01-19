@@ -204,6 +204,11 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             switch (msg.what) {
                 case DATA_ERROR:
                     Log.i(TAG, "error to get profile from service");
+                    if(null == msg.obj){
+                        Utils.showToast(MyProfileActivity.this,getString(R.string.http_request_error));
+                    }else{
+                        Utils.showToast(MyProfileActivity.this, (String) msg.obj);
+                    }
                     mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
                     updateUI(mUserInfo);
                     break;

@@ -404,6 +404,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                             intent.setClass(BilliardSearchActivity.this,MyProfileActivity.class);
                         }
                         startActivity(intent);
+                        overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
                         break;
                     case 1:
                         if(checkUserId()) {

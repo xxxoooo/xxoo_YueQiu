@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.yueqiu.R;
+import com.yueqiu.constant.HttpConstants;
 
 /**
  * Created by yinfeng on 15/1/3.
@@ -32,7 +33,7 @@ public class ActivitySelectSex extends Activity implements View.OnClickListener{
         initView();
         initActionBar();
         mIntent = getIntent();
-        mSex = mIntent.getIntExtra("sex",0);
+        mSex = mIntent.getIntExtra(HttpConstants.RegisterConstant.SEX,0);
         Log.i(TAG,String.valueOf(mSex));
         if(mSex == 0)
         {
@@ -69,7 +70,7 @@ public class ActivitySelectSex extends Activity implements View.OnClickListener{
         switch (item.getItemId()) {
             case android.R.id.home:
                 mIntent = new Intent();
-                mIntent.putExtra("sex", mSex);
+                mIntent.putExtra(HttpConstants.RegisterConstant.SEX, mSex);
                 setResult(RESULT_OK, mIntent);
                 finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
@@ -84,10 +85,10 @@ public class ActivitySelectSex extends Activity implements View.OnClickListener{
         switch (v.getId())
         {
             case R.id.activity_select_man:
-                mIntent.putExtra("sex", 0);
+                mIntent.putExtra(HttpConstants.RegisterConstant.SEX, 0);
                 break;
             case R.id.activity_select_woman:
-                mIntent.putExtra("sex", 1);
+                mIntent.putExtra(HttpConstants.RegisterConstant.SEX, 1);
                 break;
         }
 
@@ -100,7 +101,7 @@ public class ActivitySelectSex extends Activity implements View.OnClickListener{
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 mIntent = new Intent();
-                mIntent.putExtra("sex", mSex);
+                mIntent.putExtra(HttpConstants.RegisterConstant.SEX, mSex);
                 setResult(RESULT_OK, mIntent);
                 finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);

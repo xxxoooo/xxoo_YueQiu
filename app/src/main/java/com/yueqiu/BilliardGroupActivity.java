@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -49,7 +50,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         };
     }
 
-    public class SectionPagerAdapter extends FragmentPagerAdapter{
+    public class SectionPagerAdapter extends FragmentStatePagerAdapter {
 
         public SectionPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -58,8 +59,11 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         @Override
         public Fragment getItem(int i) {
 
-            Fragment mFragment = new BilliardGroupBasicFragment();
-            return mFragment;
+            Fragment fragment = new BilliardGroupBasicFragment();
+            Bundle args = new Bundle();
+            args.putInt("type",i+1);
+            fragment.setArguments(args);
+            return fragment;
         }
 
         @Override

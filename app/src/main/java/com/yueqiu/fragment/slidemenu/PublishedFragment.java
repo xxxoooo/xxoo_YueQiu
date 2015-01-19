@@ -432,7 +432,6 @@ public class PublishedFragment extends Fragment {
                 mActionModeTitle.setText(mActivity.getString(R.string.published_action_mode_title));
             }
             mode.setCustomView(mCustomActionBarView);
-            Log.d("wy","dadas");
             return true;
         }
 

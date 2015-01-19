@@ -44,6 +44,8 @@
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:textSize="15sp"
+                android:background="@drawable/basic_textview_bg"
+                android:id="@+id/tv_register_getchecknum"
                 android:layout_marginRight="13dp"
                 style="@style/ListItemTvStyle" />
             </RelativeLayout>
@@ -60,10 +62,10 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@null"
-            android:password="true"
             android:drawableLeft="@drawable/code_icon"
             android:drawablePadding="10dp"
             android:hint="@string/check_num"
+            android:phoneNumber="true"
             android:digits="@string/inputtype"
             android:textColorHint="@color/edit_text_hint_color"
             android:textColor="@color/md__defaultBackground"

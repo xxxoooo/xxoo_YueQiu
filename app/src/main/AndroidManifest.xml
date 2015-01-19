@@ -142,7 +142,20 @@
             android:parentActivityName=".BilliardGroupActivity"
             android:screenOrientation="portrait" >
         </activity>
-
+        <activity
+            android:name=".activity.CheckNumActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.Register1Activity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.ArticleReadActivity"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <data android:scheme="file"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
