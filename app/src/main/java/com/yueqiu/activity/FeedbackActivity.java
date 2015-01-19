@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -66,8 +67,20 @@ public class FeedbackActivity extends Activity
         switch(id){
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
                 break;
         }
         return true;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

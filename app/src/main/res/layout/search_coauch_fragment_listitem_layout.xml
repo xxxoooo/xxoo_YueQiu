@@ -31,7 +31,7 @@
     <TextView
         style="@style/TimeTextStyle"
         android:id="@+id/tv_coauch_subfragment_listitem_gender"
-        android:text="@string/search_mate_subfragment_title_gender"
+        android:text="@string/gender"
         android:textSize="14sp"
         android:drawableRight="@drawable/male"
         android:drawablePadding="3dp"

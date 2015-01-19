@@ -43,9 +43,9 @@
 
                         <TextView
                             android:id="@+id/tv_detail_username"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            style="@style/ListItemTvStyle"
                             android:layout_marginLeft="5dp"
+                            android:textSize="18sp"
                             android:text="温柔的雨" />
 
                         <LinearLayout
@@ -55,20 +55,18 @@
 
                             <TextView
                                 android:id="@+id/tv_detail_sex"
-                                style="@style/ListItemTvStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                style="@style/TimeTextStyle"
                                 android:layout_marginLeft="5dp"
-
+                                android:padding="4dp"
+                                android:textSize="14sp"
                                 android:background="@drawable/textview_withdrawable_bg"
                                 android:drawableRight="@drawable/male"
                                 android:text="@string/man" />
 
                             <TextView
                                 android:id="@+id/tv_detail_looknum"
-                                style="@style/ListItemTvStyle"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                style="@style/TimeTextStyle"
+                                android:textSize="14sp"
                                 android:layout_marginLeft="5dp"
                                 android:drawableLeft="@drawable/reading"
                                 android:text="210" />
@@ -86,16 +84,12 @@
 
                         <TextView
                             android:id="@+id/tv_detail_date"
-                            style="@style/ListItemTvStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            style="@style/TimeTextStyle"
                             android:text="12-20" />
 
                         <TextView
                             android:id="@+id/tv_detail_time"
-                            style="@style/ListItemTvStyle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            style="@style/TimeTextStyle"
                             android:layout_marginLeft="10dp"
                             android:text="21 : 20" />
                     </LinearLayout>
@@ -111,6 +105,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="8"
                     android:orientation="vertical">
+                    <TextView
+                        android:textSize="18sp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="5dp"
+                        android:id="@+id/tv_detail_title"
+                        style="@style/ListItemTvStyle"
+                        android:text="xxx台球厅周年会员比赛"
+                        android:layout_width="match_parent"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -118,35 +120,18 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
-                            android:id="@+id/tv_detail_title"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="xxx台球厅周年会员比赛" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:textSize="20sp"
-                            android:layout_marginLeft="10dp"
-                            android:layout_marginTop="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            style="@style/ListItemTvStyle"
                             android:text="@string/activities_type" />
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
                             android:id="@+id/tv_detail_type"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            style="@style/ListItemTvStyle" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -155,21 +140,19 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            style="@style/ListItemTvStyle"
                             android:text="@string/activities_site" />
 
                         <TextView
 
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
                             android:id="@+id/tv_detail_site"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            style="@style/ListItemTvStyle" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -178,20 +161,18 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            style="@style/ListItemTvStyle"
                             android:text="@string/activities_start_time" />
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
                             android:id="@+id/tv_detail_begin_time"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            style="@style/ListItemTvStyle" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -200,20 +181,18 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            style="@style/ListItemTvStyle"
                             android:text="@string/activities_end_time" />
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
                             android:id="@+id/tv_detail_end_time"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            style="@style/ListItemTvStyle" />
                     </LinearLayout>
 
 
@@ -223,20 +202,18 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            style="@style/ListItemTvStyle"
                             android:text="@string/activities_charge_module" />
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
                             android:id="@+id/tv_detail_model"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            style="@style/ListItemTvStyle" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -245,20 +222,18 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/contact" />
+                            style="@style/ListItemTvStyle"
+                            android:text="@string/btn_liaoba_contact" />
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
                             android:id="@+id/tv_detail_contact"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            style="@style/ListItemTvStyle" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -267,20 +242,18 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            style="@style/ListItemTvStyle"
                             android:text="@string/activities_phone" />
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
                             android:id="@+id/tv_detail_phone"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            style="@style/ListItemTvStyle" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -289,20 +262,18 @@
                         android:orientation="horizontal">
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            style="@style/ListItemTvStyle"
                             android:text="@string/activity_illustration" />
 
                         <TextView
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:layout_marginLeft="10dp"
                             android:layout_marginTop="5dp"
                             android:id="@+id/tv_detail_info"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            style="@style/ListItemTvStyle" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -311,20 +282,15 @@
                         android:orientation="horizontal"></LinearLayout>
                 </LinearLayout>
 
-                <LinearLayout
+                <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/ListItemTvStyle"
+                    android:text="@string/search_dating_detailed_tv_already_in"
+                    android:textSize="18sp"
                     android:layout_weight="0.5"
                     android:background="@color/devide_line"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:text="@string/search_dating_detailed_tv_already_in"
-                        android:textSize="15sp" />
-                </LinearLayout>
+                    android:gravity="center_vertical"
+                    android:paddingLeft="10dp"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -337,7 +303,6 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
                         android:layout_marginRight="10dp"
-
                         android:layout_marginTop="5dp"
                         android:gravity="bottom"
                         android:orientation="horizontal">
@@ -372,10 +337,9 @@
             <TextView
                 android:id="@+id/detail_error"
                 android:text="暂无数据"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:layout_centerInParent="true"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                style="@style/ListItemTvStyle" />
         </RelativeLayout>
     </FrameLayout>
 

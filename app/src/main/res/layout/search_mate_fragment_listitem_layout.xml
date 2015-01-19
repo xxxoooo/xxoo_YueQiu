@@ -39,7 +39,7 @@
         android:id="@+id/tv_mate_subfragment_listitem_gender"
         android:background="@drawable/textview_withdrawable_bg"
         android:layout_alignBottom="@+id/img_mate_subfragment_listitem_photo"
-        android:text="@string/search_mate_popupmenu_item_male_str"
+        android:text="@string/man"
         android:textSize="14sp"
         android:layout_toRightOf="@id/img_mate_subfragment_listitem_photo"
         android:drawableRight="@drawable/male"

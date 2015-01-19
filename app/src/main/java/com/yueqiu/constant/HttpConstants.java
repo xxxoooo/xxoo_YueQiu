@@ -372,9 +372,9 @@ public class HttpConstants
          */
         public static final int a8 = 1009;
         /*
-        *
+        * 向网络请求时，发生错误，JSON转化发生异常
         */
-        public static final int RESULT_NULL = 1010;
+        public static final int REQUEST_ERROR = 1010;
         /*
          * 请求超时
          */

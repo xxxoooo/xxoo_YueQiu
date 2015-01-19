@@ -10,9 +10,12 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.ActionMode;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -35,9 +38,10 @@ import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.PublishedDao;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
-import com.yueqiu.view.XListView;
 import com.yueqiu.view.YueQiuDialogBuilder;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
+import com.yueqiu.view.pullrefresh.PullToRefreshBase;
+import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,11 +56,12 @@ import java.util.Map;
 /**
  * Created by wangyun on 15/1/15.
  */
-public class PublishedFragment extends Fragment implements XListView.IXListViewListener{
+public class PublishedFragment extends Fragment {
     private View mView;
-    private XListView mListView;
+    private PullToRefreshListView mPullToRefreshListView;
+    private ListView mListView;
     private ProgressBar mPreProgress;
-    private TextView mEmptyView,mPreText;
+    private TextView mPreText;
     private Drawable mProgressDrawable;
     private PublishedBasicAdapter mAdapter;
     private int mPublishedType;
@@ -113,12 +118,14 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
     }
 
     private void initView(){
-        mListView = (XListView) mView.findViewById(R.id.favor_basic_listView);
-        mListView.setPullLoadEnable(true);
-        mListView.setXListViewListener(this);
+        mPullToRefreshListView = (PullToRefreshListView) mView.findViewById(R.id.favor_basic_listView);
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
+        mPullToRefreshListView.setOnRefreshListener(onRefreshListener);
+        mListView = mPullToRefreshListView.getRefreshableView();
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListView.setMultiChoiceModeListener(new ActionModeCallback());
-        mEmptyView = (TextView) mView.findViewById(R.id.favor_is_empty);
+
+
         mPreText = (TextView) mView.findViewById(R.id.pre_text);
         mPreProgress = (ProgressBar) mView.findViewById(R.id.pre_progress);
 
@@ -140,19 +147,16 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
                 break;
 
         }
-        mEmptyView.setText(getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
     }
 
     private void setEmptyViewVisible(){
-        mListView.setPullLoadEnable(false);
-        mListView.setDividerHeight(0);
-        mEmptyView.setVisibility(View.VISIBLE);
-    }
-    private void setEmptyViewGone(){
-        int dividerHeight = Utils.dip2px(mActivity,1.5f);
-        mListView.setDividerHeight(dividerHeight);
-        mListView.setPullLoadEnable(true);
-        mEmptyView.setVisibility(View.GONE);
+
+        TextView emptyView = new TextView(mActivity);
+        emptyView.setGravity(Gravity.CENTER);
+        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
+        emptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
+        emptyView.setText(getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+        mPullToRefreshListView.setEmptyView(emptyView);
     }
     private void requestPublished(){
         mParamsMap.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
@@ -210,8 +214,6 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
                     mAfterCount = mList.size();
                     if(mList.isEmpty()){
                         setEmptyViewVisible();
-                    }else{
-                        setEmptyViewGone();
                     }
                     break;
                 case PublicConstant.NO_RESULT:
@@ -219,20 +221,22 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
                         setEmptyViewVisible();
                     }else{
                         if(mLoadMore)
-                            Toast.makeText(mActivity, getString(R.string.no_more_info, mEmptyTypeStr), Toast.LENGTH_SHORT).show();
+                            Utils.showToast(mActivity,getString(R.string.no_more_info, mEmptyTypeStr));
                     }
                     break;
                 case PublicConstant.REQUEST_ERROR:
-                    Toast.makeText(mActivity, getString(R.string.http_request_error), Toast.LENGTH_SHORT).show();
+                    if(null == msg.obj){
+                       Utils.showToast(mActivity,getString(R.string.http_request_error));
+                    }else{
+                       Utils.showToast(mActivity, (String) msg.obj);
+                    }
                     if(mList.isEmpty()) {
-                        mEmptyView.setText(getString(R.string.no_published_info));
                         setEmptyViewVisible();
                     }
                     break;
                 case PublicConstant.TIME_OUT:
-                    Toast.makeText(mActivity,getString(R.string.http_request_time_out),Toast.LENGTH_SHORT).show();
+                    Utils.showToast(mActivity,getString(R.string.http_request_time_out));
                     if(mList.isEmpty()) {
-                        mEmptyView.setText(getString(R.string.no_published_info));
                         setEmptyViewVisible();
                     }
                     break;
@@ -266,11 +270,8 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
             super.onPostExecute(jsonResult);
             mPreProgress.setVisibility(View.GONE);
             mPreText.setVisibility(View.GONE);
-            if(mLoadMore || mRefresh){
-                mListView.stopRefresh();
-                mListView.stopLoadMore();
-                mListView.setRefreshTime("刚刚");
-            }
+
+            mPullToRefreshListView.onRefreshComplete();
             try {
                 if(!jsonResult.isNull("code")) {
                     if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
@@ -282,9 +283,6 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
                             mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                         }
                     }
-                    else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.RESULT_NULL){
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonResult.getString("msg")).sendToTarget();
-                    }
                     else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
                         mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
                     }
@@ -292,7 +290,7 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
                         mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                     }
                     else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonResult.getString("msg")).sendToTarget();
                     }
                 }else{
                     mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
@@ -330,11 +328,19 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
         return published;
     }
 
-    @Override
-    public void onRefresh() {
-        mHandler.postDelayed(new Runnable() {
+
+    private PullToRefreshBase.OnRefreshListener2<ListView> onRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>() {
+        @Override
+        public void onPullDownToRefresh( PullToRefreshBase<ListView> refreshView) {
+            String label = DateUtils.formatDateTime(mActivity, System.currentTimeMillis(),
+                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
+
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+
+            new Thread(new Runnable() {
             @Override
             public void run() {
+
                 if(Utils.networkAvaiable(mActivity)){
                     mRefresh = true;
                     mLoadMore = false;
@@ -342,18 +348,19 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
                     mParamsMap.put(HttpConstants.Published.END_NO, 9);
                     requestPublished();
                 }else{
-                    mListView.stopRefresh();
-                    mListView.stopLoadMore();
-                    mListView.setRefreshTime("刚刚");
                     Toast.makeText(mActivity,getString(R.string.network_not_available),Toast.LENGTH_SHORT).show();
                 }
             }
-        },1500);
-    }
+        }).start();
+        }
 
-    @Override
-    public void onLoadMore() {
-        mHandler.postDelayed(new Runnable() {
+        @Override
+        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
+            String label = DateUtils.formatDateTime(mActivity, System.currentTimeMillis(),
+                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
+
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+            mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 mLoadMore = true;
@@ -370,9 +377,7 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
                     mParamsMap.put(HttpConstants.Published.END_NO, end_no);
                     requestPublished();
                 }else{
-                    mListView.stopRefresh();
-                    mListView.stopLoadMore();
-                    mListView.setRefreshTime("刚刚");
+
                     PublishedInfo info = mPublishedDao.getPublishedInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()),mPublishedType,start_no,end_no+1);
                     if(!info.mList.isEmpty()) {
                         mHandler.obtainMessage(PublicConstant.GET_SUCCESS, info).sendToTarget();
@@ -381,9 +386,9 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
                     }
                 }
             }
-        }, 1500);
-
-    }
+        }, 1000);
+        }
+    };
 
     @Override
     public void onDestroyView() {
@@ -410,6 +415,7 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
             itemInfo.setChecked(checked);
             mAdapter.notifyDataSetChanged();
 
+
         }
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -426,7 +432,7 @@ public class PublishedFragment extends Fragment implements XListView.IXListViewL
                 mActionModeTitle.setText(mActivity.getString(R.string.published_action_mode_title));
             }
             mode.setCustomView(mCustomActionBarView);
-
+            Log.d("wy","dadas");
             return true;
         }
 

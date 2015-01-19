@@ -1,4 +1,4 @@
-package com.yueqiu.fragment.search;
+package com.yueqiu.fragment.nearby;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -25,7 +24,7 @@ import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.adapter.SearchRoomSubFragmentListAdapter;
 import com.yueqiu.bean.SearchRoomSubFragmentRoomBean;
 import com.yueqiu.constant.HttpConstants;
-import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
+import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 
 import org.json.JSONArray;
@@ -180,6 +179,7 @@ public class BilliardsSearchRoomFragment extends Fragment
                     TextView noFilter = (Button) regionPopupView.findViewById(R.id.btn_search_room_popup_no_filter);
                     ListView regionList = (ListView) regionPopupView.findViewById(R.id.list_search_room_region_filter_list);
                     regionList.setAdapter(new SearchPopupBaseAdapter(sContext, Arrays.asList(regionStrList)));
+
 
                     mPopupWindow = SubFragmentsCommonUtils.getFilterPopupWindow(sContext, sBtnDistrict, regionPopupView);
 

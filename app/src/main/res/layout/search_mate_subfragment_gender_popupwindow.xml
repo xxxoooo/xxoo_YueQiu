@@ -9,7 +9,7 @@
     <Button
         style="@style/PopupWindowTvStyle"
         android:id="@+id/search_room_popupwindow_nofilter"
-        android:text="@string/search_mate_subfragment_title_gender"
+        android:text="@string/gender"
         android:padding="5dp"
         android:textColor="@color/login_btn_normal"
         />
@@ -23,7 +23,7 @@
     <Button
         style="@style/PopupWindowTvStyle"
         android:id="@+id/search_mate_popupwindow_male"
-        android:text="@string/search_mate_popupmenu_item_male_str"
+        android:text="@string/man"
         android:layout_margin="2dp"
         android:textColor="@color/md__defaultBackground"
         />
@@ -37,7 +37,7 @@
     <Button
         style="@style/PopupWindowTvStyle"
         android:id="@+id/search_mate_popupwindow_female"
-        android:text="@string/search_mate_popupmenu_item_female_str"
+        android:text="@string/man"
         android:layout_margin="2dp"
         android:textColor="@color/md__defaultBackground"
         />

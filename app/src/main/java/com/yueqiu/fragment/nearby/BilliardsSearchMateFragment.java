@@ -1,4 +1,4 @@
-package com.yueqiu.fragment.search;
+package com.yueqiu.fragment.nearby;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -6,28 +6,22 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.yueqiu.R;
-import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
 import com.yueqiu.adapter.SearchMateSubFragmentListAdapter;
 import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
-import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
+import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 

@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.yueqiu.R;
 import com.yueqiu.bean.Activities;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.ActivitiesDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.HttpUtil;
@@ -49,47 +50,45 @@ public class ActivitiesDetail extends Activity {
     private ImageView mIv;
     private int mId;
     private ActivitiesDao mDao;
-    private static final int GET_DATA_ERROR = 0x00;
-    private static final int GET_DATA_SUCCESS = 0x01;
     private LinearLayout mLinearLayout;
     private ProgressBar mPb;
     private Drawable mProgressDrawable;
     private String mCreateTime;
-    private TextView mgetDataError;
+    private TextView mGetDataError;
     private Handler handler = new Handler() {
 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case GET_DATA_ERROR:
-                    mgetDataError.setVisibility(View.VISIBLE);
+                case PublicConstant.NO_RESULT:
+                    mGetDataError.setVisibility(View.VISIBLE);
                     mPb.setVisibility(View.GONE);
                     break;
-                case GET_DATA_SUCCESS:
+                case PublicConstant.GET_SUCCESS:
                     Activities activities = ((Activities) msg.obj);
                     if(activities.getType().equals("1"))
                     {
-                        mType.setText("群活动");
+                        mType.setText(getString(R.string.group_activity));
                     }else if(activities.getType().equals("2"))
                     {
-                        mType.setText("球星汇");
+                        mType.setText(getString(R.string.star_meet));
                     }
                     else if(activities.getType().equals("3"))
                     {
-                        mType.setText("台球展");
+                        mType.setText(getString(R.string.billiard_show));
                     }
                     else if(activities.getType().equals("4"))
                     {
-                        mType.setText("赛事");
+                        mType.setText(getString(R.string.complete));
                     }else
                     {
-                        mType.setText("其它");
+                        mType.setText(getString(R.string.billiard_other));
                     }
 
                     mTitle.setText(activities.getTitle());
                     mSite.setText(activities.getAddress());
-                    mSex.setText(Integer.valueOf(activities.getSex()) == 1 ? "男" : "女");
+                    mSex.setText(Integer.valueOf(activities.getSex()) == 1 ? getString(R.string.man) : getString(R.string.woman));
                     mBeginTime.setText(activities.getBegin_time());
                     mEndTime.setText(activities.getEnd_time());
                     mInfo.setText(activities.getContent());
@@ -98,13 +97,13 @@ public class ActivitiesDetail extends Activity {
                     mUserName.setText(activities.getUsername());
                     if(activities.getModel().equals("1"))
                     {
-                        mModel.setText("免费");
+                        mModel.setText(getString(R.string.search_dating_detailed_model_1));
                     }else if(activities.getModel().equals("2"))
                     {
-                        mModel.setText("收费");
+                        mModel.setText(getString(R.string.search_dating_detailed_model_2));
                     }else
                     {
-                        mModel.setText("AA");
+                        mModel.setText(getString(R.string.search_dating_detailed_model_3));
                     }
                     String [] when = mCreateTime.split(" ");
                     String date = when[0].substring(5, when[0].length()).toString();
@@ -117,7 +116,17 @@ public class ActivitiesDetail extends Activity {
 //                        mIv.setImageBitmap(bitmapFromInternet(activities.getImg_url()));
 //                    }
                     mPb.setVisibility(View.GONE);
-                    mgetDataError.setVisibility(View.GONE);
+                    mGetDataError.setVisibility(View.GONE);
+                    break;
+                case PublicConstant.REQUEST_ERROR:
+                    mGetDataError.setText(getString(R.string.no_data));
+                    mGetDataError.setVisibility(View.VISIBLE);
+                    mPb.setVisibility(View.GONE);
+                    break;
+                case PublicConstant.TIME_OUT:
+                    mGetDataError.setText(getString(R.string.http_request_time_out));
+                    mGetDataError.setVisibility(View.VISIBLE);
+                    mPb.setVisibility(View.GONE);
                     break;
             }
         }
@@ -166,20 +175,32 @@ public class ActivitiesDetail extends Activity {
                     map, HttpConstants.RequestMethod.GET);
 
             JSONObject object = Utils.parseJson(retStr);
+            Message msg = new Message();
             try {
-                Message msg = new Message();
-                if (object.getInt("code") != 1001) {
-                    msg.what = GET_DATA_ERROR;
-                } else {
-                    JSONObject activitiesObject = object.getJSONObject("result");
-
-                    Activities activities = Utils.mapingObject(Activities.class, activitiesObject);
-                    msg.obj = activities;
-                    activities.setCreate_time(mCreateTime);
-                    msg.what = GET_DATA_SUCCESS;
-                    mDao.updateActivities(activities);
+                if(!object.isNull("code")) {
+                    if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                        JSONObject activitiesObject = object.getJSONObject("result");
+                        if(activitiesObject != null) {
+                            Activities activities = Utils.mapingObject(Activities.class, activitiesObject);
+                            msg.obj = activities;
+                            activities.setCreate_time(mCreateTime);
+                            msg.what = PublicConstant.GET_SUCCESS;
+                            mDao.updateActivities(activities);
+                        }else{
+                            msg.what = PublicConstant.NO_RESULT;
+                        }
+                    }else if (object.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                        msg.what = PublicConstant.NO_RESULT;
+                    }else if (object.getInt("code") == HttpConstants.ResponseCode.REQUEST_ERROR){
+                        msg.what = PublicConstant.REQUEST_ERROR;
+                    }else if (object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                        msg.what = PublicConstant.TIME_OUT;
+                    }else{
+                        msg.what = PublicConstant.REQUEST_ERROR;
+                    }
+                }else{
+                    msg.what = PublicConstant.REQUEST_ERROR;
                 }
-
                 handler.sendMessage(msg);
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -194,9 +215,9 @@ public class ActivitiesDetail extends Activity {
             Activities activities = mDao.getActivities(mId);
             Message msg = new Message();
             if (null == activities || activities.getModel() == null) {
-                msg.what = GET_DATA_ERROR;
+                msg.what = PublicConstant.NO_RESULT;
             } else {
-                msg.what = GET_DATA_SUCCESS;
+                msg.what = PublicConstant.GET_SUCCESS;
                 msg.obj = activities;
             }
             handler.sendMessage(msg);
@@ -222,8 +243,8 @@ public class ActivitiesDetail extends Activity {
         mLinearLayout = (LinearLayout) findViewById(R.id.detail_ll);
         mLinearLayout.setVisibility(View.GONE);
         mPb = (ProgressBar) findViewById(R.id.pb_detail);
-        mgetDataError = (TextView) findViewById(R.id.detail_error);
-        mgetDataError.setVisibility(View.INVISIBLE);
+        mGetDataError = (TextView) findViewById(R.id.detail_error);
+        mGetDataError.setVisibility(View.INVISIBLE);
         mPb.setVisibility(View.VISIBLE);
         mProgressDrawable = new FoldingCirclesDrawable.Builder(ActivitiesDetail.this).build();
         Rect bounds = mPb.getIndeterminateDrawable().getBounds();

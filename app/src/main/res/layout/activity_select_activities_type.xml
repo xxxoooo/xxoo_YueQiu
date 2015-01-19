@@ -15,7 +15,7 @@
         <TextView
             style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
-            android:text="@string/groupactivity"
+            android:text="@string/group_activity"
             android:textSize="18sp" />
         <ImageView
             android:visibility="gone"
@@ -42,7 +42,7 @@
         <TextView
             style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
-            android:text="@string/meetstar"
+            android:text="@string/meet_star"
             android:textSize="18sp" />
         <ImageView
             android:visibility="gone"
@@ -70,7 +70,7 @@
             style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
             android:gravity="center_vertical"
-            android:text="@string/taiqiuzhan"
+            android:text="@string/billiard_show"
             android:textSize="18sp" />
         <ImageView
             android:visibility="gone"

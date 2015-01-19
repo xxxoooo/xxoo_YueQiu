@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 
 import com.yueqiu.R;
@@ -66,6 +67,7 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
         switch (id) {
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
                 break;
         }
         return true;
@@ -118,4 +120,14 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
         }
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 }

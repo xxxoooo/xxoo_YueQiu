@@ -5,11 +5,11 @@
     android:orientation="vertical"
     android:background="@android:color/white">
 
-    <com.yueqiu.view.XListView
+    <com.yueqiu.view.pullrefresh.PullToRefreshListView
         android:id="@+id/activity_activities_lv"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </com.yueqiu.view.XListView>
+    </com.yueqiu.view.pullrefresh.PullToRefreshListView>
 
     <ProgressBar
         android:layout_width="wrap_content"

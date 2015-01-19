@@ -35,7 +35,7 @@
                 android:inputType="number"
                 android:drawableLeft="@drawable/phone_icon"
                 android:drawablePadding="10dp"
-                android:hint="@string/phonenum"
+                android:hint="@string/phone_num"
                 android:textColorHint="@color/edit_text_hint_color"
                 android:textColor="@color/md__defaultBackground"
                 android:singleLine="true" />
@@ -63,7 +63,7 @@
             android:password="true"
             android:drawableLeft="@drawable/code_icon"
             android:drawablePadding="10dp"
-            android:hint="@string/checknum"
+            android:hint="@string/check_num"
             android:digits="@string/inputtype"
             android:textColorHint="@color/edit_text_hint_color"
             android:textColor="@color/md__defaultBackground"

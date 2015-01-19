@@ -1,11 +1,9 @@
-package com.yueqiu.fragment.search.common;
+package com.yueqiu.fragment.nearby.common;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,8 +14,6 @@ import com.yueqiu.R;
 import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.HttpUtil;
-
-import java.awt.font.TextAttribute;
 
 /**
  * Created by scguo on 15/1/4.

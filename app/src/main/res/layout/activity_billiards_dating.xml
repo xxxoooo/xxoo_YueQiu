@@ -44,7 +44,7 @@
             android:id="@+id/tv_search_dating_detail_gender"
             android:background="@drawable/textview_withdrawable_bg"
             android:layout_below="@id/tv_search_dating_detail_nickname"
-            android:text="@string/search_mate_popupmenu_item_male_str"
+            android:text="@string/man"
             android:layout_toRightOf="@id/img_search_dating_detail_photo"
             android:drawableRight="@drawable/male"
             android:drawablePadding="3dp"

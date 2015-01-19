@@ -58,19 +58,22 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private String mPwd;
     private UserDao mUserDao;
 
-    private static final int LOGIN_SUCCESS = 0x01;
-    private static final int LOGIN_ERROR = 0x02;
 
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case LOGIN_ERROR:
-                    Toast.makeText(LoginActivity.this, msg.obj.toString(),
-                            Toast.LENGTH_SHORT).show();
+                case PublicConstant.REQUEST_ERROR:
+                    if(msg.obj == null){
+                        Toast.makeText(LoginActivity.this, getString(R.string.http_request_error),
+                                Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(LoginActivity.this, msg.obj.toString(),
+                                Toast.LENGTH_SHORT).show();
+                    }
                     break;
-                case LOGIN_SUCCESS:
+                case PublicConstant.GET_SUCCESS:
                     Toast.makeText(LoginActivity.this, getString(R.string.login_success),Toast.LENGTH_SHORT).show();
                     Map<String,String> map = (Map<String, String>) msg.obj;
                     Utils.getOrUpdateUserBaseInfo(LoginActivity.this,map);
@@ -79,6 +82,14 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     }
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                    break;
+                case PublicConstant.TIME_OUT:
+                    Toast.makeText(LoginActivity.this, getString(R.string.http_request_time_out),
+                            Toast.LENGTH_SHORT).show();
+                    break;
+                case PublicConstant.NO_RESULT:
+                    Toast.makeText(LoginActivity.this, msg.obj.toString(),
+                            Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -157,10 +168,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
                 mImm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 break;
-            case R.id.activity_login_tv_register:
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                break;
+
         }
 
     }
@@ -186,9 +194,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             mPreText.setVisibility(View.GONE);
             try {
                 if (!object.isNull("code")){
-                    if (object.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
-                        mHandler.obtainMessage(LOGIN_ERROR,object.getString("msg")).sendToTarget();
-                    } else {
+                    if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
                         Map<String, String> successObj = new HashMap<String, String>();
                         successObj.put(DatabaseConstant.UserTable.USERNAME, object.getJSONObject("result").
                                 getString(DatabaseConstant.UserTable.USERNAME));
@@ -202,11 +208,17 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                         successObj.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
                                 getString(DatabaseConstant.UserTable.IMG_URL));
 
-                        mHandler.obtainMessage(LOGIN_SUCCESS,successObj).sendToTarget();
-
+                        mHandler.obtainMessage(PublicConstant.GET_SUCCESS,successObj).sendToTarget();
+                    }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                    }else if(object.getInt("code") == HttpConstants.ResponseCode.REQUEST_ERROR){
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                    }
+                    else {
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,object.getString("msg")).sendToTarget();
                     }
                 }else{
-                    mHandler.obtainMessage(LOGIN_ERROR,object.getString("msg")).sendToTarget();
+                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

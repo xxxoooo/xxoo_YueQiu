@@ -17,6 +17,7 @@ import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.UserDao;
 import com.yueqiu.db.DBUtils;
@@ -29,6 +30,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -134,11 +136,9 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     JSONObject object = Utils.parseJson(result);
                     Message message = new Message();
                     try {
-                        if(object.has("code")) {
-                            if (object.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
-                                message.what = DATA_ERROR;
-                                message.obj = object.getString("msg");
-                            } else {
+                        if(!object.isNull("code")) {
+                            if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+
                                 mMap.put(DatabaseConstant.UserTable.SEX, object.getJSONObject("result").
                                         getString(DatabaseConstant.UserTable.SEX));
                                 mMap.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
@@ -171,6 +171,14 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                                 mUserInfo = Utils.mapingObject(UserInfo.class, object.getJSONObject("result"));
                                 message.what = DATA_SUCCESS;
                                 message.obj = mUserInfo;
+
+
+                            }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                                mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                            }
+                            else {
+                                message.what = DATA_ERROR;
+                                message.obj = object.getString("msg");
                             }
                             mHandler.sendMessage(message);
                         }else{
@@ -202,6 +210,11 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 case DATA_SUCCESS:
                     mUserDao.updateUserInfo(mMap);
                     updateUI((UserInfo) msg.obj);
+                    break;
+                case PublicConstant.TIME_OUT:
+                    Toast.makeText(MyProfileActivity.this, getString(R.string.http_request_time_out), Toast.LENGTH_SHORT).show();
+                    mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+                    updateUI(mUserInfo);
                     break;
             }
         }
@@ -248,6 +261,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             case KeyEvent.KEYCODE_BACK:
                 mUserDao.updateUserInfo(mMap);
                 finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
                 break;
         }
         return super.onKeyDown(keyCode, event);
@@ -278,6 +292,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             case android.R.id.home:
                 mUserDao.updateUserInfo(mMap);
                 finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
                 break;
         }
         return true;

@@ -33,18 +33,6 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
     @Override
     public boolean insertActiviesList(ArrayList<Activities> list) {
         SQLiteDatabase db = dbUtils.getWritableDatabase();
-//        int size = list.size();
-//        long ret = -1;
-//        for (int i = 0; i < size; i++) {
-//            ContentValues values = new ContentValues();
-//            values.put(DatabaseConstant.ActivitiesTable._ID, list.get(i).getId());
-//            values.put(DatabaseConstant.ActivitiesTable.IMG_URL, list.get(i).getImg_url());
-//            values.put(DatabaseConstant.ActivitiesTable.TITLE, list.get(i).getTitle());
-//            values.put(DatabaseConstant.ActivitiesTable.CONTENT, list.get(i).getContent());
-//            values.put(DatabaseConstant.ActivitiesTable.CREATE_TIME, list.get(i).getCreate_time());
-//            ret = db.insert(DatabaseConstant.ActivitiesTable.TABLENAME, null, values);
-//        }
-//        return ret == -1 ? false : true;
         try {
             db.beginTransaction();
             int size = list.size();
@@ -76,11 +64,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
 
         } finally {
             db.endTransaction();
-            //db.close();
         }
-        //db.close();
-
-//        db.close();
         return false;
     }
 
@@ -89,25 +73,6 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
         SQLiteDatabase db = dbUtils.getWritableDatabase();
         ContentValues values = getContentValues(activities);
         long ret = db.insert(DatabaseConstant.ActivitiesTable.TABLENAME, null, values);
-//        try {
-//            StringBuffer sb = new StringBuffer();
-//            sb.append("insert or ignore into ").append(DatabaseConstant.ActivitiesTable.TABLENAME)
-//                    .append(" values (").append(activities.getId()).append(",").
-//                    append(activities.getUsername()).append(",").append(activities.getSex()).append(",").
-//                    append(activities.getImg_url()).append(",").append(activities.getLook_num()).append(",").
-//                    append(activities.getType()).append(",").append(activities.getTitle()).append(",").
-//                    append(activities.getAddress()).append(",").append(activities.getBegin_time()).append(",").
-//                    append(activities.getEnd_time()).append(",").append(activities.getModel()).append(",").
-//                    append(activities.getContent()).append(",").append(activities.getCreate_time()).
-//                    append(");");
-//            Log.i("Demo", sb.toString());
-//            db.execSQL(sb.toString());
-//            return true;
-//        } catch (Exception e) {
-//
-//        } finally {
-//            db.close();
-//        }
         return ret == -1 ? false : true;
     }
 
@@ -183,14 +148,10 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
                 DatabaseConstant.ActivitiesTable._ID + "=?";
         try {
             Cursor cursor = db.rawQuery(sql, new String[]{String.valueOf(id)});
-//            while (cursor.moveToNext()) {
-//
-//            }
             return getActivitesByCursor(cursor);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-//            db.close();
 
         }
         return null;
@@ -206,18 +167,6 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
             {
                 for (int i = 0; i < length; i++) {
                     fields[i].setAccessible(true);
-//                    Object obj = fields[i].getType();
-//
-//
-//                    if (obj != null) {
-//                        if (obj instanceof String) {
-//                            fields[i].set(activities, cursor.getString(
-//                                    cursor.getColumnIndex(fields[i].getName())) );
-//                        } else if (obj instanceof Integer) {
-//                            fields[i].set(activities, cursor.getInt(
-//                                    cursor.getColumnIndex(fields[i].getName())) );
-//                        }
-//                    }
                     if(!fields[i].getName().equals("look_num"))
                     {
                         fields[i].set(activities, cursor.getString(
@@ -253,7 +202,6 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
         while (cur.moveToNext()) {
             ret = cur.getString(cur.getColumnIndex(DatabaseConstant.RefreshTime.REFRESH_TIME));
         }
-        //db.close();
         return ret == null ? null : ret;
     }
 
@@ -280,7 +228,6 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
         values.put(DatabaseConstant.RefreshTime.REFRESH_TIME_TABLE,
                 time);
         ret = db.insert(DatabaseConstant.RefreshTime.REFRESH_TIME_TABLE, null, values);
-        //db.close();
         return ret == -1 ? false : true;
     }
 }

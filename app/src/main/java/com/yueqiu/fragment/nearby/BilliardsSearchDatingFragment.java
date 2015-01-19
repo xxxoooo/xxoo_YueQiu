@@ -1,4 +1,4 @@
-package com.yueqiu.fragment.search;
+package com.yueqiu.fragment.nearby;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,13 +6,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -24,13 +22,12 @@ import com.yueqiu.adapter.SearchDatingSubFragmentListAdapter;
 import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
 import com.yueqiu.constant.HttpConstants;
-import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
+import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -151,7 +148,7 @@ public class BilliardsSearchDatingFragment extends Fragment
                             sContext.getResources().getString(R.string.search_dating_popupwindow_five),
                             sContext.getResources().getString(R.string.search_dating_popupwindow_six),
                             sContext.getResources().getString(R.string.search_dating_popupwindow_seven),
-                            sContext.getResources().getString(R.string.search_dating_popupwindow_other),
+                            sContext.getResources().getString(R.string.billiard_other),
                     };
 
                     View datePopupView = inflater.inflate(R.layout.search_dating_subfragment_date_popupwindow, null);

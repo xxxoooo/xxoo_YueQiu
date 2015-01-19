@@ -17,16 +17,19 @@ import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
@@ -108,7 +111,7 @@ public class Utils {
             } else {
                 object = new JSONObject();
                 object.put("code", 1010);
-                object.put("msg", "error");
+                object.put("msg", "网络请求错误");
                 object.put("result", null);
             }
         } catch (JSONException e) {
@@ -482,5 +485,29 @@ public class Utils {
         return (int) (value/scaling+0.5f);
     }
 
-
+//    public static  void showToast(Activity activity,String msg) {
+//
+//        TypedValue value = new TypedValue();
+//        int actionBarHeight = 0;
+//        if (activity.getTheme().resolveAttribute(android.R.attr.actionBarSize, value, true)) {
+//            actionBarHeight= TypedValue.complexToDimensionPixelSize(value.data, activity.getResources().getDisplayMetrics());
+//        }
+//
+//        LayoutInflater inflater = activity.getLayoutInflater();
+//
+//        View layout = inflater.inflate(R.layout.custom_toast_layout,
+//                (ViewGroup) activity.findViewById(R.id.toast_layout_root));
+//
+//        Button button = (Button) layout.findViewById(R.id.bt_for_toast);
+//        button.setText(msg);
+//
+//        Toast toast = new Toast(activity);
+//        toast.setDuration(Toast.LENGTH_SHORT);
+//        toast.setGravity(Gravity.TOP, 0, actionBarHeight);
+//        toast.setView(layout);
+//        toast.show();
+//    }
+    public static void showToast(Context context,String msg){
+        Toast.makeText(context,msg,Toast.LENGTH_SHORT).show();
+    }
 }

@@ -1,4 +1,4 @@
-package com.yueqiu.fragment.search.common;
+package com.yueqiu.fragment.nearby.common;
 
 /**
  * Created by scguo on 15/1/6.

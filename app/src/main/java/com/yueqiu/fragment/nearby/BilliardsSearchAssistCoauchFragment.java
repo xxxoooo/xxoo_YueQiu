@@ -1,4 +1,4 @@
-package com.yueqiu.fragment.search;
+package com.yueqiu.fragment.nearby;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -21,7 +20,7 @@ import com.yueqiu.adapter.SearchAssistCoauchSubFragmentListAdapter;
 import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchAssistCoauchSubFragmentBean;
 import com.yueqiu.constant.HttpConstants;
-import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
+import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 
 import org.json.JSONArray;
@@ -30,7 +29,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 

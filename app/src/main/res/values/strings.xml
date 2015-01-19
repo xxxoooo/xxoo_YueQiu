@@ -2,8 +2,6 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
 
     <string name="app_name">约求</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
 
     <!-- 台球圈 -->
     <string name="billiard_group">台球圈</string>
@@ -18,14 +16,10 @@
     <string name="billiard_search">附近</string>
     <string name="billiard_key_serach">关键字搜索</string>
     <string name="billiard_post">发表</string>
-    <string name="billiard_back">返回</string>
     <string name="action_delete">删除</string>
     <string name="billiard_group_detail">详情</string>
     <string name="billiard_group_issue_article">发表话题</string>
     <string name="billiard_topic_type">话题类型</string>
-    <string name="title_activity_my">MyActivity</string>
-    <string name="title_activity_billiard_search">BilliardSearchActivity</string>
-    <string name="title_activity_billiard_group">BilliardGroupActivity</string>
 
     <!-- 登录注册 -->
     <string name="login_without_phone_or_account">请输入手机号或账号</string>
@@ -72,10 +66,8 @@
     <!-- 以下是位于SearchActivity当中的各个子Fragment当中的不同的listView展示的title -->
     <!-- 1.球友子Fragment中的title -->
     <string name="search_mate_subfragment_title_distance">距离</string>
-    <string name="search_mate_subfragment_title_gender">性别</string>
 
     <!-- 2.约球子Fragment的title -->
-    <string name="search_dating_subfragment_title_distance">距离</string>
     <string name="search_dating_subfragment_title_publishdata">发布时间</string>
     <string name="search_dating_detailed_btn_i_want_in">我要参加</string>
     <string name="search_dating_detailed_btn_i_want_in_success">您已成功提交请求</string>
@@ -91,7 +83,6 @@
     <string name="search_dating_popupwindow_five">5天内</string>
     <string name="search_dating_popupwindow_six">6天内</string>
     <string name="search_dating_popupwindow_seven">7天内</string>
-    <string name="search_dating_popupwindow_other">其他</string>
 
     <!-- 约球详情Activity的标题 -->
     <string name="search_dating_detailed_actionbar_title">约球详情</string>
@@ -134,7 +125,6 @@
     <string name="search_dating_detailed_activity_intro_indi_test">联系我时，就说是在约球上面看到的</string>
 
     <!-- 3.助教子Fragment的title -->
-    <string name="search_assistcaouch_subfragment_title_distance">距离</string>
     <string name="search_assistcaouch_subfragment_title_cost">花费</string>
     <string name="search_assistcaouch_subfragment_title_kinds">球种</string>
     <string name="search_assistcaouch_subfragment_title_level">水平</string>
@@ -147,7 +137,6 @@
 
     <!-- 4.教练子Fragment的title -->
     <string name="search_caouch_subfragment_title_ability">资质</string>
-    <string name="search_caouch_subfragment_title_kinds">球种</string>
     <string name="search_coauch_filter_level_no_filter">教练资质(智能筛选)</string>
     <string name="search_coauch_filter_kinds_no_filter">球种(智能筛选)</string>
     <string name="search_coauch_filter_kinds_sinuoke">斯诺克</string>
@@ -159,7 +148,6 @@
 
     <!-- 5.球厅子Fragment的title -->
     <string name="search_room_subfragment_title_zone">区域</string>
-    <string name="search_room_subfragment_title_distance">距离</string>
     <string name="search_room_subfragment_title_price">价格</string>
     <string name="search_room_subfragment_title_review">好评</string>
     <string name="search_room_popupwindow_do_notfilter">区域(不限)</string>
@@ -208,15 +196,8 @@
 
     <!-- 用于球厅Fragment当中的一些字符串 -->
     <string name="search_room_sub_fragment_price_indi">人均 ￥</string>
-    <!-- 用于球厅Fragment当中的筛选button的字符串 -->
-    <string name="search_room_sub_fragment_filterbtn_district_str">区域</string>
-    <string name="search_room_sub_fragment_filterbtn_distance_str">距离</string>
-    <string name="search_room_sub_fragment_filterbtn_price_str">价格</string>
-    <string name="search_room_sub_fragment_filterbtn_appraisal_str">好评</string>
 
     <!-- popupMenu用于筛选的字符串 -->
-    <string name="search_mate_popupmenu_item_male_str">男</string>
-    <string name="search_mate_popupmenu_item_female_str">女</string>
     <string name="search_mate_popupmenu_item_filter_str">距离(智能范围)</string>
     <string name="search_mate_popupmenu_item_500_str">500米以内</string>
     <string name="search_mate_popupmenu_item_1000_str">1000米以内</string>
@@ -227,10 +208,8 @@
     <string name="search_room_price_popupwindow_hightolow">价格从高到低</string>
 
     <!-- 用于球友子Fragment当中定义的字段值 -->
-    <string name="search_subfragment_listitem_gender_indi_str">性别:</string>
     <string name="search_subfragment_listitem_account_indi_str">账户:</string>
     <string name="search_subfragment_listitem_distan_default_str">米以内</string>
-    <string name="search_subfragment_listitem_gender_default_str">女</string>
 
     <!-- 定义反馈Activity当中的string资源 -->
     <string name="search_feedback_acti_title_indi_str">标题</string>
@@ -239,7 +218,6 @@
     <string name="search_feedback_acti_btn_submit_str">提交</string>
     <string name="search_feedback_acti_et_leave_contact_hint">手机号/邮箱/QQ</string>
     <string name="search_feedback_acti_et_leave_content_hint">具体建议...</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="search_hint_str">请输入关键词</string>
 
     <!-- 用于在Tab当中显示的4个Tab当中显示的地步栏当中显示的字符串 -->
@@ -247,11 +225,11 @@
     <string name="tab_title_chat_bar">聊吧</string>
     <string name="tab_title_activity">活动</string>
     <string name="tab_title_billiards_circle">台球圈</string>
-    <string name="title_activity_home_tab">HomeTabActivity</string>
 
     <!-- 侧滑菜单 -->
     <string name="drawer_open">drawer_open</string>
     <string name="drawer_close">drawer_close</string>
+    <string name="please_login_first">请先登录，登录后才可使用全部功能</string>
     <string name="slide_account_golden">金币:</string>
     <string name="md__drawerOpenIndicatorDesc">Close drawer</string>
     <string name="md__drawerClosedIndicatorDesc">Open drawer</string>
@@ -297,17 +275,16 @@
     <string name="next">下一步</string>
     <string name="send">发送</string>
     <string name="set_group">移至分组</string>
-
-    <!-- 活动 -->
     <string name="xlistview_header_hint_normal">下拉刷新</string>
     <string name="xlistview_header_hint_ready">松开刷新数据</string>
     <string name="xlistview_header_hint_loading">正在加载...</string>
     <string name="xlistview_header_last_time">上次更新时间：</string>
-    <string name="xlistview_footer_hint_normal">查看更多</string>
+    <string name="xlistview_footer_hint_normal">加载更多</string>
     <string name="xlistview_footer_hint_ready">松开载入更多</string>
+    <string name="no_contact_info">没有联系人信息</string>
+    <!-- 活动 -->
     <string name="time">时间</string>
     <string name="distance">距离</string>
-    <string name="back">返回</string>
     <string name="four_to_thirty_words">4~30个汉字</string>
     <string name="issueactivities">发布</string>
     <string name="activities_title">活动主题</string>
@@ -336,16 +313,38 @@
     <string name="charge_module_aa">平摊</string>
     <string name="title_activity_billiards_dating">约球详情</string>
     <string name="title_activity_search_billiard_room">球厅详情</string>
-    <string name="activity_title_cannot_empty">活动主题不能为空</string>
+    <string name="activity_title_cannot_empty">请填写活动主题</string>
     <string name="activity_title_length_less">活动主题字数不能少于4个字</string>
     <string name="activity_title_length_more">活动主题字数不能多于30个字</string>
     <string name="activity_location_cannot_empty">活动地点不能为空</string>
-    <string name="activity_start_time_cannot_empty">开始时间不能为空</string>
-    <string name="activity_end_time_cannot_empty">结束时间不能为空</string>
+    <string name="activity_start_time_cannot_empty">请选择活动开始时间</string>
+    <string name="activity_end_time_cannot_empty">请选择活动结束时间</string>
     <string name="activity_start_cannot_more_than_end">开始时间不能大于结束时间</string>
-    <string name="activity_charge_module_cannot_empty">收费模式不能为空</string>
-    <string name="activity_submit_success">发布活动成功</string>
-    <string name="activity_submit_failed">发布活动失败</string>
+    <string name="activity_charge_module_cannot_empty">请选择消费方式</string>
+    <string name="activity_submit_success">发布成功</string>
+    <string name="activity_submit_failed">发布失败</string>
+    <string name="please_write_type">请选择活动类型</string>
+    <string name="please_write_content">请填写活动说明</string>
+    <string name="activities_content">活动内容</string>
+    <string name="activities_detail">活动详情</string>
+    <string name="activities_collect">收藏</string>
+    <string name="activities_share">分享</string>
+    <string name="activities_type">活动类型</string>
+    <string name="group_activity">群活动</string>
+    <string name="meet_star">球星见面会</string>
+    <string name="billiard_show">台球展</string>
+    <string name="complete">赛事</string>
+    <string name="select_activity_type">选择活动类型</string>
+    <string name="check_num">验证码</string>
+    <string name="phone_num">手机</string>
+    <string name="join">我要参加</string>
+    <string name="star_meet">球星汇</string>
+    <string name="activity_issuing">发布中...</string>
+    <string name="no_complete_info">没有赛事信息</string>
+    <string name="no_exhibition_info">没有台球展信息</string>
+    <string name="no_group_info">没有群活动</string>
+    <string name="no_other_info">没有其他信息</string>
+    <string name="no_star_info">没有球星汇信息</string>
 
     <!-- 我的资料 -->
     <string name="photo">头像</string>
@@ -385,39 +384,16 @@
     <string name="password_null">密码不能为空！</string>
     <string name="inputtype">1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM</string>
     <string name="tv_loading">正加载,请稍后...</string>
-    <string name="no_data">网络异常...</string>
+    <string name="no_data">网络异常,未获取信息</string>
     <string name="select_sex">性别选择</string>
-    <string name="activities_content">活动内容</string>
-    <string name="please_login_first">请先登录，登录后才可使用全部功能</string>
-    <string name="title_activity_group_select_topic_type">GroupSelectTopicTypeActivity</string>
-    <string name="title_activity_group_topic_detail">GroupTopicDetailActivity</string>
-    <string name="activities_detail">活动详情</string>
-    <string name="activities_collect">收藏</string>
-    <string name="activities_share">分享</string>
-    <string name="activities_type">活动类型</string>
-    <string name="groupactivity">群活动</string>
-    <string name="meetstar">球星见面会</string>
-    <string name="taiqiuzhan">台球展</string>
-    <string name="complete">赛事</string>
-    <string name="select_activity_type">选择活动类型</string>
-    <string name="checknum">验证码</string>
-    <string name="phonenum">手机</string>
-    <string name="join">我要参加</string>
     <string name="pre_request_text">正在加载中...</string>
     <string name="pre_login_text">正在登录中...</string>
     <string name="pre_register_text">正在注册中...</string>
-    <string name="title_activity_start">StartActivity</string>
-    <string name="title_activity_test">TestActivity</string>
-    <string name="starmeet">球星汇</string>
-
-    <string name="title_activity_billiard_group_detail">BilliardGroupDetailActivity</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="title_activity_main_activity2">MainActivity2</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
-
-    <string name="contact">联系人</string>
-
+    <string name="title_activity_test">Test</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 
 </resources>

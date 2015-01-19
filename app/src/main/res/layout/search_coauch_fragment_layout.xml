@@ -91,7 +91,7 @@
         <Button
             style="@style/SearchSubFragmentFilterBtnStyle"
             android:id="@+id/btn_coauch_kinds"
-            android:text="@string/search_caouch_subfragment_title_kinds"
+            android:text="@string/ball_type"
             />
     </LinearLayout>
 

@@ -9,24 +9,30 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.text.format.DateUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.activity.ActivitiesDetail;
 import com.yueqiu.adapter.ActivitiesListViewAdapter;
 import com.yueqiu.bean.Activities;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.ActivitiesDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
-import com.yueqiu.view.XListView;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
+import com.yueqiu.view.pullrefresh.PullToRefreshBase;
+import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,18 +45,15 @@ import java.util.Map;
 /**
  * Created by yinfeng on 15/1/12.
  */
-public class OtherFragment extends Fragment implements XListView.IXListViewListener{
+public class OtherFragment extends Fragment {
 
     private static final String TAG = "ActivitiesActivity";
     private ActionBar mActionBar;
-    private XListView mListView;
+    private PullToRefreshListView mPullToRefreshListView;
+    private ListView mListView;
     private ActivitiesListViewAdapter mAdapter;
     private ArrayList<Activities> mListData;
 
-    private static final int REQUEST_CODE_SUCCESS = 1001;
-    private static final int GET_DATA_ERROR = 0x00;
-    private static final int GET_DATA_SUCCESS = 0x01;
-    private static final int GET_DATE_EMPTY = 0x02;
     private static final int LENGTH = 10;
     private ActivitiesDao mDao;
     private ProgressBar mPb;
@@ -72,10 +75,15 @@ public class OtherFragment extends Fragment implements XListView.IXListViewListe
             mPb.setVisibility(View.INVISIBLE);
             switch (msg.what)
             {
-                case GET_DATA_ERROR:
+                case PublicConstant.REQUEST_ERROR:
+                    if(null == msg.obj){
+                        Utils.showToast(mActivity,getString(R.string.http_request_error));
+                    }else{
+                        Utils.showToast(mActivity, (String) msg.obj);
+                    }
                     onLoad();
                     break;
-                case GET_DATA_SUCCESS:
+                case PublicConstant.GET_SUCCESS:
 
                     mListData = (ArrayList<Activities>)msg.obj;
                     if(mAdapter == null)
@@ -90,10 +98,14 @@ public class OtherFragment extends Fragment implements XListView.IXListViewListe
                     }
 
                     mListView.setVisibility(View.VISIBLE);
-                    mListView.setRefreshTime(Utils.getNowTime());
                     onLoad();
                     break;
-                case GET_DATE_EMPTY:
+                case PublicConstant.NO_RESULT:
+                    //setEmptyViewVisible();
+                    onLoad();
+                    break;
+                case PublicConstant.TIME_OUT:
+                    Utils.showToast(mActivity, getString(R.string.http_request_time_out));
                     onLoad();
                     break;
             }
@@ -126,7 +138,10 @@ public class OtherFragment extends Fragment implements XListView.IXListViewListe
 
     private void initView()
     {
-        mListView = (XListView)mView.findViewById(R.id.activity_activities_lv);
+        mPullToRefreshListView = (PullToRefreshListView) mView.findViewById(R.id.activity_activities_lv);
+        mListView = mPullToRefreshListView.getRefreshableView();
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
+        mPullToRefreshListView.setOnRefreshListener(mRefreshListener);
         mPb = (ProgressBar) mView.findViewById(R.id.pb_loading);
         mListView.setVisibility(View.GONE);
         mPb.setVisibility(View.VISIBLE);
@@ -135,8 +150,16 @@ public class OtherFragment extends Fragment implements XListView.IXListViewListe
         mPb.setIndeterminateDrawable(mProgressDrawable);
         mPb.getIndeterminateDrawable().setBounds(bounds);
         mListView.setOnItemClickListener(itemClickListener);
-        mListView.setPullLoadEnable(true);
-        mListView.setXListViewListener(this);
+
+    }
+    private void setEmptyViewVisible(){
+
+        TextView emptyView = new TextView(mActivity);
+        emptyView.setGravity(Gravity.CENTER);
+        emptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
+        emptyView.setTextSize(Utils.px2dip(mActivity,18));
+        emptyView.setText(getString(R.string.your_published_info_is_empty,getString(R.string.no_other_info)));
+        mPullToRefreshListView.setEmptyView(emptyView);
     }
 
 
@@ -156,11 +179,11 @@ public class OtherFragment extends Fragment implements XListView.IXListViewListe
             Message msg = new Message();
             if(list == null)
             {
-                msg.what = GET_DATE_EMPTY;
+                msg.what = PublicConstant.NO_RESULT;
             }
             else
             {
-                msg.what = GET_DATA_SUCCESS;
+                msg.what = PublicConstant.GET_SUCCESS;
                 mListData.addAll(list);
                 msg.obj = mListData;
 
@@ -180,55 +203,54 @@ public class OtherFragment extends Fragment implements XListView.IXListViewListe
         JSONObject object = Utils.parseJson(retStr);
         try {
             Message msg = new Message();
-            if(object.getInt("code") != REQUEST_CODE_SUCCESS)
-            {
-                msg.what = GET_DATA_ERROR;
-            }
-            else
-            {
-                JSONObject result = object.getJSONObject("result");
-                JSONArray array = result.getJSONArray("list_data");
-                int length = array.length();
-                if(length == 0)
-                {
-                    msg.what = GET_DATE_EMPTY;
-                }
-                else
-                {
-                    ArrayList<Activities> list = new ArrayList<Activities>();
-                    for(int i = 0; i < length; i++)
-                    {
+            if(!object.isNull("code")) {
+                //获取数据正常
+                if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                    JSONObject result = object.getJSONObject("result");
+                    JSONArray array = result.getJSONArray("list_data");
+                    int length = array.length();
+                    if (length == 0) {
+                        msg.what = PublicConstant.NO_RESULT;
+                    } else {
+                        ArrayList<Activities> list = new ArrayList<Activities>();
+                        for (int i = 0; i < length; i++) {
 
-                        JSONObject item = array.getJSONObject(i);
-                        Activities activityItem = Utils.mapingObject(Activities.class, item);
-                        boolean flag = false;
-                        for(int j = 0; j < mListData.size(); j++)
-                        {
-                            if(mListData.get(j).getId().equals(activityItem.getId()))
-                            {
-                                flag = true;
+                            JSONObject item = array.getJSONObject(i);
+                            Activities activityItem = Utils.mapingObject(Activities.class, item);
+                            boolean flag = false;
+                            for (int j = 0; j < mListData.size(); j++) {
+                                if (mListData.get(j).getId().equals(activityItem.getId())) {
+                                    flag = true;
+                                }
+                            }
+                            if (!flag) {
+                                list.add(activityItem);
                             }
                         }
-
-                        if(!flag)
-                        {
-                            list.add(activityItem);
+                        mDao.insertActiviesList(mListData);
+                        msg.what = PublicConstant.GET_SUCCESS;
+                        if (!isHead) {
+                            mListData.addAll(list);
+                        } else {
+                            mListData.addAll(0, list);
                         }
+                        msg.obj = mListData;
+                        mNetstart += LENGTH;
+                        mNetend += LENGTH;
+
                     }
-                    mDao.insertActiviesList(mListData);
-                    msg.what = GET_DATA_SUCCESS;
-                    if(!isHead)
-                    {
-                        mListData.addAll(list);
-                    }
-                    else
-                    {
-                        mListData.addAll(0,list);
-                    }
-                    msg.obj = mListData;
-                    mNetstart += LENGTH;
-                    mNetend += LENGTH;
+
+                }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                    msg.what = PublicConstant.TIME_OUT;
+                }else if(object.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                    msg.what = PublicConstant.NO_RESULT;
                 }
+                else {
+                    msg.what = PublicConstant.REQUEST_ERROR;
+                    msg.obj = object.getString("msg");
+                }
+            }else{
+                msg.what = PublicConstant.REQUEST_ERROR;
             }
             handler.sendMessage(msg);
 
@@ -251,27 +273,38 @@ public class OtherFragment extends Fragment implements XListView.IXListViewListe
         }
     };
 
+    private PullToRefreshBase.OnRefreshListener2<ListView> mRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>() {
+        @Override
+        public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView) {
+            String label = DateUtils.formatDateTime(mActivity, System.currentTimeMillis(),
+                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
 
-    @Override
-    public void onRefresh() {
-        new Thread(Utils.networkAvaiable(mActivity)
-                ? getNetworkData : getLocalData).start();
-        mNetstart = 0;
-        mNetend = 9;
-        isHead = true;
-    }
+            // Update the LastUpdatedLabel
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+            new Thread(Utils.networkAvaiable(mActivity)
+                    ? getNetworkData : getLocalData).start();
+            mNetstart = 0;
+            mNetend = 9;
+            isHead = true;
 
-    @Override
-    public void onLoadMore() {
-        new Thread(Utils.networkAvaiable(mActivity)
-                ? getNetworkData : getLocalData).start();
+        }
 
-        isHead = false;
-    }
+        @Override
+        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
+            String label = DateUtils.formatDateTime(mActivity, System.currentTimeMillis(),
+                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
+
+            // Update the LastUpdatedLabel
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+
+            new Thread(Utils.networkAvaiable(mActivity)
+                    ? getNetworkData : getLocalData).start();
+
+            isHead = false;
+        }
+    };
 
     private void onLoad() {
-        mListView.stopRefresh();
-        mListView.stopLoadMore();
-        mListView.setRefreshTime("刚刚");
+        mPullToRefreshListView.onRefreshComplete();
     }
 }

@@ -10,9 +10,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
+import android.util.TypedValue;
 import android.view.ActionMode;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,7 +30,6 @@ import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.adapter.FavorBasicAdapter;
 import com.yueqiu.bean.FavorInfo;
-import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -36,9 +37,10 @@ import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.FavorDao;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
-import com.yueqiu.view.XListView;
 import com.yueqiu.view.YueQiuDialogBuilder;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
+import com.yueqiu.view.pullrefresh.PullToRefreshBase;
+import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,13 +55,14 @@ import java.util.Map;
 /**
  * Created by wangyun on 15/1/16.
  */
-public class FavorBasicFragment extends Fragment implements XListView.IXListViewListener{
+public class FavorBasicFragment extends Fragment {
     private Activity mActivity;
     private View mView;
     private ProgressBar mPreProgress;
-    private TextView mEmptyView,mPreText;
+    private TextView mPreText;
     private Drawable mProgressDrawable;
-    private XListView mListView;
+    private PullToRefreshListView mPullToRefreshListView;
+    private ListView mListView;
     private FavorBasicAdapter mAdapter;
     private int mFavorType;
     private FavorInfo mFavorInfo;
@@ -88,7 +91,8 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
 
         mFavorDao = DaoFactory.getFavor(mActivity);
         mIsExsitsFavor = mFavorDao.isExistFavorInfo(mFavorType);
-
+        //先从缓存读取
+        //TODO:逻辑可能再改
         if(mIsExsitsFavor){
             mFavorInfo = mFavorDao.getFavorInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()),mFavorType,start_no,end_no+1);
             mHandler.obtainMessage(PublicConstant.USE_CACHE,mFavorInfo).sendToTarget();
@@ -106,20 +110,25 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
         return mView;
     }
     private void initView(){
-        mListView = (XListView) mView.findViewById(R.id.favor_basic_listView);
-        mListView.setPullLoadEnable(true);
-        mListView.setXListViewListener(this);
+        mPullToRefreshListView = (PullToRefreshListView) mView.findViewById(R.id.favor_basic_listView);
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
+        mPullToRefreshListView.setOnRefreshListener(onRefreshListener);
+        mListView = mPullToRefreshListView.getRefreshableView();
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListView.setMultiChoiceModeListener(new ActionModeCallback());
-        mEmptyView = (TextView) mView.findViewById(R.id.favor_is_empty);
+
+        //初始化ProgressBar
         mPreText = (TextView) mView.findViewById(R.id.pre_text);
         mPreProgress = (ProgressBar) mView.findViewById(R.id.pre_progress);
-
         mProgressDrawable = new FoldingCirclesDrawable.Builder(mActivity).build();
         Rect bounds = mPreProgress.getIndeterminateDrawable().getBounds();
         mPreProgress.setIndeterminateDrawable(mProgressDrawable);
         mPreProgress.getIndeterminateDrawable().setBounds(bounds);
     }
+
+    /**
+     * 设置EmptyView的内容
+     */
     private void setEmptyViewText(){
         switch(mFavorType){
             case PublicConstant.FAVOR_DATE_TYPE:
@@ -135,19 +144,21 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
                 mEmptyTypeStr = getString(R.string.tab_title_billiards_circle);
                 break;
         }
-        mEmptyView.setText(getString(R.string.your_favor_is_empty,mEmptyTypeStr));
     }
-    private void setEmptyViewVisible(){
-        mListView.setPullLoadEnable(false);
-        mListView.setDividerHeight(0);
-        mEmptyView.setVisibility(View.VISIBLE);
+
+    /**
+     * 设置EmptyView可见
+     */
+    private void setEmptyViewVisible(String content){
+        TextView emptyView = new TextView(mActivity);
+        emptyView.setGravity(Gravity.CENTER);
+        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
+        emptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
+        emptyView.setText(content);
+        mPullToRefreshListView.setEmptyView(emptyView);
+
     }
-    private void setEmptyViewGone(){
-        int dividerHeight = Utils.dip2px(mActivity,1.5f);
-        mListView.setDividerHeight(dividerHeight);
-        mListView.setPullLoadEnable(true);
-        mEmptyView.setVisibility(View.GONE);
-    }
+
     private void requestFavor(){
         mParamsMap.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
         mParamsMap.put(HttpConstants.Favor.TYPE,mFavorType);
@@ -202,31 +213,31 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
                     updateFavorDB((FavorInfo) msg.obj);
                     mAfterCount = mList.size();
                     if(mList.isEmpty()){
-                        setEmptyViewVisible();
-                    }else{
-                        setEmptyViewGone();
+                        setEmptyViewVisible(getString(R.string.your_favor_is_empty,mEmptyTypeStr));
                     }
                     break;
                 case PublicConstant.NO_RESULT:
                     if(mList.isEmpty()) {
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(getString(R.string.your_favor_is_empty,mEmptyTypeStr));
                     }else{
                         if(mLoadMore)
-                            Toast.makeText(mActivity, getString(R.string.no_more_info, mEmptyTypeStr), Toast.LENGTH_SHORT).show();
+                            Utils.showToast(mActivity,getString(R.string.no_more_info, mEmptyTypeStr));
                     }
                     break;
                 case PublicConstant.REQUEST_ERROR:
-                    Toast.makeText(mActivity, getString(R.string.http_request_error), Toast.LENGTH_SHORT).show();
+                    if(null == msg.obj){
+                        Utils.showToast(mActivity,getString(R.string.http_request_error));
+                    }else{
+                        Utils.showToast(mActivity, (String) msg.obj);
+                    }
                     if(mList.isEmpty()) {
-                        mEmptyView.setText(getString(R.string.no_store_info));
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(getString(R.string.no_store_info));
                     }
                     break;
                 case PublicConstant.TIME_OUT:
-                    Toast.makeText(mActivity,getString(R.string.http_request_time_out),Toast.LENGTH_SHORT).show();
+                    Utils.showToast(mActivity,getString(R.string.http_request_time_out));
                     if(mList.isEmpty()) {
-                        mEmptyView.setText(getString(R.string.no_store_info));
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(getString(R.string.no_store_info));
                     }
                     break;
             }
@@ -259,11 +270,8 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
             super.onPostExecute(jsonResult);
             mPreProgress.setVisibility(View.GONE);
             mPreText.setVisibility(View.GONE);
-            if(mLoadMore || mRefresh){
-                mListView.stopRefresh();
-                mListView.stopLoadMore();
-                mListView.setRefreshTime("刚刚");
-            }
+
+            mPullToRefreshListView.onRefreshComplete();
             try {
                 if(!jsonResult.isNull("code")) {
                     if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
@@ -275,9 +283,6 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
                             mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                         }
                     }
-                    else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.RESULT_NULL){
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonResult.getString("msg")).sendToTarget();
-                    }
                     else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
                         mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
                     }
@@ -285,7 +290,7 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
                         mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                     }
                     else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonResult.getString("msg")).sendToTarget();
                     }
                 }else{
                     mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
@@ -296,6 +301,11 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
         }
     }
 
+    /**
+     * 根据json对象设置Favor
+     * @param jsonResult
+     * @return
+     */
     private FavorInfo setFavorInfo(JSONObject jsonResult){
         FavorInfo info = new FavorInfo();
         info.setType(mFavorType);
@@ -323,61 +333,69 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
         return info;
     }
 
-    @Override
-    public void onRefresh() {
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if(Utils.networkAvaiable(mActivity)){
-                    mRefresh = true;
-                    mLoadMore = false;
-                    mParamsMap.put(HttpConstants.Published.START_NO,0);
-                    mParamsMap.put(HttpConstants.Published.END_NO, 9);
-                    requestFavor();
-                }else{
-                    mListView.stopRefresh();
-                    mListView.stopLoadMore();
-                    mListView.setRefreshTime("刚刚");
-                    Toast.makeText(mActivity,getString(R.string.network_not_available),Toast.LENGTH_SHORT).show();
-                }
-            }
-        },1500);
-    }
+    /**
+     * 下拉刷新和上拉加载的回调接口
+     */
+    private PullToRefreshBase.OnRefreshListener2<ListView> onRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>() {
+        @Override
+        public void onPullDownToRefresh( PullToRefreshBase<ListView> refreshView) {
+            String label = DateUtils.formatDateTime(mActivity, System.currentTimeMillis(),
+                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
 
-    @Override
-    public void onLoadMore() {
-        mHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mLoadMore = true;
-                mCurrPosition = mList.size() ;
-                if(mBeforeCount != mAfterCount){
-                    start_no = end_no + (mAfterCount-mBeforeCount);
-                    end_no += 10 + (mAfterCount-mBeforeCount);
-                }else{
-                    start_no = end_no + 1;
-                    end_no += 10;
-                }
-                if(Utils.networkAvaiable(mActivity)) {
-                    mParamsMap.put(HttpConstants.Published.START_NO,start_no);
-                    mParamsMap.put(HttpConstants.Published.END_NO, end_no);
-                    requestFavor();
-                }else{
-                    mListView.stopRefresh();
-                    mListView.stopLoadMore();
-                    mListView.setRefreshTime("刚刚");
-                    FavorInfo info = mFavorDao.getFavorInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()),mFavorType,start_no,end_no+1);
-                    if(!info.mList.isEmpty()) {
-                        mHandler.obtainMessage(PublicConstant.GET_SUCCESS, info).sendToTarget();
+            //设置上次更新时间
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if(Utils.networkAvaiable(mActivity)){
+                        mRefresh = true;
+                        mLoadMore = false;
+                        mParamsMap.put(HttpConstants.Published.START_NO,0);
+                        mParamsMap.put(HttpConstants.Published.END_NO, 9);
+                        requestFavor();
                     }else{
-                        mHandler.obtainMessage(PublicConstant.NO_RESULT,info).sendToTarget();
+                        Toast.makeText(mActivity,getString(R.string.network_not_available),Toast.LENGTH_SHORT).show();
                     }
                 }
-            }
-        }, 1500);
+            }).start();
+        }
 
-    }
+        @Override
+        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
+            String label = DateUtils.formatDateTime(mActivity, System.currentTimeMillis(),
+                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
+            //设置上次更新时间
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mLoadMore = true;
+                    mCurrPosition = mList.size() ;
+                    if(mBeforeCount != mAfterCount){
+                        start_no = end_no + (mAfterCount-mBeforeCount);
+                        end_no += 10 + (mAfterCount-mBeforeCount);
+                    }else{
+                        start_no = end_no + 1;
+                        end_no += 10;
+                    }
+                    if(Utils.networkAvaiable(mActivity)) {
+                        mParamsMap.put(HttpConstants.Published.START_NO,start_no);
+                        mParamsMap.put(HttpConstants.Published.END_NO, end_no);
+                        requestFavor();
+                    }else{
 
+                        FavorInfo info= mFavorDao.getFavorInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()), mFavorType, start_no, end_no + 1);
+                        if(!info.mList.isEmpty()) {
+                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, info).sendToTarget();
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.NO_RESULT,info).sendToTarget();
+                        }
+                    }
+                }
+            }, 1000);
+        }
+    };
     /**
      * ActionMode，ListView长按
      */
@@ -386,7 +404,6 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
         private View mCustomActionBarView;
         private TextView mActionModeTitle,mActionModeSelCount;
         private HashSet<Integer> mSelectedItems;
-
 
         @Override
         public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
@@ -413,7 +430,6 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
                 mActionModeTitle.setText(mActivity.getString(R.string.my_colloec_action_mode_title));
             }
             mode.setCustomView(mCustomActionBarView);
-
             return true;
         }
 
@@ -468,8 +484,6 @@ public class FavorBasicFragment extends Fragment implements XListView.IXListView
             mAdapter.notifyDataSetChanged();
         }
     }
-
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

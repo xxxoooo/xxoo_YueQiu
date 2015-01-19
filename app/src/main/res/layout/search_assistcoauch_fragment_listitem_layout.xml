@@ -32,7 +32,7 @@
         android:id="@+id/tv_assistcoauch_subfragment_listitem_gender"
         android:background="@drawable/textview_withdrawable_bg"
         android:drawableRight="@drawable/male"
-        android:text="@string/search_mate_popupmenu_item_male_str"
+        android:text="@string/man"
         android:textSize="14sp"
         android:layout_alignBottom="@+id/img_assistcoauch_subfragment_listitem_photo"
         android:layout_toRightOf="@+id/img_assistcoauch_subfragment_listitem_photo"
