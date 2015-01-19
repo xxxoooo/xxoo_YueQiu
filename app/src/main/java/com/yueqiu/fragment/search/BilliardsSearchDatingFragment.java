@@ -129,10 +129,6 @@ public class BilliardsSearchDatingFragment extends Fragment implements XListView
         sPreProgress.setIndeterminateDrawable(sProgressDrawable);
         sPreProgress.getIndeterminateDrawable().setBounds(bounds);
 
-        sUIEventsHandler.sendEmptyMessage(START_RETRIEVE_ALL_DATA);
-
-        sUIEventsHandler.sendEmptyMessage(START_RETRIEVE_ALL_DATA);
-
         // TODO: 以下加载的是测试数据，我们以后需要移除, 但是目前还不能移除，只是暂时注释掉，用于展示完整的UI效果
 //        initTestData();
 

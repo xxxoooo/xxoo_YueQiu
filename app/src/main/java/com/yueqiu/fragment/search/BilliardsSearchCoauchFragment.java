@@ -26,6 +26,7 @@ import com.yueqiu.adapter.SearchCoauchSubFragmentListAdapter;
 import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchCoauchSubFragmentCoauchBean;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.dao.daoimpl.SearchCoauchDaoImpl;
 import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
@@ -126,11 +127,8 @@ public class BilliardsSearchCoauchFragment extends Fragment implements XListView
         sPreProgress.setIndeterminateDrawable(sProgressDrawable);
         sPreProgress.getIndeterminateDrawable().setBounds(bounds);
 
-
         Bundle args = getArguments();
         mArgs = args.getString(PARAMS_KEY);
-
-        sUIEventsHandler.sendEmptyMessage(RETRIEVE_ALL_COAUCH_INFO);
 
         // TODO: 这里加载的是测试数据,暂时还不能删除这个方法，因为我们还要查看总的UI加载效果
 //        initListViewTestData();
@@ -149,6 +147,8 @@ public class BilliardsSearchCoauchFragment extends Fragment implements XListView
         super.onResume();
         if (sWorker != null && sWorker.getState() == Thread.State.NEW)
         {
+            // TODO: 我们需要在sWorker当中的开始方法加一些判断，用以判断当前的网络情况，
+            // TODO: 然后决定是从本地数据库，还是从网络当中进行数据的检索(这里，对于每一个Fragment当中的BackgroundHandlerThread的处理流程都是一样的)
             sWorker.start();
         }
     }
@@ -468,8 +468,12 @@ public class BilliardsSearchCoauchFragment extends Fragment implements XListView
                         case RETRIEVE_COAUCH_WITH_CLASS_FILTERED:
                             Bundle clazzData = msg.getData();
                             String clazz = clazzData.getString(KEY_REQUEST_CLAZZ_FILTER);
-
+                            sUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
                             Log.d(TAG, " inside the BackgroundThread --> the clazz string we get in the CouachFragment are : " + clazz);
+                            // TODO: 进行真正的本地检索过程
+
+
+                            sUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
                             break;
                         case RETRIEVE_COAUCH_WITH_LEVEL_FILTERED:
                             Bundle levelData = msg.getData();

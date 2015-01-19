@@ -5,12 +5,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.yueqiu.bean.SearchCoauchSubFragmentCoauchBean;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.dao.SearchCoauchDao;
 import com.yueqiu.db.DBUtils;
 
+import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +21,8 @@ import java.util.List;
  */
 public class SearchCoauchDaoImpl implements SearchCoauchDao
 {
+    private static final String TAG = "SearchCoauchDaoImpl";
+
     private Context mContext;
     private DBUtils mDBUtils;
     private SQLiteDatabase mDatabase;
@@ -63,20 +67,9 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
     }
 
     @Override
-    public List<SearchCoauchSubFragmentCoauchBean> getCoauchList(String level, String clazz)
+    public List<SearchCoauchSubFragmentCoauchBean> getCoauchList(String level, String clazz, final int limit)
     {
         List<SearchCoauchSubFragmentCoauchBean> coauchList = new ArrayList<SearchCoauchSubFragmentCoauchBean>();
-
-        String[] allColumns = {
-                DatabaseConstant.SearchCoauchTable._ID,
-                DatabaseConstant.SearchCoauchTable.USER_ID,
-                DatabaseConstant.SearchCoauchTable.NAME,
-                DatabaseConstant.SearchCoauchTable.PHOTO_URL,
-                DatabaseConstant.SearchCoauchTable.CLASS,
-                DatabaseConstant.SearchCoauchTable.LEVEL,
-                DatabaseConstant.SearchCoauchTable.RANGE,
-                DatabaseConstant.SearchCoauchTable.SEX
-        };
 
         Cursor cursor = mDatabase.query(
                 DatabaseConstant.SearchCoauchTable.COAUCH_TABLE_NAME,
@@ -99,6 +92,53 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
         cursor.close();
 
         return coauchList;
+    }
+
+    /**
+     * 我们对于教练Fragment当中的List的筛选，不是一个排序的过程，而是直接的一个select的过程，就是按照我们指定的level
+     * 进行筛选就可以了，不需要进行其他的额外的排序
+     *
+     * @param level
+     * @return
+     */
+    @Override
+    public List<SearchCoauchSubFragmentCoauchBean> getCouchListWithLevelFiltered(String level, final int limit)
+    {
+        Log.d(TAG, " the level we need to filter out are : " + level);
+        List<SearchCoauchSubFragmentCoauchBean> coauchLevelFilteredList = new ArrayList<SearchCoauchSubFragmentCoauchBean>();
+        Cursor levelCursor = mDatabase.query(
+                DatabaseConstant.SearchCoauchTable.COAUCH_TABLE_NAME,
+                allColumns,
+                "",
+                null,
+                "",
+                "",
+                "",
+                ""
+        );
+
+
+        return null;
+    }
+
+    /**
+     * 我们对于教练Fragment当中的List的筛选，不是一个排序的过程，而是直接的一个select的过程，就是按照我们指定的clazz
+     * 直接进行select操作就可以了，不用排序
+     * <p/>
+     * 当然对于助教Fragment当中的花费(price)筛选条件，是一个sort的过程，即按我们获得的price的值进行sorting就可以了，
+     * 而不是一个select的过程了
+     *
+     * @param clazz
+     * @return
+     */
+    @Override
+    public List<SearchCoauchSubFragmentCoauchBean> getCouchListWithKindsFiltered(String clazz, final int limit)
+    {
+        List<SearchCoauchSubFragmentCoauchBean> coauchKindsFilteredList = new ArrayList<SearchCoauchSubFragmentCoauchBean>();
+
+
+
+        return null;
     }
 
     /**

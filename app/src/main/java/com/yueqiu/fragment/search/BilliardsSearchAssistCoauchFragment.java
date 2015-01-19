@@ -126,7 +126,6 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment implements XLi
         sPreProgress.setIndeterminateDrawable(sProgressDrawable);
         sPreProgress.getIndeterminateDrawable().setBounds(bounds);
 
-        sUIEventsHandler.sendEmptyMessage(RETRIEVE_ALL_RAW_INFO);
 
         // TODO: 以下加载的是测试数据,但是我们目前还不能删除这个方法，因为我们还需要这些测试数据来查看整体的UI加载效果
 //        initTestData();
