@@ -36,6 +36,8 @@ public class HttpConstants
         public static final String TOKEN = "token";
     }
 
+
+
     /**
      * 用户注册请求参数
      * 发送Post请求
@@ -48,6 +50,14 @@ public class HttpConstants
          * 接口
          */
         public static final String URL = "/user/register";
+
+        public static final String CODEURL = "/user/sendCode";
+
+
+        public static final String ACTION_TYPE = "action_type";
+
+        public static final String VERFICATION_CODE = "verfication_code";
+
         /*
          * 账号
          */
@@ -301,6 +311,8 @@ public class HttpConstants
         public static final String PUBLISH = "/play/publish";
 
         public static final String GETLISTEE = "/play/getList";
+
+        public static final String GETDETAIL = "/play/deatil";
     }
 
 

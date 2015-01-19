@@ -24,9 +24,6 @@ public class DBUtils extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
-
-
         db.execSQL(DatabaseConstant.UserTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.PublishInfoTable.CRAETE_SQL);
         db.execSQL(DatabaseConstant.PublishInfoItemTable.CREATE_URL);
