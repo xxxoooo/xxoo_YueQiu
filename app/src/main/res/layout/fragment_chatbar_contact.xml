@@ -3,20 +3,19 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="25dp"
-    android:background="@color/devide_line">
+
     <TextView
-        android:textColor="@color/md__defaultBackground"
+        android:textColor="@color/chatbar_contact_up"
         android:id="@+id/contact_my_friends"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginBottom="4dp"
-        android:layout_marginTop="4dp"
-        android:text="@string/tv_contact_my_friends"/>
-    </LinearLayout>
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:paddingLeft="15dp"
+        android:text="@string/tv_contact_my_friends"
+        android:background="@color/devide_line"/>
+
 
     <com.yueqiu.view.contacts.IphoneTreeView
         android:id="@+id/iphone_tree_view"

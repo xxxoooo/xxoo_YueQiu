@@ -13,10 +13,9 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
-            android:text="@string/groupactivity"
+            android:text="@string/group_activity"
             android:textSize="18sp" />
         <ImageView
             android:visibility="gone"
@@ -41,10 +40,9 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
-            android:text="@string/meetstar"
+            android:text="@string/meet_star"
             android:textSize="18sp" />
         <ImageView
             android:visibility="gone"
@@ -69,11 +67,10 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
             android:gravity="center_vertical"
-            android:text="@string/taiqiuzhan"
+            android:text="@string/billiard_show"
             android:textSize="18sp" />
         <ImageView
             android:visibility="gone"
@@ -98,8 +95,7 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
             android:text="@string/complete"
             android:textSize="18sp" />
@@ -126,8 +122,7 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:layout_marginLeft="10dp"
             android:text="@string/billiard_other"
             android:textSize="18sp" />

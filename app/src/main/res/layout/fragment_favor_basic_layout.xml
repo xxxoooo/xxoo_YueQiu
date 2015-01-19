@@ -3,23 +3,16 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <com.yueqiu.view.XListView
+    android:layout_height="match_parent"
+    >
+    <com.yueqiu.view.pullrefresh.PullToRefreshListView
         android:background="@android:color/white"
         android:id="@+id/favor_basic_listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@color/devide_line"
         android:dividerHeight="1.5dp"/>
-    <TextView
-        android:id="@+id/favor_is_empty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/your_published_info_is_empty"
-        android:layout_centerInParent="true"
-        android:textColor="@color/md__defaultBackground"
-        android:textSize="18sp"
-        android:visibility="gone"/>
+
     <include
         layout="@layout/pre_load"
         android:layout_width="wrap_content"

@@ -2,19 +2,14 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
-
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,10 +19,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.yueqiu.R;
-import com.yueqiu.YueQiuApp;
-import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -37,20 +29,13 @@ import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
-
-import org.apache.commons.codec.digest.DigestUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+
 import java.util.Map;
 
-import org.apache.commons.codec.binary.Hex;
 
 
 
@@ -71,22 +56,24 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private InputMethodManager mImm;
     private String mUserName;
     private String mPwd;
-    private DBUtils mDbUtil;
     private UserDao mUserDao;
 
-    private static final int LOGIN_SUCCESS = 0x01;
-    private static final int LOGIN_ERROR = 0x02;
 
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case LOGIN_ERROR:
-                    Toast.makeText(LoginActivity.this, msg.obj.toString(),
-                            Toast.LENGTH_SHORT).show();
+                case PublicConstant.REQUEST_ERROR:
+                    if(msg.obj == null){
+                        Toast.makeText(LoginActivity.this, getString(R.string.http_request_error),
+                                Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(LoginActivity.this, msg.obj.toString(),
+                                Toast.LENGTH_SHORT).show();
+                    }
                     break;
-                case LOGIN_SUCCESS:
+                case PublicConstant.GET_SUCCESS:
                     Toast.makeText(LoginActivity.this, getString(R.string.login_success),Toast.LENGTH_SHORT).show();
                     Map<String,String> map = (Map<String, String>) msg.obj;
                     Utils.getOrUpdateUserBaseInfo(LoginActivity.this,map);
@@ -95,6 +82,14 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     }
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                    break;
+                case PublicConstant.TIME_OUT:
+                    Toast.makeText(LoginActivity.this, getString(R.string.http_request_time_out),
+                            Toast.LENGTH_SHORT).show();
+                    break;
+                case PublicConstant.NO_RESULT:
+                    Toast.makeText(LoginActivity.this, msg.obj.toString(),
+                            Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -106,9 +101,9 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_login);
         initView();
         initActionBar();
-
-        mDbUtil = DBUtils.getInstance(this);
         mUserDao = DaoFactory.getUser(this);
+
+
 
     }
 
@@ -135,7 +130,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         mPreText.setText(getString(R.string.pre_login_text));
 ////
         mBtnLogin.setOnClickListener(this);
-       mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mTvRegister.setOnClickListener(this);
     }
 
@@ -166,7 +161,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 paramMap.put(PublicConstant.URL,HttpConstants.LoginConstant.URL);
                 paramMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
                 if(Utils.networkAvaiable(LoginActivity.this)) {
-                    new LoginAsyncTask(requestMap, mPreProgress, mPreText).execute(paramMap);
+                    new LoginAsyncTask(requestMap).execute(paramMap);
                 }else{
                     Toast.makeText(LoginActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
                 }
@@ -174,7 +169,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 mImm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 break;
             case R.id.activity_login_tv_register:
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                startActivity(new Intent(LoginActivity.this, CheckNumActivity.class));
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
         }
@@ -184,20 +179,28 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     private class LoginAsyncTask extends AsyncTaskUtil<String>{
 
-        public LoginAsyncTask(Map<String, String> map, ProgressBar progressBar, TextView textView) {
-            super(map, progressBar, textView);
+        public LoginAsyncTask(Map<String, String> map) {
+            super(map);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mPreProgress.setVisibility(View.VISIBLE);
+            mPreText.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected void onPostExecute(JSONObject object) {
             super.onPostExecute(object);
+            mPreProgress.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
             try {
                 if (!object.isNull("code")){
-                    if (object.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
-                        mHandler.obtainMessage(LOGIN_ERROR,object.getString("msg")).sendToTarget();
-                    } else {
+                    if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
                         Map<String, String> successObj = new HashMap<String, String>();
-                        successObj.put(DatabaseConstant.UserTable.USERNAME, mUserName);
+                        successObj.put(DatabaseConstant.UserTable.USERNAME, object.getJSONObject("result").
+                                getString(DatabaseConstant.UserTable.USERNAME));
                         successObj.put(DatabaseConstant.UserTable.PASSWORD, mPwd);
                         successObj.put(DatabaseConstant.UserTable.USER_ID, object.getJSONObject("result").
                                 getString(DatabaseConstant.UserTable.USER_ID));
@@ -208,11 +211,17 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                         successObj.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
                                 getString(DatabaseConstant.UserTable.IMG_URL));
 
-                        mHandler.obtainMessage(LOGIN_SUCCESS,successObj).sendToTarget();
-
+                        mHandler.obtainMessage(PublicConstant.GET_SUCCESS,successObj).sendToTarget();
+                    }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                    }else if(object.getInt("code") == HttpConstants.ResponseCode.REQUEST_ERROR){
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                    }
+                    else {
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,object.getString("msg")).sendToTarget();
                     }
                 }else{
-                    mHandler.obtainMessage(LOGIN_ERROR,object.getString("msg")).sendToTarget();
+                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();

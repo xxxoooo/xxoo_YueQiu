@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:textColor="@android:color/white"
-                android:text="@string/back"
+                android:text="@string/btn_back"
                 android:textSize="18sp"
                 style="@android:style/Widget.Holo.ActionBar.TabText" />
 

@@ -31,6 +31,8 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.FriendsApplication.CREATE_SQL);
         db.execSQL(DatabaseConstant.ActivitiesTable.SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
+        db.execSQL(DatabaseConstant.FavorInfoTable.CRAETE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.CREATE_SQL);
 
 
     }
@@ -46,6 +48,8 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.ChatMessageTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FriendsTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FriendsApplication.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.DROP_SQL);
         onCreate(db);
     }
 

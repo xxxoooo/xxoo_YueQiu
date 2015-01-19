@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <stroke android:width="0.5dp" android:color="@color/billiard_bottom_stroke" />
+            <solid android:color="@color/white"></solid>
+        </shape>
+
+    </item>
+    <!-- the default state -->
+    <item>
+        <shape android:shape="rectangle">
+            <stroke android:width="0.5dp" android:color="@color/billiard_bottom_stroke" />
+            <solid android:color="@color/billiard_detail_bottom"></solid>
+        </shape>
+    </item>
+</selector>

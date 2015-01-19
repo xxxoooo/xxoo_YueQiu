@@ -92,7 +92,7 @@
             android:id="@+id/btn_room_distance"
             android:layout_weight="0.25"
             style="@style/SearchSubFragmentFilterBtnStyle"
-            android:text="@string/search_room_subfragment_title_distance"/>
+            android:text="@string/search_mate_subfragment_title_distance"/>
 
         <View
             android:layout_marginTop="5dp"

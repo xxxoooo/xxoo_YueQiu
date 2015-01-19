@@ -17,7 +17,7 @@
         android:orientation="vertical">
 
         <EditText
-            android:id="@+id/activity_register_et_account"
+            android:id="@+id/activity_register1_et_account"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginLeft="10dp"
@@ -115,7 +115,7 @@
             android:button="@null"
             android:background="@drawable/register_agree_article_bg"/>
         <TextView
-            android:id="@+id/register_read_and_agree_the_article"
+            android:id="@+id/register1_read_and_agree_the_article"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"

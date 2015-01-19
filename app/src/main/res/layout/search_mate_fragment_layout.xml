@@ -95,7 +95,7 @@
         <Button
             style="@style/SearchSubFragmentFilterBtnStyle"
             android:id="@+id/btn_mate_gender"
-            android:text="@string/search_mate_subfragment_title_gender"
+            android:text="@string/gender"
             />
     </LinearLayout>
 

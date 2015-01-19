@@ -257,7 +257,7 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
     private class FriendManageAsyncTask extends AsyncTaskUtil<String> {
 
         public FriendManageAsyncTask(Map<String, String> map, ProgressBar progressBar, TextView textView) {
-            super(map, progressBar, textView);
+            super(map);
         }
 
         @Override

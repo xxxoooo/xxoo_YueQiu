@@ -36,6 +36,8 @@ public class HttpConstants
         public static final String TOKEN = "token";
     }
 
+
+
     /**
      * 用户注册请求参数
      * 发送Post请求
@@ -48,6 +50,14 @@ public class HttpConstants
          * 接口
          */
         public static final String URL = "/user/register";
+
+        public static final String CODEURL = "/user/sendCode";
+
+
+        public static final String ACTION_TYPE = "action_type";
+
+        public static final String VERFICATION_CODE = "verfication_code";
+
         /*
          * 账号
          */
@@ -100,6 +110,20 @@ public class HttpConstants
     }
 
     /**
+     * 我的收藏
+     */
+    public static final class Favor{
+
+        public static final String URL = "/store/getStore";
+
+        public static final String TYPE = "type";
+
+        public static final String START_NO = "start_no";
+
+        public static final String END_NO = "end_no";
+    }
+
+    /**
      * 我的发布
      */
     public static final class Published
@@ -109,7 +133,7 @@ public class HttpConstants
 
         public static final String TYPE = "type";
 
-        public static final String STAR_NO = "start_no";
+        public static final String START_NO = "start_no";
 
         public static final String END_NO = "end_no";
     }
@@ -357,6 +381,21 @@ public class HttpConstants
         public static final String GETDETAIL = "/play/deatil";
     }
 
+    /**
+     * 发表话题
+     */
+    public static class GroupIssue{
+
+        public static final String URL = "/cricle/publish";
+
+        public static final String TYPE     = "type";
+
+        public static final String USER_ID  = "user_id";
+
+        public static final String TITLE    = "title";
+
+        public static final String CONTENT  = "content";
+    }
 
     /**
      * Json 状态码
@@ -388,7 +427,7 @@ public class HttpConstants
         /*
          * 找不到记录
          */
-        public static final int a4 = 1005;
+        public static final int NO_RESULT = 1005;
 
         /*
          * 服务器内部错误
@@ -409,6 +448,14 @@ public class HttpConstants
          * 数据库错误
          */
         public static final int a8 = 1009;
+        /*
+        * 向网络请求时，发生错误，JSON转化发生异常
+        */
+        public static final int REQUEST_ERROR = 1010;
+        /*
+         * 请求超时
+         */
+        public static final int TIME_OUT = 1011;
     }
 
 

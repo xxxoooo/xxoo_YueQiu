@@ -7,7 +7,6 @@ import android.support.v4.app.FragmentTransaction;
 
 import com.yueqiu.R;
 import com.yueqiu.fragment.requestaddfriend.FriendsApplicationFragment;
-import com.yueqiu.util.SingleFragmentActivity;
 
 /**
  * Created by doushuqi on 15/1/7.

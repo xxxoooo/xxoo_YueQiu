@@ -149,7 +149,7 @@ public class VerificationFragment extends Fragment {
     private class VerificationAsyncTask extends AsyncTaskUtil<String> {
 
         public VerificationAsyncTask(Map<String, String> map, ProgressBar progressBar, TextView textView) {
-            super(map, progressBar, textView);
+            super(map);
         }
 
         @Override

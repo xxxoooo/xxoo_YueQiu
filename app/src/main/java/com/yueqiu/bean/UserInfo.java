@@ -1,8 +1,5 @@
 package com.yueqiu.bean;
 
-import android.util.Log;
-
-import com.yueqiu.util.JSONHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,7 +8,7 @@ import org.json.JSONObject;
  * 用户基本信息实体类
  * Created by yinfeng on 14/12/23.
  */
-public class UserInfo implements JSONHelper {
+public class UserInfo  {
     private int id;
     private String img_url;//头像在网络中的地址
     private String img_real;//头像在本地的地址
@@ -253,7 +250,6 @@ public class UserInfo implements JSONHelper {
     }
 
 
-    @Override
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
         json.put(JSON_USER_ID, user_id);

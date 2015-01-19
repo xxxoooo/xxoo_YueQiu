@@ -31,9 +31,7 @@
                 android:textSize="20sp"
                 android:layout_marginLeft="10dp"
                 android:text="@string/search_feedback_acti_title_indi_str"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/md__defaultBackground"/>
+                style="@style/ListItemTvStyle"/>
             <LinearLayout
                 android:layout_width="2dp"
                 android:background="@color/devide_line"
@@ -67,9 +65,7 @@
                 android:textSize="20sp"
                 android:layout_marginLeft="10dp"
                 android:text="@string/search_feedback_acti_content_indi_str"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/md__defaultBackground"
+                style="@style/ListItemTvStyle"
                  />
             <LinearLayout
                 android:layout_width="2dp"

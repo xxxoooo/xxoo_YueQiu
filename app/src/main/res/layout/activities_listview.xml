@@ -4,9 +4,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-
     android:layout_height="match_parent"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:background="@android:color/white">
     <com.yueqiu.view.XListView
         android:id="@+id/activities_lv"
         android:layout_width="match_parent"

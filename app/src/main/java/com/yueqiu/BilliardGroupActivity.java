@@ -7,13 +7,14 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -49,7 +50,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         };
     }
 
-    public class SectionPagerAdapter extends FragmentPagerAdapter{
+    public class SectionPagerAdapter extends FragmentStatePagerAdapter {
 
         public SectionPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -58,8 +59,11 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         @Override
         public Fragment getItem(int i) {
 
-            Fragment mFragment = new BilliardGroupBasicFragment();
-            return mFragment;
+            Fragment fragment = new BilliardGroupBasicFragment();
+            Bundle args = new Bundle();
+            args.putInt("type",i+1);
+            fragment.setArguments(args);
+            return fragment;
         }
 
         @Override
@@ -109,7 +113,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
             case R.id.group_menu_editor:
                 Intent intent = new Intent(this, GroupIssueTopic.class);
                 startActivity(intent);
-                //overridePendingTransition(R.anim.push_up_in, R.anim.push_up_out);
+                overridePendingTransition(R.anim.group_in_to_left,R.anim.group_out_to_left);
                 break;
         }
         return super.onOptionsItemSelected(item);

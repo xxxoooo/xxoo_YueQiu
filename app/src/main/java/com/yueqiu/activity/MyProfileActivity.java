@@ -17,6 +17,7 @@ import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.UserDao;
 import com.yueqiu.db.DBUtils;
@@ -29,6 +30,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -133,44 +135,55 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     JSONObject object = Utils.parseJson(result);
                     Message message = new Message();
                     try {
-                        if (object.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
-                            message.what = DATA_ERROR;
-                            message.obj = object.getString("msg");
-                        } else {
-                            mMap.put(DatabaseConstant.UserTable.SEX, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.SEX));
-                            mMap.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.IMG_URL));
-                            mMap.put(DatabaseConstant.UserTable.USERNAME, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.USERNAME));
-                            mMap.put(DatabaseConstant.UserTable.NICK, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.NICK));
-                            mMap.put(DatabaseConstant.UserTable.DISTRICT, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.DISTRICT));
-                            mMap.put(DatabaseConstant.UserTable.LEVEL, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.LEVEL));
-                            mMap.put(DatabaseConstant.UserTable.BALL_TYPE, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.BALL_TYPE));
-                            mMap.put(DatabaseConstant.UserTable.APPOINT_DATE, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.APPOINT_DATE));
-                            mMap.put(DatabaseConstant.UserTable.BALLARM, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.BALLARM));
-                            mMap.put(DatabaseConstant.UserTable.USERDTYPE, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.USERDTYPE));
-                            mMap.put(DatabaseConstant.UserTable.BALLAGE, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.BALLAGE));
-                            mMap.put(DatabaseConstant.UserTable.IDOL, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.IDOL));
-                            mMap.put(DatabaseConstant.UserTable.IDOL_NAME, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.IDOL_NAME));
-                            mMap.put(DatabaseConstant.UserTable.NEW_IMG, object.getJSONObject("result").
-                                    getString(DatabaseConstant.UserTable.NEW_IMG));
+                        if(!object.isNull("code")) {
+                            if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
 
-                            mUserInfo = Utils.mapingObject(UserInfo.class, object.getJSONObject("result"));
-                            message.what = DATA_SUCCESS;
-                            message.obj = mUserInfo;
+                                mMap.put(DatabaseConstant.UserTable.SEX, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.SEX));
+                                mMap.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.IMG_URL));
+                                mMap.put(DatabaseConstant.UserTable.USERNAME, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.USERNAME));
+                                mMap.put(DatabaseConstant.UserTable.NICK, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.NICK));
+                                mMap.put(DatabaseConstant.UserTable.DISTRICT, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.DISTRICT));
+                                mMap.put(DatabaseConstant.UserTable.LEVEL, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.LEVEL));
+                                mMap.put(DatabaseConstant.UserTable.BALL_TYPE, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.BALL_TYPE));
+                                mMap.put(DatabaseConstant.UserTable.APPOINT_DATE, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.APPOINT_DATE));
+                                mMap.put(DatabaseConstant.UserTable.BALLARM, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.BALLARM));
+                                mMap.put(DatabaseConstant.UserTable.USERDTYPE, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.USERDTYPE));
+                                mMap.put(DatabaseConstant.UserTable.BALLAGE, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.BALLAGE));
+                                mMap.put(DatabaseConstant.UserTable.IDOL, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.IDOL));
+                                mMap.put(DatabaseConstant.UserTable.IDOL_NAME, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.IDOL_NAME));
+                                mMap.put(DatabaseConstant.UserTable.NEW_IMG, object.getJSONObject("result").
+                                        getString(DatabaseConstant.UserTable.NEW_IMG));
+
+                                mUserInfo = Utils.mapingObject(UserInfo.class, object.getJSONObject("result"));
+                                message.what = DATA_SUCCESS;
+                                message.obj = mUserInfo;
+
+
+                            }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                                mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                            }
+                            else {
+                                message.what = DATA_ERROR;
+                                message.obj = object.getString("msg");
+                            }
+                            mHandler.sendMessage(message);
+                        }else{
+                            message.what = DATA_ERROR;
+                            mHandler.sendMessage(message);
                         }
-                        mHandler.sendMessage(message);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -190,12 +203,22 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             switch (msg.what) {
                 case DATA_ERROR:
                     Log.i(TAG, "error to get profile from service");
+                    if(null == msg.obj){
+                        Utils.showToast(MyProfileActivity.this,getString(R.string.http_request_error));
+                    }else{
+                        Utils.showToast(MyProfileActivity.this, (String) msg.obj);
+                    }
                     mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
                     updateUI(mUserInfo);
                     break;
                 case DATA_SUCCESS:
                     mUserDao.updateUserInfo(mMap);
                     updateUI((UserInfo) msg.obj);
+                    break;
+                case PublicConstant.TIME_OUT:
+                    Toast.makeText(MyProfileActivity.this, getString(R.string.http_request_time_out), Toast.LENGTH_SHORT).show();
+                    mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+                    updateUI(mUserInfo);
                     break;
             }
         }
@@ -242,6 +265,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             case KeyEvent.KEYCODE_BACK:
                 mUserDao.updateUserInfo(mMap);
                 finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
                 break;
         }
         return super.onKeyDown(keyCode, event);
@@ -272,6 +296,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             case android.R.id.home:
                 mUserDao.updateUserInfo(mMap);
                 finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
                 break;
         }
         return true;

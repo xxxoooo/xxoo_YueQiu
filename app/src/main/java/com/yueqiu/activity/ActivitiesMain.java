@@ -53,9 +53,9 @@ public class ActivitiesMain extends FragmentActivity implements ActionBar.TabLis
         mList = new ArrayList<Fragment>();
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
 
-        mTitles = new String[]{getString(R.string.groupactivity),
-                getString(R.string.starmeet),
-                getString(R.string.taiqiuzhan),
+        mTitles = new String[]{getString(R.string.group_activity),
+                getString(R.string.star_meet),
+                getString(R.string.billiard_show),
                 getString(R.string.complete),
                 getString(R.string.billiard_other)
         };

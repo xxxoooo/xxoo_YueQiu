@@ -60,9 +60,10 @@
 
     <TextView
         android:id="@+id/tv_price_indi"
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:layout_toRightOf="@+id/search_room_divider"
         android:text="@string/search_room_sub_fragment_price_indi"
+        android:textSize="14sp"
         android:layout_below="@id/tv_room_subfragment_listitem_roomname"
         android:layout_marginLeft="4dp"
         android:layout_alignTop="@+id/rating_room_subfragment_listitem_rating"
@@ -71,16 +72,17 @@
 
 
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:layout_alignTop="@id/tv_price_indi"
         android:layout_toRightOf="@id/tv_price_indi"
         android:text="36"
+        android:textSize="14sp"
         android:id="@+id/tv_room_subfragment_listitem_roomprice"
         />
 
     <!--用于显示球厅的详细地址-->
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:id="@+id/tv_room_subfragment_listitem_roomaddress"
         android:text="@string/search_room_sub_fragment_listitem_roomaddress"
         android:layout_toRightOf="@id/img_room_subfragment_listitem_photo"
@@ -88,16 +90,15 @@
         android:layout_alignLeft="@+id/rating_room_subfragment_listitem_rating"
         android:layout_marginRight="40dp"
         android:layout_marginTop="3dp"
+        android:textSize="14sp"
         />
 
     <TextView
         android:id="@+id/tv_room_subfragment_listitem_roomdistance"
-        style="@style/ListItemTvStyle"
-        android:textSize="12sp"
+        style="@style/TimeTextStyle"
         android:layout_marginTop="30dp"
         android:layout_alignParentRight="true"
         android:text="@string/search_room_sub_fragment_listitem_roomdistance"
-        android:textColor="@color/search_distance_color"
         android:layout_centerVertical="true"
         />
 

@@ -21,6 +21,7 @@ import com.yueqiu.adapter.ExpAdapter;
 import com.yueqiu.bean.ContactsList;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.ContactsDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.AsyncTaskBase;
@@ -56,6 +57,7 @@ public class ContactFragment extends Fragment {
     private static final int GET_SUCCESS = 0;
     private List<ContactsList.Contacts> mContactsList = new ArrayList<ContactsList.Contacts>();
     private ContactsDao mContactsDao;
+    private List<ContactsList.Contacts> mList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -168,45 +170,70 @@ public class ContactFragment extends Fragment {
 
             try {
                 JSONObject jsonResult = new JSONObject(result);
-
-                if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                    ContactsList contactsList = new ContactsList();
+                if (!jsonResult.isNull("code")) {
+                    if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                        ContactsList contactsList = new ContactsList();
 //                    contactsList.setCount(jsonResult.getJSONObject("result").getInt("count"));
-                    JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
-                    for (int j = 0; j < list_data.length(); j++) {
-                        mMapArgument.put(DatabaseConstant.FriendsTable.USER_ID, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.USER_ID));
-                        mMapArgument.put(DatabaseConstant.FriendsTable.GROUP_ID, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.GROUP_ID));
-                        mMapArgument.put(DatabaseConstant.FriendsTable.USERNAME, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.USERNAME));
-                        mMapArgument.put(DatabaseConstant.FriendsTable.IMG_URL, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.IMG_URL));
-                        mMapArgument.put(DatabaseConstant.FriendsTable.LAST_MESSAGE, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.LAST_MESSAGE));
-                        mMapArgument.put(DatabaseConstant.FriendsTable.DATETIME, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.DATETIME));
-                        mContactsDao.insertContact(mMapArgument);
-                        ContactsList.Contacts contacts = contactsList.new Contacts();
-                        contacts.setUser_id(list_data.getJSONObject(j).getInt("user_id"));
-                        contacts.setGroup_id(list_data.getJSONObject(j).getInt("group_id"));
-                        contacts.setUsername(list_data.getJSONObject(j).getString("username"));
-                        contacts.setImg_url(list_data.getJSONObject(j).getString("img_url"));
-                        contacts.setContent(list_data.getJSONObject(j).getString("content"));
-                        contacts.setCreate_time(list_data.getJSONObject(j).getString("create_time"));
-                        contactsList.mList.add(contacts);
+                        JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
+                        for (int j = 0; j < list_data.length(); j++) {
+                            mMapArgument.put(DatabaseConstant.FriendsTable.USER_ID, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.USER_ID));
+                            mMapArgument.put(DatabaseConstant.FriendsTable.GROUP_ID, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.GROUP_ID));
+                            mMapArgument.put(DatabaseConstant.FriendsTable.USERNAME, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.USERNAME));
+                            mMapArgument.put(DatabaseConstant.FriendsTable.IMG_URL, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.IMG_URL));
+                            mMapArgument.put(DatabaseConstant.FriendsTable.LAST_MESSAGE, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.LAST_MESSAGE));
+                            mMapArgument.put(DatabaseConstant.FriendsTable.DATETIME, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.DATETIME));
+                            mContactsDao.insertContact(mMapArgument);
+                            ContactsList.Contacts contacts = contactsList.new Contacts();
+                            contacts.setUser_id(list_data.getJSONObject(j).getInt("user_id"));
+                            contacts.setGroup_id(list_data.getJSONObject(j).getInt("group_id"));
+                            contacts.setUsername(list_data.getJSONObject(j).getString("username"));
+                            contacts.setImg_url(list_data.getJSONObject(j).getString("img_url"));
+                            contacts.setContent(list_data.getJSONObject(j).getString("content"));
+                            contacts.setCreate_time(list_data.getJSONObject(j).getString("create_time"));
+                            contactsList.mList.add(contacts);
+                            maps.put(i, contactsList.mList);
+                        }
+                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, maps).sendToTarget();
+                        }//http请求超时
+                        else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                        }//无数据，json中的code值为1005
+                        else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT) {
+                            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                        } else {
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, jsonResult.getString("msg")).sendToTarget();
+                        }
+                    } else {
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                     }
-                    maps.put(i, contactsList.mList);
+                }catch(JSONException e){
+                    Log.e(TAG, "JSONException: " + e);
                 }
-            } catch (JSONException e) {
-                Log.e(TAG, "JSONException: " + e);
-            }
-            mHandler.obtainMessage(GET_SUCCESS, maps).sendToTarget();
+
+
         }
     }
-
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case GET_SUCCESS:
+                case PublicConstant.GET_SUCCESS:
                     mMaps = (HashMap<Integer, List<ContactsList.Contacts>>) msg.obj;
                     mExpAdapter.setData(mMaps);
                     mExpAdapter.notifyDataSetChanged();
+                    break;
+                case PublicConstant.TIME_OUT:
+                    Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
+                    break;
+                case PublicConstant.REQUEST_ERROR:
+                    if (null == msg.obj) {
+                        Utils.showToast(getActivity(), getString(R.string.http_request_error));
+                    } else {
+                        Utils.showToast(getActivity(), (String) msg.obj);
+                    }
+                    break;
+                case PublicConstant.NO_RESULT:
+                    Utils.showToast(getActivity(), getString(R.string.no_contact_info));
                     break;
                 default:
                     break;

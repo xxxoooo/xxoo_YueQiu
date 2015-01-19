@@ -85,7 +85,7 @@ public class FriendsApplicationFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friends_application, container, false);
         mListView = (ListView) view.findViewById(R.id.friends_application_container);
         mList = mApplicationDao.getApplication();
@@ -137,7 +137,7 @@ public class FriendsApplicationFragment extends Fragment {
     private class FriendsApplicationAsyncTask extends AsyncTaskUtil<String> {
 
         public FriendsApplicationAsyncTask(Map<String, String> map, ProgressBar progressBar, TextView textView) {
-            super(map, progressBar, textView);
+            super(map);
         }
 
         @Override

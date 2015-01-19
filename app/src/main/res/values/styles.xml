@@ -12,6 +12,10 @@
         <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_example</item>
         <item name="android:actionModeCloseDrawable">@drawable/ic_menu_done_holo_dark</item>
         <item name="android:actionMenuTextColor">@android:color/white</item>
+        <item name="android:actionDropDownStyle">@style/DropDownNav.Example</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Example</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu.Example</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/CustomActionBarTextStyle</item>
     </style>
 
 
@@ -22,6 +26,15 @@
         <item name="mdContentBackground">?android:attr/windowBackground</item>
         <item name="mdDrawerOpenUpContentDescription">@string/md__drawerOpenIndicatorDesc</item>
         <item name="mdDrawerClosedUpContentDescription">@string/md__drawerClosedIndicatorDesc</item>
+    </style>
+
+    <style name="MenuTextStyle">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="CustomActionBarTextStyle" parent="@android:style/TextAppearance.Holo">
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="BilliardGroupTheme" parent="@android:style/Theme.Holo.Light.DarkActionBar">
@@ -57,6 +70,23 @@
 
     </style>
 
+    <style name="DropDownNav.Example" parent="@android:style/Widget.Holo.Light.Spinner">
+        <item name="android:background">@drawable/spinner_background_ab_example</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_example</item>
+        <item name="android:dropDownSelector">@drawable/selectable_background_example</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="DropDownListView.Example" parent="@android:style/Widget.Holo.Light.ListView.DropDown">
+        <item name="android:listSelector">@drawable/selectable_background_example</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="PopupMenu.Example" parent="@android:style/Widget.Holo.Light.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_example</item>
+
+    </style>
+
     <!--用于SearchActivity-->
     <!--定义用于SearchActivity控制所有的ListViewItem当中的TextView的显示的Style-->
     <style name="ListItemTvStyle" parent="AppTheme">
@@ -65,6 +95,12 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/md__defaultBackground</item>
         <item name="android:textStyle">normal</item>
+    </style>
+    <style name="TimeTextStyle" parent="AppTheme">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/search_distance_color</item>
+        <item name="android:textSize">12sp</item>
     </style>
     <!--用于SearchActivity定义PopupWindow当中的TextView的style-->
     <style name="PopupWindowTvStyle" parent="AppTheme">
@@ -145,9 +181,8 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">22sp</item>
-        <item name="android:gravity">center</item>
-        <item name="android:layout_marginBottom">5dp</item>
-        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+
     </style>
 
     <!--定义约球详情中的PopupWindow动画的style-->
@@ -156,10 +191,7 @@
         <item name="android:windowExitAnimation">@anim/popup_window_out</item>
     </style>
 
-    <style name="MenuTextStyle">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textSize">18sp</item>
-    </style>
+
 
 
     <style name="ShareWindowStyle" parent="@android:style/Theme.Dialog">
@@ -190,6 +222,23 @@
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:background">#bfbfbf</item>
+    </style>
+
+    <style name="ActionSheet" parent="@android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:background">@color/transparent</item>
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowAnimationStyle">@style/ActionSheetAnimation</item>
+    </style>
+
+    <style name="ActionSheetAnimation" parent="@android:style/Animation.Dialog">
+        <item name="android:windowEnterAnimation">@anim/push_up_in</item>
+        <item name="android:windowExitAnimation">@anim/push_up_out</item>
     </style>
 
 

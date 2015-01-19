@@ -13,12 +13,13 @@
     <!--用于约球详情Activity当中点击分享按钮之后弹出的popupWindow-->
 
     <LinearLayout
-        android:layout_alignParentTop="true"
         android:id="@+id/first_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:weightSum="4"
+        android:layout_above="@+id/temp_view"
+        android:layout_marginBottom="5dp"
         >
 
         <TextView
@@ -32,7 +33,7 @@
             style="@style/SearchDatingDetailedImgViewStyle"
             android:id="@+id/img_search_dating_detail_share_yueqiucircle"
             android:drawableTop="@drawable/share_group"
-            android:text="@string/search_dating_detailed_title_yueqiufriend"
+            android:text="@string/search_dating_detailed_title_yueqiugroup"
             />
 
         <TextView
@@ -49,13 +50,18 @@
             android:id="@+id/img_search_dating_detail_share_weichat"
             />
     </LinearLayout>
-
+    <View
+        android:id="@+id/temp_view"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_centerInParent="true"
+        android:visibility="invisible"/>
     <LinearLayout
-        android:layout_marginTop="7dp"
+        android:layout_marginTop="5dp"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/first_group"
+        android:layout_below="@id/temp_view"
         android:id="@+id/second_group"
         android:weightSum="4"
         android:layout_marginBottom="7dp">
@@ -90,11 +96,11 @@
     </LinearLayout>
 
     <Button
-        android:layout_below="@id/second_group"
         android:text="@string/search_dating_detailed_btn_cancel_str"
         android:textColor="@color/md__defaultBackground"
         android:id="@+id/btn_search_dating_detailed_cancel"
         style="@style/SearchDatingBtn"
+        android:layout_alignParentBottom="true"
         android:background="@drawable/search_dating_detailed_btn_bg_cancel"
         />
 

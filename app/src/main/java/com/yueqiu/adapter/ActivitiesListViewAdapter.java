@@ -78,7 +78,7 @@ public class ActivitiesListViewAdapter extends BaseAdapter {
         holder.tv_content.setText(mList.get(i).getContent().toString().trim());
         if( null == mList.get(i).getImg_url() || mList.get(i).getImg_url().equals(""))
         {
-            holder.iv.setImageDrawable(mContext.getResources().getDrawable(R.drawable.head_img));
+            holder.iv.setImageDrawable(mContext.getResources().getDrawable(R.drawable.default_head));
         }
         else
         {

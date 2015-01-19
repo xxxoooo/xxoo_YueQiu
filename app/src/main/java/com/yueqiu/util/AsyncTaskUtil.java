@@ -12,13 +12,9 @@ import java.util.Map;
 public class AsyncTaskUtil<T> extends AsyncTask<Map<String,String>,Void,JSONObject>{
 
     private Map<String,T> mMap;
-    private ProgressBar mProgressBar;
-    private TextView mTextView;
 
-    public AsyncTaskUtil(Map<String,T> map,ProgressBar progressBar,TextView textView){
-        this.mMap = map;
-        this.mProgressBar = progressBar;
-        this.mTextView = textView;
+    public AsyncTaskUtil(Map<String,T> map){
+        mMap = map;
     }
 
     @Override
@@ -31,14 +27,10 @@ public class AsyncTaskUtil<T> extends AsyncTask<Map<String,String>,Void,JSONObje
     @Override
     protected void onPostExecute(JSONObject jsonObject) {
         super.onPostExecute(jsonObject);
-        mProgressBar.setVisibility(View.GONE);
-        mTextView.setVisibility(View.GONE);
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        mProgressBar.setVisibility(View.VISIBLE);
-        mTextView.setVisibility(View.VISIBLE);
     }
 }

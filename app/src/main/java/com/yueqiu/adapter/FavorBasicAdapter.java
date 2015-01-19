@@ -5,12 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yueqiu.R;
-import com.yueqiu.bean.GroupNoteInfo;
+import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.PublishedInfo;
 
 import java.util.List;
@@ -19,11 +18,11 @@ import java.util.List;
  * Created by wangyun on 15/1/4.
  */
 public class FavorBasicAdapter extends BaseAdapter {
-    private List<PublishedInfo.PublishedItemInfo> mList;
+    private List<FavorInfo.FavorItemInfo> mList;
     private Context mContext;
     private LayoutInflater mInflater;
 
-    public FavorBasicAdapter(Context context,List<PublishedInfo.PublishedItemInfo> list){
+    public FavorBasicAdapter(Context context,List<FavorInfo.FavorItemInfo> list){
         this.mContext = context;
         this.mList = list;
         mInflater = LayoutInflater.from(mContext);
@@ -48,13 +47,12 @@ public class FavorBasicAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if(convertView == null){
-            convertView = mInflater.inflate(R.layout.published_item_layout,null);
+            convertView = mInflater.inflate(R.layout.my_collection_item_layout,null);
             holder = new ViewHolder();
-            holder.image = (ImageView) convertView.findViewById(R.id.published_item_image);
-            holder.title = (TextView) convertView.findViewById(R.id.published_title);
-            holder.content = (TextView) convertView.findViewById(R.id.published_content);
-            holder.dateTime = (TextView) convertView.findViewById(R.id.published_time);
-            holder.whole_bg = (RelativeLayout) convertView.findViewById(R.id.published_item_bg_view);
+            holder.title = (TextView) convertView.findViewById(R.id.favor_title);
+            holder.content = (TextView) convertView.findViewById(R.id.favor_content);
+            holder.dateTime = (TextView) convertView.findViewById(R.id.favor_time);
+            holder.whole_bg = (RelativeLayout) convertView.findViewById(R.id.favor_item_bg_view);
             convertView.setTag(holder);
         }else{
             holder = (ViewHolder) convertView.getTag();
@@ -72,7 +70,6 @@ public class FavorBasicAdapter extends BaseAdapter {
     }
 
     class ViewHolder{
-        ImageView image;
         TextView  title;
         TextView  content;
         TextView  dateTime;

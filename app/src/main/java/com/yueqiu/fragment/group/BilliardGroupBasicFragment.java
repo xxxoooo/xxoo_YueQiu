@@ -1,25 +1,39 @@
 package com.yueqiu.fragment.group;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
+import com.yueqiu.activity.BilliardGroupDetailActivity;
 import com.yueqiu.adapter.GroupBasicAdapter;
 import com.yueqiu.bean.GroupNoteInfo;
+import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
+
+import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by wangyun on 14/12/17.
@@ -27,10 +41,21 @@ import java.util.List;
  */
 public class BilliardGroupBasicFragment extends Fragment {
     private View mView;
+    private Activity mActivity;
     private RadioGroup mGroup;
     private ListView mListView;
     private List<GroupNoteInfo> mList = new ArrayList<GroupNoteInfo>();
     private GroupBasicAdapter mAdapter;
+    private ProgressBar mPreProgress;
+    private TextView mPreText;
+    private Drawable mProgressDrawable;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = getActivity();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_billard_group_basic,null);
@@ -84,8 +109,33 @@ public class BilliardGroupBasicFragment extends Fragment {
             }
         });
 
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                YueQiuApp.sGroupInfo = (GroupNoteInfo) mAdapter.getItem(position);
+
+                Intent intent = new Intent(getActivity(), BilliardGroupDetailActivity.class);
+                startActivity(intent);
+            }
+        });
+
         return mView;
     }
+
+
+    private void initView(){
+        mPreText = (TextView) mView.findViewById(R.id.pre_text);
+        mPreProgress = (ProgressBar) mView.findViewById(R.id.pre_progress);
+
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(mActivity).build();
+        Rect bounds = mPreProgress.getIndeterminateDrawable().getBounds();
+        mPreProgress.setIndeterminateDrawable(mProgressDrawable);
+        mPreProgress.getIndeterminateDrawable().setBounds(bounds);
+        mPreText.setText(getString(R.string.activity_issuing));
+    }
+
+
 
     private class TimeComparator implements Comparator<GroupNoteInfo>{
 

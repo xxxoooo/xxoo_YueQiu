@@ -35,7 +35,7 @@
                 android:inputType="number"
                 android:drawableLeft="@drawable/phone_icon"
                 android:drawablePadding="10dp"
-                android:hint="@string/phonenum"
+                android:hint="@string/phone_num"
                 android:textColorHint="@color/edit_text_hint_color"
                 android:textColor="@color/md__defaultBackground"
                 android:singleLine="true" />
@@ -44,9 +44,10 @@
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:textSize="15sp"
+                android:background="@drawable/basic_textview_bg"
+                android:id="@+id/tv_register_getchecknum"
                 android:layout_marginRight="13dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                style="@style/ListItemTvStyle" />
             </RelativeLayout>
 
         <LinearLayout
@@ -61,10 +62,10 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@null"
-            android:password="true"
             android:drawableLeft="@drawable/code_icon"
             android:drawablePadding="10dp"
-            android:hint="@string/checknum"
+            android:hint="@string/check_num"
+            android:phoneNumber="true"
             android:digits="@string/inputtype"
             android:textColorHint="@color/edit_text_hint_color"
             android:textColor="@color/md__defaultBackground"
@@ -106,8 +107,7 @@
             android:background="@drawable/register_agree_article_bg"/>
         <TextView
             android:id="@+id/checkphone_read_and_agree_the_article"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:textSize="16sp"
             android:layout_marginLeft="10dp"
             />
@@ -126,10 +126,8 @@
         android:layout_width="match_parent">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ListItemTvStyle"
             android:textSize="18sp"
-            android:textColor="@color/md__defaultBackground"
             android:text="@string/already_have_account" />
         <TextView
             android:id="@+id/activity_checkphone_tv_login"

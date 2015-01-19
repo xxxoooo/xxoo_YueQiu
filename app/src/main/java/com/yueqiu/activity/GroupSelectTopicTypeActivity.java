@@ -13,11 +13,11 @@ import com.yueqiu.R;
 
 public class GroupSelectTopicTypeActivity extends Activity implements View.OnClickListener{
     public static final String TOPIC_TYPE_KEY = "topic_type";
-    public static final int GET_MASTER  =  0;
-    public static final int BE_MASTER   =  1;
-    public static final int FIND_FRIEND =  2;
-    public static final int EQUIP       =  3;
-    public static final int OTHER       =  4;
+    public static final int GET_MASTER  =  1;
+    public static final int BE_MASTER   =  2;
+    public static final int FIND_FRIEND =  3;
+    public static final int EQUIP       =  4;
+    public static final int OTHER       =  5;
 
     private View mGetMaster,mBeMaster,mFindFriend,mEquip,mOther;
     private ImageView mIvGetMaster,mIvBeMaster,mIvFindFriend,mIvEquip,mIvOther;
@@ -51,7 +51,7 @@ public class GroupSelectTopicTypeActivity extends Activity implements View.OnCli
         mOther.setOnClickListener(this);
 
         mIntent = getIntent();
-        mTopicType = mIntent.getIntExtra(TOPIC_TYPE_KEY,0);
+        mTopicType = mIntent.getIntExtra(TOPIC_TYPE_KEY,1);
         if(mTopicType == GET_MASTER){
             mIvBeMaster.setVisibility(View.GONE);
             mIvFindFriend.setVisibility(View.GONE);
