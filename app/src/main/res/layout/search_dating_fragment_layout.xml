@@ -71,7 +71,7 @@
         <Button
             style="@style/SearchSubFragmentFilterBtnStyle"
             android:id="@+id/btn_dating_distance"
-            android:text="@string/search_dating_subfragment_title_distance"
+            android:text="@string/search_mate_subfragment_title_distance"
             />
 
         <View
@@ -93,11 +93,13 @@
             />
     </LinearLayout>
 
-    <com.yueqiu.view.XListView
+    <ListView
         android:layout_below="@id/dating_filter_group"
         android:id="@+id/search_dating_subfragment_list"
         style="@style/SearchSubActivityListViewStyle"
-        ></com.yueqiu.view.XListView>
+        >
+
+    </ListView>
 
     <include
         layout="@layout/pre_load"

@@ -3,6 +3,7 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,8 +25,11 @@ import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.view.MyURLSpan;
+import com.yueqiu.view.YueQiuDialogBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,8 +48,6 @@ public class CheckNumActivity extends Activity implements View.OnClickListener {
     private Button mBtnNext;
     private String mPhone;
     private String mCode;
-    private static final int SUCCESS = 0x01;
-    private static final int ERROR = 0x02;
     private ActionBar mActionBar;
     private CheckBox mCheckBox;
     private Handler handler = new Handler() {
@@ -53,21 +55,28 @@ public class CheckNumActivity extends Activity implements View.OnClickListener {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
-                case SUCCESS:
+
+                case PublicConstant.GET_SUCCESS:
                     mCode = (String) msg.obj;
-                    new AlertDialog.Builder(CheckNumActivity.this).
-                            setMessage("验证码为：" + (String) msg.obj).create().show();
-                    Toast.makeText(CheckNumActivity.this,
-                            "验证码为：" + (String) msg.obj, Toast.LENGTH_LONG).show();
+//                    new AlertDialog.Builder(CheckNumActivity.this).
+//                            setMessage("验证码为：" +  msg.obj).create().show();
+//                    Toast.makeText(CheckNumActivity.this,
+//                            "验证码为：" + msg.obj, Toast.LENGTH_LONG).show();
                     break;
-                case ERROR:
-                    Toast.makeText(CheckNumActivity.this,
-                            "请在" + (String) msg.obj + "秒后重试", Toast.LENGTH_SHORT).show();
+                case PublicConstant.TIME_OUT:
+                    Utils.showToast(CheckNumActivity.this,getString(R.string.http_request_time_out));
                     break;
+                case PublicConstant.REQUEST_ERROR:
+                    if(null == msg.obj){
+                        Utils.showToast(CheckNumActivity.this,getString(R.string.retry_after_seconds,msg.obj));
+                    }else{
+                        Utils.showToast(CheckNumActivity.this,getString(R.string.http_request_error));
+                    }
+                    break;
+
             }
         }
     };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +92,7 @@ public class CheckNumActivity extends Activity implements View.OnClickListener {
         mCheckBox = (CheckBox) findViewById(R.id.checkphone_agree_article_check);
         SpannableString spanStr = new SpannableString(getString(R.string.already_read_and_agree_the_article));
         spanStr.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.have_agree_and_read)), 0, 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        spanStr.setSpan(new URLSpan("http://www.baidu.com"), 7, 16, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spanStr.setSpan(new MyURLSpan("file://android_asset/policy.html"), 7, 16, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         mTvAgree.setText(spanStr);
         mTvAgree.setMovementMethod(LinkMovementMethod.getInstance());
         mTvLogin.setOnClickListener(this);
@@ -104,7 +113,7 @@ public class CheckNumActivity extends Activity implements View.OnClickListener {
             case R.id.tv_register_getchecknum:
                 mPhone = mEtPhone.getText().toString();
                 if (mPhone.length() != 11) {
-                    Toast.makeText(CheckNumActivity.this, "请输入正确的手机号", Toast.LENGTH_SHORT).show();
+                    Utils.showToast(CheckNumActivity.this,getString(R.string.please_input_right_number));
                     return;
                 }
                 new Thread(getCheckNum).start();
@@ -112,25 +121,23 @@ public class CheckNumActivity extends Activity implements View.OnClickListener {
             case R.id.activity_checkphone_btn_register:
                 String code = mEtCheckNum.getText().toString().trim();
                 if (code == null || code.equals("")) {
-                    Toast.makeText(CheckNumActivity.this, "请输入验证码", Toast.LENGTH_SHORT).show();
+                    Utils.showToast(CheckNumActivity.this,getString(R.string.please_input_captcha));
                     return;
                 }
                 if (!code.equals(mCode)) {
-                    Toast.makeText(CheckNumActivity.this, "验证码不正确，请重新输入",
-                            Toast.LENGTH_SHORT).show();
+                    Utils.showToast(CheckNumActivity.this,getString(R.string.captcha_is_wrong));
                     return;
                 }
 
                 if (!mCheckBox.isChecked()) {
-                    Toast.makeText(CheckNumActivity.this,
-                            getString(R.string.please_read_article), Toast.LENGTH_SHORT).show();
+                    Utils.showToast(CheckNumActivity.this,getString(R.string.please_read_article));
                     return;
                 }
 
                 Intent intent = new Intent();
                 Bundle bundle = new Bundle();
-                bundle.putString("phone", mPhone);
-                bundle.putString("verfication_code", mCode);
+                bundle.putString(HttpConstants.RegisterConstant.PHONE, mPhone);
+                bundle.putString(HttpConstants.RegisterConstant.VERFICATION_CODE, mCode);
                 intent.setClass(CheckNumActivity.this, Register1Activity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
@@ -148,19 +155,25 @@ public class CheckNumActivity extends Activity implements View.OnClickListener {
         @Override
         public void run() {
             Map<String, String> map = new HashMap<String, String>();
-            map.put("phone", mPhone);
-            map.put("action_type", "3");
+            map.put(HttpConstants.RegisterConstant.PHONE, mPhone);
+            map.put(HttpConstants.RegisterConstant.ACTION_TYPE, "3");
             String retStr = HttpUtil.urlClient(HttpConstants.RegisterConstant.CODEURL,
                     map, HttpConstants.RequestMethod.POST);
             JSONObject object = Utils.parseJson(retStr);
             Message msg = new Message();
             try {
-                if (object.getInt("code") != 1001) {
-                    msg.what = ERROR;
-                    msg.obj = object.getJSONObject("result").getString("leftTime");
-                } else {
-                    msg.what = SUCCESS;
-                    msg.obj = object.getJSONObject("result").getString("code");
+                if(!object.isNull("code")) {
+                    if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                        msg.what = PublicConstant.GET_SUCCESS;
+                        msg.obj = object.getJSONObject("result").getString("code");
+                    }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                        msg.what = PublicConstant.TIME_OUT;
+                    }else {
+                        msg.what = PublicConstant.REQUEST_ERROR;
+                        msg.obj = object.getJSONObject("result").getString("leftTime");
+                    }
+                }else{
+                    msg.what = PublicConstant.REQUEST_ERROR;
                 }
                 handler.sendMessage(msg);
             } catch (JSONException e) {

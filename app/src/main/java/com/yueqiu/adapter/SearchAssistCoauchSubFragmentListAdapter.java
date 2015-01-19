@@ -1,19 +1,17 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.SearchAssistCoauchSubFragmentBean;
-import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
+import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.VolleySingleton;
 
 import java.util.ArrayList;

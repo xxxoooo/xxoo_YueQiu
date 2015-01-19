@@ -9,7 +9,7 @@
     <Button
         style="@style/PopupWindowTvStyle"
         android:id="@+id/btn_search_mate_gender_no_filter"
-        android:text="@string/search_mate_subfragment_title_gender"
+        android:text="@string/gender"
         android:padding="5dp"
         android:textColor="@color/login_btn_normal"
         />
@@ -30,7 +30,6 @@
         >
 
     </ListView>
-
 
 </LinearLayout>
 

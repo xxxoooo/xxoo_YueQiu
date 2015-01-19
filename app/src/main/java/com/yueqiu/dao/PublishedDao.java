@@ -21,5 +21,5 @@ public interface PublishedDao {
 
     public boolean isExistPublishedItemInfo(int tableId,int type);
 
-    public PublishedInfo getPublishedInfo(String userId,int type);
+    public PublishedInfo getPublishedInfo(String userId,int type,int start,int end);
 }

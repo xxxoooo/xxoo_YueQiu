@@ -17,22 +17,16 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.InflateException;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.activity.ActivitiesIssueActivity;
@@ -51,12 +45,12 @@ import com.yueqiu.bean.SlideOtherItem;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.fragment.search.BilliardsSearchAssistCoauchFragment;
-import com.yueqiu.fragment.search.BilliardsSearchCoauchFragment;
-import com.yueqiu.fragment.search.BilliardsSearchDatingFragment;
-import com.yueqiu.fragment.search.BilliardsSearchMateFragment;
-import com.yueqiu.fragment.search.BilliardsSearchRoomFragment;
-import com.yueqiu.fragment.search.common.SearchSubFragmentConstants;
+import com.yueqiu.fragment.nearby.BilliardsSearchAssistCoauchFragment;
+import com.yueqiu.fragment.nearby.BilliardsSearchCoauchFragment;
+import com.yueqiu.fragment.nearby.BilliardsSearchDatingFragment;
+import com.yueqiu.fragment.nearby.BilliardsSearchMateFragment;
+import com.yueqiu.fragment.nearby.BilliardsSearchRoomFragment;
+import com.yueqiu.fragment.nearby.common.SearchSubFragmentConstants;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.menudrawer.MenuDrawer;
@@ -65,7 +59,6 @@ import com.yueqiu.view.menudrawer.Position;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -428,11 +421,13 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                             intent.setClass(BilliardSearchActivity.this,MyProfileActivity.class);
                         }
                         startActivity(intent);
+                        overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
                         break;
                     case 1:
                         if(checkUserId()) {
                             intent.setClass(BilliardSearchActivity.this, MyProfileActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
                         }else{
                             Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
@@ -441,6 +436,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         if(checkUserId()) {
                             intent.setClass(BilliardSearchActivity.this, MyParticipationActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
                         }else{
                             Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
@@ -449,6 +445,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         if(checkUserId()) {
                             intent.setClass(BilliardSearchActivity.this, MyfavorCollActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
                         }else{
                             Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
@@ -457,6 +454,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         if(checkUserId()) {
                             intent.setClass(BilliardSearchActivity.this, PublishedInfoActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
                         }else{
                             Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
@@ -465,6 +463,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         if(checkUserId()) {
                             intent.setClass(BilliardSearchActivity.this, ActivitiesIssueActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
                         }else{
                             Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
@@ -473,6 +472,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         if(checkUserId()) {
                             intent.setClass(BilliardSearchActivity.this, FeedbackActivity.class);
                             startActivity(intent);
+                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
                         }else{
                             Toast.makeText(BilliardSearchActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }

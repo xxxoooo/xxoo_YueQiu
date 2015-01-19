@@ -24,26 +24,25 @@
         android:layout_alignTop="@+id/img_assistcoauch_subfragment_listitem_photo"
         android:layout_marginTop="3dp"
         android:layout_marginLeft="15dp"
-        android:textColor="@color/md__defaultBackground"
         android:textSize="18sp"
         />
 
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:id="@+id/tv_assistcoauch_subfragment_listitem_gender"
         android:background="@drawable/textview_withdrawable_bg"
         android:drawableRight="@drawable/male"
-        android:text="@string/search_mate_popupmenu_item_male_str"
+        android:text="@string/man"
+        android:textSize="14sp"
         android:layout_alignBottom="@+id/img_assistcoauch_subfragment_listitem_photo"
         android:layout_toRightOf="@+id/img_assistcoauch_subfragment_listitem_photo"
         android:padding="4dp"
         android:layout_marginLeft="15dp"
         android:drawablePadding="3dp"
-        android:textStyle="normal"
         />
 
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:id="@+id/tv_assistcoauch_subfragment_listitem_kinds"
         android:background="@drawable/textview_withdrawable_bg"
         android:text="@string/search_coauch_sub_fragment_listitem_userkinds"
@@ -51,7 +50,7 @@
         android:layout_alignBottom="@id/tv_assistcoauch_subfragment_listitem_gender"
         android:padding="4dp"
         android:layout_marginLeft="7dp"
-        android:textStyle="normal"
+        android:textSize="14sp"
         />
 
 
@@ -60,7 +59,7 @@
         在实际开发当中需要注意的。如果忘了，以下是关于StringPlaceHolder的具体指导博客
         http://www.piwai.info/android-string-placeholders/-->
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:id="@+id/tv_assistcoauch_subfragment_listitem_price"
         android:background="@drawable/textview_withdrawable_bg"
         android:text="@string/search_assistcaouch_subfragment_listitem_price"
@@ -68,15 +67,13 @@
         android:layout_alignBottom="@id/tv_assistcoauch_subfragment_listitem_kinds"
         android:padding="4dp"
         android:layout_marginLeft="7dp"
-        android:textStyle="normal"
+        android:textSize="14sp"
         />
 
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:id="@+id/tv_assistcoauch_subfragment_listitem_distance"
-        android:textSize="12sp"
         android:text="@string/search_coauch_sub_fragment_listitem_userdistan"
-        android:textColor="@color/search_distance_color"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
         android:layout_centerVertical="true"

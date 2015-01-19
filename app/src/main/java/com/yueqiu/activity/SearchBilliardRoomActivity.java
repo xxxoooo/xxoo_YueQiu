@@ -2,44 +2,35 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.LruCache;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
-import com.android.volley.toolbox.Volley;
 import com.yueqiu.R;
-import com.yueqiu.fragment.search.common.SubFragmentsCommonUtils;
+import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
+import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
-
-import java.awt.font.TextAttribute;
 
 /**
  * @author scguo
- *
- * 这是用于展示球厅的具体Activity
- * 当我们点击球厅子Fragment(BilliardsSearchRoomFragment)当中的ListView的任何的一个item，就会
- * 跳转到当前的这个Fragment当中
- *
- *
+ *         <p/>
+ *         这是用于展示球厅的具体Activity
+ *         当我们点击球厅子Fragment(BilliardsSearchRoomFragment)当中的ListView的任何的一个item，就会
+ *         跳转到当前的这个Fragment当中
  */
 public class SearchBilliardRoomActivity extends Activity
 {
@@ -54,7 +45,7 @@ public class SearchBilliardRoomActivity extends Activity
 
     private ActionBar mActionBar;
 
-    private FrameLayout mWindowRootElem;
+//    private FrameLayout mWindowRootElem;
 
 
     private ImageLoader mImgLoader;
@@ -79,8 +70,8 @@ public class SearchBilliardRoomActivity extends Activity
         mRoomDetailedInfo = (TextView) findViewById(R.id.tv_search_room_detailed_info);
 
         // get the root element use to dimmer the activity background
-        mWindowRootElem = (FrameLayout) findViewById(R.id.window_root_elem);
-        mWindowRootElem.getForeground().setAlpha(0);
+//        mWindowRootElem = (FrameLayout) findViewById(R.id.window_root_elem);
+//        mWindowRootElem.getForeground().setAlpha(0);
 
         mImgLoader = VolleySingleton.getInstance().getImgLoader();
 
@@ -88,8 +79,7 @@ public class SearchBilliardRoomActivity extends Activity
         // the detailed content of these TextView and ImageViews
         Intent receivedIntent = getIntent();
         Bundle receivedData = receivedIntent.getBundleExtra(SubFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT);
-        if (null != receivedData)
-        {
+        if (null != receivedData) {
             double price = receivedData.getDouble(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE);
             float level = receivedData.getFloat(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL);
             String tag = receivedData.getString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_TAG);
@@ -118,14 +108,12 @@ public class SearchBilliardRoomActivity extends Activity
     }
 
 
-
     @Override
     protected void onResume()
     {
         super.onResume();
 
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
-        {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
             mActionBar = getActionBar();
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -143,7 +131,6 @@ public class SearchBilliardRoomActivity extends Activity
     // TODO: 我们目前还不确定Server端的策略，如果他有提供这个interface，那么我们就直接在这里进行了，否则的话，就从新进行请求)
     private String getRoomDetailedInfo()
     {
-
 
 
         return "";
@@ -165,13 +152,13 @@ public class SearchBilliardRoomActivity extends Activity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        switch (id)
-        {
+        switch (id) {
             case R.id.search_room_detail_action_collect:
                 Toast.makeText(SearchBilliardRoomActivity.this, SearchBilliardRoomActivity.this.getResources().getString(R.string.search_room_collect_success_indicator), Toast.LENGTH_LONG).show();
                 break;
             case R.id.search_room_detail_action_share:
-                popupShareWindow();
+                Dialog dlg = Utils.showSheet(this);
+                dlg.show();
 
                 break;
         }
@@ -185,6 +172,7 @@ public class SearchBilliardRoomActivity extends Activity
     private PopupWindow mPopupWindow;
     private TextView mTvYueqiu, mTvYueqiuFriend, mTvFriendCircle, mTvWeichat, mTvQQZone, mTvTencentWeibo, mTvSinaWeibo, mTvRenren;
     private Button mBtnCancel;
+
     // 弹出约球详情分享的popupWindow
     private void popupShareWindow()
     {
@@ -220,15 +208,15 @@ public class SearchBilliardRoomActivity extends Activity
             {
                 mPopupWindow.dismiss();
                 // while the popupWindow is dismissed from the current activity, make the background back to the normal state
-                mWindowRootElem.getForeground().setAlpha(0);
-                mWindowRootElem.forceLayout();
+//                mWindowRootElem.getForeground().setAlpha(0);
+//                mWindowRootElem.forceLayout();
             }
         });
 
         // TODO: 当我们在后期代码压缩时，如果需要将popupWindow抽离出来的时候，需要将以下用于设置PopupWindow的显示
         // TODO: 位置的时候，我们就需要将popupWindow当前所在的Activity的准确的layout文件的根元素的指定，否则就会发生异常
         mPopupWindow.showAtLocation(findViewById(R.id.search_room_detailed_whole_container), Gravity.BOTTOM, 0, 0);
-        mWindowRootElem.getForeground().setAlpha(160);
+//        mWindowRootElem.getForeground().setAlpha(160);
     }
 
 
@@ -237,8 +225,7 @@ public class SearchBilliardRoomActivity extends Activity
         @Override
         public void onClick(View v)
         {
-            switch (v.getId())
-            {
+            switch (v.getId()) {
                 case R.id.img_search_dating_detail_share_yuqeiufirend:
                     Toast.makeText(SearchBilliardRoomActivity.this, "sharing to the yueqiu friends", Toast.LENGTH_LONG).show();
                     break;

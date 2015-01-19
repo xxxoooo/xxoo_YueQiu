@@ -21,6 +21,7 @@ import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.AsyncTaskBase;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.Utils;
 import com.yueqiu.view.contacts.IphoneTreeView;
 import com.yueqiu.view.contacts.LoadingView;
 
@@ -46,7 +47,6 @@ public class ContactFragment extends Fragment {
     private IphoneTreeView mIphoneTreeView;
     private ExpAdapter mExpAdapter;
     private HashMap<Integer, List<ContactsList.Contacts>> mMaps;
-    private static final int GET_SUCCESS = 0;
     private List<ContactsList.Contacts> mList;
 
     @Override
@@ -134,27 +134,40 @@ public class ContactFragment extends Fragment {
 
             try {
                 JSONObject jsonResult = new JSONObject(result);
-
-                if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                    ContactsList contactsList = new ContactsList();
+                if(!jsonResult.isNull("code")) {
+                    if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                        ContactsList contactsList = new ContactsList();
 //                    contactsList.setCount(jsonResult.getJSONObject("result").getInt("count"));
-                    JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
-                    for (int j = 0; j < list_data.length(); j++) {
-                        ContactsList.Contacts contacts = contactsList.new Contacts();
-                        contacts.setUser_id(list_data.getJSONObject(j).getInt("user_id"));
-                        contacts.setGroup_id(list_data.getJSONObject(j).getInt("group_id"));
-                        contacts.setUsername(list_data.getJSONObject(j).getString("username"));
-                        contacts.setImg_url(list_data.getJSONObject(j).getString("img_url"));
-                        contacts.setContent(list_data.getJSONObject(j).getString("content"));
-                        contacts.setCreate_time(list_data.getJSONObject(j).getString("create_time"));
-                        contactsList.mList.add(contacts);
+                        JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
+                        for (int j = 0; j < list_data.length(); j++) {
+                            ContactsList.Contacts contacts = contactsList.new Contacts();
+                            contacts.setUser_id(list_data.getJSONObject(j).getInt("user_id"));
+                            contacts.setGroup_id(list_data.getJSONObject(j).getInt("group_id"));
+                            contacts.setUsername(list_data.getJSONObject(j).getString("username"));
+                            contacts.setImg_url(list_data.getJSONObject(j).getString("img_url"));
+                            contacts.setContent(list_data.getJSONObject(j).getString("content"));
+                            contacts.setCreate_time(list_data.getJSONObject(j).getString("create_time"));
+                            contactsList.mList.add(contacts);
+                        }
+                        maps.put(i, contactsList.mList);
+                        mHandler.obtainMessage(PublicConstant.GET_SUCCESS, maps).sendToTarget();
+                    }//http请求超时
+                    else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                    }//无数据，json中的code值为1005
+                    else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                        mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                     }
-                    maps.put(i, contactsList.mList);
+                    else {
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonResult.getString("msg")).sendToTarget();
+                    }
+                }else{
+                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                 }
             } catch (JSONException e) {
                 Log.e(TAG, "JSONException: " + e);
             }
-            mHandler.obtainMessage(GET_SUCCESS, maps).sendToTarget();
+
         }
 
     }
@@ -163,11 +176,24 @@ public class ContactFragment extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case GET_SUCCESS:
+                case PublicConstant.GET_SUCCESS:
                     mMaps = (HashMap<Integer, List<ContactsList.Contacts>>) msg.obj;
 //                    mExpAdapter = new ExpAdapter(mContext, mMaps, mIphoneTreeView);
                     mExpAdapter.setData(mMaps);
                     mExpAdapter.notifyDataSetChanged();
+                    break;
+                case PublicConstant.TIME_OUT:
+                    Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
+                    break;
+                case PublicConstant.REQUEST_ERROR:
+                    if(null == msg.obj){
+                        Utils.showToast(getActivity(),getString(R.string.http_request_error));
+                    }else{
+                        Utils.showToast(getActivity(), (String) msg.obj);
+                    }
+                    break;
+                case PublicConstant.NO_RESULT:
+                    Utils.showToast(getActivity(),getString(R.string.no_contact_info));
                     break;
                 default:
 

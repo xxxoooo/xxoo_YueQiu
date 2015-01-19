@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
@@ -54,6 +55,7 @@ public class HttpUtil
         {
             throw new NullPointerException("url is null!");
         }
+        String realResult = null;
         StringBuilder sb = new StringBuilder();
         sb.append(HTTP).append(url);
         boolean flag = (null == map || 0 == map.size()) ? false : true;
@@ -80,6 +82,7 @@ public class HttpUtil
             HttpURLConnection conn = (HttpURLConnection)urls.openConnection();
             String requestMethod = (null == method || "".equals(method)) ? "GET" : method;
             conn.setRequestMethod(requestMethod);
+            conn.setConnectTimeout(2000);
             conn.setDoInput(true);
             conn.setDoOutput(true);
             conn.connect();
@@ -98,10 +101,12 @@ public class HttpUtil
             return result.toString().trim();
         } catch (MalformedURLException e) {
             e.printStackTrace();
+        } catch (SocketTimeoutException e){
+            realResult = "{\"code\":1011}";
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return realResult;
     }
 
 

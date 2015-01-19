@@ -29,41 +29,41 @@
         />
 
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:id="@+id/tv_coauch_subfragment_listitem_gender"
-        android:text="@string/search_mate_subfragment_title_gender"
+        android:text="@string/gender"
+        android:textSize="14sp"
         android:drawableRight="@drawable/male"
         android:drawablePadding="3dp"
         android:paddingLeft="4dp"
         android:padding="4dp"
         android:layout_marginLeft="15dp"
         android:layout_marginBottom="3dp"
-        android:textStyle="normal"
         android:layout_alignBottom="@+id/img_coauch_subfragment_listitem_photo"
         android:layout_toRightOf="@id/img_coauch_subfragment_listitem_photo"
         android:background="@drawable/textview_withdrawable_bg"
         />
 
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:id="@+id/tv_coauch_subfragment_listitem_level"
         android:text="@string/search_coauch_sub_fragment_listitem_userlevel"
         android:background="@drawable/textview_withdrawable_bg"
         android:layout_toRightOf="@id/tv_coauch_subfragment_listitem_gender"
         android:layout_alignBottom="@id/tv_coauch_subfragment_listitem_gender"
-        android:textStyle="normal"
+        android:textSize="14sp"
         android:paddingLeft="4dp"
         android:padding="4dp"
         android:layout_marginLeft="4dp"
         />
 
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:id="@+id/tv_coauch_subfragment_listitem_kinds"
         android:text="@string/search_coauch_sub_fragment_listitem_userkinds"
         android:layout_toRightOf="@id/tv_coauch_subfragment_listitem_level"
         android:layout_alignBottom="@id/tv_coauch_subfragment_listitem_level"
-        android:textStyle="normal"
+        android:textSize="14sp"
         android:paddingLeft="4dp"
         android:padding="4dp"
         android:layout_marginLeft="4dp"
@@ -71,11 +71,10 @@
         />
 
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:text="@string/search_coauch_sub_fragment_listitem_userdistan"
         android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
-        android:textSize="12sp"
         android:layout_centerVertical="true"
         android:id="@+id/tv_coauch_subfragment_listitem_distance"
         />

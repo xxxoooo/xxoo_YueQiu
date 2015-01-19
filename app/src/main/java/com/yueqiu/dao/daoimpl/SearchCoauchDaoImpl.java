@@ -44,15 +44,15 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
     public long insertCoauchItem(SearchCoauchSubFragmentCoauchBean coauchItem)
     {
         ContentValues values = new ContentValues();
-        values.put(DatabaseConstant.SearchCoauchTable.NAME, coauchItem.getUserName());
-        values.put(DatabaseConstant.SearchCoauchTable.PHOTO_URL, coauchItem.getUserPhoto());
-        values.put(DatabaseConstant.SearchCoauchTable.SEX, coauchItem.getUserGender());
-        values.put(DatabaseConstant.SearchCoauchTable.RANGE, coauchItem.getUserDistance());
-        values.put(DatabaseConstant.SearchCoauchTable.CLASS, coauchItem.getmBilliardKind());
-        values.put(DatabaseConstant.SearchCoauchTable.LEVEL, coauchItem.getUserLevel());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.NAME, coauchItem.getUserName());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.PHOTO_URL, coauchItem.getUserPhoto());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.SEX, coauchItem.getUserGender());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.RANGE, coauchItem.getUserDistance());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.CLASS, coauchItem.getmBilliardKind());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.LEVEL, coauchItem.getUserLevel());
 
         long insertId = mDatabase.insert(
-                DatabaseConstant.SearchCoauchTable.COAUCH_TABLE_NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME,
                 null,
                 values
         );
@@ -72,7 +72,7 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
         List<SearchCoauchSubFragmentCoauchBean> coauchList = new ArrayList<SearchCoauchSubFragmentCoauchBean>();
 
         Cursor cursor = mDatabase.query(
-                DatabaseConstant.SearchCoauchTable.COAUCH_TABLE_NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME,
                 allColumns,
                 null,
                 null,
@@ -107,7 +107,7 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
         Log.d(TAG, " the level we need to filter out are : " + level);
         List<SearchCoauchSubFragmentCoauchBean> coauchLevelFilteredList = new ArrayList<SearchCoauchSubFragmentCoauchBean>();
         Cursor levelCursor = mDatabase.query(
-                DatabaseConstant.SearchCoauchTable.COAUCH_TABLE_NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME,
                 allColumns,
                 "",
                 null,

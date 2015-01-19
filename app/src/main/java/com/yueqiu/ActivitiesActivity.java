@@ -11,7 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+import android.text.format.DateUtils;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.yueqiu.activity.ActivitiesDetail;
 import com.yueqiu.activity.ActivitiesIssueActivity;
@@ -27,14 +28,15 @@ import com.yueqiu.activity.ActivityBusinessActivities;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.ActivitiesListViewAdapter;
 import com.yueqiu.bean.Activities;
-import com.yueqiu.bean.ActivitiesList;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.ActivitiesDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
-import com.yueqiu.view.XListView;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
+import com.yueqiu.view.pullrefresh.PullToRefreshBase;
+import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,18 +50,14 @@ import java.util.Map;
 /**
  * Created by yinfeng on 14/12/18.
  */
-public class ActivitiesActivity extends Activity implements View.OnClickListener,
-        XListView.IXListViewListener {
+public class ActivitiesActivity extends Activity implements View.OnClickListener{
     private static final String TAG = "ActivitiesActivity";
     private ActionBar mActionBar;
-    private XListView mListView;
+    private PullToRefreshListView mPullToRefreshListView;
+    private ListView mListView;
     private ActivitiesListViewAdapter mAdapter;
     private ArrayList<Activities> mListData;
 
-    private static final int REQUEST_CODE_SUCCESS = 1001;
-    private static final int GET_DATA_ERROR = 0x00;
-    private static final int GET_DATA_SUCCESS = 0x01;
-    private static final int GET_DATE_EMPTY = 0x02;
     private static final int LENGTH = 10;
     private ActivitiesDao mDao;
     private ProgressBar mPb;
@@ -78,10 +76,15 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
             mPb.setVisibility(View.INVISIBLE);
             switch (msg.what)
             {
-                case GET_DATA_ERROR:
+                case PublicConstant.REQUEST_ERROR:
+                    if(null == msg.obj){
+                        Utils.showToast(ActivitiesActivity.this,getString(R.string.http_request_error));
+                    }else{
+                        Utils.showToast(ActivitiesActivity.this, (String) msg.obj);
+                    }
                     onLoad();
                     break;
-                case GET_DATA_SUCCESS:
+                case PublicConstant.GET_SUCCESS:
 
                     mListData = (ArrayList<Activities>)msg.obj;
                     if(mAdapter == null)
@@ -96,10 +99,13 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
                     }
 
                     mListView.setVisibility(View.VISIBLE);
-                    mListView.setRefreshTime(Utils.getNowTime());
                     onLoad();
                     break;
-                case GET_DATE_EMPTY:
+                case PublicConstant.NO_RESULT:
+                    onLoad();
+                    break;
+                case PublicConstant.TIME_OUT:
+                    Utils.showToast(ActivitiesActivity.this, getString(R.string.http_request_time_out));
                     onLoad();
                     break;
             }
@@ -130,7 +136,10 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
 
     private void initView()
     {
-        mListView = (XListView)findViewById(R.id.activity_activities_lv);
+        mPullToRefreshListView = (PullToRefreshListView) findViewById(R.id.activity_activities_lv);
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
+        mPullToRefreshListView.setOnRefreshListener(mRefreshListener);
+        mListView = mPullToRefreshListView.getRefreshableView();
         mPb = (ProgressBar) findViewById(R.id.pb_loading);
         mListView.setVisibility(View.GONE);
         mPb.setVisibility(View.VISIBLE);
@@ -140,8 +149,7 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
         mPb.getIndeterminateDrawable().setBounds(bounds);
 //        mPb = (ProgressBar) findViewById(R.id.pb_loading);
         mListView.setOnItemClickListener(itemClickListener);
-        mListView.setPullLoadEnable(true);
-        mListView.setXListViewListener(this);
+
     }
 
     private Runnable getNetworkData = new Runnable() {
@@ -160,11 +168,11 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
             Message msg = new Message();
             if(list == null)
             {
-                msg.what = GET_DATE_EMPTY;
+                msg.what = PublicConstant.NO_RESULT;
             }
             else
             {
-                msg.what = GET_DATA_SUCCESS;
+                msg.what = PublicConstant.GET_SUCCESS;
                 mListData.addAll(list);
                 msg.obj = mListData;
 
@@ -183,55 +191,55 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
         JSONObject object = Utils.parseJson(retStr);
         try {
             Message msg = new Message();
-            if(object.getInt("code") != REQUEST_CODE_SUCCESS)
-            {
-                msg.what = GET_DATA_ERROR;
-            }
-            else
-            {
-                JSONObject result = object.getJSONObject("result");
-                JSONArray array = result.getJSONArray("list_data");
-                int length = array.length();
-                if(length == 0)
-                {
-                    msg.what = GET_DATE_EMPTY;
-                }
-                else
-                {
-                    ArrayList<Activities> list = new ArrayList<Activities>();
-                    for(int i = 0; i < length; i++)
-                    {
+            if(!object.isNull("code")) {
+                if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
 
-                        JSONObject item = array.getJSONObject(i);
-                        Activities activityItem = Utils.mapingObject(Activities.class, item);
-                        boolean flag = false;
-                        for(int j = 0; j < mListData.size(); j++)
-                        {
-                            if(mListData.get(j).getId().equals(activityItem.getId()))
-                            {
-                                flag = true;
+                    JSONObject result = object.getJSONObject("result");
+                    JSONArray array = result.getJSONArray("list_data");
+                    int length = array.length();
+                    if (length == 0) {
+                        msg.what = PublicConstant.NO_RESULT;
+                    } else {
+                        ArrayList<Activities> list = new ArrayList<Activities>();
+                        for (int i = 0; i < length; i++) {
+
+                            JSONObject item = array.getJSONObject(i);
+                            Activities activityItem = Utils.mapingObject(Activities.class, item);
+                            boolean flag = false;
+                            for (int j = 0; j < mListData.size(); j++) {
+                                if (mListData.get(j).getId().equals(activityItem.getId())) {
+                                    flag = true;
+                                }
+                            }
+
+                            if (!flag) {
+                                list.add(activityItem);
                             }
                         }
-
-                        if(!flag)
-                        {
-                            list.add(activityItem);
+                        mDao.insertActiviesList(mListData);
+                        msg.what = PublicConstant.GET_SUCCESS;
+                        if (!isHead) {
+                            mListData.addAll(list);
+                        } else {
+                            mListData.addAll(0, list);
                         }
+                        msg.obj = mListData;
+                        mNetstart += LENGTH;
+                        mNetend += LENGTH;
                     }
-                    mDao.insertActiviesList(mListData);
-                    msg.what = GET_DATA_SUCCESS;
-                    if(!isHead)
-                    {
-                        mListData.addAll(list);
-                    }
-                    else
-                    {
-                        mListData.addAll(0,list);
-                    }
-                    msg.obj = mListData;
-                    mNetstart += LENGTH;
-                    mNetend += LENGTH;
+
+
+                } else if (object.getInt("code") != HttpConstants.ResponseCode.TIME_OUT) {
+                    msg.what = PublicConstant.TIME_OUT;
+                }else if(object.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                    msg.what = PublicConstant.NO_RESULT;
                 }
+                else {
+                    msg.what = PublicConstant.REQUEST_ERROR;
+                    msg.obj = object.getString("msg");
+                }
+            }else{
+                msg.what = PublicConstant.REQUEST_ERROR;
             }
             handler.sendMessage(msg);
 
@@ -270,14 +278,14 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
                 finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
-//            case R.id.menu_activities:
-//                startActivity(new Intent(this, ActivityBusinessActivities.class));
-//                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
-//                break;
-//            case R.id.menu_issue_activities:
-//                startActivity(new Intent(ActivitiesActivity.this, ActivitiesIssueActivity.class));
-//                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
-//                break;
+            case R.id.menu_activities:
+                startActivity(new Intent(this, ActivityBusinessActivities.class));
+                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                break;
+            case R.id.menu_issue_activities:
+                startActivity(new Intent(ActivitiesActivity.this, ActivitiesIssueActivity.class));
+                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                break;
         }
         return true;
     }
@@ -303,28 +311,37 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
         return super.onKeyDown(keyCode, event);
     }
 
-    @Override
-    public void onRefresh() {
-        new Thread(Utils.networkAvaiable(ActivitiesActivity.this)
-                ? getNetworkData : getLocalData).start();
-        mNetstart = 0;
-        mNetend = 9;
-        isHead = true;
 
-    }
+    private PullToRefreshBase.OnRefreshListener2<ListView> mRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>() {
+        @Override
+        public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView) {
+            String label = DateUtils.formatDateTime(ActivitiesActivity.this, System.currentTimeMillis(),
+                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
 
-    @Override
-    public void onLoadMore() {
-        new Thread(Utils.networkAvaiable(ActivitiesActivity.this)
-                ? getNetworkData : getLocalData).start();
+            // Update the LastUpdatedLabel
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+            new Thread(Utils.networkAvaiable(ActivitiesActivity.this)
+                    ? getNetworkData : getLocalData).start();
+            mNetstart = 0;
+            mNetend = 9;
+            isHead = true;
+        }
 
-        isHead = false;
-    }
+        @Override
+        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
+            String label = DateUtils.formatDateTime(ActivitiesActivity.this, System.currentTimeMillis(),
+                    DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
 
+            // Update the LastUpdatedLabel
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+            new Thread(Utils.networkAvaiable(ActivitiesActivity.this)
+                    ? getNetworkData : getLocalData).start();
+
+            isHead = false;
+        }
+    };
 
     private void onLoad() {
-        mListView.stopRefresh();
-        mListView.stopLoadMore();
-        mListView.setRefreshTime("刚刚");
+        mPullToRefreshListView.onRefreshComplete();
     }
 }

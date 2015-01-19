@@ -2,6 +2,8 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,13 +25,17 @@ import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 
+import com.yueqiu.bean.Activities;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,23 +47,22 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
     private static final int START_FLAG = 0;
     private static final int END_FLAG   = 1;
     private EditText mTitleEdit,mContactEdit,mPhoneEdit,mIllustrationEdit;
-    private TextView mLocationTv,mStartTimeTv,mEndTimeTv,mChargeModuleTv;
-    private String mContactStr,mPhoneNumberStr,mTitleStr,mLocationStr;
-    private String mIllustrationStr;
-    private int mChargeModule;
+    private TextView mLocationTv,mStartTimeTv,mEndTimeTv,mChargeModuleTv,mPreTextView;
+    private String mContactStr,mPhoneNumberStr;
     private DatePickerDialog mDatePickerDialog;
     private TimePickerDialog mTimePickerDialog;
     private StringBuilder mStartTimeStr = new StringBuilder(),
             mEndTimeStr = new StringBuilder();
     private int mTimeFlag;
-    private EditText mEtActivityType;
+    private TextView mEtActivityType;
     private ImageView mIvAddImg, mIvExpression;
     private static final int SELECT_TYPE = 0x02;
     private int mType = 0;
     private int mModel = 0;
 
-    private static final int SUCCESS = 0x08;
-    private static final int ERROR = 0x09;
+    private ProgressBar mPreProgress;
+    private Drawable mProgressDrawable;
+
 
     private Handler mHandler = new Handler()
     {
@@ -65,16 +71,27 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
             super.handleMessage(msg);
             switch (msg.what)
             {
-                case SUCCESS:
+                case PublicConstant.GET_SUCCESS:
                     Toast.makeText(ActivitiesIssueActivity.this,
-                            "发布成功",Toast.LENGTH_SHORT).show();
+                            getString(R.string.activity_submit_success),Toast.LENGTH_SHORT).show();
+                    mPreProgress.setVisibility(View.GONE);
+                    mPreTextView.setVisibility(View.GONE);
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                     break;
-                case ERROR:
+                case PublicConstant.REQUEST_ERROR:
                     Toast.makeText(ActivitiesIssueActivity.this,
-                            "发布失败", Toast.LENGTH_LONG).show();
+                            getString(R.string.activity_submit_failed), Toast.LENGTH_LONG).show();
+                    mPreProgress.setVisibility(View.GONE);
+                    mPreTextView.setVisibility(View.GONE);
                     break;
+                case PublicConstant.TIME_OUT:
+                    Toast.makeText(ActivitiesIssueActivity.this,
+                            getString(R.string.http_request_time_out), Toast.LENGTH_LONG).show();
+                    mPreProgress.setVisibility(View.GONE);
+                    mPreTextView.setVisibility(View.GONE);
+                    break;
+
             }
         }
     };
@@ -107,9 +124,18 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         mChargeModuleTv   = (TextView) findViewById(R.id.activity_charge_module_text);
         mLocationTv       = (TextView) findViewById(R.id.activity_location_text);
 
-        mEtActivityType = (EditText) findViewById(R.id.activitie_title_edit_type);
+        mEtActivityType = (TextView) findViewById(R.id.activitie_title_edit_type);
         mIvAddImg = (ImageView) findViewById(R.id.activitiy_issues_iv_add_img);
         mIvExpression = (ImageView) findViewById(R.id.activity_issues_expression);
+
+        mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(this).build();
+        Rect bounds = mPreProgress.getIndeterminateDrawable().getBounds();
+        mPreProgress.setIndeterminateDrawable(mProgressDrawable);
+        mPreProgress.getIndeterminateDrawable().setBounds(bounds);
+        mPreTextView = (TextView) findViewById(R.id.pre_text);
+        mPreTextView.setText(getString(R.string.activity_issuing));
+
         final Calendar calendar = Calendar.getInstance();
 
         mDatePickerDialog = DatePickerDialog.newInstance(this, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH), false);
@@ -138,40 +164,44 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         switch(id){
             case android.R.id.home:
                 finish();
-                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
                 break;
             case R.id.issue_activity:
                 final Map<String, Object> requests = getActivityInfo();
-                new Thread()
-                {
-                    @Override
-                    public void run() {
-                        super.run();
+                if(Utils.networkAvaiable(ActivitiesIssueActivity.this)) {
+                    mPreProgress.setVisibility(View.VISIBLE);
+                    mPreTextView.setVisibility(View.VISIBLE);
+                    new Thread() {
+                        @Override
+                        public void run() {
+                            super.run();
 
-                       if(requests != null)
-                       {
-                           String result = HttpUtil.urlClient(HttpConstants.Play.PUBLISH, requests, HttpConstants.RequestMethod.GET);
-                           if(result != null)
-                           {
-                               JSONObject object = Utils.parseJson(result);
-                               Message msg = new Message();
-                               try {
-                                   if(object.getInt("code") == 1001 )
-                                   {
-                                       msg.what = SUCCESS;
-                                   }
-                                   else
-                                   {
-                                       msg.what = ERROR;
-                                   }
-                                   mHandler.sendMessage(msg);
-                               } catch (JSONException e) {
-                                   e.printStackTrace();
-                               }
-                           }
-                       }
-                    }
-                }.start();
+                            if (requests != null) {
+                                String result = HttpUtil.urlClient(HttpConstants.Play.PUBLISH, requests, HttpConstants.RequestMethod.GET);
+                                if (result != null) {
+                                    JSONObject object = Utils.parseJson(result);
+                                    Message msg = new Message();
+                                    try {
+                                        if (!object.isNull("code")) {
+                                            if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                                                msg.what = PublicConstant.GET_SUCCESS;
+                                            } else if (object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                                                msg.what = PublicConstant.TIME_OUT;
+                                            } else {
+                                                msg.what = PublicConstant.REQUEST_ERROR;
+                                            }
+                                        }
+                                        mHandler.sendMessage(msg);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+                    }.start();
+                }else{
+                    Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.network_not_available),Toast.LENGTH_SHORT).show();
+                }
 
                 break;
         }
@@ -224,13 +254,13 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
                 intent.setClass(this,SelectChargeModuleActivity.class);
                 if(mChargeModuleTv.getText().equals(getString(R.string.charge_module_free))){
                     intent.putExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_FREE);
-                    mChargeModule = SelectChargeModuleActivity.MODULE_FREE;
+                    mModel = SelectChargeModuleActivity.MODULE_FREE;
                 }else if(mChargeModuleTv.getText().equals(getString(R.string.charge_module_pay))){
                     intent.putExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_PAY);
-                    mChargeModule = SelectChargeModuleActivity.MODULE_PAY;
+                    mModel = SelectChargeModuleActivity.MODULE_PAY;
                 }else{
                    intent.putExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_AA);
-                    mChargeModule = SelectChargeModuleActivity.MODULE_AA;
+                    mModel = SelectChargeModuleActivity.MODULE_AA;
                 }
                 startActivityForResult(intent,0);
                 overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
@@ -244,14 +274,22 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         map.put("user_id",YueQiuApp.sUserInfo.getUser_id());
         if(mType == 0)
         {
-            Toast.makeText(ActivitiesIssueActivity.this,"请选择活动类型",Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.please_write_type),Toast.LENGTH_SHORT).show();
             return null;
         }
         map.put("type",mType);
         String title = mTitleEdit.getText().toString().trim();
         if(title.equals(""))
         {
-            Toast.makeText(ActivitiesIssueActivity.this,"请填写活动主题",Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_title_cannot_empty),Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        if(title.length() < 4){
+            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_title_length_less),Toast.LENGTH_SHORT).show();
+            return null;
+        }
+        if(title.length() > 30){
+            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_title_length_more),Toast.LENGTH_SHORT).show();
             return null;
         }
         map.put("title", title);
@@ -260,28 +298,37 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         String beginTime = mStartTimeTv.getText().toString().trim();
         if(beginTime.equals(""))
         {
-            Toast.makeText(ActivitiesIssueActivity.this,"请选择活动开始时间",Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_start_time_cannot_empty),Toast.LENGTH_SHORT).show();
             return null;
         }
         map.put("begin_time",beginTime);
         String datetime = mEndTimeTv.getText().toString().trim();
         if(datetime.equals(""))
         {
-            Toast.makeText(ActivitiesIssueActivity.this,"请选择活动结束时间",Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_end_time_cannot_empty),Toast.LENGTH_SHORT).show();
             return null;
+        }
+        try {
+            if(Utils.stringToLong(beginTime,"yyyy-MM-dd HH-mm") > Utils.stringToLong(datetime,"yyyy-MM-dd HH-mm")){
+
+                Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_start_cannot_more_than_end),Toast.LENGTH_SHORT).show();
+                return null;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
         map.put("datetime",datetime);
 
         if(mModel == 0)
         {
-            Toast.makeText(ActivitiesIssueActivity.this,"请选择消费方式",Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_charge_module_cannot_empty),Toast.LENGTH_SHORT).show();
             return null;
         }
         map.put("model", mModel);
         String content = mIllustrationEdit.getText().toString();
         if(content.equals(""))
         {
-            Toast.makeText(ActivitiesIssueActivity.this,"请填写活动说明",Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.please_write_content),Toast.LENGTH_SHORT).show();
             return null;
         }
         map.put("content", content);
@@ -298,13 +345,13 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
             int module = data.getIntExtra(SelectChargeModuleActivity.MODULE_KEY,SelectChargeModuleActivity.MODULE_FREE);
             if(module == SelectChargeModuleActivity.MODULE_FREE){
                 mChargeModuleTv.setText(getString(R.string.charge_module_free));
-                mModel = 1;
+                mModel = SelectChargeModuleActivity.MODULE_FREE;
             }else if(module == SelectChargeModuleActivity.MODULE_PAY){
-                mModel = 2;
+                mModel = SelectChargeModuleActivity.MODULE_PAY;
                 mChargeModuleTv.setText(getString(R.string.charge_module_pay));
             }else{
                 mChargeModuleTv.setText(getString(R.string.charge_module_aa));
-                mModel = 3;
+                mModel = SelectChargeModuleActivity.MODULE_AA;
             }
         }
 
@@ -313,15 +360,15 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         {
             String type = data.getStringExtra("type");
             if(type.equals("0")) {
-                mEtActivityType.setText(getString(R.string.groupactivity));
+                mEtActivityType.setText(getString(R.string.group_activity));
                 mType = 1;
             }
             else if(type.equals("1")) {
-                mEtActivityType.setText(getString(R.string.meetstar));
+                mEtActivityType.setText(getString(R.string.meet_star));
                 mType = 2;
             }
             else if(type.equals("2")) {
-                mEtActivityType.setText(getString(R.string.taiqiuzhan));
+                mEtActivityType.setText(getString(R.string.billiard_show));
                 mType = 3;
             }
             else if(type.equals("3")) {
@@ -337,11 +384,11 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
 
     private String getType(String type)
     {
-        if(type.equals(getString(R.string.groupactivity)))
+        if(type.equals(getString(R.string.group_activity)))
             return "0";
-        else if(type.equals(getString(R.string.meetstar)))
+        else if(type.equals(getString(R.string.meet_star)))
             return "1";
-        else if(type.equals(getString(R.string.taiqiuzhan)))
+        else if(type.equals(getString(R.string.billiard_show)))
             return "2";
         else if(type.equals(getString(R.string.complete)))
             return "3";
@@ -386,7 +433,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 finish();
-                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
                 break;
         }
         return super.onKeyDown(keyCode, event);

@@ -39,13 +39,13 @@ public class SearchDatingDaoImpl implements SearchDatingDao
     public long insertDatingItem(SearchDatingSubFragmentDatingBean datingItem)
     {
         ContentValues values = new ContentValues();
-        values.put(DatabaseConstant.SearchDatingTable.NAME, datingItem.getUserName());
-        values.put(DatabaseConstant.SearchDatingTable.PHOTO_URL, datingItem.getUserPhoto());
-        values.put(DatabaseConstant.SearchDatingTable.TITLE, datingItem.getUserDeclare());
-        values.put(DatabaseConstant.SearchDatingTable.RANGE, datingItem.getUserDistance());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.NAME, datingItem.getUserName());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.PHOTO_URL, datingItem.getUserPhoto());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.TITLE, datingItem.getUserDeclare());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.RANGE, datingItem.getUserDistance());
 
         long insertId = mDatabase.insert(
-                DatabaseConstant.SearchDatingTable.DATING_TABLE_NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchDatingTable.DATING_TABLE_NAME,
                 null,
                 values
         );
@@ -65,17 +65,17 @@ public class SearchDatingDaoImpl implements SearchDatingDao
         List<SearchDatingSubFragmentDatingBean> datingBeanList = new ArrayList<SearchDatingSubFragmentDatingBean>();
 
         String[] columns = {
-                DatabaseConstant.SearchDatingTable._ID,
-                DatabaseConstant.SearchDatingTable.USER_ID,
-                DatabaseConstant.SearchDatingTable.NAME,
-                DatabaseConstant.SearchDatingTable.PHOTO_URL,
-                DatabaseConstant.SearchDatingTable.TITLE,
-                DatabaseConstant.SearchDatingTable.RANGE
+                DatabaseConstant.FavorInfoItemTable.SearchDatingTable._ID,
+                DatabaseConstant.FavorInfoItemTable.SearchDatingTable.USER_ID,
+                DatabaseConstant.FavorInfoItemTable.SearchDatingTable.NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchDatingTable.PHOTO_URL,
+                DatabaseConstant.FavorInfoItemTable.SearchDatingTable.TITLE,
+                DatabaseConstant.FavorInfoItemTable.SearchDatingTable.RANGE
 
         };
 
         Cursor cursor = mDatabase.query(
-                DatabaseConstant.SearchDatingTable.DATING_TABLE_NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchDatingTable.DATING_TABLE_NAME,
                 columns,
                 null,
                 null,

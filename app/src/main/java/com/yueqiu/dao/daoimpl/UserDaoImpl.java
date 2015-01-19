@@ -30,7 +30,7 @@ public class UserDaoImpl implements UserDao{
     }
 
     @Override
-    public long insertUserInfo(Map<String, String> map) {
+    public synchronized long insertUserInfo(Map<String, String> map) {
         ContentValues values = new ContentValues();
 
         values.put(DatabaseConstant.UserTable.USER_ID,map.get(DatabaseConstant.UserTable.USER_ID));
@@ -74,8 +74,17 @@ public class UserDaoImpl implements UserDao{
                 "" : map.get(DatabaseConstant.UserTable.LOGIN_TIME));
 
         SQLiteDatabase db = mDBUtils.getWritableDatabase();
-        long result = db.insert(DatabaseConstant.UserTable.TABLE,null,values);
-        db.close();
+        long result = -1;
+        db.beginTransaction();
+        try{
+            result = db.insert(DatabaseConstant.UserTable.TABLE,null,values);
+            db.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            db.endTransaction();
+        }
+
         return result;
     }
 
@@ -88,27 +97,34 @@ public class UserDaoImpl implements UserDao{
             return false;
         }
         cursor.close();
-        db.close();
         return true;
     }
 
     @Override
-    public long updateUserInfo(Map<String, String> map) {
+    public synchronized long updateUserInfo(Map<String, String> map) {
         SQLiteDatabase db = mDBUtils.getWritableDatabase();
+        long result = -1;
         ContentValues values = new ContentValues();
         Iterator iterator = map.entrySet().iterator();
         while (iterator.hasNext()) {
             Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator.next();
             values.put(entry.getKey(), entry.getValue());
         }
-        long result = db.update(DatabaseConstant.UserTable.TABLE, values, DatabaseConstant.UserTable.USER_ID + "=?",
-                new String[]{map.get(DatabaseConstant.UserTable.USER_ID)});
-        db.close();
+        db.beginTransaction();
+        try {
+            result = db.update(DatabaseConstant.UserTable.TABLE, values, DatabaseConstant.UserTable.USER_ID + "=?",
+                    new String[]{map.get(DatabaseConstant.UserTable.USER_ID)});
+            db.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            db.endTransaction();
+        }
         return result;
     }
 
     @Override
-    public UserInfo getUserByUserId(String userId) {
+    public synchronized UserInfo getUserByUserId(String userId) {
         SQLiteDatabase db = mDBUtils.getReadableDatabase();
         UserInfo info = new UserInfo();
         String sql = "select * from " + DatabaseConstant.UserTable.TABLE + " where " + DatabaseConstant.UserTable.USER_ID + "=?";
@@ -136,7 +152,6 @@ public class UserDaoImpl implements UserDao{
             info.setLogin_time(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.LOGIN_TIME)));
         }
         cursor.close();
-        db.close();
         return info;
     }
 }

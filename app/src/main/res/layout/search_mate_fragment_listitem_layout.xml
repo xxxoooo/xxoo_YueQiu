@@ -35,23 +35,23 @@
 
     <!-- 用于显示用户的性别 -->
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:id="@+id/tv_mate_subfragment_listitem_gender"
         android:background="@drawable/textview_withdrawable_bg"
         android:layout_alignBottom="@+id/img_mate_subfragment_listitem_photo"
-        android:text="@string/search_mate_popupmenu_item_male_str"
+        android:text="@string/man"
+        android:textSize="14sp"
         android:layout_toRightOf="@id/img_mate_subfragment_listitem_photo"
         android:drawableRight="@drawable/male"
         android:drawablePadding="6dp"
         android:paddingLeft="4dp"
         android:padding="4dp"
         android:layout_marginLeft="15dp"
-        android:layout_marginBottom="3dp"
-        android:textStyle="normal"/>
+        android:layout_marginBottom="3dp"/>
 
     <!-- 用于显示用户当前所在的区域 -->
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:id="@+id/tv_mate_subfragment_listitem_district"
         android:background="@drawable/textview_withdrawable_bg"
         android:layout_alignBottom="@id/tv_mate_subfragment_listitem_gender"
@@ -59,11 +59,11 @@
         android:text="@string/search_mate_sub_fragment_listitem_user_zone"
         android:padding="4dp"
         android:layout_marginLeft="7dp"
-        android:textStyle="normal"
+        android:textSize="14sp"
         android:layout_alignTop="@id/tv_mate_subfragment_listitem_gender"
         />
     <TextView
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:id="@+id/tv_mate_subfragment_listitem_distance_meter"
         android:padding="4dp"
         android:layout_alignParentRight="true"

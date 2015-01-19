@@ -40,14 +40,14 @@ public class SearchMateDaoImpl implements SearchMateDao
     {
         ContentValues values = new ContentValues();
 
-        values.put(DatabaseConstant.SearchMateTable.NAME, mateItem.getUserNickName());
-        values.put(DatabaseConstant.SearchMateTable.PHOTO_URL, mateItem.getUserPhotoUrl());
-        values.put(DatabaseConstant.SearchMateTable.SEX, mateItem.getUserGender());
-        values.put(DatabaseConstant.SearchMateTable.DISTRICT, mateItem.getUserDistrict());
-        values.put(DatabaseConstant.SearchMateTable.RANGE, mateItem.getUserDistance());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.NAME, mateItem.getUserNickName());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.PHOTO_URL, mateItem.getUserPhotoUrl());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.SEX, mateItem.getUserGender());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DISTRICT, mateItem.getUserDistrict());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.RANGE, mateItem.getUserDistance());
 
         long insertId = mSQLdatabase.insert(
-                DatabaseConstant.SearchMateTable.MATE_TABLE,
+                DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE,
                 null,
                 values
         );
@@ -73,16 +73,16 @@ public class SearchMateDaoImpl implements SearchMateDao
     {
         List<SearchMateSubFragmentUserBean> mateList = new ArrayList<SearchMateSubFragmentUserBean>();
         String[] allColumns = {
-                DatabaseConstant.SearchMateTable._ID,
-                DatabaseConstant.SearchMateTable.USER_ID,
-                DatabaseConstant.SearchMateTable.NAME,
-                DatabaseConstant.SearchMateTable.PHOTO_URL,
-                DatabaseConstant.SearchMateTable.SEX,
-                DatabaseConstant.SearchMateTable.DISTRICT,
-                DatabaseConstant.SearchMateTable.RANGE
+                DatabaseConstant.FavorInfoItemTable.SearchMateTable._ID,
+                DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID,
+                DatabaseConstant.FavorInfoItemTable.SearchMateTable.NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchMateTable.PHOTO_URL,
+                DatabaseConstant.FavorInfoItemTable.SearchMateTable.SEX,
+                DatabaseConstant.FavorInfoItemTable.SearchMateTable.DISTRICT,
+                DatabaseConstant.FavorInfoItemTable.SearchMateTable.RANGE
         };
         Cursor cursor = mSQLdatabase.query(
-                DatabaseConstant.SearchMateTable.MATE_TABLE, // table 用于查询的表的名字
+                DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE, // table 用于查询的表的名字
                 allColumns, // columns 查询之后我们所需要返回的所有的Column的集合
                 null, // selection 用于过滤的语句
                 null, // selectionArgs

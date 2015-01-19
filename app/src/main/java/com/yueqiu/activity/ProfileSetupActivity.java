@@ -7,8 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
@@ -23,13 +21,7 @@ import com.yueqiu.fragment.myprofilesetup.PlayAgeSetupFragment;
 import com.yueqiu.fragment.myprofilesetup.RegionSetupFragment;
 import com.yueqiu.fragment.myprofilesetup.SignSetupFragment;
 import com.yueqiu.fragment.myprofilesetup.TheNewestPostSetupFragment;
-import com.yueqiu.util.AsyncTaskUtil;
-import com.yueqiu.util.SingleFragmentActivity;
 import com.yueqiu.util.Utils;
-
-import org.json.JSONObject;
-
-import java.util.Map;
 
 /**
  * Created by doushuqi on 15/1/4.

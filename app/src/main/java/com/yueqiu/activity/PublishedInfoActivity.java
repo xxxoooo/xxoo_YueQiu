@@ -5,24 +5,21 @@ import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.UserHandle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 import android.widget.SearchView;
 
 import com.yueqiu.R;
-import com.yueqiu.activity.SearchResultActivity;
-import com.yueqiu.fragment.slidemenu.MyFavorBasicFragment;
+import com.yueqiu.fragment.slidemenu.PublishedFragment;
 
 
 public class PublishedInfoActivity extends FragmentActivity implements ActionBar.TabListener
@@ -48,7 +45,6 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
                 getString(R.string.billiard_group)
         };
         mViewPager = (ViewPager) findViewById(R.id.favor_coll_pager);
-       // mViewPager = $(R.id.favor_coll_pager);
 
     }
 
@@ -92,7 +88,7 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
     }
 
 
-    public class SectionPagerAdapter extends FragmentPagerAdapter {
+    public class SectionPagerAdapter extends FragmentStatePagerAdapter {
 
 
         public SectionPagerAdapter(FragmentManager fm) {
@@ -101,9 +97,10 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
 
         @Override
         public Fragment getItem(int i) {
-            Fragment fragment = new MyFavorBasicFragment();
+            //Fragment fragment = new PublishBasicFragment();
+            Fragment fragment = new PublishedFragment();
             Bundle args = new Bundle();
-            args.putInt("type",i);
+            args.putInt("type",i+1);
             fragment.setArguments(args);
             return fragment;
 
@@ -137,8 +134,20 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
         switch(id){
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
                 break;
         }
         return true;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

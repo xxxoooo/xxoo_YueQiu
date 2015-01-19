@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
-            android:textSize="23sp"
+            android:textSize="18sp"
             style="@style/ListItemTvStyle"
             android:text="雪花飘落"/>
 
@@ -38,31 +38,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <TextView
-                style="@style/ListItemTvStyle"
+                style="@style/TimeTextStyle"
                 android:layout_margin="4dp"
                 android:id="@+id/chatbar_item_gender_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:drawablePadding="2dp"
                 android:padding="2dp"
                 android:text="男"
                 android:drawableRight="@drawable/male"
-                android:background="@color/devide_line"/>
+                android:background="@color/devide_line"
+                android:textSize="14sp"/>
             <TextView
                 android:id="@+id/chatbar_item_district_tv"
-                style="@style/ListItemTvStyle"
+                style="@style/TimeTextStyle"
                 android:layout_margin="4dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:padding="2dp"
                 android:text="海淀区"
+                android:textSize="14sp"
                 android:background="@color/devide_line"/>
             <TextView
-                style="@style/ListItemTvStyle"
+                style="@style/TimeTextStyle"
                 android:id="@+id/friends_application_verify_message"
                 android:visibility="invisible"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_margin="4dp"
+                android:textSize="14sp"
+                />
             </LinearLayout>
 
 
@@ -72,10 +71,8 @@
     <TextView
         android:id="@+id/chatbar_item_sendtime_tv"
         android:layout_alignParentRight="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        style="@style/ListItemTvStyle"
+        style="@style/TimeTextStyle"
         android:text="12-19 12:12"/>
 
 </RelativeLayout>

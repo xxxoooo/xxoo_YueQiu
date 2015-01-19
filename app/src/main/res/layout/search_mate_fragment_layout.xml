@@ -94,17 +94,18 @@
         <Button
             style="@style/SearchSubFragmentFilterBtnStyle"
             android:id="@+id/btn_mate_gender"
-            android:text="@string/search_mate_subfragment_title_gender"
+            android:text="@string/gender"
             />
     </LinearLayout>
 
-    <com.yueqiu.view.XListView
+    <ListView
         style="@style/SearchSubActivityListViewStyle"
         android:layout_below="@id/filter_group"
         android:id="@+id/search_sub_fragment_list"
         >
 
-    </com.yueqiu.view.XListView>
+    </ListView>
+
 
     <include
         layout="@layout/pre_load"

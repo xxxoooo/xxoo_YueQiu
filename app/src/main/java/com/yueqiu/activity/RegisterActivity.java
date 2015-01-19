@@ -213,7 +213,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                 paramMap.put(PublicConstant.URL,HttpConstants.RegisterConstant.URL);
                 paramMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
                 if(Utils.networkAvaiable(RegisterActivity.this)) {
-                    new RegisterAsyncTask(requestMap,mPreProgress,mPreText).execute(paramMap);
+                    new RegisterAsyncTask(requestMap).execute(paramMap);
                 }else{
                     Toast.makeText(RegisterActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
                 }
@@ -266,13 +266,22 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
 
     private class RegisterAsyncTask extends AsyncTaskUtil<String>{
 
-        public RegisterAsyncTask(Map<String, String> map, ProgressBar progressBar, TextView textView) {
-            super(map, progressBar, textView);
+        public RegisterAsyncTask(Map<String, String> map) {
+            super(map);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mPreProgress.setVisibility(View.VISIBLE);
+            mPreText.setVisibility(View.VISIBLE);
         }
 
         @Override
         protected void onPostExecute(JSONObject object) {
             super.onPostExecute(object);
+            mPreProgress.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
             try {
                 if(object.getInt("code") != HttpConstants.ResponseCode.NORMAL)
                 {

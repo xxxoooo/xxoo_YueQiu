@@ -15,13 +15,11 @@
         android:paddingLeft="10dp"
         android:layout_centerInParent="true"
         android:layout_alignParentLeft="true"
-        android:textSize="17sp"
+        android:textSize="16sp"
         android:text="@string/qiuyou_request"/>
     <TextView
-        android:textColor="@color/md__defaultBackground"
         android:id="@+id/friends_application_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/TimeTextStyle"
         android:text="2014-12-12"
         android:paddingRight="10dp"
         android:layout_alignParentRight="true"
@@ -49,7 +47,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_centerInParent="true"
-            android:src="@drawable/head_img"/>
+            android:src="@drawable/default_head"/>
 
         <LinearLayout
             android:layout_toRightOf="@id/friends_application_icon"
@@ -64,7 +62,7 @@
                 android:padding="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="17sp"
+                android:textSize="16sp"
                 android:text="tangxin"/>
 
             <TextView
@@ -73,7 +71,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:textSize="23sp"
+                android:textSize="16sp"
                 android:text="韩寒"/>
         </LinearLayout>
 
@@ -82,7 +80,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginRight="10dp"
             android:layout_width="66dp"
-            android:layout_height="35dp"
+            android:layout_height="36dp"
             android:layout_centerInParent="true"
             android:background="@drawable/update_assistant_click"
             android:textColor="@color/white"

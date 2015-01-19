@@ -9,7 +9,7 @@
     <item
         android:id="@+id/menu_issue_activities"
         android:icon="@drawable/title_edit"
-        android:title="@string/activities"
+        android:title="@string/search_publishing_dating_billiards_info_str"
         android:showAsAction="ifRoom"
         />
     <item android:id="@+id/near_nemu_search"

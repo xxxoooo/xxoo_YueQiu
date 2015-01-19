@@ -3,6 +3,7 @@ package com.yueqiu.dao;
 import android.content.Context;
 
 import com.yueqiu.dao.daoimpl.ActivitiesDaoImpl;
+import com.yueqiu.dao.daoimpl.FavorDaoImpl;
 import com.yueqiu.dao.daoimpl.PublishedImpl;
 import com.yueqiu.dao.daoimpl.UserDaoImpl;
 
@@ -24,6 +25,11 @@ public class DaoFactory {
     public static PublishedDao getPublished(Context context){
 
         return new PublishedImpl(context);
+    }
+
+    public static FavorDao getFavor(Context context){
+
+        return new FavorDaoImpl(context);
     }
 
 }

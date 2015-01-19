@@ -30,13 +30,15 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.ChatMessageTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.ActivitiesTable.SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
+        db.execSQL(DatabaseConstant.FavorInfoTable.CRAETE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.CREATE_SQL);
 
         // 加载用于SearchActivity当中的Fragment的table
-        db.execSQL(DatabaseConstant.SearchMateTable.CREATE_SQL);
-        db.execSQL(DatabaseConstant.SearchDatingTable.CREATE_SQL);
-        db.execSQL(DatabaseConstant.SearchAssistCoauchTable.CREATE_SQL);
-        db.execSQL(DatabaseConstant.SearchCoauchTable.CREATE_SQL);
-        db.execSQL(DatabaseConstant.SearchRoomTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchMateTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.CREATE_SQL);
 
     }
 
@@ -51,12 +53,14 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.ChatMessageTable.DROP_SQL);
 
         // 加载用于SearchActivity当中的Fragment的Drop sql
-        db.execSQL(DatabaseConstant.SearchMateTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.SearchDatingTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.SearchAssistCoauchTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.SearchCoauchTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.SearchRoomTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.DROP_SQL);
 
+        db.execSQL(DatabaseConstant.FavorInfoTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.DROP_SQL);
         onCreate(db);
     }
 

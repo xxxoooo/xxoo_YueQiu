@@ -4,6 +4,8 @@ import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -24,6 +26,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,7 +36,10 @@ import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.RequestAddFriendActivity;
 import com.yueqiu.bean.SearchPeopleInfo;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.Utils;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,14 +56,15 @@ import java.util.Map;
  */
 public class AddPersonFragment extends Fragment implements LocationListener {
     private static final String TAG = "AddPersonFragment";
-    private static final int GET_SUCCESS = 0;
-    private static final int GET_FAIL = 1;
+//    private static final int GET_SUCCESS = 0;
+//    private static final int GET_FAIL = 1;
     private ActionBar mActionBar;
     private LinearLayout mLinearLayout;
-    private View mProgressBar;
+    private ProgressBar mProgressBar;
     private List<SearchPeopleInfo.SearchPeopleItemInfo> mList;
     private ListView mListView;
     private LocationManager mLocationManager;
+    private Drawable mProgressDrawable;
     private double mLatitude, mLongitude;
     public static final String FRIEND_INFO_USER_ID = "com.yueqiu.fragment.chatbar.friend_info.user_id";
     public static final String FRIEND_INFO_USERNAME = "com.yueqiu.fragment.chatbar.friend_info.username";
@@ -76,7 +83,11 @@ public class AddPersonFragment extends Fragment implements LocationListener {
             mActionBar = getActivity().getActionBar();
         }
         mListView = (ListView) view.findViewById(R.id.search_result_container);
-        mProgressBar = view.findViewById(R.id.chatbar_search_progressbar_container);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.pre_progress);
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(getActivity()).build();
+        Rect bounds = mProgressBar.getIndeterminateDrawable().getBounds();
+        mProgressBar.setIndeterminateDrawable(mProgressDrawable);
+        mProgressBar.getIndeterminateDrawable().setBounds(bounds);
         mLinearLayout = (LinearLayout) view.findViewById(R.id.search_friend_nearby);
         mLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -134,7 +145,7 @@ public class AddPersonFragment extends Fragment implements LocationListener {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case GET_SUCCESS:
+                case PublicConstant.GET_SUCCESS:
                     mProgressBar.setVisibility(View.GONE);
                     SearchPeopleInfo searchPeopleInfo = (SearchPeopleInfo) msg.obj;
                     mList = searchPeopleInfo.mList;
@@ -152,9 +163,20 @@ public class AddPersonFragment extends Fragment implements LocationListener {
                         }
                     });
                     break;
-                case GET_FAIL:
+                case PublicConstant.NO_RESULT:
                     mProgressBar.setVisibility(View.GONE);
                     Toast.makeText(getActivity(), "该位置暂无球友！", Toast.LENGTH_LONG).show();
+                    break;
+                case PublicConstant.TIME_OUT:
+                    Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
+                    break;
+                case PublicConstant.REQUEST_ERROR:
+                    if(null == msg.obj){
+                        Utils.showToast(getActivity(),getString(R.string.http_request_error));
+                    }else{
+                        Utils.showToast(getActivity(), (String) msg.obj);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -168,23 +190,31 @@ public class AddPersonFragment extends Fragment implements LocationListener {
         String result = HttpUtil.urlClient(HttpConstants.SearchPeopleByNearby.URL, map, HttpConstants.RequestMethod.GET);
         try {
             JSONObject jsonResult = new JSONObject(result);
-
-            if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                SearchPeopleInfo searchPeople = new SearchPeopleInfo();
+            if(!jsonResult.isNull("code")) {
+                if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                    SearchPeopleInfo searchPeople = new SearchPeopleInfo();
 //                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
-                JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
-                for (int i = 0; i < list_data.length(); i++) {
-                    SearchPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
-                    itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
-                    itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
-                    itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                    itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
-                    itemInfo.setDatetime(list_data.getJSONObject(i).getString("datetime"));
-                    searchPeople.mList.add(itemInfo);
+                    JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
+                    for (int i = 0; i < list_data.length(); i++) {
+                        SearchPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
+                        itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
+                        itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
+                        itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
+                        itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
+                        itemInfo.setDatetime(list_data.getJSONObject(i).getString("datetime"));
+                        searchPeople.mList.add(itemInfo);
+                    }
+                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS, searchPeople).sendToTarget();
+                } else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                    mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                }else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                    mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                 }
-                mHandler.obtainMessage(GET_SUCCESS, searchPeople).sendToTarget();
-            } else {
-                mHandler.obtainMessage(GET_FAIL).sendToTarget();
+                else {
+                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonResult.getString("msg")).sendToTarget();
+                }
+            }else{
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
             }
 
         } catch (JSONException e) {
@@ -250,21 +280,30 @@ public class AddPersonFragment extends Fragment implements LocationListener {
         String result = HttpUtil.urlClient(HttpConstants.SearchPeopleByKeyword.URL, map, HttpConstants.RequestMethod.GET);
         try {
             JSONObject jsonResult = new JSONObject(result);
-
-            if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                SearchPeopleInfo searchPeople = new SearchPeopleInfo();
+            if(!jsonResult.isNull("code")) {
+                if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                    SearchPeopleInfo searchPeople = new SearchPeopleInfo();
 //                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
-                JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
-                for (int i = 0; i < list_data.length(); i++) {
-                    SearchPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
-                    itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
-                    itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
-                    itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                    itemInfo.setSex(list_data.getJSONObject(i).getInt("sex"));
-                    itemInfo.setDistrict(list_data.getJSONObject(i).getString("district"));
-                    searchPeople.mList.add(itemInfo);
+                    JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
+                    for (int i = 0; i < list_data.length(); i++) {
+                        SearchPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
+                        itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
+                        itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
+                        itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
+                        itemInfo.setSex(list_data.getJSONObject(i).getInt("sex"));
+                        itemInfo.setDistrict(list_data.getJSONObject(i).getString("district"));
+                        searchPeople.mList.add(itemInfo);
+                    }
+                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS, searchPeople).sendToTarget();
+                }else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                    mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                }else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                    mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                }else{
+                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonResult.getString("msg")).sendToTarget();
                 }
-                mHandler.obtainMessage(GET_SUCCESS, searchPeople).sendToTarget();
+            }else{
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
             }
 
         } catch (JSONException e) {

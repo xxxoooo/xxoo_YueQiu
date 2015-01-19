@@ -40,14 +40,14 @@ public class SearchRoomDaoImpl implements SearchRoomDao
     public long insertRoomItem(SearchRoomSubFragmentRoomBean roomItem)
     {
         ContentValues values = new ContentValues();
-        values.put(DatabaseConstant.SearchRoomTable.NAME, roomItem.getRoomName());
-        values.put(DatabaseConstant.SearchRoomTable.ROOM_URL, roomItem.getRoomPhotoUrl());
-        values.put(DatabaseConstant.SearchRoomTable.ROOM_LEVEL, roomItem.getLevel());
-        values.put(DatabaseConstant.SearchRoomTable.RANGE, roomItem.getDistance());
-        values.put(DatabaseConstant.SearchRoomTable.DETAILED_ADDRESS, roomItem.getDetailedAddress());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.NAME, roomItem.getRoomName());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_URL, roomItem.getRoomPhotoUrl());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_LEVEL, roomItem.getLevel());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.RANGE, roomItem.getDistance());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.DETAILED_ADDRESS, roomItem.getDetailedAddress());
 
         long insertId = mDatabase.insert(
-                DatabaseConstant.SearchRoomTable.ROOM_TABLE_NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_TABLE_NAME,
                 null, // null column hack
                 values
         );
@@ -77,15 +77,15 @@ public class SearchRoomDaoImpl implements SearchRoomDao
     {
         List<SearchRoomSubFragmentRoomBean> roomList = new ArrayList<SearchRoomSubFragmentRoomBean>();
         String[] allColumns = {
-                DatabaseConstant.SearchRoomTable._ID,
-                DatabaseConstant.SearchRoomTable.ROOM_ID,
-                DatabaseConstant.SearchRoomTable.NAME,
-                DatabaseConstant.SearchRoomTable.ROOM_URL,
-                DatabaseConstant.SearchRoomTable.ROOM_LEVEL,
-                DatabaseConstant.SearchRoomTable.RANGE,
-                DatabaseConstant.SearchRoomTable.PHONE_NUM,
-                DatabaseConstant.SearchRoomTable.TAG,
-                DatabaseConstant.SearchRoomTable.DETAILED_ADDRESS
+                DatabaseConstant.FavorInfoItemTable.SearchRoomTable._ID,
+                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_ID,
+                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_URL,
+                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_LEVEL,
+                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.RANGE,
+                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.PHONE_NUM,
+                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.TAG,
+                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.DETAILED_ADDRESS
         };
 
         // TODO: 以下这种检索只是单纯的将所有的数据不加选择的一次性检索出来(这也是我们默认的检索加载方式)
@@ -93,7 +93,7 @@ public class SearchRoomDaoImpl implements SearchRoomDao
         // TODO: 出来，然后存到我们建立的本地数据库当中。然后再从数据库当中进行检索
         // TODO: 这样我们所经过的筛选条件就是完整的SQL语句进行检索了，而不是通过添加请求参数进行检索的
         Cursor cursor = mDatabase.query(
-                DatabaseConstant.SearchRoomTable.ROOM_TABLE_NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_TABLE_NAME,
                 allColumns,
                 null,
                 null,

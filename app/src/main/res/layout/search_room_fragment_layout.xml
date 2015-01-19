@@ -91,7 +91,7 @@
             android:id="@+id/btn_room_distance"
             android:layout_weight="0.25"
             style="@style/SearchSubFragmentFilterBtnStyle"
-            android:text="@string/search_room_subfragment_title_distance"/>
+            android:text="@string/search_mate_subfragment_title_distance"/>
 
         <View
             android:layout_marginTop="5dp"
@@ -133,12 +133,13 @@
 
     </LinearLayout>
 
-    <com.yueqiu.view.XListView
+    <ListView
         style="@style/SearchSubActivityListViewStyle"
         android:layout_below="@id/room_filter_group"
         android:id="@+id/search_room_subfragment_listview">
 
-    </com.yueqiu.view.XListView>
+    </ListView>
+
 
     <!--用于加载ProgressBar,这些ProgressBar的初始属性都被设置成GONG，即不占用任何位置，直到
         开始加载为止-->

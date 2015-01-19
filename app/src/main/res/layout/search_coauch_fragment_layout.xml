@@ -90,15 +90,17 @@
         <Button
             style="@style/SearchSubFragmentFilterBtnStyle"
             android:id="@+id/btn_coauch_kinds"
-            android:text="@string/search_caouch_subfragment_title_kinds"
+            android:text="@string/ball_type"
             />
     </LinearLayout>
 
-    <com.yueqiu.view.XListView
+    <ListView
         style="@style/SearchSubActivityListViewStyle"
         android:id="@+id/search_coauch_subfragment_list"
-        android:layout_below="@id/coauch_filter_group"
-        ></com.yueqiu.view.XListView>
+        android:layout_below="@id/coauch_filter_group">
+
+    </ListView>
+
 
     <include
         layout="@layout/pre_load"

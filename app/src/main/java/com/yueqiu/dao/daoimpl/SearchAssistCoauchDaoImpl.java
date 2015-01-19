@@ -41,15 +41,15 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
     public long insertAssistCoauchItem(SearchAssistCoauchSubFragmentBean assistCoauchItem)
     {
         ContentValues values = new ContentValues();
-        values.put(DatabaseConstant.SearchAssistCoauchTable.NAME, assistCoauchItem.getName());
-        values.put(DatabaseConstant.SearchAssistCoauchTable.SEX, assistCoauchItem.getGender());
-        values.put(DatabaseConstant.SearchAssistCoauchTable.MONEY, assistCoauchItem.getPrice());
-        values.put(DatabaseConstant.SearchAssistCoauchTable.PHOTO_URL, assistCoauchItem.getPhoto());
-        values.put(DatabaseConstant.SearchAssistCoauchTable.CLASS, assistCoauchItem.getKinds());
-        values.put(DatabaseConstant.SearchAssistCoauchTable.RANGE, assistCoauchItem.getDistance());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.NAME, assistCoauchItem.getName());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.SEX, assistCoauchItem.getGender());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.MONEY, assistCoauchItem.getPrice());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.PHOTO_URL, assistCoauchItem.getPhoto());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.CLASS, assistCoauchItem.getKinds());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.RANGE, assistCoauchItem.getDistance());
 
         long insertId = mDatabase.insert(
-                DatabaseConstant.SearchAssistCoauchTable.ASSISTCOAUCH_TABLE_NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.ASSISTCOAUCH_TABLE_NAME,
                 null,
                 values
         );
@@ -77,18 +77,18 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
         List<SearchAssistCoauchSubFragmentBean> asList = new ArrayList<SearchAssistCoauchSubFragmentBean>();
 
         String[] allColumns = {
-                DatabaseConstant.SearchAssistCoauchTable._ID,
-                DatabaseConstant.SearchAssistCoauchTable.USER_ID,
-                DatabaseConstant.SearchAssistCoauchTable.NAME,
-                DatabaseConstant.SearchAssistCoauchTable.PHOTO_URL,
-                DatabaseConstant.SearchAssistCoauchTable.CLASS,
-                DatabaseConstant.SearchAssistCoauchTable.MONEY,
-                DatabaseConstant.SearchAssistCoauchTable.RANGE,
-                DatabaseConstant.SearchAssistCoauchTable.SEX
+                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable._ID,
+                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.USER_ID,
+                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.PHOTO_URL,
+                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.CLASS,
+                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.MONEY,
+                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.RANGE,
+                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.SEX
         };
 
         Cursor cursor = mDatabase.query(
-                DatabaseConstant.SearchAssistCoauchTable.ASSISTCOAUCH_TABLE_NAME,
+                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.ASSISTCOAUCH_TABLE_NAME,
                 allColumns,
                 null,
                 null,

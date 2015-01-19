@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
+
     <application
         android:name=".YueQiuApp"
         android:allowBackup="true"
@@ -37,7 +38,6 @@
                 <action android:name="android.intent.action.SEARCH"/>
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
-
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
@@ -105,6 +105,20 @@
             android:screenOrientation="portrait"/>
 
         <activity
+            android:name=".activity.ActivitiesDetail"
+            android:label="@string/activities_detail"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.ActivitySelectType"
+            android:label="@string/type"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.ActivityBusinessActivities"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.SelectChargeModuleActivity"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name=".activity.RegisterActivity"
             android:screenOrientation="portrait"/>
         <activity
@@ -113,7 +127,6 @@
         <activity
             android:name=".activity.ActivitySelectSex"
             android:screenOrientation="portrait"/>
-
         <activity
             android:name=".activity.SearchBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating"
@@ -132,11 +145,6 @@
             android:label="@string/billiard_group_issue_article"
             android:screenOrientation="portrait">
         </activity>
-        <activity
-            android:name=".activity.GroupTopicDetailActivity"
-            android:label="@string/title_activity_group_topic_detail"
-            android:screenOrientation="portrait">
-        </activity>
 
         <activity
             android:name=".activity.ActivitiesMain"
@@ -147,14 +155,38 @@
             android:screenOrientation="portrait"/>
 
         <activity
-
+            android:name=".activity.GroupIssueTopic"
+            android:label="@string/billiard_group_issue_article"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".activity.GroupSelectTopicTypeActivity"
+            android:parentActivityName=".activity.GroupIssueTopic"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.ActivitiesMain"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.BilliardGroupDetailActivity"
+            android:parentActivityName=".BilliardGroupActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
             android:name=".activity.CheckNumActivity"
+
             android:screenOrientation="portrait"/>
 
         <activity
             android:name=".activity.Register1Activity"
             android:screenOrientation="portrait"/>
+        <activity
+            android:name=".activity.ArticleReadActivity"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <data android:scheme="file"/>
+            </intent-filter>
+        </activity>
     </application>
-
 
 </manifest>

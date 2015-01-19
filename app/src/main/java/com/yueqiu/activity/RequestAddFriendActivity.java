@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
 import com.yueqiu.fragment.requestaddfriend.FriendProfileFragment;
-import com.yueqiu.util.SingleFragmentActivity;
 
 /**
  * Created by doushuqi on 15/1/8.

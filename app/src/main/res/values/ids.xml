@@ -22,4 +22,7 @@
 
     <item name="md__translationY" type="id" />
 
+    <item type="id" name="gridview" />
+
+
 </resources>
