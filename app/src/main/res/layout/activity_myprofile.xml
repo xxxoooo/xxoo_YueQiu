@@ -37,7 +37,7 @@
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/my_profile_footer"
+        android:layout_alignParentTop="true"
         android:background="@color/devide_line">
 
         <com.yueqiu.view.CustomerScrollView
