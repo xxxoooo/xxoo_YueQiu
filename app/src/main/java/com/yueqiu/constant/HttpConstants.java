@@ -288,6 +288,7 @@ public class HttpConstants
         public static final String URL = "/friend/nearby";
 
         //请求参数：位置坐标
+        public static final String USER_ID = "user_id";
         public static final String LAT = "lat";
         public static final String LNG = "lng";
     }
