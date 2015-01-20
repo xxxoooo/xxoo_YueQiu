@@ -5,11 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.SearchMateSubFragmentUserBean;
+import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
+import com.yueqiu.util.VolleySingleton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +34,11 @@ public class SearchMateSubFragmentListAdapter extends BaseAdapter
     private LayoutInflater mInflater;
     // contains all of the user list
     private List<SearchMateSubFragmentUserBean> mUserList;
-
+    private ImageLoader mImgLoader;
     public SearchMateSubFragmentListAdapter(Context context, ArrayList<SearchMateSubFragmentUserBean> userList)
     {
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
+
         this.mInflater = LayoutInflater.from(context);
         this.mUserList = userList;
     }
@@ -73,7 +78,7 @@ public class SearchMateSubFragmentListAdapter extends BaseAdapter
             convertView = mInflater.inflate(R.layout.search_mate_fragment_listitem_layout, parent, false);
             viewHolder = new ViewHolder();
 
-            viewHolder.mUserPhoto = (ImageView) convertView.findViewById(R.id.img_mate_subfragment_listitem_photo);
+            viewHolder.mUserPhoto = (NetworkImageView) convertView.findViewById(R.id.img_mate_subfragment_listitem_photo);
             viewHolder.mUserNickName = (TextView) convertView.findViewById(R.id.tv_mate_subfragment_listitem_nickname);
             viewHolder.mUserGender = (TextView) convertView.findViewById(R.id.tv_mate_subfragment_listitem_gender);
             viewHolder.mUserDistanceMeter = (TextView) convertView.findViewById(R.id.tv_mate_subfragment_listitem_distance_meter);
@@ -88,8 +93,13 @@ public class SearchMateSubFragmentListAdapter extends BaseAdapter
 
         // then, inflate the content of the listView item
         // the following user photo are all test url
-        viewHolder.mUserPhoto.setImageResource(R.drawable.default_head);
+        // TODO: 现在的我们的JSon数据返回的关于用户头像的图片仍然都是一些空值，我们需要在正式数据完成的时候，继续深入的检测以下
+        // TODO: 我们在Layout文件当中已经设置关于UserPhoto的默认图片，我们在这里重新加载以下
+        viewHolder.mUserPhoto.setDefaultImageResId(R.drawable.default_head);
+        viewHolder.mUserPhoto.setImageUrl(userInsta.getUserPhotoUrl(), mImgLoader);
         viewHolder.mUserGender.setText(userInsta.getUserGender());
+        viewHolder.mUserGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, SubFragmentsCommonUtils.parseGenderDrawable(userInsta.getUserGender()), 0);
+        viewHolder.mUserGender.setCompoundDrawablePadding(6);
         viewHolder.mUserNickName.setText(userInsta.getUserNickName());
         viewHolder.mUserDistanceMeter.setText(userInsta.getUserDistance());
         viewHolder.mUserDistrict.setText(userInsta.getUserDistrict());
@@ -100,7 +110,7 @@ public class SearchMateSubFragmentListAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        public ImageView mUserPhoto;
+        public NetworkImageView mUserPhoto;
         public TextView mUserNickName, mUserGender, mUserDistanceMeter, mUserDistrict;
     }
 }

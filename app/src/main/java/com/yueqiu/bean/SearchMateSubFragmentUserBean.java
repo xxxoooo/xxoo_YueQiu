@@ -16,6 +16,7 @@ import java.awt.font.TextAttribute;
  */
 public class SearchMateSubFragmentUserBean
 {
+    private String mUserId;
     private String mUserNickName;
     private String mUserGender;
     private String mUserDistrict;
@@ -29,8 +30,9 @@ public class SearchMateSubFragmentUserBean
     public SearchMateSubFragmentUserBean()
     {}
 
-    public SearchMateSubFragmentUserBean(String userPhotoUrl, String nickName, String userGender, String userDistrict, String userDistance)
+    public SearchMateSubFragmentUserBean(String userId, String userPhotoUrl, String nickName, String userGender, String userDistrict, String userDistance)
     {
+        this.mUserId = userId;
         this.mUserDistance = userDistance;
         this.mUserPhotoUrl = userPhotoUrl;
         this.mUserDistrict = userDistrict;
@@ -89,6 +91,15 @@ public class SearchMateSubFragmentUserBean
         return mUserPhotoUrl;
     }
 
+    public String getUserId()
+    {
+        return mUserId;
+    }
+
+    public void setUserId(String userId)
+    {
+        this.mUserId = userId;
+    }
     private static final String JSON_USER_ID = "user_id";
     private static final String JSON_SEX = "sex";
     private static final String JSON_RANGE = "range";
@@ -121,9 +132,6 @@ public class SearchMateSubFragmentUserBean
         Log.d("search_mate_bean", " the name : " + mUserNickName);
         mUserDistance = jsonObject.getString(JSON_RANGE);
         Log.d("search_mate_bean", " the range are : " + mUserDistance);
-
-
-
     }
 
     @Override

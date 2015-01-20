@@ -55,7 +55,6 @@
     </LinearLayout>
 
 
-
     <!--用于SearchActivity当中的教练子Fragment的布局文件-->
     <LinearLayout
         android:layout_below="@id/coauch_gallery_view_pager_zone"
@@ -98,10 +97,18 @@
     <ListView
         style="@style/SearchSubActivityListViewStyle"
         android:id="@+id/search_coauch_subfragment_list"
-        android:layout_below="@id/coauch_filter_group"
-        >
+        android:layout_below="@id/coauch_filter_group">
 
     </ListView>
+
+
+    <include
+        layout="@layout/pre_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+    </include>
 
 
 </RelativeLayout>

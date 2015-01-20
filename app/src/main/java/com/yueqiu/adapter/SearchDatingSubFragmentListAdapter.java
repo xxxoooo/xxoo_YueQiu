@@ -1,6 +1,7 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +9,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
+import com.yueqiu.util.VolleySingleton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +31,11 @@ public class SearchDatingSubFragmentListAdapter extends BaseAdapter
     private List<SearchDatingSubFragmentDatingBean> mDatingBeanList;
 
     private LayoutInflater mInflater;
+    private ImageLoader mImgLoader;
 
     public SearchDatingSubFragmentListAdapter(Context context, ArrayList<SearchDatingSubFragmentDatingBean> beanList)
     {
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
         mInflater = LayoutInflater.from(context);
 
         this.mDatingBeanList = beanList;
@@ -62,7 +68,7 @@ public class SearchDatingSubFragmentListAdapter extends BaseAdapter
             convertView = mInflater.inflate(R.layout.search_dating_fragment_listitem_layout, parent, false);
             viewHolder = new ViewHolder();
 
-            viewHolder.mUserPhoto = (ImageView) convertView.findViewById(R.id.img_dating_subfragment_listitem_photo);
+            viewHolder.mUserPhoto = (NetworkImageView) convertView.findViewById(R.id.img_dating_subfragment_listitem_photo);
             viewHolder.mUserNickname = (TextView) convertView.findViewById(R.id.tv_dating_subfragment_listitem_nickname);
             viewHolder.mUserDeclareation = (TextView) convertView.findViewById(R.id.tv_dating_subfragment_listitem_declareation);
             viewHolder.mUserDistance = (TextView) convertView.findViewById(R.id.tv_dating_subfragment_listitem_distance_meter);
@@ -76,7 +82,9 @@ public class SearchDatingSubFragmentListAdapter extends BaseAdapter
         SearchDatingSubFragmentDatingBean bean = mDatingBeanList.get(position);
         if (bean != null)
         {
-            viewHolder.mUserPhoto.setImageResource(R.drawable.default_head);
+            viewHolder.mUserPhoto.setDefaultImageResId(R.drawable.default_head);
+            viewHolder.mUserPhoto.setImageUrl(bean.getUserPhoto(), mImgLoader);
+
             viewHolder.mUserNickname.setText(bean.getUserName());
             viewHolder.mUserDistance.setText(bean.getUserDistance());
             viewHolder.mUserDeclareation.setText(bean.getUserDeclare());
@@ -87,7 +95,7 @@ public class SearchDatingSubFragmentListAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        public ImageView mUserPhoto;
+        public NetworkImageView mUserPhoto;
         public TextView mUserNickname, mUserDeclareation, mUserDistance;
     }
 

@@ -5,11 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.SearchAssistCoauchSubFragmentBean;
+import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
+import com.yueqiu.util.VolleySingleton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +30,11 @@ public class SearchAssistCoauchSubFragmentListAdapter extends BaseAdapter
 
     private LayoutInflater mInflater;
 
+    private ImageLoader mImgLoader;
     public SearchAssistCoauchSubFragmentListAdapter(Context context, ArrayList<SearchAssistCoauchSubFragmentBean> beanList)
     {
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
+
         this.mBeanList = beanList;
         // a better way to get the LAYOUT_INFLATE_SERVICE
         mInflater = LayoutInflater.from(context);
@@ -61,7 +67,7 @@ public class SearchAssistCoauchSubFragmentListAdapter extends BaseAdapter
             convertView = mInflater.inflate(R.layout.search_assistcoauch_fragment_listitem_layout, parent, false);
             viewHolder = new ViewHolder();
 
-            viewHolder.mPhoto = (ImageView) convertView.findViewById(R.id.img_assistcoauch_subfragment_listitem_photo);
+            viewHolder.mPhoto = (NetworkImageView) convertView.findViewById(R.id.img_assistcoauch_subfragment_listitem_photo);
             viewHolder.mNickname = (TextView) convertView.findViewById(R.id.tv_assistcoauch_subfragment_listitem_name);
             viewHolder.mGender = (TextView) convertView.findViewById(R.id.tv_assistcoauch_subfragment_listitem_gender);
             viewHolder.mKinds = (TextView) convertView.findViewById(R.id.tv_assistcoauch_subfragment_listitem_kinds);
@@ -78,9 +84,13 @@ public class SearchAssistCoauchSubFragmentListAdapter extends BaseAdapter
 
         // the user photo should be the image resource that can be retrieved from the network dynamically
         // here we set it as static data
-        viewHolder.mPhoto.setImageResource(R.drawable.default_head);
+        viewHolder.mPhoto.setDefaultImageResId(R.drawable.default_head);
+        viewHolder.mPhoto.setImageUrl(bean.getPhoto(), mImgLoader);
+
         viewHolder.mNickname.setText(bean.getName());
         viewHolder.mGender.setText(bean.getGender());
+        viewHolder.mGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, SubFragmentsCommonUtils.parseGenderDrawable(bean.getGender()), 0);
+        viewHolder.mGender.setCompoundDrawablePadding(6);
         viewHolder.mKinds.setText(bean.getKinds());
         // TODO: the price here should use the String placeHolder to implement it,
         // TODO: otherwise, some exception would happen
@@ -92,7 +102,7 @@ public class SearchAssistCoauchSubFragmentListAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        private ImageView mPhoto;
+        private NetworkImageView mPhoto;
         private TextView mNickname, mGender, mKinds, mPrice, mDistance;
     }
 }

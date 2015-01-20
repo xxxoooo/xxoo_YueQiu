@@ -1,6 +1,7 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +9,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.SearchDatingDetailedAlreadyBean;
+import com.yueqiu.util.VolleySingleton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,9 +29,12 @@ public class SearchDatingDetailedGridAdapter extends BaseAdapter
 {
     private LayoutInflater mInflater;
     private List<SearchDatingDetailedAlreadyBean> mBeanList;
+    private ImageLoader mImgLoader;
 
     public SearchDatingDetailedGridAdapter(Context context, ArrayList<SearchDatingDetailedAlreadyBean> list)
     {
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
+
         this.mInflater = LayoutInflater.from(context);
         mBeanList = list;
     }
@@ -58,7 +65,7 @@ public class SearchDatingDetailedGridAdapter extends BaseAdapter
         {
             convertView = mInflater.inflate(R.layout.search_dating_grid_item_layout, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.mPhoto = (ImageView) convertView.findViewById(R.id.img_grid_search_dating_detailed_userphoto);
+            viewHolder.mPhoto = (NetworkImageView) convertView.findViewById(R.id.img_grid_search_dating_detailed_userphoto);
             viewHolder.mName = (TextView) convertView.findViewById(R.id.tv_grid_search_dating_detailed_username);
             convertView.setTag(viewHolder);
         } else
@@ -70,7 +77,9 @@ public class SearchDatingDetailedGridAdapter extends BaseAdapter
 
         // then, inflate the layout
         // TODO: the following user photo are the test data, and change them later
-        viewHolder.mPhoto.setImageResource(R.drawable.default_head);
+        viewHolder.mPhoto.setDefaultImageResId(R.drawable.default_head);
+        viewHolder.mPhoto.setImageUrl(bean.getUserPhoto(), mImgLoader);
+
         viewHolder.mName.setText(bean.getUserName());
 
         return convertView;
@@ -78,7 +87,7 @@ public class SearchDatingDetailedGridAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        public ImageView mPhoto;
+        public NetworkImageView mPhoto;
         public TextView mName;
     }
 

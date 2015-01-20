@@ -6,7 +6,7 @@
     android:padding="10dp">
 
     <!-- 用于SearchActivity当中的约球子Fragment当中的ListView当中的item的具体的布局layout文件-->
-    <ImageView
+    <com.android.volley.toolbox.NetworkImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
