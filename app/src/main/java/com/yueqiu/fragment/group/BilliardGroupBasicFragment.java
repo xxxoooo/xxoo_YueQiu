@@ -117,6 +117,7 @@ public class BilliardGroupBasicFragment extends Fragment {
 
                 Intent intent = new Intent(getActivity(), BilliardGroupDetailActivity.class);
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.group_in_to_left,R.anim.group_out_to_left);
             }
         });
 

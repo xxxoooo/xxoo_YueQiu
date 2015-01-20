@@ -344,6 +344,15 @@ public class HttpConstants
 
         public static final String CONTENT  = "content";
     }
+    /**
+     * 台球圈详情
+     */
+    public static class GroupDetail{
+
+        public static final String URL = "/cricle/getDetail";
+
+        public static final String ID  = "id";
+    }
 
     /**
      * Json 状态码
