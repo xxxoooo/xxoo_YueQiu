@@ -51,6 +51,7 @@ import java.util.Map;
  * Created by doushuqi on 15/1/7.
  */
 public class FriendsApplicationFragment extends Fragment {
+    private static final String TAG = "FriendsApplicationFragment";
     private ListView mListView;
     private MyAdapter mMyAdapter;
     private FragmentManager mFragmentManager;
@@ -85,7 +86,7 @@ public class FriendsApplicationFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friends_application, container, false);
         mListView = (ListView) view.findViewById(R.id.friends_application_container);
         mList = mApplicationDao.getApplication();
@@ -128,7 +129,7 @@ public class FriendsApplicationFragment extends Fragment {
         paramMap.put(PublicConstant.URL, HttpConstants.GetAsk.URL);
         paramMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.GET);
         if (Utils.networkAvaiable(getActivity())) {
-            new FriendsApplicationAsyncTask(requestMap, null, null).execute(paramMap);
+            new FriendsApplicationAsyncTask(requestMap).execute(paramMap);
         } else {
             Toast.makeText(getActivity(), getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
         }
@@ -136,7 +137,7 @@ public class FriendsApplicationFragment extends Fragment {
 
     private class FriendsApplicationAsyncTask extends AsyncTaskUtil<String> {
 
-        public FriendsApplicationAsyncTask(Map<String, String> map, ProgressBar progressBar, TextView textView) {
+        public FriendsApplicationAsyncTask(Map<String, String> map) {
             super(map);
         }
 
@@ -161,10 +162,18 @@ public class FriendsApplicationFragment extends Fragment {
                         list.add(application);
                     }
                     mApplicationDao.insertApplication(list);
-//                    mHandler.obtainMessage(GET_ASK_SUCCESS, list).sendToTarget();
+                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS, list).sendToTarget();
+
+                } else if (jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                    mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                } else if (jsonObject.getInt("code") == HttpConstants.ResponseCode.NO_RESULT) {
+                    mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                } else {
+                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, jsonObject.getString("msg")).sendToTarget();
                 }
             } catch (JSONException e) {
-                e.printStackTrace();
+                Log.e(TAG, "JSONException->" + e);
+                mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
             }
         }
     }
@@ -173,9 +182,22 @@ public class FriendsApplicationFragment extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
-                case 0:
+                case PublicConstant.GET_SUCCESS:
                     mList = (List<FriendsApplication>) msg.obj;
                     mMyAdapter.notifyDataSetChanged();
+                    break;
+                case PublicConstant.NO_RESULT:
+                    Toast.makeText(getActivity(), "暂无好友申请信息！", Toast.LENGTH_LONG).show();
+                    break;
+                case PublicConstant.TIME_OUT:
+                    Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
+                    break;
+                case PublicConstant.REQUEST_ERROR:
+                    if (null == msg.obj) {
+                        Utils.showToast(getActivity(), getString(R.string.http_request_error));
+                    } else {
+                        Utils.showToast(getActivity(), (String) msg.obj);
+                    }
                     break;
                 default:
                     break;

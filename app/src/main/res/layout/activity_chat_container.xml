@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="@android:color/white"
-     android:layout_width="match_parent"
-     android:layout_height="match_parent"
+                android:background="@android:color/white"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
     >
 
     <RelativeLayout
@@ -80,52 +80,54 @@
 
         </RelativeLayout>
 
-        <LinearLayout
-            android:layout_below="@id/chat_container_extension"
-            android:id="@+id/chat_container_extension_container"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:background="@color/devide_line">
 
-            <TableLayout
+            <LinearLayout
+                android:layout_below="@id/chat_container_extension"
+                android:id="@+id/chat_container_extension_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="180dp"
+                android:visibility="gone"
+                android:background="@color/devide_line">
 
-                <TableRow>
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical">
+                    <TableRow>
 
-                        <TextView
-                            android:layout_width="75dp"
-                            android:layout_height="75dp"
-                            android:drawableTop="@drawable/picture"
-                            android:gravity="center"
-                            android:text="图片"/>
-                    </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="10dp"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical">
+                            <TextView
+                                android:layout_width="75dp"
+                                android:layout_height="75dp"
+                                android:drawableTop="@drawable/picture"
+                                android:gravity="center"
+                                android:text="图片"/>
+                        </LinearLayout>
 
-                        <TextView
-                            android:layout_width="75dp"
-                            android:layout_height="75dp"
-                            android:gravity="center"
-                            android:drawableTop="@drawable/camera"
-                            android:text="拍照"/>
-                    </LinearLayout>
-                </TableRow>
-            </TableLayout>
-        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="75dp"
+                                android:layout_height="75dp"
+                                android:gravity="center"
+                                android:drawableTop="@drawable/camera"
+                                android:text="拍照"/>
+                        </LinearLayout>
+                    </TableRow>
+                </TableLayout>
+            </LinearLayout>
+
     </RelativeLayout>
 
     <LinearLayout

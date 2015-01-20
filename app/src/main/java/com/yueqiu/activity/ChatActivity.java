@@ -6,10 +6,12 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewStub;
 import android.view.inputmethod.InputMethod;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -47,6 +49,7 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
     private int mFriendUserId;
     private String mUserName;
     private View mMessageMore;
+    private Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +144,13 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
         if (isShow) {
             if (mInputMethodManager.isActive())
                 mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
-            mExtension.setVisibility(View.VISIBLE);
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mExtension.setVisibility(View.VISIBLE);
+                }
+            }, 500);
+
             isShowExtension = true;
         } else {
             mExtension.setVisibility(View.GONE);
