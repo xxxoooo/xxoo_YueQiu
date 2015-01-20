@@ -9,18 +9,6 @@ import java.util.List;
  * Created by wangyun on 15/1/4.
  */
 public class PublishedInfo {
-
-    private static final String USER_ID     = "user_id";
-    private static final String STAR_NO     = "start_no";
-    private static final String END_NO      = "end_no";
-    private static final String COUNT       = "count";
-    private static final String LIST_DATA   = "list_data";
-    private static final String ID          = "id";
-    private static final String IMG_URL     = "img_url";
-    private static final String TITLE       = "title";
-    private static final String CONTENT     = "content";
-    private static final String CREATE_TIME = "create_time";
-
     private int user_id;
     private int type;/*发布类型*/
     private int start_no;/*开始条数*/

@@ -89,8 +89,6 @@ public class PullToRefreshListView extends PullToRefreshAdapterViewBase<ListView
 				oppositeListViewLoadingView = mHeaderLoadingView;
 				selection = mRefreshableView.getCount() - 1;
 				scrollToY = getScrollY() - getFooterSize();
-                Log.d("wy","getScrollY->" + getScrollY());
-                Log.d("wy","scrollToY->" + scrollToY);
 				break;
 			case PULL_FROM_START:
 			default:
@@ -112,7 +110,6 @@ public class PullToRefreshListView extends PullToRefreshAdapterViewBase<ListView
 		// Show the ListView Loading View and set it to refresh.
 		listViewLoadingView.setVisibility(View.VISIBLE);
 		listViewLoadingView.refreshing();
-        Log.d("wy","doScroll->" + doScroll);
 		if (doScroll) {
 			// We need to disable the automatic visibility changes for now
 			disableLoadingLayoutVisibilityChanges();

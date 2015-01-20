@@ -124,6 +124,7 @@ public class ActivitiesDaoImpl implements ActivitiesDao {
                 + start + "," + 10;
         Cursor cursor = db.rawQuery(sql, null);
         int count = cursor.getColumnCount();
+        Log.d("wy","count->" + count);
         ArrayList<Activities> list = new ArrayList<Activities>();
         if (count != 0) {
             while (cursor.moveToNext()) {

@@ -120,7 +120,6 @@ public class ArticleReadActivity extends Activity {
 
             String line;
             String result = "";
-
             while ((line = bufReader.readLine()) != null)
                 result += line;
             if (bufReader != null)

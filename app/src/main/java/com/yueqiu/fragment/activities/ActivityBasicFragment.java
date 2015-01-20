@@ -1,6 +1,6 @@
 package com.yueqiu.fragment.activities;
 
-import android.app.ActionBar;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
@@ -8,8 +8,11 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +21,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.activity.ActivitiesDetail;
@@ -42,37 +44,92 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by yinfeng on 15/1/12.
- */
-public class ExhibitionFragment extends Fragment {
+public class ActivityBasicFragment extends Fragment {
 
-    private static final String TAG = "ActivitiesActivity";
-    private ActionBar mActionBar;
+    private static final int LENGTH = 10;
+    private Activity mActivity;
+    private View mView;
     private PullToRefreshListView mPullToRefreshListView;
     private ListView mListView;
     private ActivitiesListViewAdapter mAdapter;
     private ArrayList<Activities> mListData;
-
-    private static final int LENGTH = 10;
     private ActivitiesDao mDao;
     private ProgressBar mPb;
-    private int mNetstart;
-    private int mNetend;
-    private int mLocalStart;
-    private int mLocalEnd;
-    private boolean isHead;
+    private TextView mEmptyView;
+    private int mNetStart = 0,mNetEnd = 9;
+//    private int mLocalStart = 0,mLocalEnd = 10;
+    private boolean mIsHead,mLoadMore;
     private boolean mNetworkAvailable;
-    private Activity mActivity;
-    private View mView;
-    private Drawable mProgressDrawable;
     private int mType;
-    private Handler handler = new Handler()
+    private Drawable mProgressDrawable;
+    private String mEmptyTypeStr;
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        mActivity = activity;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mView = inflater.inflate(R.layout.activity_activites,null);
+        mListData = new ArrayList<Activities>();
+        mDao = DaoFactory.getActivities(mActivity);
+        initView();
+        mNetworkAvailable = Utils.networkAvaiable(mActivity);
+        mType = getArguments().getInt("type",1);
+        setmEmptyStr();
+        new Thread(mNetworkAvailable ? getNetworkData : getLocalData).start();
+        return mView;
+    }
+
+    private void initView()
     {
+        mPullToRefreshListView = (PullToRefreshListView) mView.findViewById(R.id.activity_activities_lv);
+        mListView = mPullToRefreshListView.getRefreshableView();
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
+        mPullToRefreshListView.setOnRefreshListener(mRefreshListener);
+        mPb = (ProgressBar) mView.findViewById(R.id.pb_loading);
+        mPb.setVisibility(View.VISIBLE);
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(mActivity).build();
+        Rect bounds = mPb.getIndeterminateDrawable().getBounds();
+        mPb.setIndeterminateDrawable(mProgressDrawable);
+        mPb.getIndeterminateDrawable().setBounds(bounds);
+        mListView.setOnItemClickListener(itemClickListener);
+
+    }
+    private void setmEmptyStr(){
+        switch(mType){
+            case PublicConstant.GROUP_ACTIVITY:
+                mEmptyTypeStr = getString(R.string.group_activity);
+                break;
+            case PublicConstant.MEET_STAR:
+                mEmptyTypeStr = getString(R.string.star_meet);
+                break;
+            case PublicConstant.BILLIARD_SHOW:
+                mEmptyTypeStr = getString(R.string.billiard_show);
+                break;
+            case PublicConstant.COMPETITION:
+                mEmptyTypeStr = getString(R.string.complete);
+                break;
+            case PublicConstant.OTHER_ACTIVITY:
+                mEmptyTypeStr = getString(R.string.billiard_other);
+                break;
+        }
+    }
+
+    protected void setEmptyViewVisible(){
+        mEmptyView = new TextView(mActivity);
+        mEmptyView.setGravity(Gravity.CENTER);
+        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
+        mEmptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setText(getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+        mPullToRefreshListView.setEmptyView(mEmptyView);
+    }
+    private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            mPb.setVisibility(View.INVISIBLE);
+            mPb.setVisibility(View.GONE);
             switch (msg.what)
             {
                 case PublicConstant.REQUEST_ERROR:
@@ -90,18 +147,20 @@ public class ExhibitionFragment extends Fragment {
                     {
                         mAdapter = new ActivitiesListViewAdapter(mListData ,mActivity);
                         mListView.setAdapter(mAdapter);
-
                     }
                     else
                     {
                         mAdapter.notifyDataSetChanged();
                     }
-
-                    mListView.setVisibility(View.VISIBLE);
                     onLoad();
                     break;
                 case PublicConstant.NO_RESULT:
-                    //setEmptyViewVisible();
+                    if(mListData.isEmpty()){
+                        setEmptyViewVisible();
+                    }
+                    if(!mIsHead && mLoadMore){
+                        Utils.showToast(mActivity,getString(R.string.no_more_type_activity,mEmptyTypeStr));
+                    }
                     onLoad();
                     break;
                 case PublicConstant.TIME_OUT:
@@ -111,59 +170,6 @@ public class ExhibitionFragment extends Fragment {
             }
         }
     };
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mActivity = getActivity();
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.activity_activites,null);
-        mNetstart = 0;
-        mNetend = 9;
-        mLocalStart = 0;
-        mLocalEnd = 10;
-        mListData = new ArrayList<Activities>();
-        mDao = DaoFactory.getActivities(mActivity);
-        initView();
-        mNetworkAvailable = Utils.networkAvaiable(mActivity);
-//        handler.post(getInternetDataThread);
-        isHead = false;
-        mType = getArguments().getInt("type",3);
-        new Thread(mNetworkAvailable ? getNetworkData : getLocalData).start();
-        return mView;
-    }
-
-    private void initView()
-    {
-        mPullToRefreshListView = (PullToRefreshListView) mView.findViewById(R.id.activity_activities_lv);
-        mListView = mPullToRefreshListView.getRefreshableView();
-        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
-        mPullToRefreshListView.setOnRefreshListener(mRefreshListener);
-        mPb = (ProgressBar) mView.findViewById(R.id.pb_loading);
-        //mListView.setVisibility(View.GONE);
-        mPb.setVisibility(View.VISIBLE);
-        mProgressDrawable = new FoldingCirclesDrawable.Builder(mActivity).build();
-        Rect bounds = mPb.getIndeterminateDrawable().getBounds();
-        mPb.setIndeterminateDrawable(mProgressDrawable);
-        mPb.getIndeterminateDrawable().setBounds(bounds);
-        mListView.setOnItemClickListener(itemClickListener);
-
-    }
-
-    private void setEmptyViewVisible(){
-
-        TextView emptyView = new TextView(mActivity);
-        emptyView.setGravity(Gravity.CENTER);
-        emptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
-        emptyView.setTextSize(Utils.px2dip(mActivity,18));
-        emptyView.setText(getString(R.string.your_published_info_is_empty,getString(R.string.no_exhibition_info)));
-        mPullToRefreshListView.setEmptyView(emptyView);
-    }
-
-
     private Runnable getNetworkData = new Runnable() {
         @Override
         public void run() {
@@ -172,38 +178,42 @@ public class ExhibitionFragment extends Fragment {
     };
 
     private Runnable getLocalData = new Runnable() {
+        ArrayList<Activities> mList;
         @Override
         public void run() {
-            ArrayList<Activities> list = mDao.getActivities(mLocalStart, mLocalEnd);
-            mLocalStart += LENGTH;
-            mLocalEnd += LENGTH;
+            Log.d("wy","start->" + mNetStart);
+            Log.d("wy","end->" + mNetEnd);
+            mList = mDao.getActivities(mNetStart, mNetEnd + 1);
+            mNetStart += LENGTH;
+            mNetEnd += LENGTH;
             Message msg = new Message();
-            if(list == null)
+            if(mList == null)
             {
                 msg.what = PublicConstant.NO_RESULT;
             }
             else
             {
                 msg.what = PublicConstant.GET_SUCCESS;
-                mListData.addAll(list);
+                mListData.addAll(mList);
                 msg.obj = mListData;
 
             }
-            handler.sendMessage(msg);
+            mHandler.sendMessage(msg);
         }
     };
 
     private void getDatafromInternet()
     {
         Map<String,Object> map = new HashMap<String, Object>();
-        map.put("start_no",mNetstart);
-        map.put("end_no",mNetend);
+        map.put("start_no",mNetStart);
+        map.put("end_no",mNetEnd);
         map.put("type",mType);
         String retStr = HttpUtil.urlClient(
                 HttpConstants.Play.GETLISTEE, map, HttpConstants.RequestMethod.GET);
         JSONObject object = Utils.parseJson(retStr);
         try {
             Message msg = new Message();
+            //object不包含code
             if(!object.isNull("code")) {
                 //获取数据正常
                 if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
@@ -213,9 +223,7 @@ public class ExhibitionFragment extends Fragment {
                     if (length == 0) {
                         msg.what = PublicConstant.NO_RESULT;
                     } else {
-                        ArrayList<Activities> list = new ArrayList<Activities>();
                         for (int i = 0; i < length; i++) {
-
                             JSONObject item = array.getJSONObject(i);
                             Activities activityItem = Utils.mapingObject(Activities.class, item);
                             boolean flag = false;
@@ -225,22 +233,20 @@ public class ExhibitionFragment extends Fragment {
                                 }
                             }
                             if (!flag) {
-                                list.add(activityItem);
+                                if(!mIsHead){
+                                    mListData.add(activityItem);
+                                }else{
+                                    mListData.add(0,activityItem);
+                                }
                             }
                         }
-                        mDao.insertActiviesList(mListData);
                         msg.what = PublicConstant.GET_SUCCESS;
-                        if (!isHead) {
-                            mListData.addAll(list);
-                        } else {
-                            mListData.addAll(0, list);
-                        }
+                        mDao.insertActiviesList(mListData);
                         msg.obj = mListData;
-                        mNetstart += LENGTH;
-                        mNetend += LENGTH;
 
+                        mNetStart += LENGTH;
+                        mNetEnd += LENGTH;
                     }
-
                 }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
                     msg.what = PublicConstant.TIME_OUT;
                 }else if(object.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
@@ -253,8 +259,7 @@ public class ExhibitionFragment extends Fragment {
             }else{
                 msg.what = PublicConstant.REQUEST_ERROR;
             }
-            handler.sendMessage(msg);
-
+            mHandler.sendMessage(msg);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -274,41 +279,40 @@ public class ExhibitionFragment extends Fragment {
         }
     };
 
-
-    private PullToRefreshBase.OnRefreshListener2 mRefreshListener = new PullToRefreshBase.OnRefreshListener2() {
+    private PullToRefreshBase.OnRefreshListener2<ListView> mRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>() {
         @Override
-        public void onPullDownToRefresh(PullToRefreshBase refreshView) {
+        public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView) {
             String label = DateUtils.formatDateTime(mActivity, System.currentTimeMillis(),
                     DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
 
-            // Update the LastUpdatedLabel
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-
+            mNetStart = 0;
+            mNetEnd = 9;
+            mIsHead = true;
+            mLoadMore = false;
             new Thread(Utils.networkAvaiable(mActivity)
                     ? getNetworkData : getLocalData).start();
-            mNetstart = 0;
-            mNetend = 9;
-            isHead = true;
+
+
         }
 
         @Override
-        public void onPullUpToRefresh(PullToRefreshBase refreshView) {
+        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
             String label = DateUtils.formatDateTime(mActivity, System.currentTimeMillis(),
                     DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
 
-            // Update the LastUpdatedLabel
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-
+            mIsHead = false;
+            mLoadMore = true;
             new Thread(Utils.networkAvaiable(mActivity)
                     ? getNetworkData : getLocalData).start();
 
-            isHead = false;
+
         }
     };
 
     private void onLoad() {
-        mPullToRefreshListView.onRefreshComplete();
+        if(mPullToRefreshListView.isRefreshing())
+            mPullToRefreshListView.onRefreshComplete();
     }
-
-
 }

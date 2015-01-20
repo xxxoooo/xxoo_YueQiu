@@ -32,6 +32,7 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
         db.execSQL(DatabaseConstant.FavorInfoTable.CRAETE_SQL);
         db.execSQL(DatabaseConstant.FavorInfoItemTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.GroupInfo.CREATE_SQL);
 
         // 加载用于SearchActivity当中的Fragment的table
         db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchMateTable.CREATE_SQL);

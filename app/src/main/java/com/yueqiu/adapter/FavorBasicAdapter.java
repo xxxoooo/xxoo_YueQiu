@@ -18,11 +18,11 @@ import java.util.List;
  * Created by wangyun on 15/1/4.
  */
 public class FavorBasicAdapter extends BaseAdapter {
-    private List<FavorInfo.FavorItemInfo> mList;
+    private List<Object> mList;
     private Context mContext;
     private LayoutInflater mInflater;
 
-    public FavorBasicAdapter(Context context,List<FavorInfo.FavorItemInfo> list){
+    public FavorBasicAdapter(Context context,List<Object> list){
         this.mContext = context;
         this.mList = list;
         mInflater = LayoutInflater.from(mContext);
@@ -57,15 +57,15 @@ public class FavorBasicAdapter extends BaseAdapter {
         }else{
             holder = (ViewHolder) convertView.getTag();
         }
-        PublishedInfo.PublishedItemInfo itemInfo = (PublishedInfo.PublishedItemInfo) getItem(position);
+        FavorInfo.FavorItemInfo itemInfo = (FavorInfo.FavorItemInfo) getItem(position);
         if(itemInfo.isChecked()){
             holder.whole_bg.setBackgroundColor(mContext.getResources().getColor(R.color.actionbar_color));
         }else{
             holder.whole_bg.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.published_item_bg));
         }
-        holder.title.setText(mList.get(position).getTitle());
-        holder.content.setText(mList.get(position).getContent());
-        holder.dateTime.setText(mList.get(position).getDateTime());
+        holder.title.setText(((FavorInfo.FavorItemInfo)mList.get(position)).getTitle());
+        holder.content.setText(((FavorInfo.FavorItemInfo)mList.get(position)).getContent());
+        holder.dateTime.setText(((FavorInfo.FavorItemInfo)mList.get(position)).getDateTime());
         return convertView;
     }
 
@@ -78,7 +78,7 @@ public class FavorBasicAdapter extends BaseAdapter {
 
     public void unCheckAll(){
         for(int i=0;i<getCount();i++){
-            PublishedInfo.PublishedItemInfo item = (PublishedInfo.PublishedItemInfo) getItem(i);
+            FavorInfo.FavorItemInfo item = (FavorInfo.FavorItemInfo) getItem(i);
             item.setChecked(false);
         }
 

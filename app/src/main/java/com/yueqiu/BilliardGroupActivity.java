@@ -61,7 +61,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
 
             Fragment fragment = new BilliardGroupBasicFragment();
             Bundle args = new Bundle();
-            args.putInt("type",i+1);
+            args.putInt("type",i);
             fragment.setArguments(args);
             return fragment;
         }

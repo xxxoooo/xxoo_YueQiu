@@ -334,7 +334,7 @@ public class HttpConstants
      */
     public static class GroupIssue{
 
-        public static final String URL = "/cricle/publish";
+        public static final String URL      = "/cricle/publish";
 
         public static final String TYPE     = "type";
 
@@ -344,6 +344,23 @@ public class HttpConstants
 
         public static final String CONTENT  = "content";
     }
+
+    /**
+     * 台球圈List
+     */
+    public static class GroupList{
+
+        public static final String URL      = "/cricle/getList";
+
+        public static final String TYPE     = "type";
+
+        public static final String STAR_NO  = "start_no";
+
+        public static final String END_NO   = "end_no";
+
+
+    }
+
     /**
      * 台球圈详情
      */

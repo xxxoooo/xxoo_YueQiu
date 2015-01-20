@@ -410,4 +410,38 @@ public class DatabaseConstant
 
     }
 
+    public static class GroupInfo{
+
+        public static final String TABLE = "group_info";
+
+        public static final String _ID = "id";
+
+        public static final String NOTE_ID = "note_id";
+
+        public static final String USER_NAME = "user_name";
+
+        public static final String SEX = "sex";
+
+        public static final String BROWSE_COUNT = "browse_count";
+
+        public static final String ISSUE_TIME = "issue_time";
+
+        public static final String TITLE = "title";
+
+        public static final String CONTENT = "content";
+
+        public static final String COMMENT_COUNT = "comment_count";
+
+        public static final String IMG_URL = "img_url";
+
+        public static final String PRAISE_NUM = "praise_num";
+
+        public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + NOTE_ID + " INTEGER NOT NULL, " + USER_NAME + " VARCHAR(50), " + SEX + " INTEGER, " + BROWSE_COUNT + " INTEGER, " + ISSUE_TIME
+                + " VARCHAR(50), " + TITLE + " VARCHAR(255), " + CONTENT + " TEXT, " + COMMENT_COUNT + " INTEGER, " + IMG_URL + " VARCHAR(255), "
+                + PRAISE_NUM + " INTEGER" + ")";
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
+
+    }
+
 }

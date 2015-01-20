@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
@@ -20,15 +19,8 @@ import android.widget.SearchView;
 
 import com.yueqiu.ActivitiesActivity;
 import com.yueqiu.R;
-import com.yueqiu.fragment.activities.CompleteFragment;
-import com.yueqiu.fragment.activities.ExhibitionFragment;
-import com.yueqiu.fragment.activities.GroupActvitiesFragment;
-import com.yueqiu.fragment.activities.OtherFragment;
-import com.yueqiu.fragment.activities.StarMeetFragment;
-import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
+import com.yueqiu.fragment.activities.ActivityBasicFragment;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by yinfeng on 15/1/12.
@@ -38,21 +30,12 @@ public class ActivitiesMain extends FragmentActivity implements ActionBar.TabLis
     private String[] mTitles;
     private SectionPagerAdapter mPagerAdapter;
     private ActionBar mActionBar;
-    private CompleteFragment completeFragment;
-    private ExhibitionFragment exhibitionFragment;
-    private GroupActvitiesFragment groupActvitiesFragment;
-    private OtherFragment otherFragment;
-    private StarMeetFragment starMeetFragment;
-
-    private List<Fragment> mList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_billiard_group);
-        mList = new ArrayList<Fragment>();
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
-
         mTitles = new String[]{getString(R.string.group_activity),
                 getString(R.string.star_meet),
                 getString(R.string.billiard_show),
@@ -70,31 +53,9 @@ public class ActivitiesMain extends FragmentActivity implements ActionBar.TabLis
 
         @Override
         public Fragment getItem(int i) {
-            Fragment fragment = null;
+            Fragment fragment = new ActivityBasicFragment();
             Bundle bundle = new Bundle();
-            switch (i)
-            {
-                case 0:
-                    fragment = new GroupActvitiesFragment();
-                    bundle.putInt("type", 1);
-                    break;
-                case 1:
-                    fragment = new StarMeetFragment();
-                    bundle.putInt("type", 2);
-                    break;
-                case 2:
-                    fragment = new ExhibitionFragment();
-                    bundle.putInt("type", 3);
-                    break;
-                case 3:
-                    fragment = new CompleteFragment();
-                    bundle.putInt("type", 4);
-                    break;
-                case 4:
-                    fragment = new OtherFragment();
-                    bundle.putInt("type", 5);
-                    break;
-            }
+            bundle.putInt("type",i+1);
             fragment.setArguments(bundle);
             return fragment;
         }
