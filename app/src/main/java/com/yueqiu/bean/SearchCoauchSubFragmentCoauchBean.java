@@ -2,6 +2,7 @@ package com.yueqiu.bean;
 
 import android.widget.BaseExpandableListAdapter;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,6 +13,7 @@ import org.json.JSONObject;
  */
 public class SearchCoauchSubFragmentCoauchBean
 {
+    private String mId;
     private String mUserPhoto;
     private String mUserName;
     private String mUserGender;
@@ -19,8 +21,11 @@ public class SearchCoauchSubFragmentCoauchBean
     private String mUserLevel;
     private String mBilliardKind;
 
-    public SearchCoauchSubFragmentCoauchBean(String photo, String name, String gender, String distance, String level, String kind)
+    public SearchCoauchSubFragmentCoauchBean(){}
+
+    public SearchCoauchSubFragmentCoauchBean(String id, String photo, String name, String gender, String distance, String level, String kind)
     {
+        this.mId = id;
         this.mUserPhoto = photo;
         this.mUserName = name;
         this.mUserGender = gender;
@@ -28,6 +33,16 @@ public class SearchCoauchSubFragmentCoauchBean
         this.mUserLevel = level;
         this.mBilliardKind = kind;
 
+    }
+
+    public String getId()
+    {
+        return mId;
+    }
+
+    public void setId(String id)
+    {
+        this.mId = id;
     }
 
     public String getUserPhoto()
@@ -102,6 +117,7 @@ public class SearchCoauchSubFragmentCoauchBean
 
     public JSONObject toJson() throws JSONException
     {
+
         JSONObject jsonObject = new JSONObject();
         jsonObject.put(JSON_USERNAME, mUserName);
         jsonObject.put(JSON_SEX, mUserGender);
@@ -117,6 +133,7 @@ public class SearchCoauchSubFragmentCoauchBean
     // 将json数据解析成我们这里教练所对应的bean文件
     public SearchCoauchSubFragmentCoauchBean parseJson(JSONObject jsonObject) throws JSONException
     {
+        mId = String.valueOf(jsonObject.get(JSON_USER_ID));
         mUserPhoto = String.valueOf(jsonObject.get(JSON_IMG_URL));
         mUserName = String.valueOf(jsonObject.get(JSON_USERNAME));
         mUserGender = String.valueOf(jsonObject.get(JSON_SEX));
@@ -124,7 +141,7 @@ public class SearchCoauchSubFragmentCoauchBean
         mUserLevel = String.valueOf(jsonObject.get(JSON_LEVEL));
         mBilliardKind = String.valueOf(jsonObject.get(JSON_CLASS));
 
-        return new SearchCoauchSubFragmentCoauchBean(mUserPhoto, mUserName, mUserGender, mUserDistance, mUserLevel, mBilliardKind);
+        return new SearchCoauchSubFragmentCoauchBean(mId, mUserPhoto, mUserName, mUserGender, mUserDistance, mUserLevel, mBilliardKind);
     }
 
 }

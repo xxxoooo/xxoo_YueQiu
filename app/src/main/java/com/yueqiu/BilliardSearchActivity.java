@@ -75,6 +75,8 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private static final String STATE_MENUDRAWER = "com.yueqiu.menuDrawer";
     private static final int NUM_OF_FRAGMENTS = 5;
 
+    private static final String FRAGMENT_PAGER_LAST_POSITION = "fragmentPagerLastPosition";
+
     private static final int LOGOUT_SUCCESS = 0;
     private static final int LOGOUT_FAILED = 1;
 
@@ -96,9 +98,13 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
 
+    // 这个变量用于保存每次当SearchActivity被切换到别的地方的时候，回来的时候，还能确保我们回到最后一次滑动到的Fragment的position
+    private static int sPagerPos = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        Log.d(TAG, " the onCreate has been called ");
         super.onCreate(savedInstanceState);
 
         mFragmentManager = getSupportFragmentManager();
@@ -152,6 +158,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
             }
         });
+        mViewPager.setCurrentItem(sPagerPos);
 
     }
 
@@ -162,6 +169,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         setupTabs();
         initDrawer();
         mNearbyRadio.setChecked(true);
+        mViewPager.setCurrentItem(sPagerPos);
     }
 
     @Override
@@ -169,13 +177,16 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     {
         super.onPause();
         mActionBar.removeAllTabs();
+        sPagerPos = mViewPager.getCurrentItem();
     }
 
     @Override
     protected void onDestroy()
     {
+        Log.d(TAG, " the onDestroy has been called ");
         super.onDestroy();
         mContext = null;
+        sPagerPos = mViewPager.getCurrentItem();
     }
 
     private void setupTabs()
@@ -233,6 +244,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     private static final String TAG_COAUCH_FRAGMENT = "searchCoauchFragment";
     private static final String TAG_ROOM_FRAGMENT = "searchRoomFragment";
 
+
     private class SectionPagerAdapter extends FragmentPagerAdapter
     {
         public SectionPagerAdapter(FragmentManager fm)
@@ -244,7 +256,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
         public Fragment getItem(int index)
         {
             Log.d(TAG, " the current Fragment index are : " + index);
-            Fragment fragment = null;
+            Fragment fragment;
             Bundle args;
 
             switch (index) {
@@ -289,6 +301,11 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
 
                     break;
                 default:
+                    fragment = BilliardsSearchMateFragment.newInstance(mContext, "MateFragment");
+                    args = new Bundle();
+                    args.putString(SearchSubFragmentConstants.MATE_FRAGMENT_INIT, mTitles[index]);
+                    fragment.setArguments(args);
+                    Log.d(TAG, "mate fragment has been created ");
                     break;
             }
 
@@ -548,7 +565,13 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     protected void onRestoreInstanceState(Bundle state)
     {
         super.onRestoreInstanceState(state);
-        mMenuDrawer.restoreState(state.getParcelable(STATE_MENUDRAWER));
+        if (null != state)
+        {
+            mMenuDrawer.restoreState(state.getParcelable(STATE_MENUDRAWER));
+            int pos = state.getInt(FRAGMENT_PAGER_LAST_POSITION, 0);
+            mViewPager.setCurrentItem(pos);
+        }
+
     }
 
     @Override
@@ -556,6 +579,8 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
     {
         super.onSaveInstanceState(outState);
         outState.putParcelable(STATE_MENUDRAWER, mMenuDrawer.saveState());
+        outState.putInt(FRAGMENT_PAGER_LAST_POSITION, mViewPager.getCurrentItem());
+
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.yueqiu.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.ContactsContract;
 import android.util.Log;
 
 import com.yueqiu.constant.DatabaseConstant;
@@ -34,6 +35,12 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.FavorInfoTable.CRAETE_SQL);
         db.execSQL(DatabaseConstant.FavorInfoItemTable.CREATE_SQL);
 
+        // 加载用于SearchActivity当中的Fragment的table
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchMateTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.CREATE_SQL);
 
     }
 
@@ -48,6 +55,13 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.ChatMessageTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FriendsTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FriendsApplication.DROP_SQL);
+
+        // 加载用于SearchActivity当中的Fragment的Drop sql
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FavorInfoTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FavorInfoItemTable.DROP_SQL);
         onCreate(db);

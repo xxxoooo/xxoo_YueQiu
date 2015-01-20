@@ -2,8 +2,8 @@ package com.yueqiu.fragment.nearby.common;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -14,6 +14,10 @@ import com.yueqiu.R;
 import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.HttpUtil;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Created by scguo on 15/1/4.
@@ -37,6 +41,8 @@ public class SubFragmentsCommonUtils
     public static final String KEY_ROOM_FRAGMENT_PHOTO = "roomPhoto";
     public static final String KEY_ROOM_FRAGMENT_NAME = "roomName";
     public static final String KEY_ROOM_FRAGMENT_LEVEL = "roomLevel";
+    public static final String KEY_ROOM_FRAGMENT_DETAILED_INFO = "roomDetailedInfo";
+
 
     // 以下是用于球友Fragment当中需要传输的数据的详细的key值
     public static final String KEY_BUNDLE_SEARCH_MATE_FRAGMENT = "searchMateFragment";
@@ -56,35 +62,37 @@ public class SubFragmentsCommonUtils
     public static final String KEY_BUNDLE_SEARCH_ASSISTCOAUCH_FRAGMENT = "searchAssistCoauchFragment";
 
 
-    private SubFragmentsCommonUtils(){}
-
-
-    // TODO: 以下的这个方法已经不再使用，在确定没有类用这个方法之后就删除掉
-    /**
-     * @param context
-     * @param anchorView  当前的popupWindow是依附于具体的哪一个View组件
-     * @param layoutResId 用于显示当前的PopupWindow的具体的布局文件
-     */
-    @Deprecated
-    public static void initPopupWindow(Context context, View anchorView, int layoutResId)
+    private SubFragmentsCommonUtils()
     {
-        final int popupWidth = LinearLayout.LayoutParams.MATCH_PARENT;
-        final int popupHeight = LinearLayout.LayoutParams.WRAP_CONTENT;
-
-        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View popupWindowLayout = layoutInflater.inflate(layoutResId, null);
-
-        final PopupWindow popupWindow = new PopupWindow(context);
-        popupWindow.setContentView(popupWindowLayout);
-        popupWindow.setWidth(popupWidth);
-        popupWindow.setHeight(popupHeight);
-        popupWindow.setFocusable(true);
-
-        popupWindow.setOutsideTouchable(true);
-        popupWindow.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.popup_window_bg));
-
-        popupWindow.showAsDropDown(anchorView);
     }
+
+
+//    // TODO: 以下的这个方法已经不再使用，在确定没有类用这个方法之后就删除掉
+//    /**
+//     * @param context
+//     * @param anchorView  当前的popupWindow是依附于具体的哪一个View组件
+//     * @param layoutResId 用于显示当前的PopupWindow的具体的布局文件
+//     */
+//    @Deprecated
+//    public static void initPopupWindow(Context context, View anchorView, int layoutResId)
+//    {
+//        final int popupWidth = LinearLayout.LayoutParams.MATCH_PARENT;
+//        final int popupHeight = LinearLayout.LayoutParams.WRAP_CONTENT;
+//
+//        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+//        View popupWindowLayout = layoutInflater.inflate(layoutResId, null);
+//
+//        final PopupWindow popupWindow = new PopupWindow(context);
+//        popupWindow.setContentView(popupWindowLayout);
+//        popupWindow.setWidth(popupWidth);
+//        popupWindow.setHeight(popupHeight);
+//        popupWindow.setFocusable(true);
+//
+//        popupWindow.setOutsideTouchable(true);
+//        popupWindow.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.popup_window_bg));
+//
+//        popupWindow.showAsDropDown(anchorView);
+//    }
 
     public static PopupWindow getFilterPopupWindow(Context context, View anchorView, View popupLayoutView)
     {
@@ -105,23 +113,6 @@ public class SubFragmentsCommonUtils
         return popupWindow;
     }
 
-    private static void setImgBackground(int selectedItem)
-    {
-        int i;
-        final int size = sPagerIndicatorImgList.length;
-        for (i = 0; i < size; ++i)
-        {
-            if (i == selectedItem)
-            {
-                Log.d(TAG, " the current selected item are : " + i + " and set the image resource here ");
-                sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_focused);
-            } else
-            {
-                sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
-            }
-        }
-
-    }
 
     // TODO: 这里我们使用的是服务器端的同学开发的接口
     // TODO: 这里我们加载的是商家推荐的信息的列表，也就是显示在每一个Fragment当中的最上面的滚动的Image Gallery
@@ -129,28 +120,48 @@ public class SubFragmentsCommonUtils
     {
         String rawResult = HttpUtil.urlClient(HttpConstants.SearchRoomRecommendation.URL, null, HttpConstants.RequestMethod.GET);
         Log.d(TAG, " the recommendation info we get are : " + rawResult);
+
+        if (!TextUtils.isEmpty(rawResult)) {
+            try {
+                JSONObject initialJsonData = new JSONObject(rawResult);
+                Log.d(TAG, " the initial json data we get are : " + initialJsonData.toString());
+                final int status = initialJsonData.getInt("code");
+                if (status == HttpConstants.ResponseCode.NORMAL) {
+                    JSONArray resultJsonArr = initialJsonData.getJSONArray("result");
+                    final int count = resultJsonArr.length();
+                    int i;
+                    for (i = 0; i < count; ++i) {
+                        JSONObject dataUnit = resultJsonArr.getJSONObject(i);
+                        String photoUrl = dataUnit.getString("img_url");
+
+                    }
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.d(TAG, " exception happened in parsing the room recommendation detailed information, and the detailed reason are : " + e.toString());
+            }
+        }
     }
 
-
-    private static ImageView[] sPagerIndicatorImgList;
     private static ImageView[] sPagerImgArr;
-
     private static LinearLayout sGalleryIndicatorGroup;
     private static SearchMateFragmentViewPagerImgAdapter sGalleryImgAdapter;
-
     private static int[] sPagerImgResArr;
     private static ViewPager sImgGalleryViewPager;
 
     /**
-     *
      * @param context
-     * @param parentView 用于加载ViewPager的父View
-     * @param viewPagerId ViewPager在parentView当中的id值
+     * @param parentView         用于加载ViewPager的父View
+     * @param viewPagerId        ViewPager在parentView当中的id值
      * @param galleryIndiGroupId ViewPager底部的indicator所在的布局中的id值
      */
-    public static void initViewPager(Context context, View parentView, final int viewPagerId, final int galleryIndiGroupId)
+    public static void initViewPager(final Context context, View parentView, final int viewPagerId, final int galleryIndiGroupId)
     {
+        final ImageView[] sPagerIndicatorImgList;
+
         // TODO: 以下仅仅是测试数据，在测试接口的时候就删除掉
+        // TODO: 我们通过网络请求将以下的数据获得
         sPagerImgResArr = new int[]{R.drawable.test_pager_1, R.drawable.test_pager_2, R.drawable.test_pager_3, R.drawable.test_pager_4};
 
         new Thread(new Runnable()
@@ -158,10 +169,10 @@ public class SubFragmentsCommonUtils
             @Override
             public void run()
             {
-                retrieveRecommdedRoomInfo();
+                Log.d(TAG, " start retrieving the view pager data here ");
+//                retrieveRecommdedRoomInfo();
             }
         }).start();
-
 
         sImgGalleryViewPager = (ViewPager) parentView.findViewById(viewPagerId);
         sGalleryIndicatorGroup = (LinearLayout) parentView.findViewById(galleryIndiGroupId);
@@ -172,19 +183,15 @@ public class SubFragmentsCommonUtils
         Log.d(TAG, " the size we get are : " + size);
         ImageView indicatorView;
         int i;
-        for (i = 0; i < size; ++i)
-        {
+        for (i = 0; i < size; ++i) {
             indicatorView = new ImageView(context);
             indicatorView.setLayoutParams(new ViewGroup.LayoutParams(10, 10));
 
             sPagerIndicatorImgList[i] = indicatorView;
             // 用于初始化所有的indicator的初始状态
-            if (i == 0)
-            {
-                Log.d(TAG, " we have reset all the pager indicator here, and this is the wrong place here ");
+            if (i == 0) {
                 sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_focused);
-            } else
-            {
+            } else {
                 sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
             }
 
@@ -197,8 +204,7 @@ public class SubFragmentsCommonUtils
 
         sPagerImgArr = new ImageView[size];
         int j;
-        for (j = 0; j < size; ++j)
-        {
+        for (j = 0; j < size; ++j) {
             ImageView imgView = new ImageView(context);
             sPagerImgArr[j] = imgView;
             imgView.setBackgroundResource(sPagerImgResArr[j]);
@@ -206,23 +212,27 @@ public class SubFragmentsCommonUtils
 
         sGalleryImgAdapter = new SearchMateFragmentViewPagerImgAdapter(sPagerImgArr);
         sImgGalleryViewPager.setAdapter(sGalleryImgAdapter);
-        sImgGalleryViewPager.setCurrentItem(sPagerImgArr.length * 100);
 
         sImgGalleryViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
         {
             @Override
             public void onPageScrolled(int i, float v, int i2)
             {
-
             }
 
             @Override
             public void onPageSelected(int i)
             {
                 Log.d(TAG, " the current page index are : " + i + ", and the selected index are : " + i % sPagerImgArr.length);
-//                setImgBackground(i % sPagerImgArr.length);
-                setImgBackground(i % size);
 
+                int j;
+                for (j = 0; j < size; ++j) {
+                    if (j == (i % size)) {
+                        sPagerIndicatorImgList[j].setBackgroundResource(R.drawable.page_indicator_focused);
+                    } else {
+                        sPagerIndicatorImgList[j].setBackgroundResource(R.drawable.page_indicator_unfocused);
+                    }
+                }
             }
 
             @Override
@@ -233,7 +243,64 @@ public class SubFragmentsCommonUtils
         });
     }
 
+    // 通过得到的关于性别的字符串来解析成具体的男女的字符串
+    public static String parseGenderStr(Context context, String sexVal)
+    {
+        if (!TextUtils.isEmpty(sexVal)) {
+            return sexVal.equals("1") ? context.getString(R.string.man) : context.getString(R.string.woman);
+        }
 
+        return "";
+    }
+
+    public static final int parseGenderDrawable(String sexVal)
+    {
+        if (!TextUtils.isEmpty(sexVal)) {
+            Log.d(TAG, " the sex val we get are :" + sexVal);
+            return sexVal.equals("男") ? R.drawable.male : R.drawable.female;
+        }
+        return R.drawable.female;
+    }
+
+    public static final String parseBilliardsKinds(Context context, String kindVal)
+    {
+        String ballKinds = "";
+        if (!TextUtils.isEmpty(kindVal)) {
+            if (kindVal.equals("1")) {
+                ballKinds = context.getString(R.string.ball_type_1);
+            } else if (kindVal.equals("2")) {
+                ballKinds = context.getString(R.string.ball_type_2);
+            } else if (kindVal.equals("3")) {
+                ballKinds = context.getString(R.string.ball_type_3);
+            } else {
+                // TODO: 这是默认的球种类型，具体还要征求产品的要求，即在默认情况下，默认的球种是什么？？？
+                ballKinds = context.getString(R.string.ball_type_3);
+            }
+        }
+
+        return ballKinds;
+    }
+
+
+    // 解析教练的水平
+    public static final String parseCoauchLevel(Context context, String levelVal)
+    {
+        String levelStr = "";
+        if (!TextUtils.isEmpty(levelVal)) {
+            if (levelVal.equals("1")) {
+                levelStr = context.getString(R.string.level_base);
+            } else if (levelVal.equals("2")) {
+                levelStr = context.getString(R.string.level_middle);
+            } else if (levelVal.equals("3")) {
+                levelStr = context.getString(R.string.level_master);
+            } else if (levelVal.equals("4")) {
+                levelStr = context.getString(R.string.level_super_master);
+            } else {
+                levelStr = context.getString(R.string.level_middle);
+            }
+        }
+        return levelStr;
+    }
 
 
 }

@@ -3,40 +3,41 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
+import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
 
 /**
  * @author scguo
- *
- * 这是用于展示球厅的具体Activity
- * 当我们点击球厅子Fragment(BilliardsSearchRoomFragment)当中的ListView的任何的一个item，就会
- * 跳转到当前的这个Fragment当中
- *
- *
+ *         <p/>
+ *         这是用于展示球厅的具体Activity
+ *         当我们点击球厅子Fragment(BilliardsSearchRoomFragment)当中的ListView的任何的一个item，就会
+ *         跳转到当前的这个Fragment当中
  */
 public class SearchBilliardRoomActivity extends Activity
 {
-    private ImageView mRoomPhoto;
+    private static final String TAG = "SearchBilliardRoomActivity";
+
+    private NetworkImageView mRoomPhoto;
     private TextView mRoomName;
-    private float mRoomRatingLevel;
     private TextView mRoomRatingNum;
     private RatingBar mRoomRatingBar;
     private TextView mRoomPrice, mRoomTag, mRoomAddress, mRoomPhone;
@@ -46,13 +47,16 @@ public class SearchBilliardRoomActivity extends Activity
 
 //    private FrameLayout mWindowRootElem;
 
+
+    private ImageLoader mImgLoader;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_billiard_room);
 
-        mRoomPhoto = (ImageView) findViewById(R.id.img_search_room_detailed_photo);
+        mRoomPhoto = (NetworkImageView) findViewById(R.id.img_search_room_detailed_photo);
         mRoomName = (TextView) findViewById(R.id.tv_search_room_detailed_name);
         mRoomRatingBar = (RatingBar) findViewById(R.id.ratingbar_search_room_detailed_ratingbar);
         mRoomRatingNum = (TextView) findViewById(R.id.tv_search_room_level_num);
@@ -69,11 +73,39 @@ public class SearchBilliardRoomActivity extends Activity
 //        mWindowRootElem = (FrameLayout) findViewById(R.id.window_root_elem);
 //        mWindowRootElem.getForeground().setAlpha(0);
 
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
+
         // then, we need the data that transferred from the previous listView item to inflate
         // the detailed content of these TextView and ImageViews
+        Intent receivedIntent = getIntent();
+        Bundle receivedData = receivedIntent.getBundleExtra(SubFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT);
+        if (null != receivedData) {
+            double price = receivedData.getDouble(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE);
+            float level = receivedData.getFloat(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL);
+            String tag = receivedData.getString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_TAG);
+            String info = receivedData.getString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO);
+            String address = receivedData.getString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS);
+            String phone = receivedData.getString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE);
+            String photoUrl = receivedData.getString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO);
+            String name = receivedData.getString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME);
 
+
+            // 把我们得到的数据全部渲染到Activity当中
+            mRoomPrice.setText(String.valueOf(price));
+            mRoomRatingBar.setRating(level);
+            mRoomRatingNum.setText(String.valueOf(level));
+            mRoomAddress.setText(address);
+            mRoomTag.setText(tag);
+            mRoomPrice.setText(String.valueOf(price));
+            mRoomDetailedInfo.setText(info);
+            mRoomPhone.setText(phone);
+            mRoomName.setText(name);
+
+            Log.d(TAG, " the room photo url we get are : " + photoUrl);
+            mRoomPhoto.setDefaultImageResId(R.drawable.test_pager_5);
+            mRoomPhoto.setImageUrl(photoUrl, mImgLoader);
+        }
     }
-
 
 
     @Override
@@ -81,9 +113,7 @@ public class SearchBilliardRoomActivity extends Activity
     {
         super.onResume();
 
-
-        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB)
-        {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
             mActionBar = getActionBar();
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -97,9 +127,10 @@ public class SearchBilliardRoomActivity extends Activity
     }
 
     // TODO: 用于得到球厅详情信息的网络请求处理过程
+    // TODO: 这里暂时还不知道怎么处理(目前的处理是直接从前一个Fragment的List当中直接获取
+    // TODO: 我们目前还不确定Server端的策略，如果他有提供这个interface，那么我们就直接在这里进行了，否则的话，就从新进行请求)
     private String getRoomDetailedInfo()
     {
-
 
 
         return "";
@@ -121,8 +152,7 @@ public class SearchBilliardRoomActivity extends Activity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        switch (id)
-        {
+        switch (id) {
             case R.id.search_room_detail_action_collect:
                 Toast.makeText(SearchBilliardRoomActivity.this, SearchBilliardRoomActivity.this.getResources().getString(R.string.search_room_collect_success_indicator), Toast.LENGTH_LONG).show();
                 break;
@@ -142,6 +172,7 @@ public class SearchBilliardRoomActivity extends Activity
     private PopupWindow mPopupWindow;
     private TextView mTvYueqiu, mTvYueqiuFriend, mTvFriendCircle, mTvWeichat, mTvQQZone, mTvTencentWeibo, mTvSinaWeibo, mTvRenren;
     private Button mBtnCancel;
+
     // 弹出约球详情分享的popupWindow
     private void popupShareWindow()
     {
@@ -194,8 +225,7 @@ public class SearchBilliardRoomActivity extends Activity
         @Override
         public void onClick(View v)
         {
-            switch (v.getId())
-            {
+            switch (v.getId()) {
                 case R.id.img_search_dating_detail_share_yuqeiufirend:
                     Toast.makeText(SearchBilliardRoomActivity.this, "sharing to the yueqiu friends", Toast.LENGTH_LONG).show();
                     break;

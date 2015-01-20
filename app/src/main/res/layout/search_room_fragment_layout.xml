@@ -55,9 +55,8 @@
         </RelativeLayout>
 
     </LinearLayout>
-    
 
-    
+
     <!--用于SearchActivity当中的球厅的子Fragment的布局文件-->
     <LinearLayout
         android:layout_below="@id/room_gallery_view_pager_zone"
@@ -140,5 +139,17 @@
         android:id="@+id/search_room_subfragment_listview">
 
     </ListView>
+
+
+    <!--用于加载ProgressBar,这些ProgressBar的初始属性都被设置成GONG，即不占用任何位置，直到
+        开始加载为止-->
+    <include
+        layout="@layout/pre_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+    </include>
+
 
 </RelativeLayout>

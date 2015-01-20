@@ -22,24 +22,35 @@ import java.util.concurrent.FutureTask;
 /**
  * Created by wangyun on 15/1/4.
  */
-public class YueQiuApp extends Application {
+public class YueQiuApp extends Application
+{
 
     public static UserInfo sUserInfo = new UserInfo();
     public static GroupNoteInfo sGroupInfo = new GroupNoteInfo();
     private SharedPreferences mSharedPreferences;
+
+    // 由于Volley的官方推荐构建方式是定义成全局的Singleton模式，用于保存唯一的RequestQueue来加速图片的加载，所以我们在这里创建了全局的Context
+    private static Context sAppContext;
+
     @Override
-    public void onCreate() {
+    public void onCreate()
+    {
         super.onCreate();
 
-        mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER,Context.MODE_PRIVATE);
+        mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
 
-        sUserInfo.setUsername(mSharedPreferences.getString(DatabaseConstant.UserTable.USERNAME,getString(R.string.guest)));
-        sUserInfo.setUser_id(Integer.valueOf(mSharedPreferences.getString(DatabaseConstant.UserTable.USER_ID,"0")));
-        sUserInfo.setImg_url(mSharedPreferences.getString(DatabaseConstant.UserTable.IMG_URL,""));
-        sUserInfo.setTitle(mSharedPreferences.getString(DatabaseConstant.UserTable.TITLE,getString(R.string.search_billiard_mate_str)));
-        sUserInfo.setPhone(mSharedPreferences.getString(DatabaseConstant.UserTable.PHONE,""));
+        sUserInfo.setUsername(mSharedPreferences.getString(DatabaseConstant.UserTable.USERNAME, getString(R.string.guest)));
+        sUserInfo.setUser_id(Integer.valueOf(mSharedPreferences.getString(DatabaseConstant.UserTable.USER_ID, "0")));
+        sUserInfo.setImg_url(mSharedPreferences.getString(DatabaseConstant.UserTable.IMG_URL, ""));
+        sUserInfo.setTitle(mSharedPreferences.getString(DatabaseConstant.UserTable.TITLE, getString(R.string.search_billiard_mate_str)));
+        sUserInfo.setPhone(mSharedPreferences.getString(DatabaseConstant.UserTable.PHONE, ""));
 
+        sAppContext = getApplicationContext();
+    }
 
+    public static Context getAppContext()
+    {
+        return sAppContext;
     }
 
 

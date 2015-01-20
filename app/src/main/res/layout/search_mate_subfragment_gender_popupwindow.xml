@@ -4,11 +4,11 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:layout_margin="5dp"
-    android:padding="4dp">
+              android:padding="4dp">
 
     <Button
         style="@style/PopupWindowTvStyle"
-        android:id="@+id/search_room_popupwindow_nofilter"
+        android:id="@+id/btn_search_mate_gender_no_filter"
         android:text="@string/gender"
         android:padding="5dp"
         android:textColor="@color/login_btn_normal"
@@ -20,33 +20,45 @@
         android:background="@color/login_btn_normal">
     </View>
 
-    <Button
-        style="@style/PopupWindowTvStyle"
-        android:id="@+id/search_mate_popupwindow_male"
-        android:text="@string/man"
-        android:layout_margin="2dp"
-        android:textColor="@color/md__defaultBackground"
-        />
 
-    <View
+    <ListView
+        android:id="@+id/list_search_mate_gender_filter_list"
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@color/devide_line">
-    </View>
+        android:layout_height="wrap_content"
+        android:dividerHeight="0.5dp"
+        android:divider="@color/devide_line"
+        >
 
-    <Button
-        style="@style/PopupWindowTvStyle"
-        android:id="@+id/search_mate_popupwindow_female"
-        android:text="@string/man"
-        android:layout_margin="2dp"
-        android:textColor="@color/md__defaultBackground"
-        />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@color/devide_line">
-    </View>
-
+    </ListView>
 
 </LinearLayout>
+
+    <!-- 我们将下面的button的操作改成了ListView实现，因为这样会减少
+        我们发送数据的请求过程 -->
+    <!--<Button-->
+    <!--style="@style/PopupWindowTvStyle"-->
+    <!--android:id="@+id/search_mate_popupwindow_male"-->
+    <!--android:text="@string/search_mate_popupmenu_item_male_str"-->
+    <!--android:layout_margin="2dp"-->
+    <!--android:textColor="@color/md__defaultBackground"-->
+    <!--/>-->
+
+    <!--<View-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0.5dp"-->
+    <!--android:background="@color/devide_line">-->
+    <!--</View>-->
+
+    <!--<Button-->
+    <!--style="@style/PopupWindowTvStyle"-->
+    <!--android:id="@+id/search_mate_popupwindow_female"-->
+    <!--android:text="@string/search_mate_popupmenu_item_female_str"-->
+    <!--android:layout_margin="2dp"-->
+    <!--android:textColor="@color/md__defaultBackground"-->
+    <!--/>-->
+
+    <!--<View-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="0.5dp"-->
+    <!--android:background="@color/devide_line">-->
+    <!--</View>-->

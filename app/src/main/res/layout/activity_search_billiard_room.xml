@@ -1,3 +1,9 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/window_root_elem">
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -15,7 +21,9 @@
             android:id="@+id/img_search_room_detailed_photo_frame"
             android:layout_weight="1">
 
-            <ImageView
+            <!--我们将下面的传统的ImageView替换成的VolleyImageView，
+                VolleyImageView会帮助我们处理好很多事情，比如说最基本的网络请求，已经请求好的图片的本地缓存-->
+            <com.android.volley.toolbox.NetworkImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/img_search_room_detailed_photo"
@@ -66,6 +74,7 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/info_coll_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1.1"
@@ -145,11 +154,16 @@
                 />
         </RelativeLayout>
 
+
         <TextView
+            android:textSize="17sp"
+            android:padding="6dp"
+            android:layout_margin="4dp"
+            android:textColor="@color/md__defaultBackground"
             android:id="@+id/tv_search_room_detailed_info"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_below="@id/tv_separator"
-            android:layout_weight="0.9"
+            android:layout_weight="1.1"
             />
     </LinearLayout>
+</FrameLayout>
