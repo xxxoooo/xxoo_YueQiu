@@ -101,7 +101,7 @@ public class GroupInfoDaoImpl implements GroupInfoDao{
     public  List<GroupNoteInfo> getAllGroupInfoLimit(int start,int num) {
         mDB = mDBUtils.getReadableDatabase();
         String sql = "SELECT * FROM " + DatabaseConstant.GroupInfo.TABLE + " order by " + DatabaseConstant.GroupInfo.NOTE_ID + " desc limit "
-                 + start + "," + num;
+                + start + "," + num;
         Cursor cursor = mDB.rawQuery(sql,null);
         List<GroupNoteInfo> list = new ArrayList<GroupNoteInfo>();
         if(null != cursor && cursor.getCount() != 0){
