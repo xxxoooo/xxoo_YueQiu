@@ -5,12 +5,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.yueqiu.bean.SearchRoomSubFragmentRoomBean;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.dao.SearchRoomDao;
 import com.yueqiu.db.DBUtils;
 
+import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +21,8 @@ import java.util.List;
  */
 public class SearchRoomDaoImpl implements SearchRoomDao
 {
+    private static final String TAG = "SearchRoomDaoImpl";
+
     private Context mContext;
     private DBUtils mDBUtils;
     private SQLiteDatabase mDatabase;
@@ -27,7 +31,7 @@ public class SearchRoomDaoImpl implements SearchRoomDao
     {
         this.mContext = context;
         this.mDBUtils = DBUtils.getInstance(context);
-        this.mDatabase = mDBUtils.getWritableDatabase();
+
     }
 
     /**
@@ -37,8 +41,9 @@ public class SearchRoomDaoImpl implements SearchRoomDao
      * @return
      */
     @Override
-    public long insertRoomItem(SearchRoomSubFragmentRoomBean roomItem)
+    public synchronized long insertRoomItem(SearchRoomSubFragmentRoomBean roomItem)
     {
+        this.mDatabase = mDBUtils.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.NAME, roomItem.getRoomName());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_URL, roomItem.getRoomPhotoUrl());
@@ -51,14 +56,59 @@ public class SearchRoomDaoImpl implements SearchRoomDao
                 null, // null column hack
                 values
         );
-
         return insertId;
     }
 
     @Override
-    public long updateRoomItem(SearchRoomSubFragmentRoomBean roomItem)
+    public synchronized long updateRoomItem(SearchRoomSubFragmentRoomBean roomItem)
     {
         return 0;
+    }
+
+    @Override
+    public synchronized long updateRoomItemBatch(List<SearchRoomSubFragmentRoomBean> roomList)
+    {
+        return 0;
+    }
+
+    @Override
+    public synchronized long insertRoomItemBatch(List<SearchRoomSubFragmentRoomBean> roomList)
+    {
+        this.mDatabase = mDBUtils.getWritableDatabase();
+        long insertResult = 0;
+
+        final int size = roomList.size();
+        int i;
+        mDatabase.beginTransaction();
+        try
+        {
+            for (i = 0; i < size; ++i)
+            {
+                ContentValues values = new ContentValues();
+                SearchRoomSubFragmentRoomBean roomItem = new SearchRoomSubFragmentRoomBean();
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_ID, roomItem.getRoomId());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.NAME, roomItem.getRoomName());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_URL, roomItem.getRoomPhotoUrl());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_LEVEL, roomItem.getLevel());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.RANGE, roomItem.getDistance());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.DETAILED_ADDRESS, roomItem.getDetailedAddress());
+
+                insertResult = mDatabase.insert(
+                        DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_TABLE_NAME,
+                        null, // null column hack
+                        values
+                );
+                mDatabase.setTransactionSuccessful();
+                return insertResult;
+            }
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we insert data into the room table, and the reason are : " + e.toString());
+        } finally {
+            mDatabase.endTransaction();
+        }
+
+        return -1;
     }
 
     /**
@@ -66,41 +116,30 @@ public class SearchRoomDaoImpl implements SearchRoomDao
      * 在进行排序的时候，我们可以将这些String解析成Integer或者Float，然后就可以直接通过
      * 使用SQL的检索语句进行排序了
      *
-     * @param district 区域，这个值默认是筛选条件列表当中的第一个区
-     * @param distance 距离，我们就直接将最原始获得的数据展现给用户，然后用户可以再次通过距离来进行筛选
-     * @param price 价格
-     * @param level 好评度
+     * @param startNum 这就是我们每次开始请求的数据的开始的条目数,我们需要结合startNum的值和limit的值来
+     *                 实现上拉刷新(即滑动到ListView的最底部的时候执行加载更多)
+     * @param limit 每次我们可以获取到的数据条数(我们不能一次就将所有的数据一次性检索出来)
+     *
      * @return
      */
     @Override
-    public List<SearchRoomSubFragmentRoomBean> getRoomList(String district, String distance, String price, String level)
+    public List<SearchRoomSubFragmentRoomBean> getRoomList(final int startNum, final int limit)
     {
+        this.mDatabase = mDBUtils.getReadableDatabase();
+        Log.d(TAG, " we have retrieved the data set from the room table, and the start number are : " + startNum + " , the limit are : " + limit);
         List<SearchRoomSubFragmentRoomBean> roomList = new ArrayList<SearchRoomSubFragmentRoomBean>();
-        String[] allColumns = {
-                DatabaseConstant.FavorInfoItemTable.SearchRoomTable._ID,
-                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_ID,
-                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.NAME,
-                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_URL,
-                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_LEVEL,
-                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.RANGE,
-                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.PHONE_NUM,
-                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.TAG,
-                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.DETAILED_ADDRESS
-        };
+
+        String roomInfoSql = " SELECT * FROM " + DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_TABLE_NAME
+                + " ORDER BY " + DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_ID
+                + " DESC LIMIT " + startNum + " , " + limit;
 
         // TODO: 以下这种检索只是单纯的将所有的数据不加选择的一次性检索出来(这也是我们默认的检索加载方式)
         // TODO: 现在客户端的实现准则是所有的数据都是先从Server端的Service当中检索
         // TODO: 出来，然后存到我们建立的本地数据库当中。然后再从数据库当中进行检索
         // TODO: 这样我们所经过的筛选条件就是完整的SQL语句进行检索了，而不是通过添加请求参数进行检索的
-        Cursor cursor = mDatabase.query(
-                DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_TABLE_NAME,
-                allColumns,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
+        Cursor cursor = mDatabase.rawQuery(
+                roomInfoSql,
+                null);
 
         cursor.moveToFirst();
         while (! cursor.isAfterLast())
@@ -110,9 +149,11 @@ public class SearchRoomDaoImpl implements SearchRoomDao
             cursor.moveToNext();
         }
         cursor.close();
+        Log.d(TAG, " we have get the room info list we just need, and the content are : " + roomList.size());
 
         return roomList;
     }
+
 
 
     // TODO: 现阶段球厅的table具体字段内容还没有确定，还需要服务器端的进一步确定
@@ -136,6 +177,7 @@ public class SearchRoomDaoImpl implements SearchRoomDao
     private SearchRoomSubFragmentRoomBean cursorToRoomBean(Cursor cursor)
     {
         SearchRoomSubFragmentRoomBean roomBean = new SearchRoomSubFragmentRoomBean();
+        roomBean.setRoomId(cursor.getString(1));
         roomBean.setRoomName(cursor.getString(2));
         roomBean.setRoomPhotoUrl(cursor.getString(3));
         roomBean.setDetailedAddress(cursor.getString(4));

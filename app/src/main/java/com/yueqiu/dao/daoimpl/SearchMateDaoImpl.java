@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.provider.ContactsContract;
+import android.util.Log;
 
 import com.yueqiu.bean.SearchMateSubFragmentUserBean;
 import com.yueqiu.constant.DatabaseConstant;
@@ -22,6 +23,8 @@ import java.util.List;
  */
 public class SearchMateDaoImpl implements SearchMateDao
 {
+    private static final String TAG = "SearchMateDaoImpl";
+
     private Context mContext;
     private DBUtils mDBUtils;
     private SQLiteDatabase mSQLdatabase;
@@ -30,16 +33,17 @@ public class SearchMateDaoImpl implements SearchMateDao
     {
         this.mContext = context;
         this.mDBUtils = DBUtils.getInstance(context);
-        // 因为我们DAO的作用不仅仅是获取数据，还会涉及到添加数据，所以我们需要得到的是WritableDatabase，而不是ReadableDatabase
-        this.mSQLdatabase = mDBUtils.getWritableDatabase();
+
 
     }
 
     @Override
-    public long insertMateItem(SearchMateSubFragmentUserBean mateItem)
+    public synchronized long insertMateItem(SearchMateSubFragmentUserBean mateItem)
     {
+        this.mSQLdatabase = mDBUtils.getWritableDatabase();
         ContentValues values = new ContentValues();
 
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID, mateItem.getUserId());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.NAME, mateItem.getUserNickName());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.PHOTO_URL, mateItem.getUserPhotoUrl());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.SEX, mateItem.getUserGender());
@@ -56,42 +60,92 @@ public class SearchMateDaoImpl implements SearchMateDao
     }
 
     @Override
-    public long updateMateInfo(SearchMateSubFragmentUserBean mateImte)
+    public synchronized long updateMateInfo(SearchMateSubFragmentUserBean mateItem)
+    {
+        this.mSQLdatabase = mDBUtils.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID, mateItem.getUserId());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.NAME, mateItem.getUserNickName());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.PHOTO_URL, mateItem.getUserPhotoUrl());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.SEX, mateItem.getUserGender());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DISTRICT, mateItem.getUserDistrict());
+        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.RANGE, mateItem.getUserDistance());
+
+        return 0;
+    }
+
+    @Override
+    public synchronized long updateMateInfoBatch(List<SearchMateSubFragmentUserBean> mateList)
     {
         return 0;
     }
 
     /**
-     * 用于获取球友的信息列表
+     * 用于批零的插入数据
+     * 因为Android当中每次同SQLite建立连接的过程都是一个很耗时的过程，所以我们一旦同SQLite建立的连接，
+     * 就充分的利用这次连接，将我们的所有的已经获得的数据插入到SQLite当中我们创建的table当中.
+     * 在批量插入数据的过程当中我们还要用到database transaction来进行操作
      *
-     * @param distance 距离
-     * @param gender 性别
+     * @param mateList
      * @return
      */
     @Override
-    public List<SearchMateSubFragmentUserBean> getMateList(String distance, String gender)
+    public synchronized long insertMateItemBatch(List<SearchMateSubFragmentUserBean> mateList)
     {
+        this.mSQLdatabase = mDBUtils.getWritableDatabase();
+        long result = 0;
+        mSQLdatabase.beginTransaction();
+        final int size = mateList.size();
+        int i;
+        try
+        {
+            for (i = 0; i < size; ++i)
+            {
+                ContentValues values = new ContentValues();
+                SearchMateSubFragmentUserBean mateItem = mateList.get(i);
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID, mateItem.getUserId());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.NAME, mateItem.getUserNickName());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.PHOTO_URL, mateItem.getUserPhotoUrl());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.SEX, mateItem.getUserGender());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DISTRICT, mateItem.getUserDistrict());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.RANGE, mateItem.getUserDistance());
+
+                result = mSQLdatabase.insert(DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE, null, values);
+            }
+            mSQLdatabase.setTransactionSuccessful();
+            return result;
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened in inserting the data into the mate table batch : " + e.toString());
+        } finally {
+            mSQLdatabase.endTransaction();
+        }
+
+        return -1;
+    }
+
+    /**
+     * 用于获取球友的信息列表
+     * 这个获取过程是没有筛选条件的，即将我们所有的插入的数据直接不加筛选的获取到就可以了
+     *
+     * @param startNum 每次我们请求数据是的数据的ID值，这个值是以我们创建mate表时的USER_ID的值作为判断依据的
+     * @param limit
+     * @return
+     */
+    @Override
+    public List<SearchMateSubFragmentUserBean> getMateList(final int startNum, final int limit)
+    {
+        this.mSQLdatabase = mDBUtils.getReadableDatabase();
         List<SearchMateSubFragmentUserBean> mateList = new ArrayList<SearchMateSubFragmentUserBean>();
-        String[] allColumns = {
-                DatabaseConstant.FavorInfoItemTable.SearchMateTable._ID,
-                DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID,
-                DatabaseConstant.FavorInfoItemTable.SearchMateTable.NAME,
-                DatabaseConstant.FavorInfoItemTable.SearchMateTable.PHOTO_URL,
-                DatabaseConstant.FavorInfoItemTable.SearchMateTable.SEX,
-                DatabaseConstant.FavorInfoItemTable.SearchMateTable.DISTRICT,
-                DatabaseConstant.FavorInfoItemTable.SearchMateTable.RANGE
-        };
-        Cursor cursor = mSQLdatabase.query(
-                DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE, // table 用于查询的表的名字
-                allColumns, // columns 查询之后我们所需要返回的所有的Column的集合
-                null, // selection 用于过滤的语句
-                null, // selectionArgs
-                null, // groupBy
-                null, // having
-                null // orderBy
+
+        String mateInfoSql = " SELECT * FROM " + DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE
+                + " ORDER BY " + DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID
+                + " DESC LIMIT " + startNum + " , " + limit;
+
+        Cursor cursor = mSQLdatabase.rawQuery(
+                mateInfoSql,
+                null
         );
-
-
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast())
@@ -102,8 +156,12 @@ public class SearchMateDaoImpl implements SearchMateDao
         }
         cursor.close();
 
+
         return mateList;
     }
+
+
+
 
     /**
      * 这是一个转化类，用于将我们得到的cursor对象直接转换成一个完整的SearchMateSubFragmentUserBean对象，

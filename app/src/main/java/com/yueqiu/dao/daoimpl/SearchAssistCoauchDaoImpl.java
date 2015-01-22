@@ -4,12 +4,18 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
+import android.util.Log;
 
 import com.yueqiu.bean.SearchAssistCoauchSubFragmentBean;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.dao.SearchAssistCoauchDao;
 import com.yueqiu.db.DBUtils;
 
+import org.apache.http.impl.DefaultHttpServerConnection;
+import org.w3c.dom.Text;
+
+import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,6 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
 {
+    private static final String TAG = "SearchAssistCoauchDaoImpl";
+
+
     private Context mContext;
     private DBUtils mDBUtils;
     private SQLiteDatabase mDatabase;
@@ -27,7 +36,7 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
     {
         this.mContext = context;
         this.mDBUtils = DBUtils.getInstance(context);
-        this.mDatabase = mDBUtils.getWritableDatabase();
+
 
     }
 
@@ -38,8 +47,9 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
      * @return
      */
     @Override
-    public long insertAssistCoauchItem(SearchAssistCoauchSubFragmentBean assistCoauchItem)
+    public synchronized long insertAssistCoauchItem(SearchAssistCoauchSubFragmentBean assistCoauchItem)
     {
+        this.mDatabase = mDBUtils.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.NAME, assistCoauchItem.getName());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.SEX, assistCoauchItem.getGender());
@@ -58,45 +68,76 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
     }
 
     @Override
-    public long updateAssistCoauchItem(SearchAssistCoauchSubFragmentBean assistCoauchItem)
+    public synchronized long updateAssistCoauchItem(SearchAssistCoauchSubFragmentBean assistCoauchItem)
+    {
+        return 0;
+    }
+
+    @Override
+    public synchronized long insertAssistCoauchItemBatch(List<SearchAssistCoauchSubFragmentBean> assistCoauchList)
+    {
+        this.mDatabase = mDBUtils.getWritableDatabase();
+        long insertResult = 0;
+        final int size = assistCoauchList.size();
+        int i;
+        mDatabase.beginTransaction();
+        try
+        {
+            for (i = 0; i < size; ++i)
+            {
+                ContentValues values = new ContentValues();
+                SearchAssistCoauchSubFragmentBean assistCoauchItem = assistCoauchList.get(i);
+                // TODO: 但是我们现在确不确定，插入userId是否是有必要的一个字段，因为SearchActivity当中所有的内容都是不需要user在登录的情况下就可以查看的
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.USER_ID, assistCoauchItem.getUserId());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.NAME, assistCoauchItem.getName());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.SEX, assistCoauchItem.getGender());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.MONEY, assistCoauchItem.getPrice());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.PHOTO_URL, assistCoauchItem.getPhoto());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.CLASS, assistCoauchItem.getKinds());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.RANGE, assistCoauchItem.getDistance());
+
+                insertResult = mDatabase.insert(
+                        DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.ASSISTCOAUCH_TABLE_NAME,
+                        null,
+                        values
+                );
+            }
+            mDatabase.setTransactionSuccessful();
+
+            return insertResult;
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we inserting data into the AssistCoauch table, reason are : " + e.toString());
+        } finally {
+            mDatabase.endTransaction();
+        }
+        return -1;
+    }
+
+    @Override
+    public synchronized long updateAssistCoauchItemBatch(List<SearchAssistCoauchSubFragmentBean> assistCoauchList)
     {
         return 0;
     }
 
     /**
-     *
-     * @param distance 距离
-     * @param cost 花费(即请助教的费用)
-     * @param clazz 助教的球种
-     * @param level 助教的水平
      * @return
      */
     @Override
-    public List<SearchAssistCoauchSubFragmentBean> getAssistCoauchList(String distance, String cost, String clazz, String level)
+    public List<SearchAssistCoauchSubFragmentBean> getAssistCoauchList(final int startNum, final int limit)
     {
+        this.mDatabase = mDBUtils.getReadableDatabase();
         List<SearchAssistCoauchSubFragmentBean> asList = new ArrayList<SearchAssistCoauchSubFragmentBean>();
 
-        String[] allColumns = {
-                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable._ID,
-                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.USER_ID,
-                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.NAME,
-                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.PHOTO_URL,
-                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.CLASS,
-                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.MONEY,
-                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.RANGE,
-                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.SEX
-        };
+        String asInfoSql = " SELECT * FROM" + DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.ASSISTCOAUCH_TABLE_NAME
+                + " ORDER BY " + DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.USER_ID
+                + " DESC LIMIT " + startNum + " , " + limit;
 
-        Cursor cursor = mDatabase.query(
-                DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.ASSISTCOAUCH_TABLE_NAME,
-                allColumns,
-                null,
-                null,
-                null,
-                null,
+        // 这是最基本的筛选操作，得到的是全部的list
+        Cursor cursor = mDatabase.rawQuery(
+                asInfoSql,
                 null
         );
-
         cursor.moveToFirst();
         while (! cursor.isAfterLast())
         {
@@ -106,6 +147,8 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
         }
 
         cursor.close();
+        Log.d(TAG, " the finally assistCoauch list we get are : " + asList.size());
+
         return asList;
     }
 
@@ -127,10 +170,14 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
     private SearchAssistCoauchSubFragmentBean cursorToAssistCoauch(Cursor cursor)
     {
         SearchAssistCoauchSubFragmentBean bean = new SearchAssistCoauchSubFragmentBean();
-
-
+        bean.setUserId(cursor.getString(1));
+        bean.setName(cursor.getString(2));
+        bean.setPhoto(cursor.getString(3));
+        bean.setKinds(cursor.getString(4));
+        bean.setPrice(cursor.getString(5));
+        bean.setDistance(cursor.getString(6));
+        bean.setGender(cursor.getString(7));
 
         return bean;
     }
-
 }

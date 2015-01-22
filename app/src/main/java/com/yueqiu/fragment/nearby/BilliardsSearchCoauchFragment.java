@@ -28,15 +28,20 @@ import com.yueqiu.adapter.SearchCoauchSubFragmentListAdapter;
 import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchCoauchSubFragmentCoauchBean;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.fragment.nearby.common.SearchParamsPreference;
 import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
+import com.yueqiu.view.pullrefresh.PullToRefreshBase;
+import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.interfaces.RSAKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +63,7 @@ public class BilliardsSearchCoauchFragment extends Fragment
     private View mView;
     private static Button sBtnAbility, sBtnKinds;
 
-    private ListView mCoauchListView;
+    private static PullToRefreshListView sCoauchListView;
 
     private static Context sContext;
 
@@ -116,7 +121,9 @@ public class BilliardsSearchCoauchFragment extends Fragment
         (sBtnAbility = (Button) mView.findViewById(R.id.btn_coauch_ability)).setOnClickListener(new OnFilterBtnClickListener());
         (sBtnKinds = (Button) mView.findViewById(R.id.btn_coauch_kinds)).setOnClickListener(new OnFilterBtnClickListener());
 
-        mCoauchListView = (ListView) mView.findViewById(R.id.search_coauch_subfragment_list);
+        sCoauchListView = (PullToRefreshListView) mView.findViewById(R.id.search_coauch_subfragment_list);
+        sCoauchListView.setMode(PullToRefreshBase.Mode.BOTH);
+        sCoauchListView.setOnRefreshListener(mOnRefreshListener);
 
         sPreProgress = (ProgressBar) mView.findViewById(R.id.pre_progress);
         sPreTextView = (TextView) mView.findViewById(R.id.pre_text);
@@ -131,10 +138,7 @@ public class BilliardsSearchCoauchFragment extends Fragment
         // TODO: 这里加载的是测试数据,暂时还不能删除这个方法，因为我们还要查看总的UI加载效果
 //        initListViewTestData();
 
-        sCoauchListAdapter = new SearchCoauchSubFragmentListAdapter(sContext, (ArrayList<SearchCoauchSubFragmentCoauchBean>) sCoauchList);
-        Log.d(TAG, " the source list content are : " + sCoauchList.size());
-        mCoauchListView.setAdapter(sCoauchListAdapter);
-        sCoauchListAdapter.notifyDataSetChanged();
+
 
         return mView;
     }
@@ -158,6 +162,8 @@ public class BilliardsSearchCoauchFragment extends Fragment
         super.onDestroy();
     }
 
+    private static SearchParamsPreference sParamsPreference = SearchParamsPreference.getInstance();
+
     private static class OnFilterBtnClickListener implements View.OnClickListener
     {
         private LayoutInflater inflater = (LayoutInflater) sContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -171,9 +177,10 @@ public class BilliardsSearchCoauchFragment extends Fragment
                     View levelPopupView = inflater.inflate(R.layout.search_coauch_subfragment_level_popupwindow, null);
 
                     final String[] levelStrList = {
-                            sContext.getResources().getString(R.string.search_coauch_filter_level_guojiadui),
-                            sContext.getResources().getString(R.string.search_coauch_filter_level_in_guojiadui),
-                            sContext.getResources().getString(R.string.search_coauch_filter_level_pre_guojiadui),
+                            sContext.getResources().getString(R.string.search_coauch_filter_level_guojiadui), // TODO: 现在服务端还没有定义每一个教练所对应的级别的具体的称号
+                                                                                                              // TODO: 我们这里也是暂时命名 1
+                            sContext.getResources().getString(R.string.search_coauch_filter_level_in_guojiadui), // TODO: 2
+                            sContext.getResources().getString(R.string.search_coauch_filter_level_pre_guojiadui), // TODO: 3 注意这里的值还有待服务器端的确定
                     };
 
                     Button btnLevelNoFilter = (Button) levelPopupView.findViewById(R.id.btn_search_coauch_level_popup_no_filter);
@@ -201,9 +208,9 @@ public class BilliardsSearchCoauchFragment extends Fragment
                     break;
                 case R.id.btn_coauch_kinds:
                     final String[] kindsStrList = {
-                            sContext.getResources().getString(R.string.search_coauch_filter_kinds_desk),
-                            sContext.getResources().getString(R.string.search_coauch_filter_kinds_jiuqiu),
-                            sContext.getResources().getString(R.string.search_coauch_filter_kinds_sinuoke)
+                            sContext.getResources().getString(R.string.search_coauch_filter_kinds_desk), // 中式球对应的值为1
+                            sContext.getResources().getString(R.string.search_coauch_filter_kinds_sinuoke), // 斯诺克对应的参数值为2
+                            sContext.getResources().getString(R.string.search_coauch_filter_kinds_jiuqiu) // 九球对应的参数值为3
                     };
 
                     View kindsPopupView = inflater.inflate(R.layout.search_coauch_subfragment_kinds_popupwindow, null);
@@ -219,7 +226,8 @@ public class BilliardsSearchCoauchFragment extends Fragment
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                         {
-                            final String clazzStr = kindsStrList[position];
+                            final String clazzStr = String.valueOf(position + 1);
+                            sParamsPreference.setCouchClazz(sContext, clazzStr);
                             Message msg = sUIEventsHandler.obtainMessage(RETRIEVE_COAUCH_WITH_CLASS_FILTERED);
                             Bundle data = new Bundle();
                             data.putString(KEY_REQUEST_CLAZZ_FILTER, clazzStr);
@@ -271,55 +279,69 @@ public class BilliardsSearchCoauchFragment extends Fragment
 
         String rawResult = HttpUtil.urlClient(HttpConstants.SearchCoauch.URL, requestParams, HttpConstants.RequestMethod.GET);
         Log.d(TAG, " the raw result we get for the Coauch are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult)) {
-            try {
+        if (!TextUtils.isEmpty(rawResult))
+        {
+            try
+            {
                 JSONObject initialResultJson = new JSONObject(rawResult);
-                final int status = initialResultJson.getInt("code");
-                if (status == HttpConstants.ResponseCode.NORMAL) {
-                    JSONObject resultJsonObj = initialResultJson.getJSONObject("result");
-                    Log.d(TAG, " the final json data we need to parse are : " + resultJsonObj);
-                    JSONArray dataArr = resultJsonObj.getJSONArray("list_data");
-                    final int len = dataArr.length();
-                    int i;
-                    for (i = 0; i < len; ++i) {
-                        JSONObject dataUnit = dataArr.getJSONObject(i);
-                        Log.d(TAG, " the sub data json unit we get are : " + dataUnit);
+                if (! initialResultJson.isNull("code"))
+                {
+                    final int status = initialResultJson.getInt("code");
+                    if (status == HttpConstants.ResponseCode.NORMAL)
+                    {
+                        JSONObject resultJsonObj = initialResultJson.getJSONObject("result");
+                        Log.d(TAG, " the final json data we need to parse are : " + resultJsonObj);
+                        JSONArray dataArr = resultJsonObj.getJSONArray("list_data");
+                        final int len = dataArr.length();
+                        int i;
+                        for (i = 0; i < len; ++i)
+                        {
+                            JSONObject dataUnit = dataArr.getJSONObject(i);
+                            Log.d(TAG, " the sub data json unit we get are : " + dataUnit);
 
-                        // TODO: 部分字段的值还需要进一步的确认
-                        String userId = dataUnit.getString("user_id");
-                        String photoUrl = dataUnit.getString("img_url");
-                        String userName = dataUnit.getString("username");
-                        // TODO: 这里需要注意的是我们得到的关于资质的字段值是一个数字，我们还需要进一步同服务器端确定以下这几个数字分别代表的具体的含义
-                        String level = dataUnit.getString("zizhi");
-                        String sex = dataUnit.getString("sex");
-                        String kinds = dataUnit.getString("class");
-                        String district = dataUnit.getString("district");
-                        long range = dataUnit.getLong("range");
+                            // TODO: 部分字段的值还需要进一步的确认
+                            String userId = dataUnit.getString("user_id");
+                            String photoUrl = dataUnit.getString("img_url");
+                            String userName = dataUnit.getString("username");
+                            // TODO: 这里需要注意的是我们得到的关于资质的字段值是一个数字，我们还需要进一步同服务器端确定以下这几个数字分别代表的具体的含义
+                            String level = dataUnit.getString("zizhi");
+                            String sex = dataUnit.getString("sex");
+                            String kinds = dataUnit.getString("class");
+                            String district = dataUnit.getString("district");
+                            long range = dataUnit.getLong("range");
 
-                        SearchCoauchSubFragmentCoauchBean coauchBean = new SearchCoauchSubFragmentCoauchBean(
-                                userId,
-                                photoUrl,
-                                userName,
-                                SubFragmentsCommonUtils.parseGenderStr(sContext, sex),
-                                String.valueOf(range),
-                                SubFragmentsCommonUtils.parseCoauchLevel(sContext, level),
-                                SubFragmentsCommonUtils.parseBilliardsKinds(sContext, kinds));
-                        sCoauchList.add(coauchBean);
-                        // TODO: 我们应该在这里把所有的我们解析到的数据插入到数据库当中
-                        // TODO: 当时这里有一个很重要的一点就是我们将数据插入数据库时，千万不要一条一条的插！！！
-                        // TODO: 因为这样很浪费资源，数据库的打开和关闭是一个很大的开销，我们需要借用
-                        // TODO: 数据库的transaction业务进行操作，即批量的插入数据和检索数据，这样可以加快我们的插入过程
-                        // TODO: 这是十分需要注意的！！！
+                            SearchCoauchSubFragmentCoauchBean coauchBean = new SearchCoauchSubFragmentCoauchBean(
+                                    userId,
+                                    photoUrl,
+                                    userName,
+                                    SubFragmentsCommonUtils.parseGenderStr(sContext, sex),
+                                    String.valueOf(range),
+                                    SubFragmentsCommonUtils.parseCoauchLevel(sContext, level),
+                                    SubFragmentsCommonUtils.parseBilliardsKinds(sContext, kinds));
+                            sCoauchList.add(coauchBean);
+                        }
 
+                        sUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, sCoauchList).sendToTarget();
 
-                        // TODO: 我们暂时还不确定，是否是需要每增加一条数据，就要通过Adapter我们进行了数据源的更新，
-                        // TODO: 还是在我们已经获取完所有的数据之后在进行这个操作？？？？
-                        sUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                        // TODO: 这时，数据已经完全检索完毕，我们可以取消dialog的显示了
+                        sUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
+                    } else if (status == HttpConstants.ResponseCode.TIME_OUT)
+                    {
+                        sUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                    } else if (status == HttpConstants.ResponseCode.NO_RESULT)
+                    {
+                        sUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                    } else
+                    {
+                        Message msg = sUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                        Bundle data = new Bundle();
+                        data.putString(KEY_REQUEST_ERROR_MSG_COAUCH, initialResultJson.getString("msg"));
+                        msg.setData(data);
+                        sUIEventsHandler.sendMessage(msg);
                     }
-
-                    // TODO: 这时，数据已经完全检索完毕，我们可以取消dialog的显示了
-                    sUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
-
+                } else
+                {
+                    sUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                 }
 
 
@@ -329,6 +351,8 @@ public class BilliardsSearchCoauchFragment extends Fragment
             }
         }
     }
+
+    private static final String KEY_REQUEST_ERROR_MSG_COAUCH = "keyRequestErrorMsgCoauch";
 
     private static final int DATA_HAS_BEEN_UPDATED = 1 << 8;
 
@@ -355,7 +379,8 @@ public class BilliardsSearchCoauchFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
-            switch (msg.what) {
+            switch (msg.what)
+            {
                 case UI_SHOW_PROGRESS:
                     showProgress();
                     Log.d(TAG, " start showing the progress bar in the Coauch fragment ");
@@ -374,6 +399,24 @@ public class BilliardsSearchCoauchFragment extends Fragment
                     Toast.makeText(sContext, reasonDesc, Toast.LENGTH_SHORT).show();
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
+                    List<SearchCoauchSubFragmentCoauchBean> coauchList = (ArrayList<SearchCoauchSubFragmentCoauchBean>) msg.obj;
+                    final int size = coauchList.size();
+                    int i;
+                    for (i = 0; i < size; ++i)
+                    {
+                        if (! sCoauchList.contains(coauchList.get(i)))
+                        {
+                            sCoauchList.add(coauchList.get(i));
+                        }
+                    }
+
+                    // TODO: 在这里进行一下更新数据库的操作
+
+                    if (sCoauchList.isEmpty())
+                    {
+                        loadEmptyTv();
+                    }
+
                     break;
 
                 case RETRIEVE_COAUCH_WITH_LEVEL_FILTERED:
@@ -397,9 +440,50 @@ public class BilliardsSearchCoauchFragment extends Fragment
                     Log.d(TAG, " the adapter has been updated ");
                     break;
 
+                case PublicConstant.TIME_OUT:
+                    // 超时之后的处理策略
+                    Utils.showToast(sContext, sContext.getString(R.string.http_request_time_out));
+                    if (sCoauchList.isEmpty()) {
+                        loadEmptyTv();
+                    }
+                    break;
+
+                case PublicConstant.NO_RESULT:
+                    if (sCoauchList.isEmpty()) {
+                        loadEmptyTv();
+                    } else {
+                        if (sLoadMore) {
+                            Utils.showToast(sContext, sContext.getString(R.string.no_more_info));
+                        }
+                    }
+                    break;
+
+                case PublicConstant.REQUEST_ERROR:
+                    Bundle errorData = msg.getData();
+                    if (null != errorData) {
+                        Utils.showToast(sContext, errorData.getString(KEY_REQUEST_ERROR_MSG_COAUCH));
+                    } else {
+                        Utils.showToast(sContext, sContext.getString(R.string.http_request_error));
+                    }
+
+                    if (sCoauchList.isEmpty())
+                    {
+                        loadEmptyTv();
+                    }
+
+                    break;
             }
+            sCoauchListAdapter = new SearchCoauchSubFragmentListAdapter(sContext, (ArrayList<SearchCoauchSubFragmentCoauchBean>) sCoauchList);
+            Log.d(TAG, " the source list content are : " + sCoauchList.size());
+            sCoauchListView.setAdapter(sCoauchListAdapter);
+            sCoauchListAdapter.notifyDataSetChanged();
         }
     };
+
+    private static void loadEmptyTv()
+    {
+        SubFragmentsCommonUtils.setFragmentEmptyTextView(sContext, sCoauchListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+    }
 
     private static void showProgress()
     {
@@ -484,8 +568,75 @@ public class BilliardsSearchCoauchFragment extends Fragment
             msg.setData(data);
             mWorkerHandler.sendMessage(msg);
         }
-
     }
+
+    private static boolean sLoadMore;
+    private static boolean sRefresh;
+
+    private int mCurrentPos;
+    private int mBeforeCount;
+    private int mAfterCount;
+
+    private int mStartNum;
+    private int mEndNum;
+
+    private PullToRefreshBase.OnRefreshListener2<ListView> mOnRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>()
+    {
+        @Override
+        public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView)
+        {
+            String label = SubFragmentsCommonUtils.getLastedTime(sContext);
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if (Utils.networkAvaiable(sContext)) {
+                        sLoadMore = false;
+                        sRefresh = true;
+                        retrieveInitialCoauchInfo(0, 9);
+                    } else {
+                        Toast.makeText(sContext, sContext.getString(R.string.network_not_available), Toast.LENGTH_LONG).show();
+                    }
+                }
+            }).start();
+        }
+
+        @Override
+        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView)
+        {
+            String label = SubFragmentsCommonUtils.getLastedTime(sContext);
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+
+            sUIEventsHandler.postDelayed(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    sLoadMore = true;
+                    mCurrentPos = sCoauchList.size();
+                    if (mBeforeCount != mAfterCount) {
+                        mStartNum = mEndNum + (mAfterCount - mBeforeCount);
+                        mEndNum += 10 + (mAfterCount - mBeforeCount);
+                    } else {
+                        mStartNum = mEndNum + 1;
+                        mEndNum += 10;
+                    }
+
+                    if (Utils.networkAvaiable(sContext)) {
+                        retrieveInitialCoauchInfo(mStartNum, mEndNum);
+                    } else {
+                        // TODO: 我们需要从本地的数据库当中进行检索
+
+
+                    }
+                }
+            }, 1000);
+
+        }
+    };
 
 
     // TODO: 以下是测试数据,在测试接口的时候，将以下的初始化过程删除

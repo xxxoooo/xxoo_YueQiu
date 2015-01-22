@@ -30,10 +30,13 @@ import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.adapter.SearchRoomSubFragmentListAdapter;
 import com.yueqiu.bean.SearchRoomSubFragmentRoomBean;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
+import com.yueqiu.view.pullrefresh.PullToRefreshBase;
+import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -106,7 +109,7 @@ public class BilliardsSearchRoomFragment extends Fragment
 
     private static Button sBtnDistrict, sBtnDistan, sBtnPrice, sBtnApprisal;
 
-    private ListView mRoomListView;
+    private static PullToRefreshListView sRoomListView;
     private View mView;
     private static List<SearchRoomSubFragmentRoomBean> sRoomList = new ArrayList<SearchRoomSubFragmentRoomBean>();
     private static SearchRoomSubFragmentListAdapter sSearchRoomAdapter;
@@ -131,10 +134,12 @@ public class BilliardsSearchRoomFragment extends Fragment
         (sBtnPrice = (Button) mView.findViewById(R.id.btn_room_price)).setOnClickListener(new OnFilterBtnClickListener());
         (sBtnApprisal = (Button) mView.findViewById(R.id.btn_room_apprisal)).setOnClickListener(new OnFilterBtnClickListener());
 
-        mRoomListView = (ListView) mView.findViewById(R.id.search_room_subfragment_listview);
+        sRoomListView = (PullToRefreshListView) mView.findViewById(R.id.search_room_subfragment_listview);
+        sRoomListView.setMode(PullToRefreshBase.Mode.BOTH);
+        sRoomListView.setOnRefreshListener(onRefreshListener);
 
         sSearchRoomAdapter = new SearchRoomSubFragmentListAdapter(sContext, (ArrayList<SearchRoomSubFragmentRoomBean>) sRoomList);
-        mRoomListView.setAdapter(sSearchRoomAdapter);
+        sRoomListView.setAdapter(sSearchRoomAdapter);
 
         // 初始化ProgressBar
         sPreTextView = (TextView) mView.findViewById(R.id.pre_text);
@@ -147,13 +152,13 @@ public class BilliardsSearchRoomFragment extends Fragment
 
         // TODO: 我们在获得了供我们调用的网络数据(并且这些数据是解析之后的数据的话，ListView所设置的Adapter是一定会发生变化的，我们需要另外选择通知ListView进行刷新的时机
         // TODO: 否则就会发生IllegalStateException,也就是我们没有进行Adapter.NotifyDatasetChanged()的相关操作，或者仅仅是调用这些方法的时机是不对的)
-        mRoomListView.requestLayout();
+        sRoomListView.requestLayout();
         sSearchRoomAdapter.notifyDataSetChanged();
 
         // TODO: 初始化测试数据
 //        initListStaticTestData();
 
-        mRoomListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        sRoomListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
         {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -161,7 +166,7 @@ public class BilliardsSearchRoomFragment extends Fragment
                 // TODO: 现在的这里似乎是一个XListView引入的自己的内部的一个特性,也就是说XListView当中真正的
                 // TODO: 数据开始是从第1条开始的，而不是从第0条开始的。这样我们就需要手动改动(但是具体的内部细节还
                 // TODO: 是不清楚)，出现同样的问题还有助教Fragment当中的List(其实只要是涉及到List的点击事件都会需要处理这个问题)
-                SearchRoomSubFragmentRoomBean bean = sRoomList.get(position - 1);
+                SearchRoomSubFragmentRoomBean bean = sRoomList.get(position);
                 Bundle bundle = new Bundle();
                 bundle.putString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getRoomPhotoUrl());
                 bundle.putString(SubFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getRoomName());
@@ -182,8 +187,6 @@ public class BilliardsSearchRoomFragment extends Fragment
 
 
         return mView;
-
-
     }
 
 
@@ -202,7 +205,6 @@ public class BilliardsSearchRoomFragment extends Fragment
     {
         super.onSaveInstanceState(outState);
     }
-
 
 
     private static class OnFilterBtnClickListener implements View.OnClickListener
@@ -387,6 +389,7 @@ public class BilliardsSearchRoomFragment extends Fragment
 
     // TODO: 以下是用于从大众点评的接里面请求的关键字
     private static final String REQUEST_KEYWORD = "台球,桌球室,台球室,桌球";
+    private static ConcurrentHashMap<String, String> sRequestParams = new ConcurrentHashMap<String, String>();
 
     /**
      * 对于大众点评提供的接口，我们默认的category是“台球”
@@ -402,8 +405,11 @@ public class BilliardsSearchRoomFragment extends Fragment
      *               价格对应于sort的8和9，好评对应于sort的2.
      *               我们在请求所有参数的时候默认sort为1
      * @param limit  我们在请求所有参数的时候，默认limit的值为40，然后每次用户滑动的时候再进行加载(这个值默认为20，最小为1，最大为40)
+     *               注意，这个值指定是每一个page当中所包含的准确的item的数目
+     * @param page   在我们向大众点评的Service请求数据时，他是不提供我们请求的开始条数，和结束条数的，提供的仅仅是页数，即我们可以指定
+     *               请求的页面的数目
      */
-    private static void retrieveRoomListInfo(final String city, final String region, final String range, final int sort, final int limit)
+    private static void retrieveRoomListInfo(final String city, final String region, final String range, final int sort, final int limit, final int page)
     {
         if (!sNetworkAvailable) {
             Log.d(TAG, " the network are really sucked off, and we have to stop fetching any more data from the server any more ");
@@ -416,73 +422,95 @@ public class BilliardsSearchRoomFragment extends Fragment
             sUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
         }
 
-        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
-        requestParams.put("keyword", REQUEST_KEYWORD);
-        requestParams.put("city", city);
-        requestParams.put("region", region);
-        requestParams.put("sort", sort + "");
-        requestParams.put("limit", limit + "");
+        sRequestParams.put("keyword", REQUEST_KEYWORD);
+        sRequestParams.put("city", city);
+        sRequestParams.put("region", region);
+        sRequestParams.put("sort", sort + "");
+        sRequestParams.put("limit", limit + "");
         // TODO: 以下是添加我们所挑选的商店的附近的商店列表的参数值(但是我们传递这个参数的前提是先要将用户当前的经度和纬度信息作为参数传递到Server端)
 //        requestParams.put("range", "");
-        requestParams.put("format", "json");
-        requestParams.put("has_coupon", 0 + "");
+        sRequestParams.put("format", "json");
+        sRequestParams.put("has_coupon", 0 + "");
+        sRequestParams.put("page", page + "");
 
         // TODO: 得到当前用户的经纬度信息,因为我们需要这两个值才能获得以当前用户为中心，附近指定范围内的球店信息
 
 
-        String rawResult = HttpUtil.dpUrlClient(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams);
+        String rawResult = HttpUtil.dpUrlClient(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, sRequestParams);
         Log.d(TAG, " the raw result we get are : " + rawResult);
         if (!TextUtils.isEmpty(rawResult)) {
             try {
                 JSONObject resultJsonObj = new JSONObject(rawResult);
                 Log.d(TAG, " the initial json data of the room fragment we get are : " + resultJsonObj.toString());
-                String status = resultJsonObj.getString("status");
-                if (status.equals("OK")) {
-                    // TODO: 现阶段，由于返回的原始的Json包含了两个int值，一个是total_count,一个是count
-                    // TODO: 但是我们不确定究竟是哪一个代表的是我们获得的数据的条数，我们暂时先使用total_count这个值作为数据的条数
-                    final int count = resultJsonObj.getInt("total_count");
-                    JSONArray businessJsonArr = resultJsonObj.getJSONArray("businesses");
-                    final int size = businessJsonArr.length();
-                    Log.d(TAG, " the total json objects we get are : " + size);
-                    int i;
-                    for (i = 0; i < size; ++i) {
-                        JSONObject businessObj = (JSONObject) businessJsonArr.get(i);
-                        Log.d(TAG, " the sub json object we parsed out are : " + businessObj.toString());
-                        final long businessId = businessObj.getLong("business_id");
-                        String roomName = businessObj.getString("name");
-                        float level = businessObj.getInt("service_score");
-                        double price = businessObj.getDouble("avg_price");
-                        String address = businessObj.getString("address");
-                        String distance = String.valueOf(businessObj.getInt("distance"));
-                        String roomPhoto = businessObj.getString("photo_list_url");
+                if (! resultJsonObj.isNull("status"))
+                {
+                    String status = resultJsonObj.getString("status");
+                    if (status.equals("OK"))
+                    {
+                        // TODO: 现阶段，由于返回的原始的Json包含了两个int值，一个是total_count,一个是count
+                        // TODO: 但是我们不确定究竟是哪一个代表的是我们获得的数据的条数，我们暂时先使用total_count这个值作为数据的条数
+                        final int count = resultJsonObj.getInt("total_count");
+                        JSONArray businessJsonArr = resultJsonObj.getJSONArray("businesses");
+                        final int size = businessJsonArr.length();
+                        Log.d(TAG, " the total json objects we get are : " + size);
+                        int i;
+                        for (i = 0; i < size; ++i)
+                        {
+                            JSONObject businessObj = (JSONObject) businessJsonArr.get(i);
+                            Log.d(TAG, " the sub json object we parsed out are : " + businessObj.toString());
+                            final long businessId = businessObj.getLong("business_id");
+                            String roomName = businessObj.getString("name");
+                            float level = businessObj.getInt("service_score");
+                            double price = businessObj.getDouble("avg_price");
+                            String address = businessObj.getString("address");
+                            String distance = String.valueOf(businessObj.getInt("distance"));
+                            String roomPhoto = businessObj.getString("photo_list_url");
 
-                        // TODO: 我们以下解析的数据全部都是为下一个即RoomDetailedActivity当中的数据(这些数据都是需要传动到球厅详情Activity当中的)
-                        String roomPhoneNum = businessObj.getString("telephone");
+                            // TODO: 我们以下解析的数据全部都是为下一个即RoomDetailedActivity当中的数据(这些数据都是需要传动到球厅详情Activity当中的)
+                            String roomPhoneNum = businessObj.getString("telephone");
 
-                        // 我们从一个jsonArray当中解析出球厅详情Activity当中需要的关于球厅的tag
-                        JSONArray regionJsonArr = businessObj.getJSONArray("regions");
-                        Log.d(TAG, " the sub-sub json object we get are : " + regionJsonArr.toString());
-                        String roomTag = parseRoomTag(regionJsonArr);
-                        Log.d(TAG, " the tag we get for the room are : " + roomTag);
-                        JSONArray roomDetailedInfoArr = businessObj.getJSONArray("deals");
-                        String detailedRoomInfo = parseRoomDetailedInfo(roomDetailedInfoArr);
-                        Log.d(TAG, " the room detailed info we get are : " + detailedRoomInfo);
+                            // 我们从一个jsonArray当中解析出球厅详情Activity当中需要的关于球厅的tag
+                            JSONArray regionJsonArr = businessObj.getJSONArray("regions");
+                            Log.d(TAG, " the sub-sub json object we get are : " + regionJsonArr.toString());
+                            String roomTag = parseRoomTag(regionJsonArr);
+                            Log.d(TAG, " the tag we get for the room are : " + roomTag);
+                            JSONArray roomDetailedInfoArr = businessObj.getJSONArray("deals");
+                            String detailedRoomInfo = parseRoomDetailedInfo(roomDetailedInfoArr);
+                            Log.d(TAG, " the room detailed info we get are : " + detailedRoomInfo);
 
-                        Log.d(TAG, " after totally parsed this json obj : " + businessId + " , " + roomName + " , " + level + " , " + price + " , " + distance + " , " + roomPhoto + " , " + address);
-                        // String roomPhoto, String roomName, float level, double price, String address, String distance
-                        SearchRoomSubFragmentRoomBean roomBean = new SearchRoomSubFragmentRoomBean(roomPhoto, roomName, level, price, address, distance, roomPhoneNum, roomTag, detailedRoomInfo);
-                        // TODO: 将这条数据加入到roomList当中(现在由于数据不完整，所以暂时不添加，等数据完整性已经比较好的时候再进行添加)
-                        sRoomList.add(roomBean);
+                            Log.d(TAG, " after totally parsed this json obj : " + businessId + " , " + roomName + " , " + level + " , " + price + " , " + distance + " , " + roomPhoto + " , " + address);
+                            // String roomPhoto, String roomName, float level, double price, String address, String distance
+                            SearchRoomSubFragmentRoomBean roomBean = new SearchRoomSubFragmentRoomBean(String.valueOf(businessId), roomPhoto, roomName, level, price, address, distance, roomPhoneNum, roomTag, detailedRoomInfo);
+                            // TODO: 将这条数据加入到roomList当中(现在由于数据不完整，所以暂时不添加，等数据完整性已经比较好的时候再进行添加)
+                            sRoomList.add(roomBean);
 
-                        // TODO: 然后我们还需要本地缓存我们所获得到的这条数据
+                        }
+                        sUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, sRoomList).sendToTarget();
+                        // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
+                        sUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
 
-                        // TODO: 我们这里需要进行数据的更新(因为数据的更新必须在主线程当中进行，所以我们就通过Handler发送到MainUiThread当中)
-                        sUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                    } else if (status.equals("ERROR"))
+                    {
+                        JSONObject errorObj = resultJsonObj.getJSONObject("error");
+                        final int errorCode = errorObj.getInt("errorCode");
+                        final String errorMsgStr = errorObj.getString("errorMessage");
+                        StringBuilder errorInfo = new StringBuilder();
+                        errorInfo.append("Error Code : ").append(errorCode).append("; Error Info : ").append(errorMsgStr);
+
+                        Message errorMsg = sUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                        Bundle data = new Bundle();
+                        data.putString(KEY_REQUEST_ERROR_MSG_ROOM, errorInfo.toString());
+
+                        errorMsg.setData(data);
+                        sUIEventsHandler.sendMessage(errorMsg);
                     }
-                    // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
-                    sUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
-                    sUIEventsHandler.sendEmptyMessage(STATE_FETCH_DATA_SUCCESS);
+                } else
+                {
+                    // 什么错误信息都没有获取到，甚至连error都没有
+                    sUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                 }
+
+
             } catch (JSONException e) {
                 e.printStackTrace();
                 Log.d(TAG, " Exception happened in parsing the resulted json object we get, and the detailed reason are : " + e.toString());
@@ -553,6 +581,8 @@ public class BilliardsSearchRoomFragment extends Fragment
     // TODO: 发送到sUIEventsHandler当中执行
     private static final int DATA_HAS_BEEN_UPDATED = 1 << 10;
 
+    private static final String KEY_REQUEST_ERROR_MSG_ROOM = "keyRequestErrorMsgRoom";
+
     private static Handler sUIEventsHandler = new Handler()
     {
         @Override
@@ -575,7 +605,25 @@ public class BilliardsSearchRoomFragment extends Fragment
                     Log.d(TAG, " we have fail to fetch the data for the room fragment, and the reason are : " + failStr);
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
-                    Toast.makeText(sContext, " the item list has been clicked ", Toast.LENGTH_SHORT).show();
+
+                    List<SearchRoomSubFragmentRoomBean> roomList = (ArrayList<SearchRoomSubFragmentRoomBean>) msg.obj;
+                    final int size = roomList.size();
+                    int i;
+                    for (i = 0; i < size; ++i)
+                    {
+                        if (! sRoomList.contains(roomList.get(i)))
+                        {
+                            sRoomList.add(roomList.get(i));
+                        }
+                    }
+
+                    // TODO: 更新数据库
+
+                    if (sRoomList.isEmpty())
+                    {
+                        loadEmptyTv();
+                    }
+
                     break;
 
                 case REQUEST_ROOM_INFO_RANGE_FILTERED:
@@ -612,16 +660,39 @@ public class BilliardsSearchRoomFragment extends Fragment
                     break;
 
                 case DATA_HAS_BEEN_UPDATED:
-
-                    // TODO: 这里需要进一步验证可操作性
-                    sSearchRoomAdapter.notifyDataSetChanged();
-                    Log.d(TAG, " the adapter has been updated ");
+                    // TODO: 考虑移除这个标签，因为这会使Adapter的更新发生异常
                     break;
-                default:
+
+                // 对于大众点评的服务牛逼的一点在于所有的请求错误，会有详细的错误信息供我们向用户展示
+                // 所以我们不需要单独的额外的判断errorCode来判断具体的错误信息，我们只需要定义一条信息就可以了
+                case PublicConstant.REQUEST_ERROR:
+                    Bundle errorData = msg.getData();
+                    if (null != errorData)
+                    {
+                        Log.d(TAG , " the error data we get are : " + errorData);
+                        Utils.showToast(sContext, errorData.getString(KEY_REQUEST_ERROR_MSG_ROOM));
+                    } else {
+                        Utils.showToast(sContext, sContext.getString(R.string.http_request_error));
+                    }
+
+                    if (sRoomList.isEmpty()) {
+                        loadEmptyTv();
+                    }
+
                     break;
             }
+
+            sSearchRoomAdapter = new SearchRoomSubFragmentListAdapter(sContext, (ArrayList<SearchRoomSubFragmentRoomBean>) sRoomList);
+            sRoomListView.setAdapter(sSearchRoomAdapter);
+            sSearchRoomAdapter.notifyDataSetChanged();
+
         }
     };
+
+    private static void loadEmptyTv()
+    {
+        SubFragmentsCommonUtils.setFragmentEmptyTextView(sContext, sRoomListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+    }
 
     private static void showProgress()
     {
@@ -666,7 +737,7 @@ public class BilliardsSearchRoomFragment extends Fragment
                             // 通知UI线程开始显示dialog
                             sUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
                             // 然后开始正式的加载数据
-                            retrieveRoomListInfo("北京", "海淀区", "1000", 2, 20);
+                            retrieveRoomListInfo("北京", "海淀区", "1000", 2, 20, 1);
                             break;
                         case REQUEST_ROOM_INFO_APPRISAL_FILTERED:
                             // TODO: 按商家的好评度来进行筛选
@@ -712,7 +783,7 @@ public class BilliardsSearchRoomFragment extends Fragment
                             sUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
                             // TODO: 但是我们这里需要先将ListView之前当中的数据清空，否则我们似乎无法直接
                             // TODO: 将listView当中的数据进行替换
-                            retrieveRoomListInfo("北京", regionStr, "1000", 2, 20);
+                            retrieveRoomListInfo("北京", regionStr, "1000", 2, 20, 1);
                             sUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                             break;
 
@@ -766,6 +837,65 @@ public class BilliardsSearchRoomFragment extends Fragment
         }
     }
 
+    // 定义的用于下拉刷新过程当中需要用到的变量
+    private static boolean sLoadMore, sRefresh;
+
+    // TODO: 尝试将下面的这个过程抽象出来，单独形成一个Module放大SearchFragmentCommonUtils里面
+    /**
+     * 实现RoomFragment当中的ListView的下拉刷新的实现逻辑
+     * 这个过程是可以抽象出来的
+     */
+    private PullToRefreshBase.OnRefreshListener2<ListView> onRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>()
+    {
+
+        /**
+         * onPullDownToRefresh will be called only when the user has Pulled from
+         * the start, and released.
+         *
+         * @param refreshView
+         */
+        @Override
+        public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView)
+        {
+            String label = SubFragmentsCommonUtils.getLastedTime(sContext);
+
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    if (Utils.networkAvaiable(sContext)) {
+                        sRefresh = true;
+                        sLoadMore = false;
+                        // 我们将我们的page数增加
+                        // 因为我们向下拉的时候，加载的总是最新的数据，所以我们将这里的page的数目置成1，
+                        // 因为第一页当中的数据总是最新的
+                        sRequestParams.put("page", 1 + "");
+                        retrieveRoomListInfo("北京", "海淀区", "1000", 2, 20, 1);
+                    } else {
+                        Toast.makeText(sContext, sContext.getString(R.string.network_not_available), Toast.LENGTH_LONG).show();
+                    }
+                }
+            }).start();
+        }
+
+        /**
+         * onPullUpToRefresh will be called only when the user has Pulled from
+         * the end, and released.
+         *
+         * @param refreshView
+         */
+        @Override
+        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView)
+        {
+            String label = SubFragmentsCommonUtils.getLastedTime(sContext);
+
+            refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+
+        }
+    };
 
     // TODO: 以下仅仅是测试数据，在项目最终通过测试之后再删除下面的静态数据部分
     // use the static data to init the BilliardsSearchRoomFragment
@@ -783,7 +913,7 @@ public class BilliardsSearchRoomFragment extends Fragment
         String roomDetailedInfo = "办会员卡，容声VIP会员。我是屌丝，我为屌丝代言";
         int i;
         for (i = 0; i < 100; ++i) {
-            sRoomList.add(new SearchRoomSubFragmentRoomBean("", roomName, level, price, address, distance, roomPhoneNum, roomTag, roomDetailedInfo));
+            sRoomList.add(new SearchRoomSubFragmentRoomBean("", "", roomName, level, price, address, distance, roomPhoneNum, roomTag, roomDetailedInfo));
         }
     }
 }

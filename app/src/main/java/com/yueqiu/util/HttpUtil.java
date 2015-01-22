@@ -113,7 +113,7 @@ public class HttpUtil
     /**
      * 以下的这个方法是专为SearchActivity当中的SearchRoomFragment(即球厅Fragment)当中的列表,
      * 需要注意的是如果以下的请求使用HttpUrlConnection的话，是请求不到数据的，而且服务器端会报的
-     * 错误也是10015，也就是请求方法错误
+     * 错误也是10015，也就是请求方法错误(所以我们直接使用的是Apache HttpClient进行数据的请求)
      *
      * @param baseUrl
      * @param relativeUrl

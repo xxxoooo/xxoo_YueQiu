@@ -60,7 +60,7 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
     private boolean isDisplayInputMethod;//键盘
     private boolean isShowExtension;//扩展(包括表情和插件)
     private boolean isDisplayPlugin;//插件
-    private boolean isDisplayEmoji;//表情，三者（键盘、插件、表情）只能显示一个或者都不显示，当键盘消失时需延时加载其他控件
+    private boolean isDisplayEmoji;//表情，三者（键盘、插件、表情）只能显示一个或1者都不显示，当键盘消失时需延时加载其他控件
     private static final int DISPLAY_INPUT_METHOD = 0;
     private static final int UNDISPLAY_INPUT_METHOD = 1;
 
@@ -166,6 +166,9 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
                 break;
             case R.id.chat_container_send_btn:
                 sendMessage();
+                if (isShowExtension) {
+                    showExtension(false);
+                }
                 break;
             case R.id.chat_container_message_more:
                 //查看更多消息
@@ -221,6 +224,7 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
     @Override
     protected void onStart() {
         super.onStart();
+        //加载表情Fragment
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.chat_container_emotion, EmojiconsFragment.newInstance(false))

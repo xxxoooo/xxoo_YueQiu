@@ -59,6 +59,8 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
 
     public static final String EXTRA_FRAGMENT_ID =
             "com.yueqiu.activity.searchmenu.myprofileactivity.fragment_id";
+    public static final String EXTRA_USERINFO =
+            "com.yueqiu.activity.searchmenu.myprofileactivity.userinfo";
     public static int EXTRA_REQUEST_ID = 0;
     public static String EXTRA_RESULT_ID = "com.yueqiu.activity.searchmenu.myprofileactivity.result_id";
 
@@ -135,7 +137,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     JSONObject object = Utils.parseJson(result);
                     Message message = new Message();
                     try {
-                        if(!object.isNull("code")) {
+                        if (!object.isNull("code")) {
                             if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
 
                                 mMap.put(DatabaseConstant.UserTable.SEX, object.getJSONObject("result").
@@ -172,27 +174,32 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                                 message.obj = mUserInfo;
 
 
-                            }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            } else if (object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
                                 mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                            }
-                            else {
+                            } else {
                                 message.what = DATA_ERROR;
                                 message.obj = object.getString("msg");
                             }
                             mHandler.sendMessage(message);
-                        }else{
+                        } else {
                             message.what = DATA_ERROR;
                             mHandler.sendMessage(message);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
+                        //加载本地数据
+                        getMyProfileFromLocal();
                     }
                 }
             }).start();
         } else {
-            mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+            getMyProfileFromLocal();
             mHandler.obtainMessage(DATA_SUCCESS, mUserInfo).sendToTarget();
         }
+    }
+
+    private void getMyProfileFromLocal() {
+        mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
     }
 
 
@@ -203,12 +210,12 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             switch (msg.what) {
                 case DATA_ERROR:
                     Log.i(TAG, "error to get profile from service");
-                    if(null == msg.obj){
-                        Utils.showToast(MyProfileActivity.this,getString(R.string.http_request_error));
-                    }else{
+                    if (null == msg.obj) {
+                        Utils.showToast(MyProfileActivity.this, getString(R.string.http_request_error));
+                    } else {
                         Utils.showToast(MyProfileActivity.this, (String) msg.obj);
                     }
-                    mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+                    getMyProfileFromLocal();
                     updateUI(mUserInfo);
                     break;
                 case DATA_SUCCESS:
@@ -217,7 +224,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     break;
                 case PublicConstant.TIME_OUT:
                     Toast.makeText(MyProfileActivity.this, getString(R.string.http_request_time_out), Toast.LENGTH_SHORT).show();
-                    mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+                    getMyProfileFromLocal();
                     updateUI(mUserInfo);
                     break;
             }
@@ -265,7 +272,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             case KeyEvent.KEYCODE_BACK:
                 mUserDao.updateUserInfo(mMap);
                 finish();
-                overridePendingTransition(R.anim.top_in,R.anim.top_out);
+                overridePendingTransition(R.anim.top_in, R.anim.top_out);
                 break;
         }
         return super.onKeyDown(keyCode, event);
@@ -296,7 +303,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             case android.R.id.home:
                 mUserDao.updateUserInfo(mMap);
                 finish();
-                overridePendingTransition(R.anim.top_in,R.anim.top_out);
+                overridePendingTransition(R.anim.top_in, R.anim.top_out);
                 break;
         }
         return true;
@@ -330,16 +337,16 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 startMyActivity(4);
                 break;
             case R.id.my_profile_level:
-//                startMyActivity(5);
+                startMyActivity(5);
                 break;
             case R.id.my_profile_ball_type:
-//                startMyActivity(6);
+                startMyActivity(6);
                 break;
             case R.id.my_profile_billiards_cue:
-//                startMyActivity(7);
+                startMyActivity(7);
                 break;
             case R.id.my_profile_cue_habits:
-//                startMyActivity(8);
+                startMyActivity(8);
                 break;
             case R.id.my_profile_play_age:
                 startMyActivity(9);
@@ -351,7 +358,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 startMyActivity(11);
                 break;
             case R.id.my_profile_the_new_post:
-                startMyActivity(12);
+//                startMyActivity(12);
                 break;
         }
     }
@@ -392,19 +399,30 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 mMap.put(DatabaseConstant.UserTable.DISTRICT, str);
                 break;
             case 5:
-                mLevelTextView.setText(str);
+                mLevelTextView.setText("1".equals(str)
+                        ? getString(R.string.level_base) : (("2".equals(str)) ?
+                        getString(R.string.level_middle) : getString(R.string.level_master)));
+                mUserInfo.setLevel(Integer.parseInt(str));
                 mMap.put(DatabaseConstant.UserTable.LEVEL, str);
                 break;
             case 6:
-                mBallTypeTextView.setText(str);
+                mBallTypeTextView.setText("1".equals(str)
+                        ? getString(R.string.ball_type_1) : ("2".equals(str) ?
+                        getString(R.string.ball_type_2) : getString(R.string.ball_type_3)));
+                mUserInfo.setBall_type(Integer.parseInt(str));
                 mMap.put(DatabaseConstant.UserTable.BALL_TYPE, str);
                 break;
             case 7:
-                mBilliardsCueTextView.setText(str);
+                mBilliardsCueTextView.setText("1".equals(str)
+                        ? getString(R.string.cue_1) : getString(R.string.cue_2));
+                mUserInfo.setUsedType(Integer.parseInt(str));
                 mMap.put(DatabaseConstant.UserTable.BALLARM, str);
                 break;
             case 8:
-                mCueHabitsTextView.setText(str);
+                mCueHabitsTextView.setText("1".equals(str)
+                        ? getString(R.string.habit_1) : ("2".equals(str) ?
+                        getString(R.string.habit_2) : getString(R.string.habit_3)));
+                mUserInfo.setBallArm(Integer.parseInt(str));
                 mMap.put(DatabaseConstant.UserTable.USERDTYPE, str);
                 break;
             case 9:
@@ -424,8 +442,8 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                 break;
             case 12:
                 break;
-
         }
+        mUserDao.updateUserInfo(mMap);
     }
 
 
