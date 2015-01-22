@@ -64,6 +64,8 @@ public class SearchBilliardsDatingActivity extends Activity
     private Button mBtnFollow;
     private ActionBar mActionBar;
 
+    private SearchDatingDetailedGridAdapter mAlreadyInUserGridAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -104,7 +106,9 @@ public class SearchBilliardsDatingActivity extends Activity
 
         // TODO: 以下加载的是测试数据
         initGridList();
-        mGridAlreadyFlow.setAdapter(new SearchDatingDetailedGridAdapter(this, (ArrayList<SearchDatingDetailedAlreadyBean>) mFollowList));
+        mAlreadyInUserGridAdapter = new SearchDatingDetailedGridAdapter(this, (ArrayList<SearchDatingDetailedAlreadyBean>) mFollowList);
+
+        mGridAlreadyFlow.setAdapter(mAlreadyInUserGridAdapter);
     }
 
     @Override
@@ -137,6 +141,12 @@ public class SearchBilliardsDatingActivity extends Activity
                         @Override
                         public void run()
                         {
+                            // TODO: 这里应该添加另一层逻辑，就是当用户在没有登录的情况下是没有办法直接
+                            // TODO: 是没有办法直接参加约球活动的，仍然还是需要先登录的情况下才可以
+                            // TODO: 所以我们应该先判断一下用户是否已经登录，如果已经登录了，我们就可以获取当前用户的ID值，
+                            // TODO: 然后直接处理登录的请求，但是如果用户没有登录的话，我们应该弹出一个对话框，提示用户
+                            // TODO: 登录之后才可以参加，或者干脆直接跳转到用户登录的那个界面就可以了，让用户直接
+                            // TODO: 处理登录过程就可以了
                             joinActivity(1, 1, 2);
                         }
                     }).start();
@@ -236,6 +246,7 @@ public class SearchBilliardsDatingActivity extends Activity
             String appointId = wholeResult.getString("appoint_id"); // 约球id
             String userId = wholeResult.getString("user_id"); // 用户id
             String account = wholeResult.getString("account"); // 用户昵称
+
             // TODO: 以下的两个字段服务器端还没有提供，我们需要联系服务器端的人员提供
 //            String sex = wholeResult.getString("sex"); // 用户性别
 //            String lookNumber = wholeResult.getString("look_number"); // 浏览数目，即眼睛图标对应的那个数字
@@ -280,8 +291,12 @@ public class SearchBilliardsDatingActivity extends Activity
             {
                 JSONObject follower = (JSONObject) followList.get(i);
                 String followerId = follower.getString(""); // 已经参加本次活动的人员的id
-                String followerAccount = follower.getString(""); // 已经参加本次活动的人员的account
+                String followerAccount = follower.getString(""); // 已经参加本次活动的人员的account, 这里也就是用户的名字
                 String followerPhotoUrl = follower.getString(""); // 已经参加本次活动的人员的photo的url
+
+                // TODO: 我们需要在这里将我们解析到的json object转换成我们需要的用户的bean对象，
+                // TODO: 然后就可以将下面的GridView显示出来的
+
             }
 
         } catch (JSONException e) {
@@ -340,16 +355,8 @@ public class SearchBilliardsDatingActivity extends Activity
         Toast.makeText(SearchBilliardsDatingActivity.this, content, Toast.LENGTH_LONG).show();
     }
 
-    // TODO: the following are just the static test data, and we should
-    // TODO: remove them to add the dynamic data
-    private void initGridList()
-    {
-        int i;
-        for (i = 0; i < 5; ++i)
-        {
-            mFollowList.add(new SearchDatingDetailedAlreadyBean("", "温柔的语"));
-        }
-    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -382,8 +389,6 @@ public class SearchBilliardsDatingActivity extends Activity
     }
 
 
-
-
     // TODO: 用于完成台球厅分享的网络的请求处理过程
     private void shareBilliardsRoomRequest(String shareTarget)
     {
@@ -391,5 +396,18 @@ public class SearchBilliardsDatingActivity extends Activity
     }
 
 
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////
+    // TODO: 以下只是我们加载的临时测试数据，在正式测试通过之后就可以直接删除了
+    private void initGridList()
+    {
+        int i;
+        for (i = 0; i < 5; ++i)
+        {
+            mFollowList.add(new SearchDatingDetailedAlreadyBean("", "温柔的语"));
+        }
+    }
 
 }

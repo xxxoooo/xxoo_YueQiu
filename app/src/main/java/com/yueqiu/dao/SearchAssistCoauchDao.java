@@ -1,6 +1,7 @@
 package com.yueqiu.dao;
 
 import com.yueqiu.bean.SearchAssistCoauchSubFragmentBean;
+import com.yueqiu.constant.DatabaseConstant;
 
 import java.util.List;
 
@@ -14,14 +15,26 @@ public interface SearchAssistCoauchDao
 
     public long updateAssistCoauchItem(SearchAssistCoauchSubFragmentBean assistCoauchItem);
 
+    public long insertAssistCoauchItemBatch(List<SearchAssistCoauchSubFragmentBean> assistCoauchList);
+
+    public long updateAssistCoauchItemBatch(List<SearchAssistCoauchSubFragmentBean> assistCoauchList);
+
     /**
      *
-     * @param distance 距离
-     * @param cost 花费(即请助教的费用)
-     * @param clazz 助教的球种
-     * @param level 助教的水平
+     * @param limit 我们每次请求的数据的条数的限制
+     *
      * @return
      */
-    public List<SearchAssistCoauchSubFragmentBean> getAssistCoauchList(String distance, String cost, String clazz, String level);
+    public List<SearchAssistCoauchSubFragmentBean> getAssistCoauchList(final int startNum, final int limit);
 
+    public static final String[] allColumns = {
+            DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable._ID,
+            DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.USER_ID,
+            DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.NAME,
+            DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.PHOTO_URL,
+            DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.CLASS,
+            DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.MONEY,
+            DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.RANGE,
+            DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.SEX
+    };
 }

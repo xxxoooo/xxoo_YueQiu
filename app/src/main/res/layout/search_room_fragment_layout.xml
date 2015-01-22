@@ -133,12 +133,12 @@
 
     </LinearLayout>
 
-    <ListView
+    <com.yueqiu.view.pullrefresh.PullToRefreshListView
         style="@style/SearchSubActivityListViewStyle"
         android:layout_below="@id/room_filter_group"
         android:id="@+id/search_room_subfragment_listview">
 
-    </ListView>
+    </com.yueqiu.view.pullrefresh.PullToRefreshListView>
 
 
     <!--用于加载ProgressBar,这些ProgressBar的初始属性都被设置成GONG，即不占用任何位置，直到

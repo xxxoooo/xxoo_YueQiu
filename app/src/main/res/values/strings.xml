@@ -67,6 +67,8 @@
     <string name="search_billiard_room_str">球厅</string>
     <string name="search_billiard_dating_str">约球</string>
 
+    <!--用于SearchActivity当中的各个Fragment为空时，显示的TextView-->
+    <string name="search_activity_subfragment_empty_tv_str">对不起，暂时没有加载到任何数据</string>
     <!-- 以下是位于SearchActivity当中的各个子Fragment当中的不同的listView展示的title -->
     <!-- 1.球友子Fragment中的title -->
     <string name="search_mate_subfragment_title_distance">距离</string>

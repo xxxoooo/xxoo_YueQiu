@@ -94,12 +94,12 @@
             />
     </LinearLayout>
 
-    <ListView
+    <com.yueqiu.view.pullrefresh.PullToRefreshListView
         style="@style/SearchSubActivityListViewStyle"
         android:id="@+id/search_coauch_subfragment_list"
         android:layout_below="@id/coauch_filter_group">
 
-    </ListView>
+    </com.yueqiu.view.pullrefresh.PullToRefreshListView>
 
 
     <include

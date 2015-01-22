@@ -93,13 +93,14 @@
             />
     </LinearLayout>
 
-    <ListView
+    <com.yueqiu.view.pullrefresh.PullToRefreshListView
         android:layout_below="@id/dating_filter_group"
         android:id="@+id/search_dating_subfragment_list"
         style="@style/SearchSubActivityListViewStyle"
         >
 
-    </ListView>
+    </com.yueqiu.view.pullrefresh.PullToRefreshListView>
+
 
     <include
         layout="@layout/pre_load"

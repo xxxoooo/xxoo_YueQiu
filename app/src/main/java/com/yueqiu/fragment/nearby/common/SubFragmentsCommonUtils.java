@@ -3,17 +3,22 @@ package com.yueqiu.fragment.nearby.common;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.adapter.SearchMateFragmentViewPagerImgAdapter;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,33 +71,21 @@ public class SubFragmentsCommonUtils
     {
     }
 
+    public static String getLastedTime(Context context)
+    {
+        return DateUtils.formatDateTime(context, System.currentTimeMillis(),
+                DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
+    }
 
-//    // TODO: 以下的这个方法已经不再使用，在确定没有类用这个方法之后就删除掉
-//    /**
-//     * @param context
-//     * @param anchorView  当前的popupWindow是依附于具体的哪一个View组件
-//     * @param layoutResId 用于显示当前的PopupWindow的具体的布局文件
-//     */
-//    @Deprecated
-//    public static void initPopupWindow(Context context, View anchorView, int layoutResId)
-//    {
-//        final int popupWidth = LinearLayout.LayoutParams.MATCH_PARENT;
-//        final int popupHeight = LinearLayout.LayoutParams.WRAP_CONTENT;
-//
-//        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//        View popupWindowLayout = layoutInflater.inflate(layoutResId, null);
-//
-//        final PopupWindow popupWindow = new PopupWindow(context);
-//        popupWindow.setContentView(popupWindowLayout);
-//        popupWindow.setWidth(popupWidth);
-//        popupWindow.setHeight(popupHeight);
-//        popupWindow.setFocusable(true);
-//
-//        popupWindow.setOutsideTouchable(true);
-//        popupWindow.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.popup_window_bg));
-//
-//        popupWindow.showAsDropDown(anchorView);
-//    }
+    public static void setFragmentEmptyTextView(Context context, final PullToRefreshListView listView, final String emptyText)
+    {
+        TextView emptyView = new TextView(context);
+        emptyView.setGravity(Gravity.CENTER);
+        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
+        emptyView.setTextColor(context.getResources().getColor(R.color.md__defaultBackground));
+        emptyView.setText(context.getString(R.string.your_published_info_is_empty, emptyText));
+        listView.setEmptyView(emptyView);
+    }
 
     public static PopupWindow getFilterPopupWindow(Context context, View anchorView, View popupLayoutView)
     {
