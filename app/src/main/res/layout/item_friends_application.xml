@@ -18,6 +18,7 @@
         android:textSize="16sp"
         android:text="@string/qiuyou_request"/>
     <TextView
+        android:textColor="@color/devide_line"
         android:id="@+id/friends_application_time"
         style="@style/TimeTextStyle"
         android:text="2014-12-12"

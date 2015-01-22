@@ -2,13 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:background="@color/white">
+
     <RelativeLayout
         android:id="@+id/friends_group_qiuyou"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:clickable="true"
         android:background="@drawable/list_corner_round_mid2">
+
         <TextView
             android:textColor="@color/md__defaultBackground"
             android:layout_alignParentLeft="true"
@@ -18,6 +21,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:text="@string/search_billiard_mate_str"/>
+
         <ImageView
             android:textColor="@color/md__defaultBackground"
             android:id="@+id/friends_group_qiuyou_iv"
@@ -28,16 +32,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </RelativeLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/devide_line"/>
+
     <RelativeLayout
         android:id="@+id/friends_group_assist_coach"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:clickable="true"
         android:background="@drawable/list_corner_round_mid2">
+
         <TextView
             android:textColor="@color/md__defaultBackground"
             android:layout_alignParentLeft="true"
@@ -47,6 +54,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:text="@string/search_billiard_assist_coauch_str"/>
+
         <ImageView
             android:visibility="gone"
             android:id="@+id/friends_group_assist_coach_iv"
@@ -57,16 +65,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </RelativeLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/devide_line"/>
+
     <RelativeLayout
         android:id="@+id/friends_group_coach"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:clickable="true"
         android:background="@drawable/list_corner_round_mid2">
+
         <TextView
             android:textColor="@color/md__defaultBackground"
             android:layout_alignParentLeft="true"
@@ -76,6 +87,7 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:text="@string/search_billiard_coauch_str"/>
+
         <ImageView
             android:visibility="gone"
             android:id="@+id/friends_group_coach_iv"
@@ -86,6 +98,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </RelativeLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

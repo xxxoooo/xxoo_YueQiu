@@ -12,7 +12,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:divider="@color/devide_line"
         android:dividerHeight="10dp"
         android:scrollbars="none"

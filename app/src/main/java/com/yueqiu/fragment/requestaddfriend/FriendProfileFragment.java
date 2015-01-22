@@ -48,8 +48,9 @@ public class FriendProfileFragment extends Fragment {
     public static final String ACCOUNT_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.account_key";
     public static final String GENDER_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.gender_key";
     public static final String DISTRICT_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.district_key";
+    public static final String FRIEND_USER_ID = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.friend_user_id_key";
 
-    private String img_path, account, gender, nick_name, district, level, ball_type, ball_arm, used_type;
+    private String img_path, account, gender, nick_name, district, level, ball_type, ball_arm, used_type, user_id;
 
 
     @Override
@@ -57,7 +58,7 @@ public class FriendProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             mActionBar = getActivity().getActionBar();
-            String username  = getActivity().getIntent().getStringExtra(AddPersonFragment.FRIEND_INFO_USERNAME);
+            String username = getActivity().getIntent().getStringExtra(AddPersonFragment.FRIEND_INFO_USERNAME);
             mActionBar.setTitle(username);
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
@@ -81,6 +82,7 @@ public class FriendProfileFragment extends Fragment {
                 args.putString(ACCOUNT_KEY, account);
                 args.putString(GENDER_KEY, gender);
                 args.putString(DISTRICT_KEY, district);
+                args.putString(FRIEND_USER_ID, user_id);
                 Fragment fragment = new VerificationFragment();
                 fragment.setArguments(args);
                 mFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
@@ -131,7 +133,7 @@ public class FriendProfileFragment extends Fragment {
         }).start();
     }
 
-    Handler mHandler = new Handler(){
+    Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
@@ -146,7 +148,8 @@ public class FriendProfileFragment extends Fragment {
         }
     };
 
-    private void updateUI(){
+    private void updateUI() {
+        user_id = String.valueOf(mFriendInfo.getUser_id());
 
         String img_url = mFriendInfo.getImg_url();
         img_path = mFriendInfo.getImg_url();//fake
@@ -154,7 +157,8 @@ public class FriendProfileFragment extends Fragment {
         gender = mFriendInfo.getSex() == 1
                 ? getString(R.string.man) : getString(R.string.woman);
         nick_name = mFriendInfo.getUsername();
-        district = mFriendInfo.getDistrict();
+        district = "".equals(mFriendInfo.getDistrict()) ?
+                "未知" : mFriendInfo.getDistrict();
         level = 1 == mFriendInfo.getLevel()
                 ? getString(R.string.level_base) : ((2 == mFriendInfo.getLevel()) ?
                 getString(R.string.level_middle) : getString(R.string.level_master));
@@ -179,7 +183,7 @@ public class FriendProfileFragment extends Fragment {
     }
 
     private void toast() {
-        Toast.makeText(getActivity(), "获取好友信息失败！！" ,Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "获取好友信息失败！！", Toast.LENGTH_SHORT).show();
     }
 
     @Override

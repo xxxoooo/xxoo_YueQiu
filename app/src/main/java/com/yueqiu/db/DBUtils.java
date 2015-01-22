@@ -28,6 +28,8 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.PublishInfoTable.CRAETE_SQL);
         db.execSQL(DatabaseConstant.PublishInfoItemTable.CREATE_URL);
         db.execSQL(DatabaseConstant.ChatMessageTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.FriendsTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.FriendsApplication.CREATE_SQL);
         db.execSQL(DatabaseConstant.ActivitiesTable.SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
         db.execSQL(DatabaseConstant.FavorInfoTable.CRAETE_SQL);
@@ -51,6 +53,8 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.ActivitiesTable.DROP_SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
         db.execSQL(DatabaseConstant.ChatMessageTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FriendsTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.FriendsApplication.DROP_SQL);
 
         // 加载用于SearchActivity当中的Fragment的Drop sql
         db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DROP_SQL);
@@ -58,7 +62,6 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.DROP_SQL);
-
         db.execSQL(DatabaseConstant.FavorInfoTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FavorInfoItemTable.DROP_SQL);
         onCreate(db);

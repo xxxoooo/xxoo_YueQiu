@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
+              android:background="@color/devide_line"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
     <Button
@@ -17,6 +17,7 @@
     <com.yueqiu.view.CustomerScrollView
         android:id="@+id/customer_view"
         android:layout_above="@id/add_to_friends"
+        android:layout_alignParentTop="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -30,7 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:background="@drawable/list_corner_round_bg">
+                android:background="@drawable/my_profile_round_bg">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
@@ -119,7 +120,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:background="@drawable/list_corner_round_bg">
+                android:background="@drawable/my_profile_round_bg">
 
 
 

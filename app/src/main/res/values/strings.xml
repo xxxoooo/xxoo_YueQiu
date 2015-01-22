@@ -264,6 +264,7 @@
     <string name="your_published_info_is_empty">你还没有发布任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
     <string name="http_request_error">网络请求错误</string>
     <string name="http_request_time_out">网络请求超时，请稍后再试</string>
+    <string name="location_request_time_out">请求超时！请检查GPS或者网络是否可用！</string>
     <string name="no_published_info">网络请求发生错误，未获取发布信息</string>
     <string name="no_store_info">网络请求错误，未获取收藏信息</string>
     <string name="your_favor_is_empty">你还没有收藏任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
@@ -298,6 +299,7 @@
     <string name="next">下一步</string>
     <string name="send">发送</string>
     <string name="set_group">移至分组</string>
+    <string name="message_more">查看更多消息</string>
 
     <!-- 活动 -->
     <string name="xlistview_header_hint_normal">下拉刷新</string>

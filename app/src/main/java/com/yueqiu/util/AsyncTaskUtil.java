@@ -23,4 +23,14 @@ public class AsyncTaskUtil<T> extends AsyncTask<Map<String,String>,Void,JSONObje
         JSONObject jsonResult = Utils.parseJson(result);
         return jsonResult;
     }
+
+    @Override
+    protected void onPostExecute(JSONObject jsonObject) {
+        super.onPostExecute(jsonObject);
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
 }
