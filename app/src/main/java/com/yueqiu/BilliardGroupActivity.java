@@ -45,7 +45,6 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_billiard_group);
-        Log.d("wy","activity create");
 
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
         mGroupDao = DaoFactory.getGroupDao(this);

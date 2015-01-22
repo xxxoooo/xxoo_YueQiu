@@ -75,8 +75,7 @@ public class SearchDatingDetailedGridAdapter extends BaseAdapter
 
         SearchDatingDetailedAlreadyBean bean = mBeanList.get(position);
 
-        // then, inflate the layout
-        // TODO: the following user photo are the test data, and change them later
+        // 在这里，我们经所有用户的头像采用VolleyNetworkImageView来代替，用于加速用户头像的加载速度
         viewHolder.mPhoto.setDefaultImageResId(R.drawable.default_head);
         viewHolder.mPhoto.setImageUrl(bean.getUserPhoto(), mImgLoader);
 

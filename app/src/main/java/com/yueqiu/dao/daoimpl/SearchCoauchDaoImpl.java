@@ -12,6 +12,8 @@ import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.dao.SearchCoauchDao;
 import com.yueqiu.db.DBUtils;
 
+import org.apache.http.impl.DefaultHttpServerConnection;
+
 import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +43,9 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
      * @return
      */
     @Override
-    public long insertCoauchItem(SearchCoauchSubFragmentCoauchBean coauchItem)
+    public synchronized long insertCoauchItem(SearchCoauchSubFragmentCoauchBean coauchItem)
     {
+        this.mDatabase = mDBUtils.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.NAME, coauchItem.getUserName());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.PHOTO_URL, coauchItem.getUserPhoto());
@@ -62,24 +65,71 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
     }
 
     @Override
-    public long updateCoauchItem(SearchCoauchSubFragmentCoauchBean coauchItem)
+    public synchronized long updateCoauchItem(SearchCoauchSubFragmentCoauchBean coauchItem)
     {
         return 0;
     }
 
     @Override
-    public List<SearchCoauchSubFragmentCoauchBean> getCoauchList(String level, String clazz, final int limit)
+    public synchronized long insertCoauchItemBatch(List<SearchCoauchSubFragmentCoauchBean> coauchList)
     {
+        this.mDatabase = mDBUtils.getWritableDatabase();
+        long insertResult = 0;
+
+        final int size = coauchList.size();
+        int i;
+        mDatabase.beginTransaction();
+        try
+        {
+            for (i = 0; i < size; ++i)
+            {
+                SearchCoauchSubFragmentCoauchBean coauchItem = coauchList.get(i);
+                ContentValues values = new ContentValues();
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.NAME, coauchItem.getUserName());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.PHOTO_URL, coauchItem.getUserPhoto());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.SEX, coauchItem.getUserGender());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.RANGE, coauchItem.getUserDistance());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.CLASS, coauchItem.getmBilliardKind());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.LEVEL, coauchItem.getUserLevel());
+
+                insertResult = mDatabase.insert(
+                        DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME,
+                        null,
+                        values
+                );
+            }
+
+            mDatabase.setTransactionSuccessful();
+            return insertResult;
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we insert data into the Coauch table by batch, and the reason are : " + e.toString());
+        } finally {
+            mDatabase.endTransaction();
+        }
+
+        return -1;
+    }
+
+    @Override
+    public synchronized long updateCoauchItemBatch(List<SearchCoauchSubFragmentCoauchBean> coauchList)
+    {
+        return 0;
+    }
+
+    @Override
+    public List<SearchCoauchSubFragmentCoauchBean> getCoauchList(final int startNum, final int limit)
+    {
+        this.mDatabase = mDBUtils.getReadableDatabase();
         List<SearchCoauchSubFragmentCoauchBean> coauchList = new ArrayList<SearchCoauchSubFragmentCoauchBean>();
 
-        this.mDatabase = mDBUtils.getReadableDatabase();
-        Cursor cursor = mDatabase.query(
-                DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME,
-                allColumns,
-                null,
-                null,
-                null,
-                null,
+
+        String coauchInfoSql = " SELECT * FROM " + DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME
+                + " ORDER BY " + DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.USER_ID
+                + " DESC LIMIT " + startNum + " , " + limit;
+
+        Cursor cursor = mDatabase.rawQuery(
+                coauchInfoSql,
                 null
         );
 
@@ -92,56 +142,12 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
         }
 
         cursor.close();
-
+        Log.d(TAG, " the finally coauch list we get from the coauch table are : " + coauchList.size());
         return coauchList;
     }
 
-    /**
-     * 我们对于教练Fragment当中的List的筛选，不是一个排序的过程，而是直接的一个select的过程，就是按照我们指定的level
-     * 进行筛选就可以了，不需要进行其他的额外的排序
-     *
-     * @param level
-     * @return
-     */
-    @Override
-    public List<SearchCoauchSubFragmentCoauchBean> getCouchListWithLevelFiltered(String level, final int limit)
-    {
-        Log.d(TAG, " the level we need to filter out are : " + level);
-        List<SearchCoauchSubFragmentCoauchBean> coauchLevelFilteredList = new ArrayList<SearchCoauchSubFragmentCoauchBean>();
-        Cursor levelCursor = mDatabase.query(
-                DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME,
-                allColumns,
-                "",
-                null,
-                "",
-                "",
-                "",
-                ""
-        );
 
 
-        return null;
-    }
-
-    /**
-     * 我们对于教练Fragment当中的List的筛选，不是一个排序的过程，而是直接的一个select的过程，就是按照我们指定的clazz
-     * 直接进行select操作就可以了，不用排序
-     * <p/>
-     * 当然对于助教Fragment当中的花费(price)筛选条件，是一个sort的过程，即按我们获得的price的值进行sorting就可以了，
-     * 而不是一个select的过程了
-     *
-     * @param clazz
-     * @return
-     */
-    @Override
-    public List<SearchCoauchSubFragmentCoauchBean> getCouchListWithKindsFiltered(String clazz, final int limit)
-    {
-        List<SearchCoauchSubFragmentCoauchBean> coauchKindsFilteredList = new ArrayList<SearchCoauchSubFragmentCoauchBean>();
-
-
-
-        return null;
-    }
 
     /**
      *

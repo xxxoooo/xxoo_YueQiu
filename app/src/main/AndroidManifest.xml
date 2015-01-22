@@ -89,20 +89,6 @@
         <activity
             android:name=".activity.PublishedInfoActivity"
             android:screenOrientation="portrait"/>
-        <activity
-            android:name=".activity.ActivitiesDetail"
-            android:label="@string/activities_detail"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".activity.ActivitySelectType"
-            android:label="@string/type"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".activity.ActivityBusinessActivities"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".activity.SelectChargeModuleActivity"
-            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".activity.ActivitiesDetail"
@@ -111,9 +97,6 @@
         <activity
             android:name=".activity.ActivitySelectType"
             android:label="@string/type"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".activity.ActivityBusinessActivities"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.SelectChargeModuleActivity"
@@ -133,13 +116,6 @@
             android:parentActivityName=".BilliardSearchActivity"
             android:screenOrientation="portrait">
         </activity>
-
-        <activity
-            android:name=".activity.GroupIssueTopic"
-            android:label="@string/billiard_group_issue_article"
-            android:screenOrientation="portrait">
-        </activity>
-
         <activity
             android:name=".activity.ActivitiesMain"
             android:screenOrientation="portrait"/>
@@ -174,6 +150,8 @@
                 <data android:scheme="file"/>
             </intent-filter>
         </activity>
+        <activity android:name=".activity.SearchBilliardRoomActivity"
+            android:screenOrientation="portrait"/>
 
         <!--服务组件-->
         <service android:name=".util.LocationUtil"/>

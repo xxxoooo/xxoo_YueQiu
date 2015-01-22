@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -75,6 +76,7 @@ public class BilliardGroupBasicFragment extends Fragment {
     private List<GroupNoteInfo> mInsertList = new ArrayList<GroupNoteInfo>();
     private List<GroupNoteInfo> mUpdateList = new ArrayList<GroupNoteInfo>();
     //private List<GroupNoteInfo> mDBAllList;
+    public static int index = 0;
 
     @Override
     public void onAttach(Activity activity) {
@@ -84,6 +86,7 @@ public class BilliardGroupBasicFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d("wy","createView->" + index++);
         mView = inflater.inflate(R.layout.fragment_billard_group_basic,null);
         Bundle args = getArguments();
         mGroupType = args.getInt("type");
@@ -305,11 +308,16 @@ public class BilliardGroupBasicFragment extends Fragment {
                             mUpdateList.add(list.get(i));
                         }
                         YueQiuApp.sGroupDbMap.put(list.get(i).getNoteId(),list.get(i));
+                        Iterator iter = YueQiuApp.sGroupDbMap.entrySet().iterator();
+                        while(iter.hasNext()){
+                            Map.Entry<Integer,GroupNoteInfo> entry = (Map.Entry<Integer, GroupNoteInfo>) iter.next();
+                            Log.d("wy","index->" + index + "noteId->" + entry.getKey());
+                        }
                     }
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            //TODO:更新数据库,放在数据库
+                            //TODO:更新数据库,放在线程
                             updateGroupInfoDB();
                         }
                     }).start();
@@ -365,7 +373,6 @@ public class BilliardGroupBasicFragment extends Fragment {
         if(!mInsertList.isEmpty()){
             long result = mGroupDao.insertGroupInfo(mInsertList);
             //TODO:插入失败,即这条note_id数据已经在数据库中存在，则更新数据库
-            //TODO:有错误！！！！
             if(result == -1){
                 mGroupDao.updateGroupInfo(mInsertList);
             }

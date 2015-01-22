@@ -13,6 +13,7 @@ import java.io.StringReader;
  */
 public class SearchRoomSubFragmentRoomBean
 {
+    private String mRoomId;
     private String mRoomPhotoUrl;
     private String mRoomName;
     private float mLevel;
@@ -27,8 +28,9 @@ public class SearchRoomSubFragmentRoomBean
 
     public SearchRoomSubFragmentRoomBean(){}
 
-    public SearchRoomSubFragmentRoomBean(String roomPhoto, String roomName, float level, double price, String address, String distance, String roomPhone, String roomTag, String roomInfo)
+    public SearchRoomSubFragmentRoomBean(String roomId, String roomPhoto, String roomName, float level, double price, String address, String distance, String roomPhone, String roomTag, String roomInfo)
     {
+        this.mRoomId = roomId;
         this.mDetailedAddress = address;
         this.mDistance = distance;
         this.mLevel = level;
@@ -149,5 +151,15 @@ public class SearchRoomSubFragmentRoomBean
     public void setRoomInfo(String roomInfo)
     {
         this.mRoomInfo = roomInfo;
+    }
+
+    public String getRoomId()
+    {
+        return mRoomId;
+    }
+
+    public void setRoomId(String roomId)
+    {
+        this.mRoomId = roomId;
     }
 }
