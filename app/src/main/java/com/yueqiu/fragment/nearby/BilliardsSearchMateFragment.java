@@ -101,7 +101,7 @@ public class BilliardsSearchMateFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        sWorker = new BackgroundWorker();
+        //sWorker = new BackgroundWorker();
 
         sMateDaoImpl = new SearchMateDaoImpl(sContext);
 
@@ -157,10 +157,16 @@ public class BilliardsSearchMateFragment extends Fragment
     {
         super.onResume();
 
-        if (sWorker != null && sWorker.getState() == Thread.State.NEW) {
-            Log.d(TAG, " the sWorker has started ");
-            sWorker.start();
-        }
+//        if (sWorker != null && sWorker.getState() == Thread.State.NEW) {
+//            Log.d(TAG, " the sWorker has started ");
+//            sWorker.start();
+//        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                retrieveInitialMateInfoList(0,9,"","");
+            }
+        }).start();
     }
 
     @Override
@@ -347,7 +353,7 @@ public class BilliardsSearchMateFragment extends Fragment
                         // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
                         sUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, sUserList).sendToTarget();
 
-                        sUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                        //sUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                     } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
                     {
                         sUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
@@ -410,7 +416,6 @@ public class BilliardsSearchMateFragment extends Fragment
                 case DATA_RETRIEVE_FAILED:
                     Toast.makeText(sContext, sContext.getResources().getString(R.string.network_unavailable_hint_info_str), Toast.LENGTH_SHORT).show();
                     hideProgress();
-
                     break;
                 case DATA_RETRIEVE_SUCCESS:
                     // TODO: 我们会将我们从网络上以及从本地数据库当中检索到的数据
@@ -428,13 +433,12 @@ public class BilliardsSearchMateFragment extends Fragment
                     }
 
                     // 更新一下本地数据库
-                    sWorker.updateMateTable(sUserList);
+                    //sWorker.updateMateTable(sUserList);
 
                     if (sUserList.isEmpty())
                     {
                         loadEmptyTv();
                     }
-
                     break;
                 case SHOW_PROGRESSBAR:
                     showProgress();
@@ -442,7 +446,7 @@ public class BilliardsSearchMateFragment extends Fragment
 
                     break;
                 case HIDE_PROGRESSBAR:
-                    sMateListAdapter.notifyDataSetChanged();
+                    //sMateListAdapter.notifyDataSetChanged();
                     hideProgress();
                     Log.d(TAG, " hiding the progress bar ");
                     break;
@@ -499,6 +503,7 @@ public class BilliardsSearchMateFragment extends Fragment
 
                     break;
             }
+
             sMateListAdapter = new SearchMateSubFragmentListAdapter(sContext, (ArrayList<SearchMateSubFragmentUserBean>) sUserList);
             sSubFragmentList.setAdapter(sMateListAdapter);
             sMateListAdapter.notifyDataSetChanged();
@@ -541,6 +546,7 @@ public class BilliardsSearchMateFragment extends Fragment
         protected void onLooperPrepared()
         {
             super.onLooperPrepared();
+            Log.d("wy", "Thread name->" + Thread.currentThread().getName());
             mBackgroundHandler = new Handler()
             {
                 @Override

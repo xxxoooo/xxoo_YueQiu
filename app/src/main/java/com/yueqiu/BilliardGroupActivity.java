@@ -47,14 +47,19 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
         setContentView(R.layout.activity_billiard_group);
 
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
+        /**
+         * 获取全部数据库的数据
+         */
         mGroupDao = DaoFactory.getGroupDao(this);
-        //TODO:如果可以应该在线程执行
-        mDBAllList = mGroupDao.getAllGroupInfo();
-        for(GroupNoteInfo info : mDBAllList){
-            YueQiuApp.sGroupDbMap.put(info.getNoteId(),info);
-        }
-
-
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mDBAllList = mGroupDao.getAllGroupInfo();
+                for(GroupNoteInfo info : mDBAllList){
+                    YueQiuApp.sGroupDbMap.put(info.getNoteId(),info);
+                }
+            }
+        }).start();
 
         mTitles = new String[]{getString(R.string.billiard_all),
                 getString(R.string.billiard_get_master),

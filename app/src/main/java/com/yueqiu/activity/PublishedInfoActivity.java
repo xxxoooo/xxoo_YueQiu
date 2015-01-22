@@ -19,7 +19,14 @@ import android.view.MenuItem;
 import android.widget.SearchView;
 
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
+import com.yueqiu.bean.Identity;
+import com.yueqiu.bean.PublishedInfo;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.PublishedDao;
 import com.yueqiu.fragment.slidemenu.PublishedFragment;
+
+import java.util.List;
 
 
 public class PublishedInfoActivity extends FragmentActivity implements ActionBar.TabListener
@@ -29,10 +36,30 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
     private String[] mTitles;
     private SectionPagerAdapter mPagerAdapter;
     private ActionBar mActionBar;
+    private List<PublishedInfo> mDBAllList;
+    private PublishedDao mPublishedDao;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_myfavor_coll);
+        /**
+         * 获取数据库中全部的数据
+         */
+        mPublishedDao = DaoFactory.getPublished(this);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mDBAllList = mPublishedDao.getAllPublishedInfo(YueQiuApp.sUserInfo.getUser_id());
+                for(PublishedInfo info : mDBAllList){
+                    Identity identity = new Identity();
+                    identity.user_id = YueQiuApp.sUserInfo.getUser_id();
+                    identity.type = info.getType();
+                    identity.table_id = info.getTable_id();
+                    YueQiuApp.sPublishMap.put(identity,info);
+                }
+            }
+        }).start();
+
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);

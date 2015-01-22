@@ -27,6 +27,8 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.bean.FavorInfo;
+import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -60,14 +62,17 @@ public abstract class SlideMenuBasicFragment extends Fragment {
     protected ListView mListView;
     protected int mType;
     protected boolean mLoadMore,mRefresh;
-    protected List<Object> mList = new ArrayList<Object>();
-    protected Map<String,Integer> mParamsMap = new HashMap<String, Integer>();
-    protected Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
     private BasicHandler mHandler;
     protected int mStart_no = 0,mEnd_no = 9;
     protected int mCurrPosition;
     protected int mAfterCount,mBeforeCount;
-
+    protected List<Object> mList = new ArrayList<Object>();
+    protected Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
+    protected Map<String,Integer> mParamsMap = new HashMap<String, Integer>();
+    protected List<PublishedInfo> mPublishInsertList = new ArrayList<PublishedInfo>();
+    protected List<PublishedInfo> mPublishUpdateList = new ArrayList<PublishedInfo>();
+    protected List<FavorInfo> mFavorInsertList = new ArrayList<FavorInfo>();
+    protected List<FavorInfo> mFavorUpdateList = new ArrayList<FavorInfo>();
 
     @Override
     public void onAttach(Activity activity) {
@@ -122,7 +127,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
     }
 
 
-    protected class RequestAsyncTask extends AsyncTaskUtil<Integer> {
+    protected class RequestAsyncTask<T> extends AsyncTaskUtil<Integer> {
 
         public RequestAsyncTask(Map<String, Integer> map) {
             super(map);
@@ -148,10 +153,14 @@ public abstract class SlideMenuBasicFragment extends Fragment {
             try {
                 if(!jsonResult.isNull("code")) {
                     if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-
                         if (jsonResult.getJSONObject("result") != null) {
-                            Object object = setBeanByJSON(jsonResult);
-                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, object).sendToTarget();
+                            List<T> list = setBeanByJSON(jsonResult);
+                            if(list.isEmpty()){
+                                mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                            }else{
+                                mHandler.obtainMessage(PublicConstant.GET_SUCCESS, list).sendToTarget();
+                            }
+
                         }else{
                             mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                         }
@@ -178,6 +187,8 @@ public abstract class SlideMenuBasicFragment extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            if(mPullToRefreshListView.isRefreshing())
+                mPullToRefreshListView.onRefreshComplete();
             switch (msg.what){
                 case PublicConstant.NO_RESULT:
                     if(mList.isEmpty()) {
@@ -186,8 +197,6 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                         if(mLoadMore)
                             Utils.showToast(mActivity, getString(R.string.no_more_info, mEmptyTypeStr));
                     }
-                    if(mPullToRefreshListView.isRefreshing())
-                        mPullToRefreshListView.onRefreshComplete();
                     break;
                 case PublicConstant.REQUEST_ERROR:
                     if(null == msg.obj){
@@ -207,7 +216,6 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                     break;
                 case PublicConstant.NO_NETWORK:
                     Utils.showToast(mActivity,getString(R.string.network_not_available));
-                    mPullToRefreshListView.onRefreshComplete();
                     if(mList.isEmpty())
                         setEmptyViewVisible();
                     break;
@@ -313,22 +321,19 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                     DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
 
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-
-                    if(Utils.networkAvaiable(mActivity)){
-                        mRefresh = true;
-                        mLoadMore = false;
-                        mParamsMap.put(HttpConstants.Published.START_NO,0);
-                        mParamsMap.put(HttpConstants.Published.END_NO, 9);
-                        requestResult();
-                    }else{
-                        mHandler.obtainMessage(PublicConstant.NO_NETWORK).sendToTarget();
-                    }
-                }
-            }).start();
+            mRefresh = true;
+            mLoadMore = false;
+            mPublishInsertList.clear();
+            mPublishUpdateList.clear();
+            mFavorInsertList.clear();
+            mFavorInsertList.clear();
+            if(Utils.networkAvaiable(mActivity)){
+               mParamsMap.put(HttpConstants.Published.START_NO,0);
+               mParamsMap.put(HttpConstants.Published.END_NO, 9);
+               requestResult();
+            }else{
+               mHandler.obtainMessage(PublicConstant.NO_NETWORK).sendToTarget();
+            }
         }
 
         /**
@@ -344,28 +349,27 @@ public abstract class SlideMenuBasicFragment extends Fragment {
 
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mLoadMore = true;
-                    mRefresh = false;
-                    mCurrPosition = mList.size() ;
-                    if(mBeforeCount != mAfterCount){
-                        mStart_no = mEnd_no + (mAfterCount-mBeforeCount);
-                        mEnd_no += 10 + (mAfterCount-mBeforeCount);
-                    }else{
-                        mStart_no = mEnd_no + 1;
-                        mEnd_no += 10;
-                    }
-                    if(Utils.networkAvaiable(mActivity)) {
-                        mParamsMap.put(HttpConstants.Published.START_NO,mStart_no);
-                        mParamsMap.put(HttpConstants.Published.END_NO, mEnd_no);
-                        requestResult();
-                    }else{
-                        onPullUpWhenNetNotAvailable();
-                    }
-                }
-            }, 1000);
+            mLoadMore = true;
+            mRefresh = false;
+            mPublishInsertList.clear();
+            mPublishUpdateList.clear();
+            mFavorInsertList.clear();
+            mFavorUpdateList.clear();
+            mCurrPosition = mList.size() ;
+            if(mBeforeCount != mAfterCount){
+                  mStart_no = mEnd_no + (mAfterCount-mBeforeCount);
+                  mEnd_no += 10 + (mAfterCount-mBeforeCount);
+             }else{
+                  mStart_no = mEnd_no + 1;
+                  mEnd_no += 10;
+             }
+             if(Utils.networkAvaiable(mActivity)) {
+                  mParamsMap.put(HttpConstants.Published.START_NO,mStart_no);
+                  mParamsMap.put(HttpConstants.Published.END_NO, mEnd_no);
+                  requestResult();
+             }else{
+                  onPullUpWhenNetNotAvailable();
+             }
         }
     };
 
@@ -378,7 +382,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
 
     protected abstract void requestResult();
 
-    protected abstract Object setBeanByJSON(JSONObject jsonResult);
+    protected abstract <T> List<T> setBeanByJSON(JSONObject jsonResult);
 
     protected abstract BasicHandler getHandler();
 

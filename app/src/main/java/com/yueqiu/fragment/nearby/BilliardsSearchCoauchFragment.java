@@ -319,17 +319,9 @@ public class BilliardsSearchCoauchFragment extends Fragment
                                     SubFragmentsCommonUtils.parseCoauchLevel(sContext, level),
                                     SubFragmentsCommonUtils.parseBilliardsKinds(sContext, kinds));
                             sCoauchList.add(coauchBean);
-                            // TODO: 我们应该在这里把所有的我们解析到的数据插入到数据库当中
-                            // TODO: 当时这里有一个很重要的一点就是我们将数据插入数据库时，千万不要一条一条的插！！！
-                            // TODO: 因为这样很浪费资源，数据库的打开和关闭是一个很大的开销，我们需要借用
-                            // TODO: 数据库的transaction业务进行操作，即批量的插入数据和检索数据，这样可以加快我们的插入过程
-                            // TODO: 这是十分需要注意的！！！
-
-
-                            // TODO: 我们暂时还不确定，是否是需要每增加一条数据，就要通过Adapter我们进行了数据源的更新，
-                            // TODO: 还是在我们已经获取完所有的数据之后在进行这个操作？？？？
-                            sUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                         }
+
+                        sUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, sCoauchList).sendToTarget();
 
                         // TODO: 这时，数据已经完全检索完毕，我们可以取消dialog的显示了
                         sUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
@@ -407,6 +399,24 @@ public class BilliardsSearchCoauchFragment extends Fragment
                     Toast.makeText(sContext, reasonDesc, Toast.LENGTH_SHORT).show();
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
+                    List<SearchCoauchSubFragmentCoauchBean> coauchList = (ArrayList<SearchCoauchSubFragmentCoauchBean>) msg.obj;
+                    final int size = coauchList.size();
+                    int i;
+                    for (i = 0; i < size; ++i)
+                    {
+                        if (! sCoauchList.contains(coauchList.get(i)))
+                        {
+                            sCoauchList.add(coauchList.get(i));
+                        }
+                    }
+
+                    // TODO: 在这里进行一下更新数据库的操作
+
+                    if (sCoauchList.isEmpty())
+                    {
+                        loadEmptyTv();
+                    }
+
                     break;
 
                 case RETRIEVE_COAUCH_WITH_LEVEL_FILTERED:

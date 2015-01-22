@@ -25,6 +25,9 @@
     <string name="please_input_content">请输入内容</string>
     <string name="no_group_info">抱歉，目前没有台球圈的信息</string>
     <string name="no_group_type_info">抱歉,目前没有<xliff:g id="type">%1$s</xliff:g>的信息</string>
+    <string name="no_newer_info">当前已经是最新的信息了</string>
+    <string name="have_already_update_info">共更新<xliff:g id="number">%1$s</xliff:g>条信息</string>
+    <string name="no_more_group_info">没有更多的台球圈信息了</string>
 
     <!-- 登录注册 -->
     <string name="login_without_phone_or_account">请输入手机号或账号</string>

@@ -484,14 +484,11 @@ public class BilliardsSearchRoomFragment extends Fragment
                             // TODO: 将这条数据加入到roomList当中(现在由于数据不完整，所以暂时不添加，等数据完整性已经比较好的时候再进行添加)
                             sRoomList.add(roomBean);
 
-                            // TODO: 然后我们还需要本地缓存我们所获得到的这条数据
-
-                            // TODO: 我们这里需要进行数据的更新(因为数据的更新必须在主线程当中进行，所以我们就通过Handler发送到MainUiThread当中)
-                            sUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                         }
+                        sUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, sRoomList).sendToTarget();
                         // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
                         sUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
-                        sUIEventsHandler.sendEmptyMessage(STATE_FETCH_DATA_SUCCESS);
+
                     } else if (status.equals("ERROR"))
                     {
                         JSONObject errorObj = resultJsonObj.getJSONObject("error");
@@ -608,7 +605,25 @@ public class BilliardsSearchRoomFragment extends Fragment
                     Log.d(TAG, " we have fail to fetch the data for the room fragment, and the reason are : " + failStr);
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
-                    Toast.makeText(sContext, " the item list has been clicked ", Toast.LENGTH_SHORT).show();
+
+                    List<SearchRoomSubFragmentRoomBean> roomList = (ArrayList<SearchRoomSubFragmentRoomBean>) msg.obj;
+                    final int size = roomList.size();
+                    int i;
+                    for (i = 0; i < size; ++i)
+                    {
+                        if (! sRoomList.contains(roomList.get(i)))
+                        {
+                            sRoomList.add(roomList.get(i));
+                        }
+                    }
+
+                    // TODO: 更新数据库
+
+                    if (sRoomList.isEmpty())
+                    {
+                        loadEmptyTv();
+                    }
+
                     break;
 
                 case REQUEST_ROOM_INFO_RANGE_FILTERED:
@@ -645,11 +660,7 @@ public class BilliardsSearchRoomFragment extends Fragment
                     break;
 
                 case DATA_HAS_BEEN_UPDATED:
-
-                    // TODO: 这里需要进一步验证可操作性，很明显不行，关于Adapter还有一个很大的bug，
-                    // TODO: 就是我们不确定到底哪里在一个非UI线程上面进行了一些关于Adapter的更新操作！！！
-                    sSearchRoomAdapter.notifyDataSetChanged();
-                    Log.d(TAG, " the adapter has been updated ");
+                    // TODO: 考虑移除这个标签，因为这会使Adapter的更新发生异常
                     break;
 
                 // 对于大众点评的服务牛逼的一点在于所有的请求错误，会有详细的错误信息供我们向用户展示
@@ -669,9 +680,12 @@ public class BilliardsSearchRoomFragment extends Fragment
                     }
 
                     break;
-                default:
-                    break;
             }
+
+            sSearchRoomAdapter = new SearchRoomSubFragmentListAdapter(sContext, (ArrayList<SearchRoomSubFragmentRoomBean>) sRoomList);
+            sRoomListView.setAdapter(sSearchRoomAdapter);
+            sSearchRoomAdapter.notifyDataSetChanged();
+
         }
     };
 

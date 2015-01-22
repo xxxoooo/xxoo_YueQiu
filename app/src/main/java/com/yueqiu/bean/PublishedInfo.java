@@ -11,84 +11,11 @@ import java.util.List;
 public class PublishedInfo {
     private int user_id;
     private int type;/*发布类型*/
-    private int start_no;/*开始条数*/
-    private int end_no;/*结束条数*/
-    private int sumCount;/*总条数*/
-    public List<PublishedItemInfo> mList = new ArrayList<PublishedItemInfo>();
-
-
-    public class PublishedItemInfo {
-        private String table_id;/*表Id*/
-        private int type;
-        private String title;/*标题*/
-        private String content;/*内容*/
-        private String dateTime;/*时间*/
-        private boolean checked;
-
-        public String getTable_id() {
-            return table_id;
-        }
-
-        public void setTable_id(String table_id) {
-            this.table_id = table_id;
-        }
-
-        public int getType() {
-            return type;
-        }
-
-        public void setType(int type) {
-            this.type = type;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public void setContent(String content) {
-            this.content = content;
-        }
-
-        public String getDateTime() {
-            return dateTime;
-        }
-
-        public void setDateTime(String dateTime) {
-            this.dateTime = dateTime;
-        }
-
-        public boolean isChecked() {
-            return checked;
-        }
-
-        public void setChecked(boolean checked) {
-            this.checked = checked;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            PublishedItemInfo item = (PublishedItemInfo) o;
-            if(this.getTable_id().equals(item.getTable_id())){
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            String str = "table_id->" + table_id + " type->" + type + " title->" + title
-                    + " content->" + content + " dateTime->" + dateTime;
-            return str;
-        }
-    }
+    private String table_id;/*表Id*/
+    private String title;/*标题*/
+    private String content;/*内容*/
+    private String dateTime;/*时间*/
+    private boolean checked;
 
 
     public int getUser_id() {
@@ -107,29 +34,74 @@ public class PublishedInfo {
         this.type = type;
     }
 
-    public int getStart_no() {
-        return start_no;
+    public String getTable_id() {
+        return table_id;
     }
 
-    public void setStart_no(int start_no) {
-        this.start_no = start_no;
+    public void setTable_id(String table_id) {
+        this.table_id = table_id;
     }
 
-    public int getEnd_no() {
-        return end_no;
+    public String getTitle() {
+        return title;
     }
 
-    public void setEnd_no(int end_no) {
-        this.end_no = end_no;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public int getSumCount() {
-        return sumCount;
+    public String getContent() {
+        return content;
     }
 
-    public void setSumCount(int sumCount) {
-        this.sumCount = sumCount;
+    public void setContent(String content) {
+        this.content = content;
     }
+
+    public String getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(String dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    public void setChecked(boolean checked) {
+        this.checked = checked;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        PublishedInfo item = (PublishedInfo) o;
+        if(this.table_id.equals(item.getTable_id()) && this.type == item.getType()
+                &&this.user_id == item.user_id){
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result  = 37 * result + table_id.hashCode();
+        result  = 37 * result + type;
+        result  = 37 * result + user_id;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        String str = "table_id->" + table_id + " type->" + type + " title->" + title
+               + " content->" + content + " dateTime->" + dateTime;
+        return str;
+    }
+
+
+
 
 
 }

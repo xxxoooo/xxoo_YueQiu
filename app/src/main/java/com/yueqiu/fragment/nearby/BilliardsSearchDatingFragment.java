@@ -27,6 +27,7 @@ import com.yueqiu.R;
 import com.yueqiu.activity.SearchBilliardsDatingActivity;
 import com.yueqiu.adapter.SearchDatingSubFragmentListAdapter;
 import com.yueqiu.adapter.SearchPopupBaseAdapter;
+import com.yueqiu.bean.SearchDatingDetailedAlreadyBean;
 import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -333,12 +334,10 @@ public class BilliardsSearchDatingFragment extends Fragment
 
                                 // 将我们解析得到的datingBean插入到我们创建的数据库当中
                                 sDatingList.add(datingBean);
-
-                                sUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                             }
 
                             // TODO: 我们应该在这里通知UI主线程数据请求工作已经全部完成了，停止显示ProgressBar或者显示一个Toast全部数据已经加载完的提示
-                            sUIEventsHandler.sendEmptyMessage(FETCH_DATA_SUCCESSED);
+                            sUIEventsHandler.obtainMessage(FETCH_DATA_SUCCESSED, sDatingList).sendToTarget();
                             sUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                         } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
                         {
@@ -421,6 +420,24 @@ public class BilliardsSearchDatingFragment extends Fragment
                     Log.d(TAG, " fail to get data due to the reason as : " + infoStr);
                     break;
                 case FETCH_DATA_SUCCESSED:
+                    List<SearchDatingSubFragmentDatingBean> datingList = (ArrayList<SearchDatingSubFragmentDatingBean>) msg.obj;
+                    final int size = datingList.size();
+                    int i;
+                    for (i = 0; i < size; ++i)
+                    {
+                        if (! sDatingList.contains(datingList.get(i)))
+                        {
+                            sDatingList.add(datingList.get(i));
+                        }
+                    }
+
+                    // TODO: 然后我们将我们在这里得到的sDatingList同步更新到数据库当中
+
+                    if (sDatingList.isEmpty())
+                    {
+                        loadEmptyTv();
+                    }
+
                     break;
 
                 case RETRIEVE_DATA_WITH_RANGE_FILTERED:

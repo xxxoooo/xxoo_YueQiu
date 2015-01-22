@@ -2,12 +2,15 @@ package com.yueqiu.fragment.slidemenu;
 
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.adapter.PublishedBasicAdapter;
+import com.yueqiu.bean.GroupNoteInfo;
+import com.yueqiu.bean.Identity;
 import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
@@ -19,36 +22,40 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by wangyun on 15/1/15.
  */
 public class PublishedFragment extends SlideMenuBasicFragment {
     private PublishedBasicAdapter mPublishedAdapter;
-    private PublishedInfo mPublishedInfo;
     private PublishedDao mPublishedDao;
-    private boolean mIsExsitsPublished;
-
+    //跟数据库相关的list
+    private List<PublishedInfo> mDBList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater,container,savedInstanceState);
-
+        mPublishedAdapter = new PublishedBasicAdapter(mActivity,mList);
         mPublishedDao = DaoFactory.getPublished(mActivity);
-        mIsExsitsPublished = mPublishedDao.isExistPublishedInfo(mType);
-        //TODO://可能会更改逻辑
-        if(mIsExsitsPublished){
-            mPublishedInfo = mPublishedDao.getPublishedInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()),mType,mStart_no,mEnd_no+1);
-            mHandler.obtainMessage(PublicConstant.USE_CACHE,mPublishedInfo).sendToTarget();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mDBList = mPublishedDao.getPublishedInfo(YueQiuApp.sUserInfo.getUser_id(),mType,mStart_no,10);
+                if(!mDBList.isEmpty()){
+                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mDBList).sendToTarget();
+                }
+            }
+        }).start();
 
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
             requestResult();
         }else{
-            if(mList.isEmpty()){
-                mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-            }
+            mHandler.obtainMessage(PublicConstant.NO_NETWORK).sendToTarget();
+
         }
         return view;
     }
@@ -78,34 +85,32 @@ public class PublishedFragment extends SlideMenuBasicFragment {
         mUrlAndMethodMap.put(PublicConstant.URL, HttpConstants.Published.URL);
         mUrlAndMethodMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.GET);
 
-        new RequestAsyncTask(mParamsMap).execute(mUrlAndMethodMap);
+        new RequestAsyncTask<PublishedInfo>(mParamsMap).execute(mUrlAndMethodMap);
     }
 
     @Override
-    protected Object setBeanByJSON(JSONObject jsonResult) {
-        PublishedInfo published = new PublishedInfo();
-        published.setType(mType);
+    protected List<PublishedInfo> setBeanByJSON(JSONObject jsonResult) {
+        List<PublishedInfo> list = new ArrayList<PublishedInfo>();
         try {
-            published.setStart_no(jsonResult.getJSONObject("result").getInt("start_no"));
-            published.setEnd_no(jsonResult.getJSONObject("result").getInt("end_no"));
-            published.setSumCount(jsonResult.getJSONObject("result").getInt("count"));
             JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
-
-            for (int i = 0; i < list_data.length(); i++) {
-                PublishedInfo.PublishedItemInfo itemInfo = published.new PublishedItemInfo();
-                itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
-                itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
-                itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
-                itemInfo.setDateTime(list_data.getJSONObject(i).getString("create_time"));
-                itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type_id")));
-                itemInfo.setChecked(false);
-                published.mList.add(itemInfo);
-
+            if(list_data.length() < 1){
+                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+            }else {
+                for (int i = 0; i < list_data.length(); i++) {
+                    PublishedInfo itemInfo = new PublishedInfo();
+                    itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
+                    itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
+                    itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
+                    itemInfo.setDateTime(list_data.getJSONObject(i).getString("create_time"));
+                    itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type_id")));
+                    itemInfo.setChecked(false);
+                    list.add(itemInfo);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return published;
+        return list;
     }
 
     @Override
@@ -115,18 +120,19 @@ public class PublishedFragment extends SlideMenuBasicFragment {
 
     @Override
     protected void onItemStateChanged(int position,boolean checked) {
-        PublishedInfo.PublishedItemInfo itemInfo = (PublishedInfo.PublishedItemInfo) mListView.getItemAtPosition(position);
+        PublishedInfo itemInfo = (PublishedInfo) mListView.getItemAtPosition(position);
         itemInfo.setChecked(checked);
         mPublishedAdapter.notifyDataSetChanged();
     }
 
     @Override
     protected void onPullUpWhenNetNotAvailable() {
-        PublishedInfo info = mPublishedDao.getPublishedInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()),mType,mStart_no,mEnd_no+1);
-        if(!info.mList.isEmpty()) {
+        //TODO:有错误,还要改，limit的number不应该用mEnd,固定为10条
+        List<PublishedInfo> info = mPublishedDao.getPublishedInfo(YueQiuApp.sUserInfo.getUser_id(),mType,mStart_no,10);
+        if(!info.isEmpty()) {
             mHandler.obtainMessage(PublicConstant.GET_SUCCESS, info).sendToTarget();
         }else{
-            mHandler.obtainMessage(PublicConstant.NO_RESULT,info).sendToTarget();
+            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
         }
     }
 
@@ -148,29 +154,21 @@ public class PublishedFragment extends SlideMenuBasicFragment {
         return mActivity.getString(R.string.published_action_mode_title);
     }
 
-    private void updatePublishedDB(final PublishedInfo info){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if(mPublishedDao.isExistPublishedInfo(info.getType())){
-                    if(mPublishedDao.updatePublishInfo(info) != -1){
-                        for(int i=0;i<info.mList.size();i++){
-                            PublishedInfo.PublishedItemInfo item =  info.mList.get(i);
-                            if(mPublishedDao.isExistPublishedItemInfo(Integer.valueOf(item.getTable_id()),item.getType())){
-                                mPublishedDao.updatePublishedItemInfo(info);
-                            }else{
-                                mPublishedDao.insertPublishItemInfo(info);
-                            }
-                        }
-                    }
-                }else {
-                    mPublishedDao.insertPublishInfo(info);
-                    mPublishedDao.insertPublishItemInfo(info);
-                }
+    private void updatePublishDB(){
+        if(!mPublishUpdateList.isEmpty()){
+            mPublishedDao.updatePublishInfo(mPublishUpdateList);
+        }
+        if(!mPublishInsertList.isEmpty()){
+            long result = mPublishedDao.insertPublishInfo(mPublishInsertList);
+            //TODO:目前noteId没有unique，可能还会存在重复插入的问题，还需要再验证
+            /**
+             * 插入失败，则更新数据库
+             */
+            if(result == -1){
+                mPublishedDao.updatePublishInfo(mPublishInsertList);
             }
-        }).start();
+        }
     }
-
 
     private  BasicHandler mHandler = new BasicHandler(){
         @Override
@@ -178,39 +176,61 @@ public class PublishedFragment extends SlideMenuBasicFragment {
             super.handleMessage(msg);
             switch(msg.what){
                 case PublicConstant.USE_CACHE:
-                    mList.addAll(((PublishedInfo)msg.obj).mList);
+                    List<PublishedInfo> cacheList = (List<PublishedInfo>) msg.obj;
+                    mList.addAll(cacheList);
                     break;
                 case PublicConstant.GET_SUCCESS:
-                    if(mPullToRefreshListView.isRefreshing())
-                        mPullToRefreshListView.onRefreshComplete();
                     mBeforeCount = mList.size();
-                    PublishedInfo info = (PublishedInfo) msg.obj;
-                    for(int i=0;i<info.mList.size();i++){
-                        if(!mList.contains(info.mList.get(i))){
-                            mList.add(info.mList.get(i));
+                    List<PublishedInfo> list = (List<PublishedInfo>) msg.obj;
+                    for(PublishedInfo info : list){
+                        if(!mList.contains(info)){
+                            mList.add(info);
                         }
+                        Identity identity = new Identity();
+                        identity.user_id = YueQiuApp.sUserInfo.getUser_id();
+                        identity.table_id = info.getTable_id();
+                        identity.type = info.getType();
+                        Log.d("wy",YueQiuApp.sPublishMap.containsKey(identity) + "");
+                        if(!YueQiuApp.sPublishMap.containsKey(identity)){
+                            mPublishInsertList.add(info);
+                        }else{
+                            mPublishUpdateList.add(info);
+                        }
+                        YueQiuApp.sPublishMap.put(identity,info);
                     }
-                    updatePublishedDB((PublishedInfo) msg.obj);
+
                     mAfterCount = mList.size();
                     if(mList.isEmpty()){
                         setEmptyViewVisible();
+                    }else{
+                        if(mRefresh){
+                            if (mAfterCount == mBeforeCount) {
+                                Utils.showToast(mActivity, getString(R.string.no_newer_info));
+                            } else {
+                                Utils.showToast(mActivity, getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                            }
+                        }
                     }
+
+                    //TODO:更新数据库
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                           updatePublishDB();
+
+                        }
+                    }).start();
+
+
                     break;
             }
-            mPublishedAdapter = new PublishedBasicAdapter(mActivity,mList);
             mListView.setAdapter(mPublishedAdapter);
-            if(mLoadMore || mRefresh) {
-                mPublishedAdapter.notifyDataSetChanged();
-            }
+            mPublishedAdapter.notifyDataSetChanged();
             if(mLoadMore && !mList.isEmpty()){
                 mListView.setSelection(mCurrPosition);
             }
         }
     };
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mList.clear();
-    }
+
 
 }

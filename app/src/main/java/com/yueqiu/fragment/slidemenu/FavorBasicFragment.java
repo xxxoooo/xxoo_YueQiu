@@ -11,6 +11,7 @@ import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.adapter.FavorBasicAdapter;
 import com.yueqiu.bean.FavorInfo;
+import com.yueqiu.bean.Identity;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -22,15 +23,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Created by wangyun on 15/1/16.
  */
 public class FavorBasicFragment extends SlideMenuBasicFragment {
     private FavorBasicAdapter mAdapter;
-    private FavorInfo mFavorInfo;
     private FavorDao mFavorDao;
-    private boolean mIsExsitsFavor;
+
+    //跟数据库相关的list
+    private List<FavorInfo> mDBList;
 
 
     @Override
@@ -38,21 +43,23 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
                              Bundle savedInstanceState) {
         View view = super.onCreateView(inflater,container,savedInstanceState);
         mFavorDao = DaoFactory.getFavor(mActivity);
-        mIsExsitsFavor = mFavorDao.isExistFavorInfo(mType);
-        //先从缓存读取
-        //TODO:逻辑可能再改
-        if(mIsExsitsFavor){
-            mFavorInfo = mFavorDao.getFavorInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()),mType,mStart_no,mEnd_no+1);
-            mHandler.obtainMessage(PublicConstant.USE_CACHE,mFavorInfo).sendToTarget();
-        }
+        mAdapter = new FavorBasicAdapter(mActivity,mList);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mDBList = mFavorDao.getFavorLimit(YueQiuApp.sUserInfo.getUser_id(),mType,mStart_no,10);
+                if(!mDBList.isEmpty()){
+                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mDBList).sendToTarget();
+                }
+            }
+        }).start();
+
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
             requestResult();
         }else{
-            if(mList.isEmpty()){
-                mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-            }
+            mHandler.obtainMessage(PublicConstant.NO_NETWORK).sendToTarget();
         }
         return view;
     }
@@ -98,35 +105,33 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
         mUrlAndMethodMap.put(PublicConstant.URL, HttpConstants.Favor.URL);
         mUrlAndMethodMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.GET);
 
-        new RequestAsyncTask(mParamsMap).execute(mUrlAndMethodMap);
+        new RequestAsyncTask<FavorInfo>(mParamsMap).execute(mUrlAndMethodMap);
     }
 
     @Override
-    protected Object setBeanByJSON(JSONObject jsonResult) {
-        FavorInfo info = new FavorInfo();
-        info.setType(mType);
+    protected List<FavorInfo> setBeanByJSON(JSONObject jsonResult) {
+        List<FavorInfo> list = new ArrayList<FavorInfo>();
         try {
-            info.setStart_no(jsonResult.getJSONObject("result").getInt("start_no"));
-            info.setEnd_no(jsonResult.getJSONObject("result").getInt("end_no"));
-            info.setCount(jsonResult.getJSONObject("result").getInt("count"));
             JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
-
-            for (int i = 0; i < list_data.length(); i++) {
-                FavorInfo.FavorItemInfo itemInfo = info.new FavorItemInfo();
-                itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
-                itemInfo.setImage_url(list_data.getJSONObject(i).getString("img_url"));
-                itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
-                itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
-                itemInfo.setDateTime(list_data.getJSONObject(i).getString("create_time"));
-                itemInfo.setUserName(list_data.getJSONObject(i).getString("username"));
-                itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type_id")));
-                itemInfo.setChecked(false);
-                info.mList.add(itemInfo);
+            if(list_data.length() < 1){
+                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+            }else{
+                for (int i = 0; i < list_data.length(); i++) {
+                    FavorInfo itemInfo = new FavorInfo();
+                    itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
+                    itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
+                    itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
+                    itemInfo.setCreateTime(list_data.getJSONObject(i).getString("create_time"));
+                    itemInfo.setUserName(list_data.getJSONObject(i).getString("username"));
+                    itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type_id")));
+                    itemInfo.setChecked(false);
+                    list.add(itemInfo);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return info;
+        return list;
     }
 
     @Override
@@ -136,17 +141,17 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
 
     @Override
     protected void onItemStateChanged(int position, boolean checked) {
-        FavorInfo.FavorItemInfo itemInfo = (FavorInfo.FavorItemInfo) mListView.getItemAtPosition(position);
+        FavorInfo itemInfo = (FavorInfo) mListView.getItemAtPosition(position);
         itemInfo.setChecked(checked);
     }
 
     @Override
     protected void onPullUpWhenNetNotAvailable() {
-        FavorInfo info= mFavorDao.getFavorInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()), mType, mStart_no, mEnd_no + 1);
-        if(!info.mList.isEmpty()) {
-            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, info).sendToTarget();
+        List<FavorInfo> list= mFavorDao.getFavorLimit(YueQiuApp.sUserInfo.getUser_id(), mType, mStart_no, 10);
+        if(!list.isEmpty()) {
+            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, list).sendToTarget();
         }else{
-            mHandler.obtainMessage(PublicConstant.NO_RESULT,info).sendToTarget();
+            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
         }
     }
 
@@ -158,29 +163,21 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
 
     }
 
-    private void updateFavorDB(final FavorInfo info){
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                if(mIsExsitsFavor){
-                    if(mFavorDao.updateFavorInfo(info) != -1){
-                        for(int i=0;i<info.mList.size();i++){
-                            FavorInfo.FavorItemInfo item =  info.mList.get(i);
-                            if(mFavorDao.isExistFavorItemInfo(Integer.valueOf(item.getTable_id()),item.getType())){
-                                mFavorDao.updateFavorItemInfo(info);
-                            }else{
-                                mFavorDao.insertFavorItemInfo(info);
-                            }
-                        }
-                    }
-                }else {
-                    mFavorDao.insertFavorInfo(info);
-                    mFavorDao.insertFavorItemInfo(info);
-                }
+    private void updateDB(){
+        if(!mFavorUpdateList.isEmpty()){
+            mFavorDao.updateFavorInfo(mFavorUpdateList);
+        }
+        if(!mFavorInsertList.isEmpty()){
+            long result = mFavorDao.insertFavorInfo(mFavorInsertList);
+            //TODO:目前noteId没有unique，可能还会存在重复插入的问题，还需要再验证
+            /**
+             * 插入失败，则更新数据库
+             */
+            if(result == -1){
+                mFavorDao.updateFavorInfo(mFavorInsertList);
             }
-        }).start();
+        }
     }
-
 
     private BasicHandler mHandler = new BasicHandler(){
         @Override
@@ -188,26 +185,48 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
             super.handleMessage(msg);
             switch(msg.what){
                 case PublicConstant.USE_CACHE:
-                    mList.addAll(((FavorInfo)msg.obj).mList);
+                    List<FavorInfo> cacheList = (List<FavorInfo>) msg.obj;
+                    mList.addAll(cacheList);
                     break;
                 case PublicConstant.GET_SUCCESS:
-                    if(mPullToRefreshListView.isRefreshing())
-                        mPullToRefreshListView.onRefreshComplete();
                     mBeforeCount = mList.size();
-                    FavorInfo info = (FavorInfo) msg.obj;
-                    for(int i=0;i<info.mList.size();i++){
-                        if(!mList.contains(info.mList.get(i))){
-                            mList.add(info.mList.get(i));
+                    List<FavorInfo> list = (List<FavorInfo>) msg.obj;
+                    for(FavorInfo info : list){
+                        if(!mList.contains(info)){
+                            mList.add(info);
                         }
+                        Identity identity = new Identity();
+                        identity.user_id = YueQiuApp.sUserInfo.getUser_id();
+                        identity.table_id = info.getTable_id();
+                        identity.type = info.getType();
+                        if(!YueQiuApp.sFavorMap.containsKey(identity)){
+                            mFavorInsertList.add(info);
+                        }else{
+                            mFavorUpdateList.add(info);
+                        }
+                        YueQiuApp.sFavorMap.put(identity,info);
                     }
-                    updateFavorDB((FavorInfo) msg.obj);
                     mAfterCount = mList.size();
                     if(mList.isEmpty()){
                         setEmptyViewVisible();
+                    }else{
+                        if(mRefresh){
+                            if (mAfterCount == mBeforeCount) {
+                                Utils.showToast(mActivity, getString(R.string.no_newer_info));
+                            } else {
+                                Utils.showToast(mActivity, getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                            }
+                        }
                     }
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            updateDB();
+                        }
+                    }).start();
                     break;
             }
-            mAdapter = new FavorBasicAdapter(mActivity,mList);
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
             if(mLoadMore && !mList.isEmpty()){

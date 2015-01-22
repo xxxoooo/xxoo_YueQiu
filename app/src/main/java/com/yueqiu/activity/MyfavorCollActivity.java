@@ -18,7 +18,14 @@ import android.view.MenuItem;
 import android.widget.SearchView;
 
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
+import com.yueqiu.bean.FavorInfo;
+import com.yueqiu.bean.Identity;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.FavorDao;
 import com.yueqiu.fragment.slidemenu.FavorBasicFragment;
+
+import java.util.List;
 
 
 public class MyfavorCollActivity extends FragmentActivity implements ActionBar.TabListener{
@@ -26,10 +33,28 @@ public class MyfavorCollActivity extends FragmentActivity implements ActionBar.T
     private String[] mTitles;
     private SectionPagerAdapter mPagerAdapter;
     private ActionBar mActionBar;
+    private List<FavorInfo> mDBAllList;
+    private FavorDao mFavorDao;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_myfavor_coll);
+
+        mFavorDao = DaoFactory.getFavor(this);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mDBAllList = mFavorDao.getAllFavor(YueQiuApp.sUserInfo.getUser_id());
+                for(FavorInfo info : mDBAllList){
+                    Identity identity = new Identity();
+                    identity.user_id = YueQiuApp.sUserInfo.getUser_id();
+                    identity.type = info.getType();
+                    identity.table_id = info.getTable_id();
+                    YueQiuApp.sFavorMap.put(identity,info);
+                }
+            }
+        }).start();
+
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);

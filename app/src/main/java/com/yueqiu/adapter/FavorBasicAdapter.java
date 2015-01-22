@@ -57,15 +57,15 @@ public class FavorBasicAdapter extends BaseAdapter {
         }else{
             holder = (ViewHolder) convertView.getTag();
         }
-        FavorInfo.FavorItemInfo itemInfo = (FavorInfo.FavorItemInfo) getItem(position);
+        FavorInfo itemInfo = (FavorInfo) getItem(position);
         if(itemInfo.isChecked()){
             holder.whole_bg.setBackgroundColor(mContext.getResources().getColor(R.color.actionbar_color));
         }else{
             holder.whole_bg.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.published_item_bg));
         }
-        holder.title.setText(((FavorInfo.FavorItemInfo)mList.get(position)).getTitle());
-        holder.content.setText(((FavorInfo.FavorItemInfo)mList.get(position)).getContent());
-        holder.dateTime.setText(((FavorInfo.FavorItemInfo)mList.get(position)).getDateTime());
+        holder.title.setText(((FavorInfo)mList.get(position)).getTitle());
+        holder.content.setText(((FavorInfo)mList.get(position)).getContent());
+        holder.dateTime.setText(((FavorInfo)mList.get(position)).getCreateTime());
         return convertView;
     }
 
@@ -78,7 +78,7 @@ public class FavorBasicAdapter extends BaseAdapter {
 
     public void unCheckAll(){
         for(int i=0;i<getCount();i++){
-            FavorInfo.FavorItemInfo item = (FavorInfo.FavorItemInfo) getItem(i);
+            FavorInfo item = (FavorInfo) getItem(i);
             item.setChecked(false);
         }
 

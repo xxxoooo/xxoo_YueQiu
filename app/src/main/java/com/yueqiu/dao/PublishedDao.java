@@ -9,17 +9,26 @@ import java.util.List;
  */
 public interface PublishedDao {
 
-    public long insertPublishInfo(PublishedInfo info);
 
-    public long insertPublishItemInfo(PublishedInfo info);
+    public long insertPublishInfo(List<PublishedInfo> list);
 
-    public long updatePublishInfo(PublishedInfo info);
+    public long updatePublishInfo(List<PublishedInfo> list);
 
-    public List<Long> updatePublishedItemInfo(PublishedInfo info);
+    public List<PublishedInfo> getPublishedInfo(int userId,int type,int start,int num);
 
-    public boolean isExistPublishedInfo(int type);
+    public List<PublishedInfo> getAllPublishedInfo(int userId);
 
-    public boolean isExistPublishedItemInfo(int tableId,int type);
-
-    public PublishedInfo getPublishedInfo(String userId,int type,int start,int end);
+//    public long insertPublishInfo(PublishedInfo info);
+//
+//    public long insertPublishItemInfo(PublishedInfo info);
+//
+//    public long updatePublishInfo(PublishedInfo info);
+//
+//    public List<Long> updatePublishedItemInfo(PublishedInfo info);
+//
+//    public boolean isExistPublishedInfo(int type);
+//
+//    public boolean isExistPublishedItemInfo(int tableId,int type);
+//
+//    public PublishedInfo getPublishedInfo(String userId,int type,int start,int end);
 }

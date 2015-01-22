@@ -6,7 +6,9 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.GroupNoteInfo;
+import com.yueqiu.bean.Identity;
 import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
@@ -39,7 +41,19 @@ public class YueQiuApp extends Application
     // 由于Volley的官方推荐构建方式是定义成全局的Singleton模式，用于保存唯一的RequestQueue来加速图片的加载，所以我们在这里创建了全局的Context
     private static Context sAppContext;
 
+    /**
+     * 用于存放从数据库中查询到的全部Group信息
+     */
     public static Map<Integer,GroupNoteInfo> sGroupDbMap = new LinkedHashMap<Integer, GroupNoteInfo>();
+    /**
+     * 用于存放从数据库中查询到的全部Publish信息
+     */
+    public static Map<Identity,PublishedInfo> sPublishMap = new LinkedHashMap<Identity, PublishedInfo>();
+
+    /**
+     * 用于存放从数据库中查询得到的全部Favor信息
+     */
+    public static Map<Identity,FavorInfo> sFavorMap = new LinkedHashMap<Identity, FavorInfo>();
 
     @Override
     public void onCreate()
