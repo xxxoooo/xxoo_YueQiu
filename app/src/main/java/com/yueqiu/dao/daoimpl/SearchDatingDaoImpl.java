@@ -48,6 +48,7 @@ public class SearchDatingDaoImpl implements SearchDatingDao
         values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.TITLE, datingItem.getUserDeclare());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.RANGE, datingItem.getUserDistance());
 
+        this.mDatabase = mDBUtils.getWritableDatabase();
         long insertId = mDatabase.insert(
                 DatabaseConstant.FavorInfoItemTable.SearchDatingTable.DATING_TABLE_NAME,
                 null,
@@ -100,6 +101,7 @@ public class SearchDatingDaoImpl implements SearchDatingDao
 
         return -1;
     }
+
 
     @Override
     public synchronized long updateDatingItemBatch(List<SearchDatingSubFragmentDatingBean> datingList)

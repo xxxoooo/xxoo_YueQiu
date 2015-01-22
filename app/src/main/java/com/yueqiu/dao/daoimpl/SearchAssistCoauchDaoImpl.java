@@ -58,6 +58,7 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
         values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.CLASS, assistCoauchItem.getKinds());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.RANGE, assistCoauchItem.getDistance());
 
+        this.mDatabase = mDBUtils.getWritableDatabase();
         long insertId = mDatabase.insert(
                 DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.ASSISTCOAUCH_TABLE_NAME,
                 null,
@@ -128,6 +129,7 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
     {
         this.mDatabase = mDBUtils.getReadableDatabase();
         List<SearchAssistCoauchSubFragmentBean> asList = new ArrayList<SearchAssistCoauchSubFragmentBean>();
+
 
         String asInfoSql = " SELECT * FROM" + DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.ASSISTCOAUCH_TABLE_NAME
                 + " ORDER BY " + DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.USER_ID

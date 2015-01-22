@@ -43,6 +43,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -104,7 +105,7 @@ public class Utils {
      * 解析json
      */
     public static JSONObject parseJson(String result) {
-        JSONObject object ;
+        JSONObject object;
         try {
             if (result != null) {
                 object = new JSONObject(result);

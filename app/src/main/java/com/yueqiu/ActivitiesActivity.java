@@ -12,6 +12,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.format.DateUtils;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,11 +22,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.yueqiu.activity.ActivitiesDetail;
-import com.yueqiu.activity.ActivitiesIssueActivity;
-import com.yueqiu.activity.ActivityBusinessActivities;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.ActivitiesListViewAdapter;
 import com.yueqiu.bean.Activities;
@@ -50,30 +50,30 @@ import java.util.Map;
 /**
  * Created by yinfeng on 14/12/18.
  */
-public class ActivitiesActivity extends Activity implements View.OnClickListener{
+public class ActivitiesActivity extends Activity{
     private static final String TAG = "ActivitiesActivity";
     private ActionBar mActionBar;
     private PullToRefreshListView mPullToRefreshListView;
     private ListView mListView;
+    private TextView mEmptyView;
     private ActivitiesListViewAdapter mAdapter;
     private ArrayList<Activities> mListData;
 
     private static final int LENGTH = 10;
     private ActivitiesDao mDao;
     private ProgressBar mPb;
-    private int mNetstart;
-    private int mNetend;
-    private int mLocalStart;
-    private int mLocalEnd;
-    private boolean isHead;
+    private int mNetStart = 0,mNetEnd = 9;
+    private int mLocalStart,mLocalEnd = 10;
+    private boolean mIsHead,mLoadMore;
     private Drawable mProgressDrawable;
     private boolean mNetworkAvailable;
-    private Handler handler = new Handler()
+
+    private Handler mHandler = new Handler()
     {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            mPb.setVisibility(View.INVISIBLE);
+            mPb.setVisibility(View.GONE);
             switch (msg.what)
             {
                 case PublicConstant.REQUEST_ERROR:
@@ -97,11 +97,15 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
                     {
                         mAdapter.notifyDataSetChanged();
                     }
-
-                    mListView.setVisibility(View.VISIBLE);
                     onLoad();
                     break;
                 case PublicConstant.NO_RESULT:
+                    if(mListData.isEmpty()){
+                        setEmptyViewVisible();
+                    }
+                    if(!mIsHead && mLoadMore){
+                        Utils.showToast(ActivitiesActivity.this,getString(R.string.no_more_business_activity));
+                    }
                     onLoad();
                     break;
                 case PublicConstant.TIME_OUT:
@@ -117,16 +121,10 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_activites);
         initActionBar();
-        mNetstart = 0;
-        mNetend = 9;
-        mLocalStart = 0;
-        mLocalEnd = 10;
         mListData = new ArrayList<Activities>();
         mDao = DaoFactory.getActivities(ActivitiesActivity.this);
         initView();
         mNetworkAvailable = Utils.networkAvaiable(ActivitiesActivity.this);
-//        handler.post(getInternetDataThread);
-        isHead = false;
         new Thread(mNetworkAvailable ? getNetworkData : getLocalData).start();
     }
 
@@ -141,15 +139,23 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
         mPullToRefreshListView.setOnRefreshListener(mRefreshListener);
         mListView = mPullToRefreshListView.getRefreshableView();
         mPb = (ProgressBar) findViewById(R.id.pb_loading);
-        mListView.setVisibility(View.GONE);
         mPb.setVisibility(View.VISIBLE);
         mProgressDrawable = new FoldingCirclesDrawable.Builder(this).build();
         Rect bounds = mPb.getIndeterminateDrawable().getBounds();
         mPb.setIndeterminateDrawable(mProgressDrawable);
         mPb.getIndeterminateDrawable().setBounds(bounds);
-//        mPb = (ProgressBar) findViewById(R.id.pb_loading);
         mListView.setOnItemClickListener(itemClickListener);
 
+    }
+
+
+    protected void setEmptyViewVisible(){
+        mEmptyView = new TextView(this);
+        mEmptyView.setGravity(Gravity.CENTER);
+        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
+        mEmptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setText(getString(R.string.your_published_info_is_empty,getString(R.string.no_business_activity)));
+        mPullToRefreshListView.setEmptyView(mEmptyView);
     }
 
     private Runnable getNetworkData = new Runnable() {
@@ -177,15 +183,15 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
                 msg.obj = mListData;
 
             }
-            handler.sendMessage(msg);
+            mHandler.sendMessage(msg);
         }
     };
 
     private void getDatafromInternet()
     {
         Map<String,Object> map = new HashMap<String, Object>();
-        map.put("start_no",mNetstart);
-        map.put("end_no",mNetend);
+        map.put("start_no",mNetStart);
+        map.put("end_no",mNetEnd);
         String retStr = HttpUtil.urlClient(
                 HttpConstants.Play.GETLISTEE, map, HttpConstants.RequestMethod.GET);
         JSONObject object = Utils.parseJson(retStr);
@@ -211,24 +217,21 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
                                     flag = true;
                                 }
                             }
-
                             if (!flag) {
                                 list.add(activityItem);
                             }
                         }
                         mDao.insertActiviesList(mListData);
                         msg.what = PublicConstant.GET_SUCCESS;
-                        if (!isHead) {
+                        if (!mIsHead) {
                             mListData.addAll(list);
                         } else {
                             mListData.addAll(0, list);
                         }
                         msg.obj = mListData;
-                        mNetstart += LENGTH;
-                        mNetend += LENGTH;
+                        mNetStart += LENGTH;
+                        mNetEnd += LENGTH;
                     }
-
-
                 } else if (object.getInt("code") != HttpConstants.ResponseCode.TIME_OUT) {
                     msg.what = PublicConstant.TIME_OUT;
                 }else if(object.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
@@ -241,7 +244,7 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
             }else{
                 msg.what = PublicConstant.REQUEST_ERROR;
             }
-            handler.sendMessage(msg);
+            mHandler.sendMessage(msg);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -263,11 +266,6 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
         mActionBar.setTitle(getString(R.string.tab_title_activity));
     }
 
-    @Override
-    public void onClick(View view) {
-
-    }
-
 
 
     @Override
@@ -277,14 +275,6 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
             case android.R.id.home:
                 finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
-                break;
-            case R.id.menu_activities:
-                startActivity(new Intent(this, ActivityBusinessActivities.class));
-                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
-                break;
-            case R.id.menu_issue_activities:
-                startActivity(new Intent(ActivitiesActivity.this, ActivitiesIssueActivity.class));
-                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
                 break;
         }
         return true;
@@ -322,9 +312,10 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
             new Thread(Utils.networkAvaiable(ActivitiesActivity.this)
                     ? getNetworkData : getLocalData).start();
-            mNetstart = 0;
-            mNetend = 9;
-            isHead = true;
+            mNetStart = 0;
+            mNetEnd = 9;
+            mIsHead = true;
+            mLoadMore = false;
         }
 
         @Override
@@ -337,7 +328,8 @@ public class ActivitiesActivity extends Activity implements View.OnClickListener
             new Thread(Utils.networkAvaiable(ActivitiesActivity.this)
                     ? getNetworkData : getLocalData).start();
 
-            isHead = false;
+            mIsHead = false;
+            mLoadMore = true;
         }
     };
 

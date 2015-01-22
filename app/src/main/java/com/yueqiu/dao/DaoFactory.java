@@ -6,6 +6,7 @@ import com.yueqiu.dao.daoimpl.ActivitiesDaoImpl;
 import com.yueqiu.dao.daoimpl.ApplicationDaoImpl;
 import com.yueqiu.dao.daoimpl.ContactsDaoImpl;
 import com.yueqiu.dao.daoimpl.FavorDaoImpl;
+import com.yueqiu.dao.daoimpl.GroupInfoDaoImpl;
 import com.yueqiu.dao.daoimpl.PublishedImpl;
 import com.yueqiu.dao.daoimpl.UserDaoImpl;
 
@@ -40,5 +41,10 @@ public class DaoFactory {
     public static FavorDao getFavor(Context context) {
 
         return new FavorDaoImpl(context);
+    }
+
+    public static GroupInfoDao getGroupDao(Context context){
+
+        return new GroupInfoDaoImpl(context);
     }
 }

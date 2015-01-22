@@ -18,11 +18,11 @@ import java.util.List;
  * Created by wangyun on 15/1/15.
  */
 public class PublishedBasicAdapter extends BaseAdapter {
-    private List<PublishedInfo.PublishedItemInfo> mList;
+    private List<Object> mList;
     private Context mContext;
     private LayoutInflater mInflater;
 
-    public PublishedBasicAdapter(Context context,List<PublishedInfo.PublishedItemInfo> list){
+    public PublishedBasicAdapter(Context context,List<Object> list){
         this.mContext = context;
         this.mList = list;
         mInflater = LayoutInflater.from(mContext);
@@ -58,15 +58,15 @@ public class PublishedBasicAdapter extends BaseAdapter {
         }else{
             holder = (ViewHolder) convertView.getTag();
         }
-        PublishedInfo.PublishedItemInfo itemInfo = (PublishedInfo.PublishedItemInfo) getItem(position);
+        PublishedInfo itemInfo = (PublishedInfo) getItem(position);
         if(itemInfo.isChecked()){
             holder.whole_bg.setBackgroundColor(mContext.getResources().getColor(R.color.actionbar_color));
         }else{
             holder.whole_bg.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.published_item_bg));
         }
-        holder.title.setText(mList.get(position).getTitle());
-        holder.content.setText(mList.get(position).getContent());
-        holder.dateTime.setText(mList.get(position).getDateTime());
+        holder.title.setText(((PublishedInfo)mList.get(position)).getTitle());
+        holder.content.setText(((PublishedInfo)mList.get(position)).getContent());
+        holder.dateTime.setText(((PublishedInfo)mList.get(position)).getDateTime());
         return convertView;
     }
 
@@ -80,7 +80,7 @@ public class PublishedBasicAdapter extends BaseAdapter {
 
     public void unCheckAll(){
         for(int i=0;i<getCount();i++){
-            PublishedInfo.PublishedItemInfo item = (PublishedInfo.PublishedItemInfo) getItem(i);
+            PublishedInfo item = (PublishedInfo) getItem(i);
             item.setChecked(false);
         }
 

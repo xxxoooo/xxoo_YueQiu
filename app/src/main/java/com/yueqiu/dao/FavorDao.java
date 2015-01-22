@@ -9,17 +9,25 @@ import java.util.List;
  */
 public interface FavorDao {
 
-    public long insertFavorInfo(FavorInfo info);
+//    public long insertFavorInfo(FavorInfo info);
+//
+//    public long insertFavorItemInfo(FavorInfo info);
+//
+//    public long updateFavorInfo(FavorInfo info);
+//
+//    public List<Long> updateFavorItemInfo(FavorInfo info);
+//
+//    public boolean isExistFavorInfo(int type);
+//
+//    public boolean isExistFavorItemInfo(int tableId,int type);
+//
+//    public FavorInfo getFavorInfo(String userId,int type,int start,int num);
 
-    public long insertFavorItemInfo(FavorInfo info);
+    public long insertFavorInfo(List<FavorInfo> list);
 
-    public long updateFavorInfo(FavorInfo info);
+    public long updateFavorInfo(List<FavorInfo> list);
 
-    public List<Long> updateFavorItemInfo(FavorInfo info);
+    public List<FavorInfo> getAllFavor(int userId);
 
-    public boolean isExistFavorInfo(int type);
-
-    public boolean isExistFavorItemInfo(int tableId,int type);
-
-    public FavorInfo getFavorInfo(String userId,int type,int start,int num);
+    public List<FavorInfo> getFavorLimit(int userId,int type,int start,int num);
 }

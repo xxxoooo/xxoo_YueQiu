@@ -23,6 +23,11 @@
     <string name="please_input_title">请输入标题</string>
     <string name="please_select_topic_type">请选择话题类型</string>
     <string name="please_input_content">请输入内容</string>
+    <string name="no_group_info">抱歉，目前没有台球圈的信息</string>
+    <string name="no_group_type_info">抱歉,目前没有<xliff:g id="type">%1$s</xliff:g>的信息</string>
+    <string name="no_newer_info">当前已经是最新的信息了</string>
+    <string name="have_already_update_info">共更新<xliff:g id="number">%1$s</xliff:g>条信息</string>
+    <string name="no_more_group_info">没有更多的台球圈信息了</string>
 
     <!-- 登录注册 -->
     <string name="login_without_phone_or_account">请输入手机号或账号</string>
@@ -140,7 +145,7 @@
         这个是用于显示助教的价格，这里我们将用到<=这个符号，为了将这个符号完整的拼接到TextView当中，我们最好使用
         Xliff，而不是通过复杂的StringBuilder来实现，因为我们的TextView是有背景图片的，所以我们只能使用这个技巧
     -->
-    <string name="search_assistcaouch_subfragment_listitem_price">大约<xliff:g id="price"/> 元/时</string>
+    <string name="search_assistcaouch_subfragment_listitem_price">大约<xliff:g id="price" /> 元/时</string>
 
     <!-- 4.教练子Fragment的title -->
     <string name="search_caouch_subfragment_title_ability">资质</string>
@@ -211,14 +216,13 @@
     <string name="search_room_sub_fragment_filterbtn_price_str">价格</string>
     <string name="search_room_sub_fragment_filterbtn_appraisal_str">好评</string>
 
-    <!--用于球厅的好评程度的筛选列表-->
+    <!-- 用于球厅的好评程度的筛选列表 -->
     <string name="search_room_filter_no_filter">好评程度(智能排序)</string>
     <string name="search_room_filter_list_star">星级高优先</string>
     <string name="search_room_filter_list_product">产品评价高优先</string>
     <string name="search_room_filter_list_service">服务评价高优先</string>
     <string name="search_room_filter_list_environment">环境评价高优先</string>
     <string name="search_room_filter_list_comment">点评数量多优先</string>
-
 
     <!-- popupMenu用于筛选的字符串 -->
     <string name="search_mate_popupmenu_item_filter_str">距离(智能范围)</string>
@@ -358,16 +362,15 @@
     <string name="check_num">验证码</string>
     <string name="phone_num">手机</string>
     <string name="star_meet">球星汇</string>
+    <string name="no_business_activity">未获取商家活动信息</string>
+    <string name="no_more_type_activity">没有更多<xliff:g id="number" example="15">%1$s</xliff:g>信息了</string>
+    <string name="no_more_business_activity">没有更多商家活动信息了</string>
     <string name="activity_issuing">发布中...</string>
-    <string name="no_complete_info">没有赛事信息</string>
-    <string name="no_exhibition_info">没有台球展信息</string>
-    <string name="no_group_info">没有群活动</string>
-    <string name="no_other_info">没有其他信息</string>
-    <string name="no_star_info">没有球星汇信息</string>
     <string name="please_input_right_number">请输入正确的手机号</string>
     <string name="please_input_captcha">请输入验证码</string>
     <string name="captcha_is_wrong">验证码有误，请重新输入</string>
     <string name="retry_after_seconds">获取验证码失败，请在<xliff:g id="number" example="15">%1$s</xliff:g></string>
+    <string name="activity_no_result">抱歉，未获取到<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
 
     <!-- 我的资料 -->
     <string name="photo">头像</string>
@@ -439,5 +442,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_article_read">ArticleReadActivity</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

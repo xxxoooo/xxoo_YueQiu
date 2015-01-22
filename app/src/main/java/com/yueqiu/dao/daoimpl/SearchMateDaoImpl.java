@@ -50,6 +50,7 @@ public class SearchMateDaoImpl implements SearchMateDao
         values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DISTRICT, mateItem.getUserDistrict());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.RANGE, mateItem.getUserDistance());
 
+        mSQLdatabase = mDBUtils.getWritableDatabase();
         long insertId = mSQLdatabase.insert(
                 DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE,
                 null,
@@ -137,6 +138,7 @@ public class SearchMateDaoImpl implements SearchMateDao
     {
         this.mSQLdatabase = mDBUtils.getReadableDatabase();
         List<SearchMateSubFragmentUserBean> mateList = new ArrayList<SearchMateSubFragmentUserBean>();
+
 
         String mateInfoSql = " SELECT * FROM " + DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE
                 + " ORDER BY " + DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID

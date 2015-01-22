@@ -80,31 +80,6 @@ public class DatabaseConstant
 
         public static final String USER_ID = "user_id";
 
-        public static final String TYPE = "type";
-
-        public static final String START_NO = "start_no";
-
-        public static final String END_NO = "end_no";
-
-        public static final String COUNT = "count";
-
-        public static final String CRAETE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + USER_ID + " INTEGER NOT NULL, " + TYPE + " INTEGER NOT NULL DEFAULT 1, " + START_NO + " INTEGER DEFAULT 0, " +
-                END_NO + " INTEGER DEFAULT 9, " + COUNT + " INTEGER" + ")";
-        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
-
-
-    }
-
-    public final class PublishInfoItemTable
-    {
-
-        public static final String TABLE = "published_item_info";
-
-        public static final String _ID = "id";
-
-        public static final String USER_ID = "user_id";
-
         public static final String TABLE_ID = "table_id";
 
         public static final String TYPE = "type";
@@ -117,7 +92,7 @@ public class DatabaseConstant
 
         public static final String DATETIME = "datetime";
 
-        public static final String CREATE_URL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+        public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + TABLE_ID + " INTEGER, " + TYPE + " INTEGER DEFAULT 1, "
                 + TITLE + " VARCHAR(255), " + CONTENT + " VARCHAR(500), " + DATETIME + " VARCHAR(50)" + ")";
         public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
@@ -254,31 +229,6 @@ public class DatabaseConstant
         public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
 
-    public final class FavorInfoTable
-    {
-
-        public static final String TABLE = "my_store_info";
-
-        public static final String _ID = "id";
-
-        public static final String USER_ID = "user_id";
-
-        public static final String TYPE = "type";
-
-        public static final String START_NO = "start_no";
-
-        public static final String END_NO = "end_no";
-
-        public static final String COUNT = "count";
-
-
-        public static final String CRAETE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + USER_ID + " INTEGER NOT NULL, " + TYPE + " INTEGER NOT NULL DEFAULT 1, " + START_NO + " INTEGER DEFAULT 0, " +
-                END_NO + " INTEGER DEFAULT 9, " + COUNT + " INTEGER" + ")";
-        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
-
-
-    }
 
     public final class FavorInfoItemTable
     {
@@ -440,8 +390,6 @@ public class DatabaseConstant
 
         public static final String TYPE = "type";
 
-        public static final String IMAGE_URL = "image_url";
-
         public static final String TITLE = "title";
 
         public static final String CONTENT = "content";
@@ -451,10 +399,48 @@ public class DatabaseConstant
         public static final String USER_NAME = "username";
 
         public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + USER_ID + " INTEGER NOT NULL, " + TABLE_ID + " INTEGER, " + TYPE + " INTEGER DEFAULT 1, " + IMAGE_URL + " VARCHAR(255), "
+                + USER_ID + " INTEGER NOT NULL, " + TABLE_ID + " INTEGER, " + TYPE + " INTEGER DEFAULT 1, "
                 + TITLE + " VARCHAR(255), " + CONTENT + " VARCHAR(500), " + DATETIME + " VARCHAR(50), " + USER_NAME + " VARCHAR(255)" + ")";
         public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
+
+    }
+
+    public static class GroupInfo{
+
+        public static final String TABLE = "group_info";
+
+        public static final String _ID = "id";
+
+        public static final String NOTE_ID = "note_id";
+
+        public static final String USER_NAME = "user_name";
+
+        public static final String SEX = "sex";
+
+        public static final String BROWSE_COUNT = "browse_count";
+
+        public static final String ISSUE_TIME = "issue_time";
+
+        public static final String TITLE = "title";
+
+        public static final String CONTENT = "content";
+
+        public static final String COMMENT_COUNT = "comment_count";
+
+        public static final String IMG_URL = "img_url";
+
+        public static final String PRAISE_NUM = "praise_num";
+
+        public static final String TYPE = "type";
+
+        public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + NOTE_ID + " INTEGER NOT NULL, "  + TYPE + " INTEGER, "+ USER_NAME + " VARCHAR(50), " + SEX + " INTEGER, " + BROWSE_COUNT + " INTEGER, " + ISSUE_TIME
+                + " VARCHAR(50), " + TITLE + " VARCHAR(255), " + CONTENT + " TEXT, " + COMMENT_COUNT + " INTEGER, " + IMG_URL + " VARCHAR(255), "
+                + PRAISE_NUM + " INTEGER" + ")";
+        public static final String INSERT_SQL = "INSERT INTO " + TABLE + "(" + NOTE_ID + "," + TYPE + "," + USER_NAME + "," + SEX + "," + BROWSE_COUNT + "," + ISSUE_TIME
+                + "," + TITLE + "," + CONTENT + "," + COMMENT_COUNT + "," + IMG_URL + "," + PRAISE_NUM + ") values(?,?,?,?,?,?,?,?,?,?,?)";
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
     }
 
