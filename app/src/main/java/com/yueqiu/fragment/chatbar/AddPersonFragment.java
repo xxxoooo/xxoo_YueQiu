@@ -265,10 +265,10 @@ public class AddPersonFragment extends Fragment {
                 @Override
                 public void run() {
                     mProgressBar.setVisibility(View.GONE);
+                    Utils.showToast(getActivity(), getString(R.string.no_data));
                 }
             }, 100);
             Log.e(TAG, "JSONException>>" + e.toString());
-            Utils.showToast(getActivity(), getString(R.string.no_data));
         }
     }
 

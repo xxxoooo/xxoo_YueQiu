@@ -208,7 +208,6 @@ public class ContactFragment extends Fragment {
                 }
             } catch (JSONException e) {
                 Log.e(TAG, "JSONException: " + e);
-                Utils.showToast(getActivity(), getString(R.string.no_data));
             }
 
 
