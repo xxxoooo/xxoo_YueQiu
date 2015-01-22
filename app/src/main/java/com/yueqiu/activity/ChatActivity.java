@@ -7,6 +7,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -20,6 +22,9 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.rockerhieu.emojicon.EmojiconGridFragment;
+import com.rockerhieu.emojicon.EmojiconsFragment;
+import com.rockerhieu.emojicon.emoji.Emojicon;
 import com.yueqiu.R;
 import com.yueqiu.adapter.ChatMsgViewAdapter;
 import com.yueqiu.bean.ChatMsgEntity;
@@ -27,6 +32,7 @@ import com.yueqiu.bean.RecentChatEntity;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.db.DBUtils;
 import com.yueqiu.fragment.chatbar.MessageFragment;
+import com.yueqiu.view.CustomListView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,11 +40,13 @@ import java.util.List;
 /**
  * Created by doushuqi on 15/1/10.
  */
-public class ChatActivity extends Activity implements View.OnClickListener, EditText.OnFocusChangeListener, EditText.OnEditorActionListener {
+public class ChatActivity extends FragmentActivity implements View.OnClickListener,
+        EditText.OnFocusChangeListener, EditText.OnEditorActionListener,
+        EmojiconGridFragment.OnEmojiconClickedListener,
+        EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     private ImageView mEmotion, mAssistToggle;
-    private View mExtension;
-    private boolean isShowExtension = false;
+    private View mExtension, mEmotionToggle;
     private EditText mEditText;
     private InputMethodManager mInputMethodManager;
     private Button mSend;
@@ -49,7 +57,12 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
     private int mFriendUserId;
     private String mUserName;
     private View mMessageMore;
-    private Handler mHandler = new Handler();
+    private boolean isDisplayInputMethod;//键盘
+    private boolean isShowExtension;//扩展(包括表情和插件)
+    private boolean isDisplayPlugin;//插件
+    private boolean isDisplayEmoji;//表情，三者（键盘、插件、表情）只能显示一个或者都不显示，当键盘消失时需延时加载其他控件
+    private static final int DISPLAY_INPUT_METHOD = 0;
+    private static final int UNDISPLAY_INPUT_METHOD = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +84,7 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
     private void initView() {
         mEmotion = $(R.id.chat_container_open_emotion);
         mAssistToggle = $(R.id.chat_container_open_assist_toggle);
+        mEmotionToggle = $(R.id.chat_container_emotion);
         mExtension = $(R.id.chat_container_extension_container);
         mEditText = $(R.id.chat_container_text_ed);
         mSend = $(R.id.chat_container_send_btn);
@@ -80,10 +94,18 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
 
     private void setListener() {
         mAssistToggle.setOnClickListener(this);
+        mEmotion.setOnClickListener(this);
         mEditText.setOnFocusChangeListener(this);
         mEditText.setOnClickListener(this);
         mSend.setOnClickListener(this);
         mMessageMore.setOnClickListener(this);
+        //用于判断当前屏幕是否显示了软键盘
+        ((CustomListView) mListView).setOnResizeListener(new CustomListView.OnResizeListener() {
+            @Override
+            public void onResize(int w, int h, int oldw, int oldh) {
+                isDisplayInputMethod = !isShowExtension;
+            }
+        });
     }
 
     private void initData() {
@@ -121,13 +143,26 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.chat_container_open_emotion:
+                isDisplayEmoji = true;
+                isDisplayPlugin = false;
+                showExtension(true);
+                isShowExtension = true;
+                break;
             case R.id.chat_container_open_assist_toggle:
-                showExtension(!isShowExtension);
+
+                isDisplayEmoji = false;
+                isDisplayPlugin = !isDisplayPlugin;
+                showExtension(isDisplayPlugin);
+
+                isShowExtension = isDisplayPlugin;
                 break;
             case R.id.chat_container_text_ed:
+                isDisplayPlugin = false;
+                isDisplayEmoji = false;
                 mEditText.setFocusable(true);
-                if (isShowExtension)
-                    showExtension(false);
+                showExtension(false);
+                isShowExtension = false;
                 break;
             case R.id.chat_container_send_btn:
                 sendMessage();
@@ -142,20 +177,54 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
 
     private void showExtension(boolean isShow) {
         if (isShow) {
-            if (mInputMethodManager.isActive())
-                mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mExtension.setVisibility(View.VISIBLE);
-                }
-            }, 500);
-
-            isShowExtension = true;
+            mHandler.sendEmptyMessage(isDisplayInputMethod ? DISPLAY_INPUT_METHOD : UNDISPLAY_INPUT_METHOD);
         } else {
             mExtension.setVisibility(View.GONE);
-            isShowExtension = false;
+            mEmotionToggle.setVisibility(View.GONE);
         }
+    }
+
+    Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what) {
+                case DISPLAY_INPUT_METHOD:
+                    mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            showExtensionDetail();
+                        }
+                    }, 300);
+                    break;
+                case UNDISPLAY_INPUT_METHOD:
+                    showExtensionDetail();
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    private void showExtensionDetail() {
+        if (isDisplayPlugin) {
+            mExtension.setVisibility(View.VISIBLE);
+            mEmotionToggle.setVisibility(View.GONE);
+        }
+        if (isDisplayEmoji) {
+            mEmotionToggle.setVisibility(View.VISIBLE);
+            mExtension.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.chat_container_emotion, EmojiconsFragment.newInstance(false))
+                .commit();
     }
 
     @Override
@@ -187,4 +256,13 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
         return false;
     }
 
+    @Override
+    public void onEmojiconBackspaceClicked(View v) {
+        EmojiconsFragment.backspace(mEditText);
+    }
+
+    @Override
+    public void onEmojiconClicked(Emojicon emojicon) {
+        EmojiconsFragment.input(mEditText, emojicon);
+    }
 }

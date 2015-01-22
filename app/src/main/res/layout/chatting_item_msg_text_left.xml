@@ -3,7 +3,8 @@
               android:layout_height="wrap_content"
               android:background="#ffffff"
               android:orientation="vertical"
-              android:padding="6dp">
+              android:padding="6dp"
+              xmlns:emojicon="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:id="@+id/chat_details_receive_time"
@@ -34,15 +35,15 @@
             android:background="@drawable/ic_launcher"
             android:focusable="false"/>
 
-        <TextView
+        <com.rockerhieu.emojicon.EmojiconTextView
             android:id="@+id/chat_details_receive_chatcontent"
             style="@style/chat_content_date_style"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            emojicon:emojiconSize="23sp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="50dp"
             android:layout_toRightOf="@id/chat_details_receive_userhead"
-            android:text="大家饿哦奇偶额简欧风建瓯福建多可怕看打牌去打开都怕我看到单位看打破看大盘看完都怕我看到"
             android:background="@drawable/chat_receive_message_bg"/>
 
         <!--<TextView-->

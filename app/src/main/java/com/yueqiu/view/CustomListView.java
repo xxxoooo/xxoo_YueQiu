@@ -24,5 +24,18 @@ public class CustomListView extends ListView {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         setSelection(getCount());
+        if (mListener != null) {
+            mListener.onResize(w, h, oldw, oldh);
+        }
     }
+
+    public interface OnResizeListener {
+        public void onResize(int w, int h, int oldw, int oldh);
+    }
+
+    public void setOnResizeListener(OnResizeListener l) {
+        mListener = l;
+    }
+
+    private OnResizeListener mListener;
 }

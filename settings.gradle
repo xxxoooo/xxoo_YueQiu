@@ -1,2 +1,2 @@
-include ':app', ':datetimepicker-library'
+include ':app', ':datetimepicker-library', ':emoji-library'
 
