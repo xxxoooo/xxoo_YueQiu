@@ -28,6 +28,8 @@ import com.yueqiu.adapter.GroupBasicAdapter;
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.GroupInfoDao;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
@@ -56,17 +58,23 @@ public class BilliardGroupBasicFragment extends Fragment {
     private RadioGroup mGroup;
     private PullToRefreshListView mPullToRefreshListView;
     private ListView mListView;
-    private List<GroupNoteInfo> mList = new ArrayList<GroupNoteInfo>();
     private GroupBasicAdapter mAdapter;
     private ProgressBar mPreProgress;
     private TextView mPreText,mEmptyView;
     private Drawable mProgressDrawable;
     private String mEmptyTypeStr;
+    private GroupInfoDao mGroupDao;
     private int mGroupType;
     private int mStart_no = 0,mEnd_no = 9;
+    private boolean mRefresh,mLoadMore;
 
     private Map<String,Integer> mParamMap = new HashMap<String, Integer>();
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
+    private List<GroupNoteInfo> mList = new ArrayList<GroupNoteInfo>();
+    private List<GroupNoteInfo> mDBList;
+    private List<GroupNoteInfo> mInsertList = new ArrayList<GroupNoteInfo>();
+    private List<GroupNoteInfo> mUpdateList = new ArrayList<GroupNoteInfo>();
+    //private List<GroupNoteInfo> mDBAllList;
 
     @Override
     public void onAttach(Activity activity) {
@@ -79,15 +87,36 @@ public class BilliardGroupBasicFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_billard_group_basic,null);
         Bundle args = getArguments();
         mGroupType = args.getInt("type");
+        mGroupDao = DaoFactory.getGroupDao(mActivity);
+        mAdapter = new GroupBasicAdapter(mActivity,mList);
         initView();
         setEmptyTypeStr();
 
+        //TODO:获取数据库的全部内容,要放在线程中
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //mDBAllList = mGroupDao.getAllGroupInfo();
+
+                //TODO:缓存的list，
+                if(mGroupType == PublicConstant.GROUP_ALL) {
+                    mDBList = mGroupDao.getAllGroupInfoLimit(mStart_no, mEnd_no + 1);
+                }else{
+                    mDBList = mGroupDao.getGroupInfoByType(mGroupType,mStart_no,mEnd_no + 1);
+                }
+                if(!mDBList.isEmpty()){
+                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mDBList).sendToTarget();
+                }
+            }
+        }).start();
+
         if(Utils.networkAvaiable(mActivity)){
+            mLoadMore = false;
+            mRefresh = false;
             requestGroup();
         }else{
-
+            mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
         }
-
 
         return mView;
     }
@@ -107,7 +136,6 @@ public class BilliardGroupBasicFragment extends Fragment {
         Rect bounds = mPreProgress.getIndeterminateDrawable().getBounds();
         mPreProgress.setIndeterminateDrawable(mProgressDrawable);
         mPreProgress.getIndeterminateDrawable().setBounds(bounds);
-
 
         mGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -179,7 +207,7 @@ public class BilliardGroupBasicFragment extends Fragment {
             JSONArray list_data = object.getJSONObject("result").getJSONArray("list_data");
             for(int i=0;i<list_data.length();i++) {
                 GroupNoteInfo info = new GroupNoteInfo();
-                info.setNoteId(Integer.valueOf(list_data.getJSONObject(i).getString("id")));
+                info.setNoteId(Integer.parseInt(list_data.getJSONObject(i).getString("id")));
                 info.setUserName(list_data.getJSONObject(i).getString("username"));
                 info.setImg_url(list_data.getJSONObject(i).getString("img_url"));
                 info.setTitle(list_data.getJSONObject(i).getString("title"));
@@ -187,6 +215,9 @@ public class BilliardGroupBasicFragment extends Fragment {
                 info.setIssueTime(list_data.getJSONObject(i).getString("create_time"));
                 info.setCommentCount(list_data.getJSONObject(i).getInt("comment_num"));
                 info.setBrowseCount(list_data.getJSONObject(i).getInt("look_number"));
+                if(mGroupType != PublicConstant.GROUP_ALL) {
+                    info.setType(mGroupType);
+                }
                 infos.add(info);
             }
         } catch (JSONException e) {
@@ -220,8 +251,8 @@ public class BilliardGroupBasicFragment extends Fragment {
                 if (!jsonObject.isNull("code")) {
                     if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
                         if(jsonObject.getJSONObject("result") != null){
-                            List<GroupNoteInfo> infos = setGroupInfoByJSON(jsonObject);
-                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS,infos).sendToTarget();
+                            List<GroupNoteInfo> list = setGroupInfoByJSON(jsonObject);
+                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list).sendToTarget();
                         }else{
                             mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                         }
@@ -241,19 +272,47 @@ public class BilliardGroupBasicFragment extends Fragment {
         }
     }
 
+
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch(msg.what){
+                case PublicConstant.USE_CACHE:
+                    List<GroupNoteInfo> tmpList = (List<GroupNoteInfo>) msg.obj;
+                    mList.addAll(tmpList);
+                    break;
                 case PublicConstant.GET_SUCCESS:
                     if(mPullToRefreshListView.isRefreshing())
                         mPullToRefreshListView.onRefreshComplete();
+
                     List<GroupNoteInfo> list = (List<GroupNoteInfo>) msg.obj;
                     for(int i=0;i<list.size();i++){
-                         if (!mList.contains(list.get(i)))
-                                mList.add(list.get(i));
+                        //TODO:UI显示的List，与数据库无关
+                         if (!mList.contains(list.get(i))) {
+                             mList.add(list.get(i));
+                         }
+                        //TODO:数据库里的所有数据都不包含这条数据才插入数据,否则
+                        //TODO:应该更新数据库
+//                        if(!mDBAllList.contains(list.get(i))){
+//                            mInsertList.add(list.get(i));
+//                        }else{
+//                            mUpdateList.add(list.get(i));
+//                        }
+                        if(!YueQiuApp.sGroupDbMap.containsKey(list.get(i).getNoteId())){
+                            mInsertList.add(list.get(i));
+                        }else{
+                            mUpdateList.add(list.get(i));
+                        }
+                        YueQiuApp.sGroupDbMap.put(list.get(i).getNoteId(),list.get(i));
                     }
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            //TODO:更新数据库,放在数据库
+                            updateGroupInfoDB();
+                        }
+                    }).start();
                     if(mList.isEmpty())
                         setEmptyViewVisible();
                     break;
@@ -274,14 +333,44 @@ public class BilliardGroupBasicFragment extends Fragment {
                     }
                     break;
                 case PublicConstant.NO_RESULT:
+                    //TODO:停止下拉刷新
+                    if(mPullToRefreshListView.isRefreshing())
+                        mPullToRefreshListView.onRefreshComplete();
+                    if(mList.isEmpty()) {
+                        setEmptyViewVisible();
+                    }else{
+                        //TODO:加载更多没有获得数据
+                        if(mLoadMore)
+                            Utils.showToast(mActivity, getString(R.string.no_more_info, mEmptyTypeStr));
+                    }
+                    break;
+                case PublicConstant.NO_NETWORK:
+                    if(mPullToRefreshListView.isRefreshing())
+                        mPullToRefreshListView.onRefreshComplete();
+                    Utils.showToast(mActivity,getString(R.string.network_not_available));
+                    if(mList.isEmpty())
+                        setEmptyViewVisible();
                     break;
             }
-
-            mAdapter = new GroupBasicAdapter(mActivity,mList);
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
         }
     };
+
+
+    private void updateGroupInfoDB(){
+        if(!mUpdateList.isEmpty()){
+            mGroupDao.updateGroupInfo(mUpdateList);
+        }
+        if(!mInsertList.isEmpty()){
+            long result = mGroupDao.insertGroupInfo(mInsertList);
+            //TODO:插入失败,即这条note_id数据已经在数据库中存在，则更新数据库
+            //TODO:有错误！！！！
+            if(result == -1){
+                mGroupDao.updateGroupInfo(mInsertList);
+            }
+        }
+    }
 
     private class TimeComparator implements Comparator<GroupNoteInfo>{
 

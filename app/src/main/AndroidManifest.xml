@@ -133,13 +133,7 @@
             android:parentActivityName=".BilliardSearchActivity"
             android:screenOrientation="portrait">
         </activity>
-        <activity
-            android:name=".activity.SearchBilliardRoomActivity"
-            android:label="@string/title_activity_search_billiard_room"
-            android:parentActivityName=".BilliardSearchActivity"
-            android:screenOrientation="portrait">
 
-        </activity>
         <activity
             android:name=".activity.GroupIssueTopic"
             android:label="@string/billiard_group_issue_article"
@@ -148,10 +142,6 @@
 
         <activity
             android:name=".activity.ActivitiesMain"
-            android:screenOrientation="portrait"/>
-
-        <activity
-            android:name=".activity.ChatActivity"
             android:screenOrientation="portrait"/>
 
         <activity
@@ -163,14 +153,11 @@
             android:name=".activity.GroupSelectTopicTypeActivity"
             android:parentActivityName=".activity.GroupIssueTopic"
             android:screenOrientation="portrait"/>
+
         <activity
-            android:name=".activity.ActivitiesMain"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".activity.BilliardGroupDetailActivity"
-            android:parentActivityName=".BilliardGroupActivity"
-            android:screenOrientation="portrait">
-        </activity>
+            android:name=".activity.ChatActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateHidden"/>
         <activity
             android:name=".activity.CheckNumActivity"
 
@@ -187,6 +174,9 @@
                 <data android:scheme="file"/>
             </intent-filter>
         </activity>
+
+        <!--服务组件-->
+        <service android:name=".util.LocationUtil"/>
     </application>
 
 </manifest>

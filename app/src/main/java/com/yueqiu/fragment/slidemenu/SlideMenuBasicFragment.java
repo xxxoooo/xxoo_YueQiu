@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -78,7 +77,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater,  ViewGroup container,  Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.fragment_favor_basic_layout,null);
         mType = getType();
         initView();
@@ -209,6 +208,8 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                 case PublicConstant.NO_NETWORK:
                     Utils.showToast(mActivity,getString(R.string.network_not_available));
                     mPullToRefreshListView.onRefreshComplete();
+                    if(mList.isEmpty())
+                        setEmptyViewVisible();
                     break;
             }
         }

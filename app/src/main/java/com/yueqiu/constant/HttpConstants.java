@@ -288,6 +288,7 @@ public class HttpConstants
         public static final String URL = "/friend/nearby";
 
         //请求参数：位置坐标
+        public static final String USER_ID = "user_id";
         public static final String LAT = "lat";
         public static final String LNG = "lng";
     }
@@ -316,6 +317,58 @@ public class HttpConstants
         public static final String GROUP_ID = "group_id";
     }
 
+    /**
+     * 聊吧中添加好友身份验证下一步
+     * post
+     */
+    public static final class FriendManage
+    {
+        public static final String URL = "/friend/manage";
+
+        public static final String MY_ID = "my_id";
+        public static final String ASK_ID = "ask_id";
+        public static final String GROUP_ID = "group_id";
+        public static final String REMARK = "remark";
+        public static final String TAG = "tag";
+    }
+
+    /**
+     * 聊吧中添加好友身份验证
+     * post
+     */
+    public static final class FriendSendAsk
+    {
+        public static final String URL = "/friend/sendAsk";
+
+        public static final String MY_ID = "my_id";
+        public static final String ASK_ID = "ask_id";
+        public static final String NEWS = "news";
+    }
+
+    /**
+     * 聊吧中处理好友身份验证
+     * post
+     */
+    public static final class AskManage
+    {
+        public static final String URL = "/friend/askManage";
+
+        public static final String ASK_ID = "id";
+        public static final String GROUP_ID = "group_id";
+        public static final String REMARK = "remark";
+        public static final String TAG = "tag";
+    }
+
+    /**
+     * 聊吧中好友申请
+     * post
+     */
+    public static final class GetAsk
+    {
+        public static final String URL = "/friend/getAsk";
+
+        public static final String USER_ID = "user_id";
+    }
 
     /**
      * 活动接口

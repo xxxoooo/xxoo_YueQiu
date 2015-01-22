@@ -27,7 +27,7 @@ public class SearchRoomDaoImpl implements SearchRoomDao
     {
         this.mContext = context;
         this.mDBUtils = DBUtils.getInstance(context);
-        this.mDatabase = mDBUtils.getWritableDatabase();
+
     }
 
     /**
@@ -46,6 +46,7 @@ public class SearchRoomDaoImpl implements SearchRoomDao
         values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.RANGE, roomItem.getDistance());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.DETAILED_ADDRESS, roomItem.getDetailedAddress());
 
+        this.mDatabase = mDBUtils.getWritableDatabase();
         long insertId = mDatabase.insert(
                 DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_TABLE_NAME,
                 null, // null column hack
@@ -92,6 +93,7 @@ public class SearchRoomDaoImpl implements SearchRoomDao
         // TODO: 现在客户端的实现准则是所有的数据都是先从Server端的Service当中检索
         // TODO: 出来，然后存到我们建立的本地数据库当中。然后再从数据库当中进行检索
         // TODO: 这样我们所经过的筛选条件就是完整的SQL语句进行检索了，而不是通过添加请求参数进行检索的
+        this.mDatabase = mDBUtils.getReadableDatabase();
         Cursor cursor = mDatabase.query(
                 DatabaseConstant.FavorInfoItemTable.SearchRoomTable.ROOM_TABLE_NAME,
                 allColumns,

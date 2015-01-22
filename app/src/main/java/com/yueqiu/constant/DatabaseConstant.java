@@ -66,8 +66,8 @@ public class DatabaseConstant
                 " VARCHAR(255), " + DISTRICT + " VARCHAR(255), " + LEVEL + " INTEGER DEFAULT 1, " + BALL_TYPE + " INTEGER DEFAULT 1, " + APPOINT_DATE +
                 " VARCHAR(255), " + BALLARM + " INTEGER DEFAULT 1, " + USERDTYPE + " INTEGER DEFAULT 1, " + BALLAGE + " INTEGER, " + IDOL + " VARCHAR(255), "
                 + IDOL_NAME + " VARCHAR(255), " + NEW_IMG + " VARCHAR(255), " + NEW_IMG_REAL + " VARCHAR(255), " + LOGIN_TIME + " VARCHAR(255)" + ")";
-        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
+        public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
     }
 
@@ -149,8 +149,54 @@ public class DatabaseConstant
         public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
     }
 
-    public final class ActivitiesTable
-    {
+    public final class FriendsTable {
+        public static final String TABLE        = "friends";
+
+        public static final String _ID          = "id";
+
+        public static final String USER_ID      = "user_id";
+
+        public static final String GROUP_ID      = "group_id";
+
+        public static final String IMG_URL    = "img_url";
+
+        public static final String USERNAME     = "username";
+
+        public static final String LAST_MESSAGE = "content";
+
+        public static final String DATETIME     = "create_time";
+
+        public static final String CREATE_SQL   =  "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + USER_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + IMG_URL + " VARCHAR(255), " + LAST_MESSAGE + " VARCHAR(255), "
+                + DATETIME + " VARCHAR(255), " + GROUP_ID + " INTEGER NOT NULL" + ")";
+        public static final String DROP_SQL   = "DROP TABLE IF EXISTS " + TABLE;
+    }
+
+    public final class FriendsApplication {
+        public static final String TABLE        = "application";//好友申请表
+
+        public static final String _ID          = "id";
+
+        public static final String APPLICATION_ID = "application_id";
+
+        public static final String USERNAME     = "username";
+
+        public static final String NICK         = "nick";
+
+        public static final String CREATE_TIME  = "create_time";
+
+        public static final String IMG_URL      = "img_url";
+
+        public static final String IS_AGREE     = "is_agree";
+
+        public static final String CREATE_SQL   = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + APPLICATION_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + IMG_URL + " VARCHAR(255), " + NICK + " VARCHAR(255), "
+                + CREATE_TIME + " VARCHAR(255), " + IS_AGREE + " INTEGER NOT NULL" + ")";
+
+        public static final String DROP_SQL     = "DROP TABLE IF EXISTS " + TABLE;
+    }
+
+    public final class ActivitiesTable {
         public static final String TABLENAME = "activities";
 
         public static final String _ID = "id";
@@ -436,10 +482,14 @@ public class DatabaseConstant
 
         public static final String PRAISE_NUM = "praise_num";
 
+        public static final String TYPE = "type";
+
         public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + NOTE_ID + " INTEGER NOT NULL, " + USER_NAME + " VARCHAR(50), " + SEX + " INTEGER, " + BROWSE_COUNT + " INTEGER, " + ISSUE_TIME
+                + NOTE_ID + " INTEGER NOT NULL, "  + TYPE + " INTEGER, "+ USER_NAME + " VARCHAR(50), " + SEX + " INTEGER, " + BROWSE_COUNT + " INTEGER, " + ISSUE_TIME
                 + " VARCHAR(50), " + TITLE + " VARCHAR(255), " + CONTENT + " TEXT, " + COMMENT_COUNT + " INTEGER, " + IMG_URL + " VARCHAR(255), "
                 + PRAISE_NUM + " INTEGER" + ")";
+        public static final String INSERT_SQL = "INSERT INTO " + TABLE + "(" + NOTE_ID + "," + TYPE + "," + USER_NAME + "," + SEX + "," + BROWSE_COUNT + "," + ISSUE_TIME
+                + "," + TITLE + "," + CONTENT + "," + COMMENT_COUNT + "," + IMG_URL + "," + PRAISE_NUM + ") values(?,?,?,?,?,?,?,?,?,?,?)";
         public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
     }

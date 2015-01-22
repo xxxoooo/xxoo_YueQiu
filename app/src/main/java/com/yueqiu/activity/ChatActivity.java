@@ -46,6 +46,7 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
     private DBUtils mDBUtils;
     private int mFriendUserId;
     private String mUserName;
+    private View mMessageMore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,7 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
         mEditText = $(R.id.chat_container_text_ed);
         mSend = $(R.id.chat_container_send_btn);
         mListView = $(R.id.chat_container_list_item);
+        mMessageMore = $(R.id.chat_container_message_more);
     }
 
     private void setListener() {
@@ -78,11 +80,12 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
         mEditText.setOnFocusChangeListener(this);
         mEditText.setOnClickListener(this);
         mSend.setOnClickListener(this);
+        mMessageMore.setOnClickListener(this);
     }
 
     private void initData() {
         //从本地读取聊天记录
-        mDataArrays = getLocalData(String.valueOf(mFriendUserId));
+//        mDataArrays = getLocalData(String.valueOf(mFriendUserId));
 
         mAdapter = new ChatMsgViewAdapter(this, mDataArrays);
         mListView.setAdapter(mAdapter);
@@ -96,7 +99,7 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
             entity.setMessage(content);
             entity.setComMsg(false);
             //TODO:本地存一份
-            insertLocalData(entity);
+//            insertLocalData(entity);
             mDataArrays.add(entity);
             mAdapter.notifyDataSetChanged();
             mEditText.setText("");
@@ -125,6 +128,9 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
                 break;
             case R.id.chat_container_send_btn:
                 sendMessage();
+                break;
+            case R.id.chat_container_message_more:
+                //查看更多消息
                 break;
             default:
                 break;
@@ -172,39 +178,4 @@ public class ChatActivity extends Activity implements View.OnClickListener, Edit
         return false;
     }
 
-    private ArrayList<ChatMsgEntity> getLocalData(String userId) {
-        mDBUtils = DBUtils.getInstance(this);
-        Log.e("ddd","==>" + DatabaseConstant.ChatMessageTable.CREATE_SQL);
-        ArrayList<ChatMsgEntity> list = new ArrayList<ChatMsgEntity>();
-        SQLiteDatabase db = mDBUtils.getReadableDatabase();
-        String sql = "select * from " + DatabaseConstant.ChatMessageTable.TABLE + " where " + DatabaseConstant.ChatMessageTable.USER_ID + "=?";
-        Cursor cursor = db.rawQuery(sql, new String[]{userId});
-        if (cursor != null && cursor.getCount() != 0) {
-            for (cursor.moveToFirst(); cursor.isAfterLast(); cursor.moveToNext()) {
-                String message = cursor.getString(cursor.getColumnIndex(DatabaseConstant.ChatMessageTable.MESSAGE_CONTENT));
-                String date = cursor.getString(cursor.getColumnIndex(DatabaseConstant.ChatMessageTable.DATETIME));
-                boolean isCome = !"0".equals(cursor.getString(cursor.getColumnIndex(DatabaseConstant.ChatMessageTable.IS_COME)));
-                ChatMsgEntity entity = new ChatMsgEntity(message, date, isCome);
-                list.add(entity);
-            }
-            cursor.close();
-        }
-        return list;
-    }
-
-    private void insertLocalData(ChatMsgEntity data) {
-        mDBUtils = DBUtils.getInstance(this);
-        SQLiteDatabase db = mDBUtils.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-
-        values.put(DatabaseConstant.ChatMessageTable.USER_ID, mFriendUserId);
-        values.put(DatabaseConstant.ChatMessageTable.IMG_URL, "");
-        values.put(DatabaseConstant.ChatMessageTable.USERNAME, mUserName);
-        values.put(DatabaseConstant.ChatMessageTable.MESSAGE_CONTENT, data.getMessage());
-        values.put(DatabaseConstant.ChatMessageTable.DATETIME, "");
-        values.put(DatabaseConstant.ChatMessageTable.IS_COME, data.isComMsg());
-
-        db.insert(DatabaseConstant.ChatMessageTable.TABLE, null, values);
-    }
 }

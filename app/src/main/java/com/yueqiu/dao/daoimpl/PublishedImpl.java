@@ -29,6 +29,7 @@ public class PublishedImpl implements PublishedDao{
     }
     @Override
     public synchronized long insertPublishInfo(PublishedInfo info) {
+
         ContentValues values = new ContentValues();
         values.put(DatabaseConstant.PublishInfoTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
         values.put(DatabaseConstant.PublishInfoTable.TYPE,info.getType());
@@ -37,7 +38,16 @@ public class PublishedImpl implements PublishedDao{
         values.put(DatabaseConstant.PublishInfoTable.COUNT,info.getSumCount());
 
         mDB = mDBUtils.getWritableDatabase();
-        long result = mDB.insert(DatabaseConstant.PublishInfoTable.TABLE, null, values);
+        long result = -1;
+        mDB.beginTransaction();
+        try {
+            result = mDB.insert(DatabaseConstant.PublishInfoTable.TABLE, null, values);
+            mDB.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            mDB.endTransaction();
+        }
         return result;
     }
 
@@ -77,10 +87,18 @@ public class PublishedImpl implements PublishedDao{
         values.put(DatabaseConstant.PublishInfoTable.COUNT,info.getSumCount());
         values.put(DatabaseConstant.PublishInfoTable.TYPE,info.getType());
 
-        long result = mDB.update(DatabaseConstant.PublishInfoTable.TABLE,values, DatabaseConstant.PublishInfoTable.USER_ID + "=? and " +
-                        DatabaseConstant.PublishInfoTable.TYPE + "=?",
-                new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),String.valueOf(info.getType())});
-
+        long result = -1;
+        mDB.beginTransaction();
+        try {
+            result = mDB.update(DatabaseConstant.PublishInfoTable.TABLE, values, DatabaseConstant.PublishInfoTable.USER_ID + "=? and " +
+                            DatabaseConstant.PublishInfoTable.TYPE + "=?",
+                    new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()), String.valueOf(info.getType())});
+            mDB.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            mDB.endTransaction();
+        }
         return result;
     }
 

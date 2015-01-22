@@ -27,7 +27,7 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
     {
         this.mContext = context;
         this.mDBUtils = DBUtils.getInstance(context);
-        this.mDatabase = mDBUtils.getWritableDatabase();
+
 
     }
 
@@ -48,6 +48,7 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
         values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.CLASS, assistCoauchItem.getKinds());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.RANGE, assistCoauchItem.getDistance());
 
+        this.mDatabase = mDBUtils.getWritableDatabase();
         long insertId = mDatabase.insert(
                 DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.ASSISTCOAUCH_TABLE_NAME,
                 null,
@@ -86,7 +87,7 @@ public class SearchAssistCoauchDaoImpl implements SearchAssistCoauchDao
                 DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.RANGE,
                 DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.SEX
         };
-
+        this.mDatabase = mDBUtils.getReadableDatabase();
         Cursor cursor = mDatabase.query(
                 DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.ASSISTCOAUCH_TABLE_NAME,
                 allColumns,

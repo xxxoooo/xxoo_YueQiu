@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
 import android.util.Log;
@@ -70,7 +69,7 @@ public class ActivityBasicFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.activity_activites,null);
         mListData = new ArrayList<Activities>();
         mDao = DaoFactory.getActivities(mActivity);

@@ -54,14 +54,18 @@ public class FriendSetGroupFragment extends Fragment implements View.OnClickList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent intent = new Intent();
-                intent.putExtra(RESULT_KEY, group_id);
-                getActivity().setResult(Activity.RESULT_OK, intent);
-                getActivity().finish();
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void finish(){
+        Intent intent = new Intent();
+        intent.putExtra(RESULT_KEY, group_id);
+        getActivity().setResult(Activity.RESULT_OK, intent);
+        getActivity().finish();
     }
 
     @Override
@@ -72,18 +76,21 @@ public class FriendSetGroupFragment extends Fragment implements View.OnClickList
                 mQiuyouImageView.setVisibility(View.VISIBLE);
                 mAssistCoachImageView.setVisibility(View.GONE);
                 mCoachImageView.setVisibility(View.GONE);
+                finish();
                 break;
             case R.id.friends_group_assist_coach:
                 group_id = 1;
                 mQiuyouImageView.setVisibility(View.GONE);
                 mAssistCoachImageView.setVisibility(View.VISIBLE);
                 mCoachImageView.setVisibility(View.GONE);
+                finish();
                 break;
             case R.id.friends_group_coach:
                 group_id = 2;
                 mQiuyouImageView.setVisibility(View.GONE);
                 mAssistCoachImageView.setVisibility(View.GONE);
                 mCoachImageView.setVisibility(View.VISIBLE);
+                finish();
                 break;
             default:
                 break;

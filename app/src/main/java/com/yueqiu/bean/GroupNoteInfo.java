@@ -9,9 +9,9 @@ public class GroupNoteInfo {
     private int type;
 
     private int noteId;
-    private String userId;
+//    private String userId;
     private String userName;
-    private String sex;
+    private int sex;
     private int browseCount;
     private String issueTime;
     private String title;
@@ -48,13 +48,13 @@ public class GroupNoteInfo {
             this.noteId = noteId;
         }
 
-    public String getUserId() {
-            return userId;
-        }
-
-    public void setUserId(String userId) {
-            this.userId = userId;
-        }
+//    public String getUserId() {
+//            return userId;
+//        }
+//
+//    public void setUserId(String userId) {
+//            this.userId = userId;
+//        }
 
     public String getUserName() {
             return userName;
@@ -64,11 +64,11 @@ public class GroupNoteInfo {
             this.userName = userName;
         }
 
-    public String getSex() {
+    public int getSex() {
             return sex;
         }
 
-    public void setSex(String sex) {
+    public void setSex(int sex) {
             this.sex = sex;
         }
 
@@ -143,5 +143,17 @@ public class GroupNoteInfo {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result  = 37 * result + this.noteId;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "note_id->" + noteId;
     }
 }

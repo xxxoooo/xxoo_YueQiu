@@ -15,6 +15,14 @@ import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.PublishedDao;
 import com.yueqiu.db.DBUtils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -26,11 +34,12 @@ public class YueQiuApp extends Application
 {
 
     public static UserInfo sUserInfo = new UserInfo();
-    public static GroupNoteInfo sGroupInfo = new GroupNoteInfo();
     private SharedPreferences mSharedPreferences;
 
     // 由于Volley的官方推荐构建方式是定义成全局的Singleton模式，用于保存唯一的RequestQueue来加速图片的加载，所以我们在这里创建了全局的Context
     private static Context sAppContext;
+
+    public static Map<Integer,GroupNoteInfo> sGroupDbMap = new LinkedHashMap<Integer, GroupNoteInfo>();
 
     @Override
     public void onCreate()
@@ -46,6 +55,7 @@ public class YueQiuApp extends Application
         sUserInfo.setPhone(mSharedPreferences.getString(DatabaseConstant.UserTable.PHONE, ""));
 
         sAppContext = getApplicationContext();
+
     }
 
     public static Context getAppContext()

@@ -31,7 +31,7 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
     {
         this.mContext = context;
         this.mDBUtils = DBUtils.getInstance(context);
-        this.mDatabase = mDBUtils.getWritableDatabase();
+
     }
 
     /**
@@ -51,6 +51,7 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
         values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.CLASS, coauchItem.getmBilliardKind());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.LEVEL, coauchItem.getUserLevel());
 
+        this.mDatabase = mDBUtils.getWritableDatabase();
         long insertId = mDatabase.insert(
                 DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME,
                 null,
@@ -71,6 +72,7 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
     {
         List<SearchCoauchSubFragmentCoauchBean> coauchList = new ArrayList<SearchCoauchSubFragmentCoauchBean>();
 
+        this.mDatabase = mDBUtils.getReadableDatabase();
         Cursor cursor = mDatabase.query(
                 DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME,
                 allColumns,

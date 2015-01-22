@@ -2,18 +2,22 @@ package com.yueqiu.fragment.chatbar;
 
 import android.app.ActionBar;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -37,8 +41,11 @@ import com.yueqiu.activity.RequestAddFriendActivity;
 import com.yueqiu.bean.SearchPeopleInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONArray;
@@ -49,14 +56,16 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by doushuqi on 14/12/17.
  * 聊吧添加好友Fragment
  */
-public class AddPersonFragment extends Fragment implements LocationListener {
+public class AddPersonFragment extends Fragment {
     private static final String TAG = "AddPersonFragment";
-//    private static final int GET_SUCCESS = 0;
+    //    private static final int GET_SUCCESS = 0;
 //    private static final int GET_FAIL = 1;
     private ActionBar mActionBar;
     private LinearLayout mLinearLayout;
@@ -92,19 +101,54 @@ public class AddPersonFragment extends Fragment implements LocationListener {
         mLinearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //通过坐标查找好友
+                if (!Utils.networkAvaiable(getActivity())) {
+                    Utils.showToast(getActivity(), getString(R.string.network_not_available));
+                    return;
+                }
                 mProgressBar.setVisibility(View.VISIBLE);
-                getLocationInfo();
+                getActivity().startService(new Intent(getActivity(), LocationUtil.class));
             }
         });
-
         return view;
+    }
+
+    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle bundle = intent.getExtras();
+            boolean isTimeout = bundle.getBoolean(LocationUtil.ISTIMEOUT_KEY);
+            if (isTimeout) {
+                mProgressBar.setVisibility(View.GONE);
+            } else {
+                Location location = bundle.getParcelable(LocationUtil.LOCATION_KEY);
+                mLatitude = location.getLatitude();
+                mLongitude = location.getLongitude();
+                Log.d(TAG, "位置信息：latitude = " + mLatitude + " longitude = " + mLongitude);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        searchFriendsByLocation(mLatitude, mLongitude);
+                    }
+                }).start();
+
+            }
+
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(getActivity())
+                .registerReceiver(mBroadcastReceiver, new IntentFilter(LocationUtil.BROADCAST_FILTER));
     }
 
     @Override
     public void onPause() {
         super.onPause();
 //        mLocationManager.removeUpdates(this);
+        LocalBroadcastManager.getInstance(getActivity())
+                .unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
@@ -165,15 +209,15 @@ public class AddPersonFragment extends Fragment implements LocationListener {
                     break;
                 case PublicConstant.NO_RESULT:
                     mProgressBar.setVisibility(View.GONE);
-                    Toast.makeText(getActivity(), "该位置暂无球友！", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), "当前位置暂无球友！", Toast.LENGTH_LONG).show();
                     break;
                 case PublicConstant.TIME_OUT:
                     Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
                     break;
                 case PublicConstant.REQUEST_ERROR:
-                    if(null == msg.obj){
-                        Utils.showToast(getActivity(),getString(R.string.http_request_error));
-                    }else{
+                    if (null == msg.obj) {
+                        Utils.showToast(getActivity(), getString(R.string.http_request_error));
+                    } else {
                         Utils.showToast(getActivity(), (String) msg.obj);
                     }
                     break;
@@ -185,12 +229,13 @@ public class AddPersonFragment extends Fragment implements LocationListener {
 
     private void searchFriendsByLocation(double latitude, double longitude) {
         Map<String, Double> map = new HashMap<String, Double>();
+        map.put(HttpConstants.SearchPeopleByNearby.USER_ID, Double.parseDouble(String.valueOf(YueQiuApp.sUserInfo.getUser_id())));
         map.put(HttpConstants.SearchPeopleByNearby.LAT, latitude);
         map.put(HttpConstants.SearchPeopleByNearby.LNG, longitude);
         String result = HttpUtil.urlClient(HttpConstants.SearchPeopleByNearby.URL, map, HttpConstants.RequestMethod.GET);
         try {
             JSONObject jsonResult = new JSONObject(result);
-            if(!jsonResult.isNull("code")) {
+            if (!jsonResult.isNull("code")) {
                 if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
                     SearchPeopleInfo searchPeople = new SearchPeopleInfo();
 //                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
@@ -205,15 +250,14 @@ public class AddPersonFragment extends Fragment implements LocationListener {
                         searchPeople.mList.add(itemInfo);
                     }
                     mHandler.obtainMessage(PublicConstant.GET_SUCCESS, searchPeople).sendToTarget();
-                } else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                } else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
                     mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                }else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                } else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT) {
                     mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                } else {
+                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, jsonResult.getString("msg")).sendToTarget();
                 }
-                else {
-                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonResult.getString("msg")).sendToTarget();
-                }
-            }else{
+            } else {
                 mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
             }
 
@@ -222,51 +266,6 @@ public class AddPersonFragment extends Fragment implements LocationListener {
         }
     }
 
-    private void getLocationInfo() {
-        mLocationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        /*
-         * TODO:这里逻辑有待确认
-         */
-        if (mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-            return;
-        } else if (mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-
-        } else {
-            Toast.makeText(getActivity(), "请检查GPS和网络是否可用！", Toast.LENGTH_SHORT).show();
-            mProgressBar.setVisibility(View.GONE);
-        }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        mLatitude = location.getLatitude();
-        mLongitude = location.getLongitude();
-        Log.d(TAG, "位置信息：latitude = " + mLatitude + " longitude = " + mLongitude);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                searchFriendsByLocation(mLatitude, mLongitude);
-            }
-        }).start();
-        mLocationManager.removeUpdates(this);//停止定位
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 
     /**
      * 通过关键字查询好友
@@ -275,12 +274,12 @@ public class AddPersonFragment extends Fragment implements LocationListener {
      */
     public void searchFriendsByKeyWords(String keyWords) {
         Map<String, String> map = new HashMap<String, String>();
-        map.put(HttpConstants.SearchPeopleByKeyword.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+        map.put(HttpConstants.SearchPeopleByKeyword.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));//
         map.put(HttpConstants.SearchPeopleByKeyword.KEYWORDS, keyWords);
         String result = HttpUtil.urlClient(HttpConstants.SearchPeopleByKeyword.URL, map, HttpConstants.RequestMethod.GET);
         try {
             JSONObject jsonResult = new JSONObject(result);
-            if(!jsonResult.isNull("code")) {
+            if (!jsonResult.isNull("code")) {
                 if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
                     SearchPeopleInfo searchPeople = new SearchPeopleInfo();
 //                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
@@ -295,14 +294,14 @@ public class AddPersonFragment extends Fragment implements LocationListener {
                         searchPeople.mList.add(itemInfo);
                     }
                     mHandler.obtainMessage(PublicConstant.GET_SUCCESS, searchPeople).sendToTarget();
-                }else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                } else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
                     mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                }else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                } else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT) {
                     mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-                }else{
-                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonResult.getString("msg")).sendToTarget();
+                } else {
+                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, jsonResult.getString("msg")).sendToTarget();
                 }
-            }else{
+            } else {
                 mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
             }
 

@@ -84,7 +84,6 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         setClickListener();
         initData();
 
-
     }
 
     private void initView() {

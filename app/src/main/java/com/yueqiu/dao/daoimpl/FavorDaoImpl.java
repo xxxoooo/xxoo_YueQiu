@@ -37,7 +37,16 @@ public class FavorDaoImpl implements FavorDao {
         values.put(DatabaseConstant.FavorInfoTable.COUNT,info.getCount());
 
         mDB = mDBUtils.getWritableDatabase();
-        long result = mDB.insert(DatabaseConstant.FavorInfoTable.TABLE, null, values);
+        long result = -1;
+        mDB.beginTransaction();
+        try {
+            result = mDB.insert(DatabaseConstant.FavorInfoTable.TABLE, null, values);
+            mDB.setTransactionSuccessful();
+        }catch (Exception e){
+            e.printStackTrace();
+        }finally {
+            mDB.endTransaction();
+        }
         return result;
     }
 
@@ -79,10 +88,18 @@ public class FavorDaoImpl implements FavorDao {
         values.put(DatabaseConstant.FavorInfoTable.COUNT,info.getCount());
         values.put(DatabaseConstant.FavorInfoTable.TYPE,info.getType());
 
-        long result = mDB.update(DatabaseConstant.FavorInfoTable.TABLE,values, DatabaseConstant.FavorInfoTable.USER_ID + "=? and " +
-                        DatabaseConstant.FavorInfoTable.TYPE + "=?",
-                new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()),String.valueOf(info.getType())});
-
+        long result = -1;
+        mDB.beginTransaction();
+        try {
+            result = mDB.update(DatabaseConstant.FavorInfoTable.TABLE, values, DatabaseConstant.FavorInfoTable.USER_ID + "=? and " +
+                            DatabaseConstant.FavorInfoTable.TYPE + "=?",
+                    new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()), String.valueOf(info.getType())});
+            mDB.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            mDB.endTransaction();
+        }
         return result;
     }
 

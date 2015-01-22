@@ -31,7 +31,7 @@ public class SearchMateDaoImpl implements SearchMateDao
         this.mContext = context;
         this.mDBUtils = DBUtils.getInstance(context);
         // 因为我们DAO的作用不仅仅是获取数据，还会涉及到添加数据，所以我们需要得到的是WritableDatabase，而不是ReadableDatabase
-        this.mSQLdatabase = mDBUtils.getWritableDatabase();
+
 
     }
 
@@ -46,6 +46,7 @@ public class SearchMateDaoImpl implements SearchMateDao
         values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DISTRICT, mateItem.getUserDistrict());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.RANGE, mateItem.getUserDistance());
 
+        mSQLdatabase = mDBUtils.getWritableDatabase();
         long insertId = mSQLdatabase.insert(
                 DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE,
                 null,
@@ -81,6 +82,7 @@ public class SearchMateDaoImpl implements SearchMateDao
                 DatabaseConstant.FavorInfoItemTable.SearchMateTable.DISTRICT,
                 DatabaseConstant.FavorInfoItemTable.SearchMateTable.RANGE
         };
+        mSQLdatabase = mDBUtils.getReadableDatabase();
         Cursor cursor = mSQLdatabase.query(
                 DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE, // table 用于查询的表的名字
                 allColumns, // columns 查询之后我们所需要返回的所有的Column的集合

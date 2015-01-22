@@ -26,7 +26,7 @@ public class SearchDatingDaoImpl implements SearchDatingDao
     {
         this.mContext = context;
         this.mDBUtils = DBUtils.getInstance(context);
-        this.mDatabase = mDBUtils.getWritableDatabase();
+
     }
 
     /**
@@ -44,6 +44,7 @@ public class SearchDatingDaoImpl implements SearchDatingDao
         values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.TITLE, datingItem.getUserDeclare());
         values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.RANGE, datingItem.getUserDistance());
 
+        this.mDatabase = mDBUtils.getWritableDatabase();
         long insertId = mDatabase.insert(
                 DatabaseConstant.FavorInfoItemTable.SearchDatingTable.DATING_TABLE_NAME,
                 null,
@@ -73,7 +74,7 @@ public class SearchDatingDaoImpl implements SearchDatingDao
                 DatabaseConstant.FavorInfoItemTable.SearchDatingTable.RANGE
 
         };
-
+        this.mDatabase = mDBUtils.getReadableDatabase();
         Cursor cursor = mDatabase.query(
                 DatabaseConstant.FavorInfoItemTable.SearchDatingTable.DATING_TABLE_NAME,
                 columns,
