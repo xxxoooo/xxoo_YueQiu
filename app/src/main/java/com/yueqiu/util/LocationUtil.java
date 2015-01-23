@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.yueqiu.R;
 
@@ -108,8 +109,6 @@ public class LocationUtil extends Service {
 
     private void initGPS() {
         myLocationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        startAllUpdate();
-        handler.postDelayed(showTime, 1000);
 
         flagGPSEnable = myLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         flagNetworkEnable = myLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -117,12 +116,16 @@ public class LocationUtil extends Service {
         flagNetworkDone = !flagNetworkEnable;
         bestLocation = null;
         counts = 0;
+        startAllUpdate();
+        handler.postDelayed(showTime, 1000);
     }
 
     //Turn on the  GPS NETWORK update
     public void startAllUpdate() {
-        myLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener01);
-        myLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener02);
+        if (flagGPSEnable)
+            myLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mLocationListener01);
+        if (flagNetworkEnable)
+            myLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, mLocationListener02);
     }
 
     //Turn of  GPS NETWORK update
