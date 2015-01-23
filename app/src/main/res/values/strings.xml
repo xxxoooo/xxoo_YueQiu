@@ -362,6 +362,7 @@
     <string name="check_num">验证码</string>
     <string name="phone_num">手机</string>
     <string name="star_meet">球星汇</string>
+    <string name="no_detail_info">没有该活动的详情信息</string>
     <string name="no_business_activity">未获取商家活动信息</string>
     <string name="no_more_type_activity">没有更多<xliff:g id="number" example="15">%1$s</xliff:g>信息了</string>
     <string name="no_more_business_activity">没有更多商家活动信息了</string>
@@ -371,6 +372,7 @@
     <string name="captcha_is_wrong">验证码有误，请重新输入</string>
     <string name="retry_after_seconds">获取验证码失败，请在<xliff:g id="number" example="15">%1$s</xliff:g></string>
     <string name="activity_no_result">抱歉，未获取到<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
+    <string name="sorry_no_info">抱歉，没有获取到详情信息</string>
 
     <!-- 我的资料 -->
     <string name="photo">头像</string>
@@ -420,7 +422,7 @@
     <string name="activities_detail">活动详情</string>
     <string name="activities_collect">收藏</string>
     <string name="activities_share">分享</string>
-    <string name="activities_type">活动类型</string>
+    <string name="activities_type">活动类型:</string>
     <string name="groupactivity">群活动</string>
     <string name="meetstar">球星见面会</string>
     <string name="taiqiuzhan">台球展</string>

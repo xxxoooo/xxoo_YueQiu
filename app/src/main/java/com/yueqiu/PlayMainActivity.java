@@ -1,4 +1,4 @@
-package com.yueqiu.activity;
+package com.yueqiu;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
@@ -17,24 +17,48 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
-import com.yueqiu.ActivitiesActivity;
-import com.yueqiu.R;
-import com.yueqiu.fragment.activities.ActivityBasicFragment;
+import com.yueqiu.activity.PlayBusinessActivity;
+import com.yueqiu.activity.PlayIssueActivity;
+import com.yueqiu.activity.SearchResultActivity;
+import com.yueqiu.bean.PlayIdentity;
+import com.yueqiu.bean.PlayInfo;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.PlayDao;
+import com.yueqiu.fragment.play.PlayBasicFragment;
+import com.yueqiu.util.Utils;
+
+import java.util.List;
 
 
 /**
  * Created by yinfeng on 15/1/12.
  */
-public class ActivitiesMain extends FragmentActivity implements ActionBar.TabListener {
+public class PlayMainActivity extends FragmentActivity implements ActionBar.TabListener {
     private ViewPager mViewPager;
     private String[] mTitles;
     private SectionPagerAdapter mPagerAdapter;
     private ActionBar mActionBar;
-
+    private PlayDao mPlayDao;
+    private List<PlayInfo> mDBAllList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_billiard_group);
+
+        mPlayDao = DaoFactory.getPlay(this);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mDBAllList = mPlayDao.getAllPlayInfo();
+                for(PlayInfo info : mDBAllList){
+                    PlayIdentity identity = new PlayIdentity();
+                    identity.table_id = info.getTable_id();
+                    identity.type = info.getType();
+                    YueQiuApp.sPlayMap.put(identity,info);
+                }
+            }
+        }).start();
+
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
         mTitles = new String[]{getString(R.string.group_activity),
                 getString(R.string.star_meet),
@@ -53,7 +77,7 @@ public class ActivitiesMain extends FragmentActivity implements ActionBar.TabLis
 
         @Override
         public Fragment getItem(int i) {
-            Fragment fragment = new ActivityBasicFragment();
+            Fragment fragment = new PlayBasicFragment();
             Bundle bundle = new Bundle();
             bundle.putInt("type",i+1);
             fragment.setArguments(bundle);
@@ -99,12 +123,18 @@ public class ActivitiesMain extends FragmentActivity implements ActionBar.TabLis
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
             case R.id.menu_activities:
-                startActivity(new Intent(this, ActivitiesActivity.class));
+                startActivity(new Intent(this, PlayBusinessActivity.class));
                 overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
                 break;
             case R.id.menu_issue_activities:
-                startActivity(new Intent(this, ActivitiesIssueActivity.class));
-                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                int user_id = YueQiuApp.sUserInfo.getUser_id();
+                if(user_id < 1) {
+                    Utils.showToast(this,getString(R.string.please_login_first));
+                }else{
+                    startActivity(new Intent(this, PlayIssueActivity.class));
+                    overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                }
+
                 break;
         }
         return true;

@@ -29,13 +29,12 @@ import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.yueqiu.activity.ActivitiesIssueActivity;
-import com.yueqiu.activity.ActivitiesMain;
+import com.yueqiu.activity.FavorActivity;
+import com.yueqiu.activity.PlayIssueActivity;
 import com.yueqiu.activity.FeedbackActivity;
 import com.yueqiu.activity.LoginActivity;
 import com.yueqiu.activity.MyParticipationActivity;
 import com.yueqiu.activity.MyProfileActivity;
-import com.yueqiu.activity.MyfavorCollActivity;
 import com.yueqiu.activity.PublishedInfoActivity;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.SlideViewAdapter;
@@ -145,7 +144,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
                     case R.id.first_title_activity:
-                        mIntent.setClass(BilliardSearchActivity.this, ActivitiesMain.class);
+                        mIntent.setClass(BilliardSearchActivity.this, PlayMainActivity.class);
                         startActivity(mIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
@@ -443,7 +442,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         break;
                     case 3:
                         if(checkUserId()) {
-                            intent.setClass(BilliardSearchActivity.this, MyfavorCollActivity.class);
+                            intent.setClass(BilliardSearchActivity.this, FavorActivity.class);
                             startActivity(intent);
                             overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
                         }else{
@@ -461,7 +460,7 @@ public class BilliardSearchActivity extends FragmentActivity implements ActionBa
                         break;
                     case 5:
                         if(checkUserId()) {
-                            intent.setClass(BilliardSearchActivity.this, ActivitiesIssueActivity.class);
+                            intent.setClass(BilliardSearchActivity.this, PlayIssueActivity.class);
                             startActivity(intent);
                             overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
                         }else{

@@ -190,7 +190,6 @@ public class PublishedFragment extends SlideMenuBasicFragment {
                         identity.user_id = YueQiuApp.sUserInfo.getUser_id();
                         identity.table_id = info.getTable_id();
                         identity.type = info.getType();
-                        Log.d("wy",YueQiuApp.sPublishMap.containsKey(identity) + "");
                         if(!YueQiuApp.sPublishMap.containsKey(identity)){
                             mPublishInsertList.add(info);
                         }else{

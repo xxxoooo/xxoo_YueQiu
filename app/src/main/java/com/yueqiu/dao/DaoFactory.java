@@ -2,7 +2,7 @@ package com.yueqiu.dao;
 
 import android.content.Context;
 
-import com.yueqiu.dao.daoimpl.ActivitiesDaoImpl;
+import com.yueqiu.dao.daoimpl.PlayDaoImpl;
 import com.yueqiu.dao.daoimpl.ApplicationDaoImpl;
 import com.yueqiu.dao.daoimpl.ContactsDaoImpl;
 import com.yueqiu.dao.daoimpl.FavorDaoImpl;
@@ -15,8 +15,8 @@ import com.yueqiu.dao.daoimpl.UserDaoImpl;
  */
 public class DaoFactory {
 
-    public static ActivitiesDao getActivities(Context context) {
-        return new ActivitiesDaoImpl(context);
+    public static PlayDao getPlay(Context context) {
+        return new PlayDaoImpl(context);
     }
 
     public static UserDao getUser(Context context) {
