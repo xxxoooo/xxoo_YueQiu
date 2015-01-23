@@ -173,10 +173,12 @@ public class DatabaseConstant
         public static final String DROP_SQL     = "DROP TABLE IF EXISTS " + TABLE;
     }
 
-    public final class ActivitiesTable {
-        public static final String TABLENAME = "activities";
+    public final class PlayTable {
+        public static final String TABLENAME = "play_info";
 
         public static final String _ID = "id";
+
+        public static final String TABLE_ID = "table_id";
 
         public static final String USERNAME = "username";
 
@@ -205,7 +207,7 @@ public class DatabaseConstant
         public static final String CREATE_TIME = "create_time";
 
         public static final String SQL = "CREATE TABLE IF NOT EXISTS " + TABLENAME + " ( " +
-                _ID + " INTEGERR PRIMARY KEY UNIQUE, " +
+                _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + TABLE_ID + " VARCHAR(50), " +
                 USERNAME + " VARCHAR(50) ," + SEX + " VARCHAR(2)," + IMG_URL + " VARCHAR(100), " + LOOK_NUM + " INTEGER," +
                 TYPE + " VARCHAR(2), " + TITLE + " VARCHAR(50), " + ADDRESS + " VARCHAR(100), " +
                 BEGIN_TIME + " VARCHAR(20), " + END_TIME + " VARCHAR(20)," +

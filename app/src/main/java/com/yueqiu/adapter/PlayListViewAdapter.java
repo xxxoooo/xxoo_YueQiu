@@ -3,7 +3,6 @@ package com.yueqiu.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,28 +12,19 @@ import android.widget.TextView;
 
 
 import com.yueqiu.R;
-import com.yueqiu.bean.Activities;
-import com.yueqiu.bean.ActivitiesList;
+import com.yueqiu.bean.PlayInfo;
 import com.yueqiu.util.HttpUtil;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Created by yinfeng on 14/12/18.
- */
-public class ActivitiesListViewAdapter extends BaseAdapter {
 
-    private ArrayList<Activities> mList;
+public class PlayListViewAdapter extends BaseAdapter {
+
+    private List<PlayInfo> mList;
     private Context mContext;
 
-    public ActivitiesListViewAdapter(ArrayList<Activities> list,Context context)
+    public PlayListViewAdapter(Context context,List<PlayInfo> list)
     {
         this.mList = list;
         this.mContext = context;
@@ -62,7 +52,7 @@ public class ActivitiesListViewAdapter extends BaseAdapter {
         {
 
             holder = new Holder();
-            view = LayoutInflater.from(mContext).inflate(R.layout.activities_listview_item,null);
+            view = LayoutInflater.from(mContext).inflate(R.layout.play_listview_item,null);
             holder.tv_title = (TextView)view.findViewById(R.id.activities_lv_item_tv_title);
             holder.tv_content = (TextView)view.findViewById(R.id.activities_lv_item_tv_activities_time);
             holder.tv_time_day = (TextView)view.findViewById(R.id.activities_lv_item_tv_time_day);

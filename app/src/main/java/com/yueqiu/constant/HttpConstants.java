@@ -17,25 +17,6 @@ public class HttpConstants
         public static final String POST = "POST";
     }
 
-    /*
-    请求公共参数
-     */
-    public static final class PublicConstant
-    {
-        /*
-         * 应用类型
-         * 1、WebApp
-         * 2、Android
-         * 3、IOS
-         */
-        public static final String APP_TYPE = "app_type";
-
-        /*
-         *
-         */
-        public static final String TOKEN = "token";
-    }
-
 
 
     /**
@@ -380,6 +361,14 @@ public class HttpConstants
         public static final String GETLISTEE = "/play/getList";
 
         public static final String GETDETAIL = "/play/deatil";
+
+        public static final String TYPE = "type";
+
+        public static final String ID = "id";
+
+        public static final String START_NO = "start_no";
+
+        public static final String END_NO = "end_no";
     }
 
     /**

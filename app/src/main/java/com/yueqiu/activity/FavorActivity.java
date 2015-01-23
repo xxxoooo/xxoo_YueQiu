@@ -28,7 +28,7 @@ import com.yueqiu.fragment.slidemenu.FavorBasicFragment;
 import java.util.List;
 
 
-public class MyfavorCollActivity extends FragmentActivity implements ActionBar.TabListener{
+public class FavorActivity extends FragmentActivity implements ActionBar.TabListener{
     private ViewPager mViewPager;
     private String[] mTitles;
     private SectionPagerAdapter mPagerAdapter;

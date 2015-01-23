@@ -3,8 +3,8 @@ package com.yueqiu.bean;
 /**
  * Created by yinfeng on 15/1/3.
  */
-public class Activities {
-    private String id;
+public class PlayInfo {
+    private String table_id;
     private String username;
     private String sex;//男1女2
     private String img_url;
@@ -18,12 +18,12 @@ public class Activities {
     private String create_time;
     private int look_num;
 
-    public String getId() {
-        return id;
+    public String getTable_id() {
+        return table_id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setTable_id(String table_id) {
+        this.table_id = table_id;
     }
 
     public String getUsername() {
@@ -123,11 +123,26 @@ public class Activities {
         this.look_num = look_num;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        PlayInfo info = (PlayInfo) o;
+        if(this.table_id.equals(info.getTable_id())){
+            return true;
+        }
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 37 * result + table_id.hashCode();
+        return result;
+    }
 
     @Override
     public String toString() {
         return "Activities{" +
-                "id='" + id + '\'' +
+                "id='" + table_id + '\'' +
                 ", username='" + username + '\'' +
                 ", sex='" + sex + '\'' +
                 ", img_url='" + img_url + '\'' +

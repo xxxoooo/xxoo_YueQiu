@@ -29,7 +29,7 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.ChatMessageTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.FriendsTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.FriendsApplication.CREATE_SQL);
-        db.execSQL(DatabaseConstant.ActivitiesTable.SQL);
+        db.execSQL(DatabaseConstant.PlayTable.SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
         db.execSQL(DatabaseConstant.FavorInfoItemTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.GroupInfo.CREATE_SQL);
@@ -48,7 +48,7 @@ public class DBUtils extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(DatabaseConstant.UserTable.DROP_SQL);
         db.execSQL(DatabaseConstant.PublishInfoTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.ActivitiesTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.PlayTable.DROP_SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
         db.execSQL(DatabaseConstant.ChatMessageTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FriendsTable.DROP_SQL);

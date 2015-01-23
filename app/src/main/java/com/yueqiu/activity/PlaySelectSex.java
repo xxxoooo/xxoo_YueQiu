@@ -17,7 +17,7 @@ import com.yueqiu.constant.HttpConstants;
 /**
  * Created by yinfeng on 15/1/3.
  */
-public class ActivitySelectSex extends Activity implements View.OnClickListener{
+public class PlaySelectSex extends Activity implements View.OnClickListener{
     private static final String TAG = "ActivitySelectSex";
     private RelativeLayout mMan;
     private RelativeLayout mWoman;

@@ -100,13 +100,12 @@ public class BilliardGroupBasicFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //mDBAllList = mGroupDao.getAllGroupInfo();
 
                 //TODO:缓存的list，
                 if(mGroupType == PublicConstant.GROUP_ALL) {
-                    mDBList = mGroupDao.getAllGroupInfoLimit(mStart_no, mEnd_no + 1);
+                    mDBList = mGroupDao.getAllGroupInfoLimit(mStart_no, 10);
                 }else{
-                    mDBList = mGroupDao.getGroupInfoByType(mGroupType,mStart_no,mEnd_no + 1);
+                    mDBList = mGroupDao.getGroupInfoByType(mGroupType,mStart_no,10);
                 }
                 if(!mDBList.isEmpty()){
                     mHandler.obtainMessage(PublicConstant.USE_CACHE,mDBList).sendToTarget();
@@ -270,7 +269,7 @@ public class BilliardGroupBasicFragment extends Fragment {
                     }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
                         mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                     }else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonObject.getString("msg")).sendToTarget();
                     }
                 } else {
                     mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
@@ -351,8 +350,6 @@ public class BilliardGroupBasicFragment extends Fragment {
                             updateGroupInfoDB();
                         }
                     }).start();
-
-
 
                     break;
                 case PublicConstant.TIME_OUT:

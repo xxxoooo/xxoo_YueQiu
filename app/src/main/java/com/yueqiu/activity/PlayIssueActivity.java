@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,7 +24,6 @@ import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 
-import com.yueqiu.bean.Activities;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.HttpUtil;
@@ -40,7 +38,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ActivitiesIssueActivity extends FragmentActivity implements View.OnClickListener,DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
+public class PlayIssueActivity extends FragmentActivity implements View.OnClickListener,DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
 
     public static final String DATEPICKER_TAG = "datepicker";
     public static final String TIMEPICKER_TAG = "timepicker";
@@ -72,7 +70,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
             switch (msg.what)
             {
                 case PublicConstant.GET_SUCCESS:
-                    Toast.makeText(ActivitiesIssueActivity.this,
+                    Toast.makeText(PlayIssueActivity.this,
                             getString(R.string.activity_submit_success),Toast.LENGTH_SHORT).show();
                     mPreProgress.setVisibility(View.GONE);
                     mPreTextView.setVisibility(View.GONE);
@@ -80,13 +78,13 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                     break;
                 case PublicConstant.REQUEST_ERROR:
-                    Toast.makeText(ActivitiesIssueActivity.this,
+                    Toast.makeText(PlayIssueActivity.this,
                             getString(R.string.activity_submit_failed), Toast.LENGTH_LONG).show();
                     mPreProgress.setVisibility(View.GONE);
                     mPreTextView.setVisibility(View.GONE);
                     break;
                 case PublicConstant.TIME_OUT:
-                    Toast.makeText(ActivitiesIssueActivity.this,
+                    Toast.makeText(PlayIssueActivity.this,
                             getString(R.string.http_request_time_out), Toast.LENGTH_LONG).show();
                     mPreProgress.setVisibility(View.GONE);
                     mPreTextView.setVisibility(View.GONE);
@@ -97,7 +95,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
     };
 
 
-    public ActivitiesIssueActivity() {
+    public PlayIssueActivity() {
     }
 
     @Override
@@ -168,7 +166,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
                 break;
             case R.id.issue_activity:
                 final Map<String, Object> requests = getActivityInfo();
-                if(Utils.networkAvaiable(ActivitiesIssueActivity.this)) {
+                if(Utils.networkAvaiable(PlayIssueActivity.this)) {
                     mPreProgress.setVisibility(View.VISIBLE);
                     mPreTextView.setVisibility(View.VISIBLE);
                     new Thread() {
@@ -200,7 +198,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
                         }
                     }.start();
                 }else{
-                    Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.network_not_available),Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PlayIssueActivity.this,getString(R.string.network_not_available),Toast.LENGTH_SHORT).show();
                 }
 
                 break;
@@ -225,7 +223,7 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
                 break;
             case R.id.activitie_title_edit_type:
                 Intent intentType = new Intent();
-                intentType.setClass(this,ActivitySelectType.class);
+                intentType.setClass(this,PlaySelectType.class);
                 intentType.putExtra("type",getType(mEtActivityType.getText().toString().trim()));
                 startActivityForResult(intentType, SELECT_TYPE);
                 overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
@@ -274,22 +272,22 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         map.put("user_id",YueQiuApp.sUserInfo.getUser_id());
         if(mType == 0)
         {
-            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.please_write_type),Toast.LENGTH_SHORT).show();
+            Toast.makeText(PlayIssueActivity.this,getString(R.string.please_write_type),Toast.LENGTH_SHORT).show();
             return null;
         }
         map.put("type",mType);
         String title = mTitleEdit.getText().toString().trim();
         if(title.equals(""))
         {
-            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_title_cannot_empty),Toast.LENGTH_SHORT).show();
+            Toast.makeText(PlayIssueActivity.this,getString(R.string.activity_title_cannot_empty),Toast.LENGTH_SHORT).show();
             return null;
         }
         if(title.length() < 4){
-            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_title_length_less),Toast.LENGTH_SHORT).show();
+            Toast.makeText(PlayIssueActivity.this,getString(R.string.activity_title_length_less),Toast.LENGTH_SHORT).show();
             return null;
         }
         if(title.length() > 30){
-            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_title_length_more),Toast.LENGTH_SHORT).show();
+            Toast.makeText(PlayIssueActivity.this,getString(R.string.activity_title_length_more),Toast.LENGTH_SHORT).show();
             return null;
         }
         map.put("title", title);
@@ -298,20 +296,20 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
         String beginTime = mStartTimeTv.getText().toString().trim();
         if(beginTime.equals(""))
         {
-            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_start_time_cannot_empty),Toast.LENGTH_SHORT).show();
+            Toast.makeText(PlayIssueActivity.this,getString(R.string.activity_start_time_cannot_empty),Toast.LENGTH_SHORT).show();
             return null;
         }
         map.put("begin_time",beginTime);
         String datetime = mEndTimeTv.getText().toString().trim();
         if(datetime.equals(""))
         {
-            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_end_time_cannot_empty),Toast.LENGTH_SHORT).show();
+            Toast.makeText(PlayIssueActivity.this,getString(R.string.activity_end_time_cannot_empty),Toast.LENGTH_SHORT).show();
             return null;
         }
         try {
             if(Utils.stringToLong(beginTime,"yyyy-MM-dd HH-mm") > Utils.stringToLong(datetime,"yyyy-MM-dd HH-mm")){
 
-                Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_start_cannot_more_than_end),Toast.LENGTH_SHORT).show();
+                Toast.makeText(PlayIssueActivity.this,getString(R.string.activity_start_cannot_more_than_end),Toast.LENGTH_SHORT).show();
                 return null;
             }
         } catch (ParseException e) {
@@ -321,14 +319,14 @@ public class ActivitiesIssueActivity extends FragmentActivity implements View.On
 
         if(mModel == 0)
         {
-            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.activity_charge_module_cannot_empty),Toast.LENGTH_SHORT).show();
+            Toast.makeText(PlayIssueActivity.this,getString(R.string.activity_charge_module_cannot_empty),Toast.LENGTH_SHORT).show();
             return null;
         }
         map.put("model", mModel);
         String content = mIllustrationEdit.getText().toString();
         if(content.equals(""))
         {
-            Toast.makeText(ActivitiesIssueActivity.this,getString(R.string.please_write_content),Toast.LENGTH_SHORT).show();
+            Toast.makeText(PlayIssueActivity.this,getString(R.string.please_write_content),Toast.LENGTH_SHORT).show();
             return null;
         }
         map.put("content", content);

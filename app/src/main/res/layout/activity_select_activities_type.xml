@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <RelativeLayout
-        android:id="@+id/activity_type00"
+        android:id="@+id/play_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.8"
@@ -19,7 +19,7 @@
             android:textSize="18sp" />
         <ImageView
             android:visibility="gone"
-            android:id="@+id/iv_activity_select_type_00"
+            android:id="@+id/play_group_iv"
             android:layout_width="wrap_content"
             android:src="@drawable/choose"
             android:layout_alignParentRight="true"
@@ -33,7 +33,7 @@
         android:background="@color/devide_line" />
 
     <RelativeLayout
-        android:id="@+id/activity_type01"
+        android:id="@+id/play_meet_star"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.8"
@@ -46,7 +46,7 @@
             android:textSize="18sp" />
         <ImageView
             android:visibility="gone"
-            android:id="@+id/iv_activity_select_type_01"
+            android:id="@+id/play_meet_star_iv"
             android:layout_width="wrap_content"
             android:src="@drawable/choose"
             android:layout_alignParentRight="true"
@@ -60,7 +60,7 @@
         android:background="@color/devide_line" />
 
     <RelativeLayout
-        android:id="@+id/activity_type02"
+        android:id="@+id/play_billiard_show"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.8"
@@ -74,7 +74,7 @@
             android:textSize="18sp" />
         <ImageView
             android:visibility="gone"
-            android:id="@+id/iv_activity_select_type_02"
+            android:id="@+id/play_billiard_show_iv"
             android:layout_width="wrap_content"
             android:src="@drawable/choose"
             android:layout_alignParentRight="true"
@@ -88,7 +88,7 @@
         android:background="@color/devide_line" />
 
     <RelativeLayout
-        android:id="@+id/activity_type03"
+        android:id="@+id/play_competition"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.8"
@@ -101,7 +101,7 @@
             android:textSize="18sp" />
         <ImageView
             android:visibility="gone"
-            android:id="@+id/iv_activity_select_type_03"
+            android:id="@+id/play_competition_iv"
             android:layout_width="wrap_content"
             android:src="@drawable/choose"
             android:layout_alignParentRight="true"
@@ -115,7 +115,7 @@
         android:background="@color/devide_line" />
 
     <RelativeLayout
-        android:id="@+id/activity_type04"
+        android:id="@+id/play_other"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.8"
@@ -128,7 +128,7 @@
             android:textSize="18sp" />
         <ImageView
             android:visibility="gone"
-            android:id="@+id/iv_activity_select_type_04"
+            android:id="@+id/play_other_iv"
             android:layout_width="wrap_content"
             android:src="@drawable/choose"
             android:layout_alignParentRight="true"

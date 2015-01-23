@@ -26,11 +26,12 @@ public class PublicConstant {
     public static final int FAVOR_ACTIVITY_TYPE     = 3;
     public static final int FAVOR_GROUP_TYPR        = 4;
 
-    public static final int GROUP_ACTIVITY          = 1;
-    public static final int MEET_STAR               = 2;
-    public static final int BILLIARD_SHOW           = 3;
-    public static final int COMPETITION             = 4;
-    public static final int OTHER_ACTIVITY          = 5;
+    public static final int PLAY_GROUP              = 1;
+    public static final int PLAY_MEET_STAR          = 2;
+    public static final int PLAY_BILLIARD_SHOW      = 3;
+    public static final int PLAY_COMPETITION        = 4;
+    public static final int PLAY_OTHER_ACTIVITY     = 5;
+    public static final int PLAY_BUSSINESS          = 6;
 
     public static final int GROUP_ALL               = 0;
     public static final int GROUP_GET_MASTER        = 1;
