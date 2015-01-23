@@ -193,26 +193,27 @@ public class ContactFragment extends Fragment {
                             contactsList.mList.add(contacts);
                             maps.put(i, contactsList.mList);
                         }
-                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, maps).sendToTarget();
-                        }//http请求超时
-                        else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
-                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                        }//无数据，json中的code值为1005
-                        else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT) {
-                            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-                        } else {
-                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, jsonResult.getString("msg")).sendToTarget();
-                        }
+                        mHandler.obtainMessage(PublicConstant.GET_SUCCESS, maps).sendToTarget();
+                    }//http请求超时
+                    else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                    }//无数据，json中的code值为1005
+                    else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT) {
+                        mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                     } else {
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, jsonResult.getString("msg")).sendToTarget();
                     }
-                }catch(JSONException e){
-                    Log.e(TAG, "JSONException: " + e);
+                } else {
+                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                 }
+            } catch (JSONException e) {
+                Log.e(TAG, "JSONException: " + e);
+            }
 
 
         }
     }
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {

@@ -3,41 +3,40 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.EditText;
-import android.widget.Toast;
 
 import com.yueqiu.R;
-import com.yueqiu.fragment.myprofilesetup.BallTypeSetupFragment;
-import com.yueqiu.fragment.myprofilesetup.BilliardsCueSetupFragment;
-import com.yueqiu.fragment.myprofilesetup.CuehabitsSetupFragment;
-import com.yueqiu.fragment.myprofilesetup.IdolSetupFragment;
-import com.yueqiu.fragment.myprofilesetup.LevelSetupFragment;
-import com.yueqiu.fragment.myprofilesetup.NickNameSetupFragment;
+import com.yueqiu.YueQiuApp;
+import com.yueqiu.bean.UserInfo;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.UserDao;
+import com.yueqiu.fragment.myprofilesetup.MyProfileRadioSetupFragment;
+import com.yueqiu.fragment.myprofilesetup.MyProfileSetupListener;
+import com.yueqiu.fragment.myprofilesetup.MyProfileTextSetupFragment;
 import com.yueqiu.fragment.myprofilesetup.PhotoSetupFragment;
-import com.yueqiu.fragment.myprofilesetup.PlayAgeSetupFragment;
-import com.yueqiu.fragment.myprofilesetup.RegionSetupFragment;
-import com.yueqiu.fragment.myprofilesetup.SignSetupFragment;
-import com.yueqiu.fragment.myprofilesetup.TheNewestPostSetupFragment;
 import com.yueqiu.util.Utils;
 
 /**
  * Created by doushuqi on 15/1/4.
  */
-public class ProfileSetupActivity extends SingleFragmentActivity {
+public class ProfileSetupActivity extends SingleFragmentActivity implements MyProfileSetupListener {
 
     private static final String TAG = "ProfileSetupActivity";
     public static final String KEY_ARGUMENT = "com.yueqiu.profilesetupactivity.key";
     private ActionBar mActionBar;
-
+    private String mSetupContent;
+    private UserInfo mUserInfo;
+    private UserDao mUserDao = DaoFactory.getUser(this);
 
     @Override
     public Fragment createFragment() {
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         int id = getIntent().getIntExtra(MyProfileActivity.EXTRA_FRAGMENT_ID, -1);
+        mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
         return getCreateFragment(id);
     }
 
@@ -64,11 +63,10 @@ public class ProfileSetupActivity extends SingleFragmentActivity {
                 .findFragmentById(R.id.fragment_container);
         if (fragment instanceof PhotoSetupFragment)
             return;//TODO:上传头像 need to develop
-        String str = ((EditText) fragment.getView()
-                .findViewById(R.id.my_profile_setup_text)).getText().toString();
-        intent.putExtra(MyProfileActivity.EXTRA_RESULT_ID, str);
+//        String str = ((EditText) fragment.getView()
+//                .findViewById(R.id.my_profile_setup_text)).getText().toString();
+        intent.putExtra(MyProfileActivity.EXTRA_RESULT_ID, mSetupContent);
         setResult(Activity.RESULT_OK, intent);
-        Toast.makeText(this, "更新资料！" + str, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -91,37 +89,61 @@ public class ProfileSetupActivity extends SingleFragmentActivity {
 //                mActionBar.setTitle(R.string.gender);
                 return null;
             case 3:
-                mActionBar.setTitle(R.string.nick_name);
-                return new NickNameSetupFragment();
+                String nick = getString(R.string.nick_name);
+                mActionBar.setTitle(nick);
+                return new MyProfileTextSetupFragment(nick);
             case 4:
-                mActionBar.setTitle(R.string.region);
-                return new RegionSetupFragment();
+                String region = getString(R.string.region);
+                mActionBar.setTitle(region);
+                return new MyProfileTextSetupFragment(region);
             case 5:
                 mActionBar.setTitle(R.string.level);
-                return new LevelSetupFragment();
+                return new MyProfileRadioSetupFragment(new String[]{
+                        getString(R.string.level_base),
+                        getString(R.string.level_middle),
+                        getString(R.string.level_master)
+                }, mUserInfo.getLevel());
             case 6:
                 mActionBar.setTitle(R.string.ball_type);
-                return new BallTypeSetupFragment();
+                return new MyProfileRadioSetupFragment(new String[]{
+                        getString(R.string.ball_type_1),
+                        getString(R.string.ball_type_2),
+                        getString(R.string.ball_type_3)
+                }, mUserInfo.getBall_type());
             case 7:
                 mActionBar.setTitle(R.string.billiards_cue);
-                return new BilliardsCueSetupFragment();
+                return new MyProfileRadioSetupFragment(new String[]{
+                        getString(R.string.cue_1),
+                        getString(R.string.cue_2)
+                }, mUserInfo.getBallArm());
             case 8:
                 mActionBar.setTitle(R.string.cue_habits);
-                return new CuehabitsSetupFragment();
+                return new MyProfileRadioSetupFragment(new String[]{
+                        getString(R.string.habit_1),
+                        getString(R.string.habit_2),
+                        getString(R.string.habit_3)
+                }, mUserInfo.getUsedType());
             case 9:
-                mActionBar.setTitle(R.string.play_age);
-                return new PlayAgeSetupFragment();
+                String playAge = getString(R.string.play_age);
+                mActionBar.setTitle(playAge);
+                return new MyProfileTextSetupFragment(playAge);
             case 10:
-                mActionBar.setTitle(R.string.idol);
-                return new IdolSetupFragment();
+                String idol = getString(R.string.idol);
+                mActionBar.setTitle(idol);
+                return new MyProfileTextSetupFragment(idol);
             case 11:
-                mActionBar.setTitle(R.string.sign);
-                return new SignSetupFragment();
+                String sign = getString(R.string.sign);
+                mActionBar.setTitle(sign);
+                return new MyProfileTextSetupFragment(sign);
             case 12:
-                mActionBar.setTitle(R.string.the_new_post);
-                return new TheNewestPostSetupFragment();
+                return null;
             default:
                 return null;
         }
+    }
+
+    @Override
+    public void setOnSetupListener(String str) {
+        mSetupContent = str;
     }
 }

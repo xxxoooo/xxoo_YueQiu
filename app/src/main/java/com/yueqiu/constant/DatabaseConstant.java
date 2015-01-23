@@ -164,6 +164,8 @@ public class DatabaseConstant
 
         public static final String IS_AGREE     = "is_agree";
 
+        public static final String IS_CLEAR     = "is_clear";
+
         public static final String CREATE_SQL   = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + APPLICATION_ID + " INTEGER NOT NULL, " + USERNAME + " VARCHAR(255) NOT NULL, " + IMG_URL + " VARCHAR(255), " + NICK + " VARCHAR(255), "
                 + CREATE_TIME + " VARCHAR(255), " + IS_AGREE + " INTEGER NOT NULL" + ")";

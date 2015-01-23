@@ -140,7 +140,7 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="女"
+                            android:text="未知"
                             android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 

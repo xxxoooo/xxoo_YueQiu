@@ -130,7 +130,6 @@ public class AddPersonFragment extends Fragment {
                         searchFriendsByLocation(mLatitude, mLongitude);
                     }
                 }).start();
-
             }
 
         }
@@ -262,7 +261,14 @@ public class AddPersonFragment extends Fragment {
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mProgressBar.setVisibility(View.GONE);
+                    Utils.showToast(getActivity(), getString(R.string.no_data));
+                }
+            }, 100);
+            Log.e(TAG, "JSONException>>" + e.toString());
         }
     }
 

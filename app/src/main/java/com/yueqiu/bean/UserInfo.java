@@ -8,7 +8,7 @@ import org.json.JSONObject;
  * 用户基本信息实体类
  * Created by yinfeng on 14/12/23.
  */
-public class UserInfo  {
+public class UserInfo {
     private int id;
     private String img_url;//头像在网络中的地址
     private String img_real;//头像在本地的地址
