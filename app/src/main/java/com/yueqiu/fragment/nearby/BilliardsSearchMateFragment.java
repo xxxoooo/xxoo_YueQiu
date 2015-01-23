@@ -143,6 +143,12 @@ public class BilliardsSearchMateFragment extends Fragment
 
         // TODO: 以下加载是测试数据，暂时不能删除(因为现在的数据不完整，我们还需要这些测试数据来查看数据加载完整的具体的具体的UI效果)
 //        initListViewDataSrc();
+
+        // TODO: 暂时定于在这里进行Adapter的更新操作
+        sMateListAdapter = new SearchMateSubFragmentListAdapter(sContext, (ArrayList<SearchMateSubFragmentUserBean>) sUserList);
+        sSubFragmentList.setAdapter(sMateListAdapter);
+        sMateListAdapter.notifyDataSetChanged();
+
         return mView;
     }
 
@@ -157,16 +163,10 @@ public class BilliardsSearchMateFragment extends Fragment
     {
         super.onResume();
 
-//        if (sWorker != null && sWorker.getState() == Thread.State.NEW) {
-//            Log.d(TAG, " the sWorker has started ");
-//            sWorker.start();
-//        }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                retrieveInitialMateInfoList(0,9,"","");
-            }
-        }).start();
+        if (sWorker != null && sWorker.getState() == Thread.State.NEW) {
+            Log.d(TAG, " the sWorker has started ");
+            sWorker.start();
+        }
     }
 
     @Override
@@ -504,9 +504,6 @@ public class BilliardsSearchMateFragment extends Fragment
                     break;
             }
 
-            sMateListAdapter = new SearchMateSubFragmentListAdapter(sContext, (ArrayList<SearchMateSubFragmentUserBean>) sUserList);
-            sSubFragmentList.setAdapter(sMateListAdapter);
-            sMateListAdapter.notifyDataSetChanged();
         }
     };
 
@@ -701,7 +698,8 @@ public class BilliardsSearchMateFragment extends Fragment
             Log.d(TAG, " the user has touched the end of the current list in the BilliardsSearchMateFragment ");
             String label = SubFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-            sUIEventsHandler.postDelayed(new Runnable()
+
+            new Thread(new Runnable()
             {
                 @Override
                 public void run()
@@ -742,7 +740,7 @@ public class BilliardsSearchMateFragment extends Fragment
                         }
                     }
                 }
-            }, 1000);
+            }).start();
 
         }
     };

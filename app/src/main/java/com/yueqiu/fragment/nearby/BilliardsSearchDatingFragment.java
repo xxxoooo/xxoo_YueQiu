@@ -141,6 +141,27 @@ public class BilliardsSearchDatingFragment extends Fragment
 
         // TODO: 以下加载的是测试数据，我们以后需要移除, 但是目前还不能移除，只是暂时注释掉，用于展示完整的UI效果
 //        initTestData();
+
+        // TODO: 我们仍然需要进一步的测试，来确定Adapter的最终正确的加载的位置
+        sDatingListAdapter = new SearchDatingSubFragmentListAdapter(sContext, (ArrayList<SearchDatingSubFragmentDatingBean>) sDatingList);
+        sDatingListView.setAdapter(sDatingListAdapter);
+        sDatingListAdapter.notifyDataSetChanged();
+        sDatingListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+            {
+                SearchDatingSubFragmentDatingBean bean = sDatingList.get(position);
+                Bundle args = new Bundle();
+                args.putString(SubFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO, bean.getUserPhoto());
+
+
+                Intent intent = new Intent(sContext, SearchBilliardsDatingActivity.class);
+                intent.putExtra(SubFragmentsCommonUtils.KEY_BUNDLE_SEARCH_DATING_FRAGMENT, args);
+                sContext.startActivity(intent);
+            }
+        });
+
         return mView;
     }
 
@@ -493,24 +514,7 @@ public class BilliardsSearchDatingFragment extends Fragment
 
                     break;
             }
-            sDatingListAdapter = new SearchDatingSubFragmentListAdapter(sContext, (ArrayList<SearchDatingSubFragmentDatingBean>) sDatingList);
-            sDatingListView.setAdapter(sDatingListAdapter);
-            sDatingListAdapter.notifyDataSetChanged();
-            sDatingListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-            {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-                {
-                    SearchDatingSubFragmentDatingBean bean = sDatingList.get(position);
-                    Bundle args = new Bundle();
-                    args.putString(SubFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO, bean.getUserPhoto());
 
-
-                    Intent intent = new Intent(sContext, SearchBilliardsDatingActivity.class);
-                    intent.putExtra(SubFragmentsCommonUtils.KEY_BUNDLE_SEARCH_DATING_FRAGMENT, args);
-                    sContext.startActivity(intent);
-                }
-            });
 
         }
     };

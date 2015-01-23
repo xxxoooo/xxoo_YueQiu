@@ -682,6 +682,10 @@ public class BilliardsSearchRoomFragment extends Fragment
                     break;
             }
 
+            // TODO: 需要注意的是，这里对Adapter进行初始化以及加载和更新通知操作，
+            // TODO: 是一个未知的操作，因为这个策略在其他的四个Fragment当中都被证实是错误的，或者说至少是
+            // TODO: 无法正常的将数据加载到当前的ListView当中，但是这里的却可以，我们暂时还没有找到
+            // TODO: 更准确的原因来描述
             sSearchRoomAdapter = new SearchRoomSubFragmentListAdapter(sContext, (ArrayList<SearchRoomSubFragmentRoomBean>) sRoomList);
             sRoomListView.setAdapter(sSearchRoomAdapter);
             sSearchRoomAdapter.notifyDataSetChanged();

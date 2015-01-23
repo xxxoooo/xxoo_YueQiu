@@ -137,6 +137,13 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
         // TODO: 以下加载的是测试数据,但是我们目前还不能删除这个方法，因为我们还需要这些测试数据来查看整体的UI加载效果
 //        initTestData();
 
+        // TODO: 还是那句话，将Adapter存放到这里只是暂时的处理策略，我们还不确定最终的策略
+        // TODO: 参考 Chris Banes的Philms程序，那个程序提供了一些最佳实践的策略，而且是一个完整的程序
+        sAssistCoauchListAdapter = new SearchAssistCoauchSubFragmentListAdapter(sContext, (ArrayList<SearchAssistCoauchSubFragmentBean>) sAssistCoauchList);
+        sListView.setAdapter(sAssistCoauchListAdapter);
+        sAssistCoauchListAdapter.notifyDataSetChanged();
+
+
         return mView;
     }
 
@@ -328,7 +335,7 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
         if (!sNetworkAvailable) {
             Message failMsg = sUIEventsHandler.obtainMessage(STATE_FETCH_DATA_FAILED);
             Bundle data = new Bundle();
-            data.putString(KEY_DATA_FETCH_FAILED_INFO, sContext.getResources().getString(R.string.network_unavailable_hint_info_str));
+            data.putString(KEY_DATA_FETCH_FAILED_INFO, sContext.getResources().getString(R.string.network_not_available));
             failMsg.setData(data);
             sUIEventsHandler.sendMessage(failMsg);
 
@@ -559,9 +566,7 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
                     }
                     break;
             }
-            sAssistCoauchListAdapter = new SearchAssistCoauchSubFragmentListAdapter(sContext, (ArrayList<SearchAssistCoauchSubFragmentBean>) sAssistCoauchList);
-            sListView.setAdapter(sAssistCoauchListAdapter);
-            sAssistCoauchListAdapter.notifyDataSetChanged();
+
         }
     };
 

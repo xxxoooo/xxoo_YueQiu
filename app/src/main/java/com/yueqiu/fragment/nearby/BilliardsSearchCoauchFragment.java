@@ -138,6 +138,11 @@ public class BilliardsSearchCoauchFragment extends Fragment
         // TODO: 这里加载的是测试数据,暂时还不能删除这个方法，因为我们还要查看总的UI加载效果
 //        initListViewTestData();
 
+        // TODO: 现阶段我们也不能完全确定Adapter的通知和更新放在onCreateView当中是完全正确的，我们仍然需要进一步的确定
+        sCoauchListAdapter = new SearchCoauchSubFragmentListAdapter(sContext, (ArrayList<SearchCoauchSubFragmentCoauchBean>) sCoauchList);
+        Log.d(TAG, " the source list content are : " + sCoauchList.size());
+        sCoauchListView.setAdapter(sCoauchListAdapter);
+        sCoauchListAdapter.notifyDataSetChanged();
 
 
         return mView;
@@ -473,10 +478,7 @@ public class BilliardsSearchCoauchFragment extends Fragment
 
                     break;
             }
-            sCoauchListAdapter = new SearchCoauchSubFragmentListAdapter(sContext, (ArrayList<SearchCoauchSubFragmentCoauchBean>) sCoauchList);
-            Log.d(TAG, " the source list content are : " + sCoauchList.size());
-            sCoauchListView.setAdapter(sCoauchListAdapter);
-            sCoauchListAdapter.notifyDataSetChanged();
+
         }
     };
 
@@ -610,7 +612,7 @@ public class BilliardsSearchCoauchFragment extends Fragment
             String label = SubFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
-            sUIEventsHandler.postDelayed(new Runnable()
+            new Thread(new Runnable()
             {
                 @Override
                 public void run()
@@ -625,15 +627,22 @@ public class BilliardsSearchCoauchFragment extends Fragment
                         mEndNum += 10;
                     }
 
-                    if (Utils.networkAvaiable(sContext)) {
+                    if (Utils.networkAvaiable(sContext))
+                    {
+
                         retrieveInitialCoauchInfo(mStartNum, mEndNum);
-                    } else {
+                        // TODO: 我们在这里更新完数据之后，就需要通知Adapter数据已经
+                        // TODO: 已经发生了改变
+
+                    } else
+                    {
                         // TODO: 我们需要从本地的数据库当中进行检索
 
 
                     }
                 }
-            }, 1000);
+            }).start();
+
 
         }
     };
