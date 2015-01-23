@@ -132,7 +132,7 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
                     Utils.showToast(this,getString(R.string.please_login_first));
                 }else{
                     startActivity(new Intent(this, PlayIssueActivity.class));
-                    overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                    overridePendingTransition(R.anim.group_in_to_left,R.anim.group_out_to_left);
                 }
 
                 break;

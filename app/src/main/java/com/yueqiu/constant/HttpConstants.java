@@ -369,6 +369,8 @@ public class HttpConstants
         public static final String START_NO = "start_no";
 
         public static final String END_NO = "end_no";
+
+        public static final String USER_ID = "user_id";
     }
 
     /**
@@ -401,6 +403,10 @@ public class HttpConstants
         public static final String END_NO   = "end_no";
 
 
+    }
+
+    public static class StroeSave{
+        public static final String URL      = "/store/storeSave";
     }
 
     /**

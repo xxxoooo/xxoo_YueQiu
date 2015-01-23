@@ -16,6 +16,7 @@ public class PublicConstant {
     public static final int TIME_OUT      = -3;
     public static final int USE_CACHE     = -4;
     public static final int NO_NETWORK    = -5;
+    public static final int SHARE_SUCCESS = 1;
 
     public static final int PUBLISHED_DATE_TYPE     = 1;
     public static final int PUBLISHED_ACTIVITY_TYPE = 2;
@@ -39,6 +40,11 @@ public class PublicConstant {
     public static final int GROUP_GET_FRIEND        = 3;
     public static final int GROUP_EQUIP             = 4;
     public static final int GROUP_OTHER             = 5;
+
+    public static final int APPOINT                 = 1;
+    public static final int ROOM                    = 2;
+    public static final int PLAY                    = 3;
+    public static final int GROUP                   = 4;
 
 
 

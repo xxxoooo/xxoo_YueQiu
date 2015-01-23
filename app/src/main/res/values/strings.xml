@@ -373,6 +373,7 @@
     <string name="retry_after_seconds">获取验证码失败，请在<xliff:g id="number" example="15">%1$s</xliff:g></string>
     <string name="activity_no_result">抱歉，未获取到<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
     <string name="sorry_no_info">抱歉，没有获取到详情信息</string>
+    <string name="store_success">收藏成功，可以进入我的收藏查看</string>
 
     <!-- 我的资料 -->
     <string name="photo">头像</string>

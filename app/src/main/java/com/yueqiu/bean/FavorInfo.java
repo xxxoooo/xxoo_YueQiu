@@ -84,7 +84,7 @@ public class FavorInfo {
 
     @Override
     public boolean equals(Object o) {
-        PublishedInfo item = (PublishedInfo) o;
+        FavorInfo item = (FavorInfo) o;
         if(this.table_id.equals(item.getTable_id()) && this.type == item.getType()
                 && this.user_id == item.getUser_id()){
             return true;

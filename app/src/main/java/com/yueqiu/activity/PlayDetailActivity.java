@@ -51,6 +51,7 @@ public class PlayDetailActivity extends Activity {
     private GridView mPartInGridView;
     private int mTableId,mInfoType;
     private String mCreateTime;
+    private boolean mStroe = false;
 
     private Map<String,Integer> mParamMap = new HashMap<String, Integer>();
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
@@ -262,6 +263,9 @@ public class PlayDetailActivity extends Activity {
                     mNoResultTv.setVisibility(View.VISIBLE);
                     Utils.showToast(PlayDetailActivity.this,getString(R.string.network_not_available));
                     break;
+                case PublicConstant.SHARE_SUCCESS:
+                    Utils.showToast(PlayDetailActivity.this,getString(R.string.store_success));
+                    break;
             }
         }
     };
@@ -285,7 +289,7 @@ public class PlayDetailActivity extends Activity {
                 if(user_id < 1) {
                     Utils.showToast(this,getString(R.string.please_login_first));
                 }else{
-
+                    store();
                 }
                 break;
             case R.id.menu_activities_share:
@@ -305,5 +309,54 @@ public class PlayDetailActivity extends Activity {
                 break;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void store(){
+        mParamMap.put(HttpConstants.Play.TYPE,PublicConstant.PLAY);
+        mParamMap.put(HttpConstants.Play.ID,mTableId);
+        mParamMap.put(HttpConstants.Play.USER_ID,YueQiuApp.sUserInfo.getUser_id());
+
+        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Play.GETDETAIL);
+        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.GET);
+        mStroe = true;
+
+        new StoreTask(mParamMap).execute(mUrlAndMethodMap);
+    }
+
+    private class StoreTask extends AsyncTaskUtil<Integer>{
+
+        public StoreTask(Map<String, Integer> map) {
+            super(map);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mPreProgressBar.setVisibility(View.VISIBLE);
+            mPreText.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
+            super.onPostExecute(jsonObject);
+            mPreProgressBar.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
+
+            try{
+                if(!jsonObject.isNull("code")){
+                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                        mHandler.sendEmptyMessage(PublicConstant.SHARE_SUCCESS);
+                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                        mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                    }else{
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonObject.getString("msg")).sendToTarget();
+                    }
+                }else{
+                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                }
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+        }
     }
 }

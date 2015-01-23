@@ -26,6 +26,7 @@ import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.GroupInfoDao;
 import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
+import com.yueqiu.util.Utils;
 
 import java.util.List;
 
@@ -34,7 +35,6 @@ import java.util.List;
  * 台球圈Activity
  */
 public class BilliardGroupActivity extends FragmentActivity implements ActionBar.TabListener{
-    public static final String BILLIARD_TAB_NAME = "billiard_tab_name";
     private ViewPager mViewPager;
     private String[] mTitles;
     private SectionPagerAdapter mPagerAdapter;
@@ -131,9 +131,15 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
             case R.id.group_menu_editor:
-                Intent intent = new Intent(this, GroupIssueTopic.class);
-                startActivity(intent);
-                overridePendingTransition(R.anim.group_in_to_left,R.anim.group_out_to_left);
+                int user_id = YueQiuApp.sUserInfo.getUser_id();
+                if(user_id < 1){
+                    Utils.showToast(this, getString(R.string.please_login_first));
+                }else{
+                    Intent intent = new Intent(this, GroupIssueTopic.class);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.group_in_to_left,R.anim.group_out_to_left);
+                }
+
                 break;
         }
         return super.onOptionsItemSelected(item);
