@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.yueqiu.BilliardSearchActivity" >
+    tools:context="com.yueqiu.BilliardNearbyActivity" >
     <item android:id="@+id/group_nemu_search"
         android:title="@string/search_search_btn_str"
         android:icon="@drawable/search"

@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
@@ -38,7 +37,7 @@ public class FavorActivity extends FragmentActivity implements ActionBar.TabList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_myfavor_coll);
+        setContentView(R.layout.activity_billiard_group);
 
         mFavorDao = DaoFactory.getFavor(this);
         new Thread(new Runnable() {
@@ -67,7 +66,7 @@ public class FavorActivity extends FragmentActivity implements ActionBar.TabList
             getString(R.string.tab_title_activity),
             getString(R.string.billiard_group)
         };
-        mViewPager = (ViewPager) findViewById(R.id.favor_coll_pager);
+        mViewPager = (ViewPager) findViewById(R.id.pager);
 
 
     }
@@ -145,7 +144,7 @@ public class FavorActivity extends FragmentActivity implements ActionBar.TabList
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
         return true;
     }
 

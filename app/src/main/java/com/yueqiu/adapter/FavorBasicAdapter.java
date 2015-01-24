@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.bean.FavorInfo;
-import com.yueqiu.bean.PublishedInfo;
 
 import java.util.List;
 
@@ -47,7 +46,7 @@ public class FavorBasicAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if(convertView == null){
-            convertView = mInflater.inflate(R.layout.my_collection_item_layout,null);
+            convertView = mInflater.inflate(R.layout.item_favor_layout,null);
             holder = new ViewHolder();
             holder.title = (TextView) convertView.findViewById(R.id.favor_title);
             holder.content = (TextView) convertView.findViewById(R.id.favor_content);

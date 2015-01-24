@@ -4,25 +4,20 @@ import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
-import android.widget.TextView;
 
-import com.yueqiu.activity.SearchResultActivity;
+import com.yueqiu.activity.NearbyResultActivity;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.chatbar.ContactFragment;
 import com.yueqiu.fragment.chatbar.MessageFragment;
@@ -116,7 +111,7 @@ public class ChatBarActivity extends FragmentActivity {
         getMenuInflater().inflate(R.menu.billiard_search, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
         return true;
     }
 

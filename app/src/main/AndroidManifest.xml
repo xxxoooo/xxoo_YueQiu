@@ -21,7 +21,7 @@
             android:screenOrientation="portrait"/>
 
         <activity
-            android:name=".BilliardSearchActivity"
+            android:name=".BilliardNearbyActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.SearchResultActivity"
+            android:name=".activity.NearbyResultActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -72,7 +72,7 @@
             android:name=".activity.FeedbackActivity"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
         <activity
-            android:name=".activity.UpdateAssistantActivity"
+            android:name=".activity.UpgradeAssistantActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.ProfileSetupActivity"
@@ -111,9 +111,9 @@
             android:name=".activity.PlaySelectSex"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".activity.SearchBilliardsDatingActivity"
+            android:name=".activity.NearbyBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating"
-            android:parentActivityName=".BilliardSearchActivity"
+            android:parentActivityName=".BilliardNearbyActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
@@ -150,7 +150,7 @@
                 <data android:scheme="file"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SearchBilliardRoomActivity"
+        <activity android:name=".activity.NearbyBilliardRoomActivity"
             android:screenOrientation="portrait"/>
 
         <!--服务组件-->

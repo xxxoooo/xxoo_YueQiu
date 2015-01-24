@@ -4,7 +4,7 @@ import android.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
-import com.yueqiu.fragment.requestaddfriend.FriendProfileFragment;
+import com.yueqiu.fragment.addfriend.FriendProfileFragment;
 
 /**
  * Created by doushuqi on 15/1/8.

@@ -52,7 +52,7 @@ public class PlayListViewAdapter extends BaseAdapter {
         {
 
             holder = new Holder();
-            view = LayoutInflater.from(mContext).inflate(R.layout.play_listview_item,null);
+            view = LayoutInflater.from(mContext).inflate(R.layout.item_play,null);
             holder.tv_title = (TextView)view.findViewById(R.id.activities_lv_item_tv_title);
             holder.tv_content = (TextView)view.findViewById(R.id.activities_lv_item_tv_activities_time);
             holder.tv_time_day = (TextView)view.findViewById(R.id.activities_lv_item_tv_time_day);

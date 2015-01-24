@@ -187,10 +187,12 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
             super.handleMessage(msg);
             switch(msg.what){
                 case PublicConstant.USE_CACHE:
+                    setEmptyViewGone();
                     List<FavorInfo> cacheList = (List<FavorInfo>) msg.obj;
                     mList.addAll(cacheList);
                     break;
                 case PublicConstant.GET_SUCCESS:
+                    setEmptyViewGone();
                     mBeforeCount = mList.size();
                     List<FavorInfo> list = (List<FavorInfo>) msg.obj;
                     for(FavorInfo info : list){

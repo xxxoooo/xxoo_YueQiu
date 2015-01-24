@@ -50,31 +50,27 @@
             android:layout_centerInParent="true"
             android:src="@drawable/default_head"/>
 
-        <LinearLayout
-            android:layout_toRightOf="@id/friends_application_icon"
-            android:orientation="vertical"
+        <TextView
+            android:textColor="@color/md__defaultBackground"
+            android:id="@+id/friends_application_username"
+            android:padding="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
+            android:textSize="16sp"
+            android:text="tangxin"
+            android:layout_alignTop="@id/friends_application_icon"
+            android:layout_toRightOf="@id/friends_application_icon"/>
 
-            <TextView
-                android:textColor="@color/md__defaultBackground"
-                android:id="@+id/friends_application_username"
-                android:padding="5dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"
-                android:text="tangxin"/>
-
-            <TextView
-                android:textColor="@color/md__defaultBackground"
-                android:id="@+id/friends_application_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="5dp"
-                android:textSize="16sp"
-                android:text="韩寒"/>
-        </LinearLayout>
+        <TextView
+            android:textColor="@color/md__defaultBackground"
+            android:id="@+id/friends_application_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textSize="16sp"
+            android:text="韩寒"
+            android:layout_below="@+id/friends_application_username"
+            android:layout_toRightOf="@id/friends_application_icon"/>
 
         <Button
             android:id="@+id/friends_application_agree"
