@@ -3,20 +3,11 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-
-    <LinearLayout
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingLeft="8dp"
-            android:layout_gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
             android:minHeight="?android:attr/listPreferredItemHeight">
-
-
             <ImageView
                 android:id="@+id/account_iv"
                 android:layout_alignParentLeft="true"
@@ -76,7 +67,7 @@
             </LinearLayout>
 
         </RelativeLayout>
-    </LinearLayout>
+
 
     <FrameLayout
         android:layout_margin="10dp"

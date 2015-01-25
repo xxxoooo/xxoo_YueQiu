@@ -1,5 +1,7 @@
 package com.yueqiu.bean;
 
+import java.util.List;
+
 /**
  * Created by yinfeng on 15/1/3.
  */
@@ -17,6 +19,9 @@ public class PlayInfo {
     private String content;
     private String create_time;
     private int look_num;
+    private String contact;
+    private String phone;
+    public List<UserInfo> mJoinList;
 
     public String getTable_id() {
         return table_id;
@@ -121,6 +126,22 @@ public class PlayInfo {
 
     public void setLook_num(int look_num) {
         this.look_num = look_num;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getContact() {
+        return contact;
+    }
+
+    public void setContact(String contact) {
+        this.contact = contact;
     }
 
     @Override

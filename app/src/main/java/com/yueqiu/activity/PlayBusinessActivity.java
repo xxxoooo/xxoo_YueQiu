@@ -73,7 +73,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_play);
+        setContentView(R.layout.activity_play_bussiness);
         initActionBar();
         initView();
         mPlayDao = DaoFactory.getPlay(this);
@@ -121,7 +121,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
         mEmptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
-        mEmptyView.setText(getString(R.string.your_published_info_is_empty,getString(R.string.no_business_activity)));
+        mEmptyView.setText(getString(R.string.no_business_activity));
         mPullToRefreshListView.setEmptyView(mEmptyView);
     }
 
@@ -339,7 +339,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
         return true;
     }
 

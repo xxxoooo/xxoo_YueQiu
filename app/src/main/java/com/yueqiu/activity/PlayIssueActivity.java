@@ -101,7 +101,7 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_issues);
+        setContentView(R.layout.activity_play_issues);
         initActionBar();
         initView();
     }

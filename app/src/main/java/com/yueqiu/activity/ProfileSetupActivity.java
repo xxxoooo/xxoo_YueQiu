@@ -3,7 +3,6 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,10 +12,10 @@ import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.UserDao;
-import com.yueqiu.fragment.myprofilesetup.MyProfileRadioSetupFragment;
-import com.yueqiu.fragment.myprofilesetup.MyProfileSetupListener;
-import com.yueqiu.fragment.myprofilesetup.MyProfileTextSetupFragment;
-import com.yueqiu.fragment.myprofilesetup.PhotoSetupFragment;
+import com.yueqiu.fragment.profilesetup.MyProfileRadioSetupFragment;
+import com.yueqiu.fragment.profilesetup.MyProfileSetupListener;
+import com.yueqiu.fragment.profilesetup.MyProfileTextSetupFragment;
+import com.yueqiu.fragment.profilesetup.PhotoSetupFragment;
 import com.yueqiu.util.Utils;
 
 /**

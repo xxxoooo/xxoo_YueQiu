@@ -18,7 +18,6 @@ import com.yueqiu.view.contacts.IphoneTreeView;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class ExpAdapter extends BaseExpandableListAdapter implements
         IphoneTreeView.IphoneTreeHeaderAdapter {
@@ -125,7 +124,7 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
         GroupHolder holder = null;
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(
-                    R.layout.fragment_constact_child, null);
+                    R.layout.item_fragment_constact_child, null);
             holder = new GroupHolder();
             holder.nameView = (TextView) convertView
                     .findViewById(R.id.contact_list_item_name);
@@ -178,7 +177,7 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
         ChildHolder holder = null;
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(
-                    R.layout.fragment_constact_group, null);
+                    R.layout.item_fragment_constact_group, null);
             holder = new ChildHolder();
             holder.nameView = (TextView) convertView
                     .findViewById(R.id.group_name);

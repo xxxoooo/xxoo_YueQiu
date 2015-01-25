@@ -28,7 +28,7 @@ public class PlaySelectType extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_activities_type);
+        setContentView(R.layout.activity_play_select_type);
         initActionBar();
         initView();
         mIntent = getIntent();

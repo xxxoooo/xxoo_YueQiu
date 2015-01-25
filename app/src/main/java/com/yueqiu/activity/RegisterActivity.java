@@ -27,7 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.yueqiu.BilliardSearchActivity;
+import com.yueqiu.BilliardNearbyActivity;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.DatabaseConstant;
@@ -96,7 +96,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                     mEditor.apply();
 
                     mUserDao.insertUserInfo(map);
-                    Intent intent = new Intent(RegisterActivity.this, BilliardSearchActivity.class);
+                    Intent intent = new Intent(RegisterActivity.this, BilliardNearbyActivity.class);
                     startActivity(intent);
                     RegisterActivity.this.finish();
                     overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);

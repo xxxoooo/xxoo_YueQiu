@@ -47,7 +47,7 @@ public class PublishedBasicAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if(convertView == null){
-            convertView = mInflater.inflate(R.layout.published_info_item,null);
+            convertView = mInflater.inflate(R.layout.item_published_info,null);
             holder = new ViewHolder();
             holder.image = (ImageView) convertView.findViewById(R.id.published_item_image);
             holder.title = (TextView) convertView.findViewById(R.id.published_title);

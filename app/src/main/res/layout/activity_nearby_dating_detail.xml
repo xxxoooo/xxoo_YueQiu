@@ -1,0 +1,289 @@
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.yueqiu.activity.searchmenu.nearby.SearchBilliardsDatingActivity"
+    android:id="@+id/search_dating_detailed_activity_main"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:weightSum="7"
+    >
+
+    <!-- 用于约球Activity当中的ListView的每一个Item的详细的展示 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.1">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/img_search_dating_detail_photo"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="10dp"
+            android:src="@drawable/default_head"
+            android:padding="2dp"
+            />
+
+        <!-- 用于显示用户的nickName，即花名-->
+        <TextView
+            style="@style/ListItemTvStyle"
+            android:id="@+id/tv_search_dating_detail_nickname"
+            android:text="@string/search_mate_sub_fragment_listitem_testname"
+            android:layout_toRightOf="@id/img_search_dating_detail_photo"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="4dp"
+            android:textSize="18sp"
+            />
+
+        <!-- 用于显示用户的性别 -->
+        <TextView
+            style="@style/TimeTextStyle"
+            android:id="@+id/tv_search_dating_detail_gender"
+            android:background="@drawable/textview_withdrawable_bg"
+            android:layout_below="@id/tv_search_dating_detail_nickname"
+            android:text="@string/man"
+            android:layout_toRightOf="@id/img_search_dating_detail_photo"
+            android:drawableRight="@drawable/male"
+            android:drawablePadding="3dp"
+            android:paddingLeft="4dp"
+            android:padding="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="2dp"/>
+
+        <!--这里还应该有另一图案，就是每一个用户的受关注的数目，
+            具体包括一个眼睛的ImageView以及另一用于显示具体的被follow的数目的TextView
+            但是现在没有提供这个图片，所以我们放到以后实现,
+            但是考虑到眼睛的图片是固定的，所以我们直接采用一个TextView来进行实现，
+            即采用TextView当中的Drawable left来直接加载-->
+        <TextView
+            style="@style/TimeTextStyle"
+            android:id="@+id/tv_search_dating_detail_follow_num"
+            android:layout_toRightOf="@id/tv_search_dating_detail_gender"
+            android:text="221"
+            android:layout_below="@id/tv_search_dating_detail_nickname"
+            android:drawableLeft="@drawable/eye_follow"
+            android:drawablePadding="5dp"
+            android:paddingLeft="4dp"
+            android:layout_marginLeft="9dp"
+            android:layout_marginTop="4dp"
+            />
+
+
+        <TextView
+            android:id="@+id/tv_search_dating_detailed_time_1"
+            android:padding="4dp"
+            android:layout_alignTop="@id/tv_search_dating_detail_nickname"
+            android:layout_alignParentRight="true"
+            style="@style/TimeTextStyle"
+            android:text="@string/search_dating_detailed_activity_time_1"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="7dp"
+            />
+
+        <TextView
+            android:id="@+id/tv_search_dating_detailed_time"
+            android:padding="4dp"
+            android:layout_alignTop="@id/tv_search_dating_detail_nickname"
+            android:layout_toLeftOf="@id/tv_search_dating_detailed_time_1"
+            style="@style/TimeTextStyle"
+            android:text="@string/search_dating_detailed_activity_time"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="7dp"
+            />
+
+        <View
+            android:id="@+id/search_dating_separator"
+            android:layout_alignParentBottom="true"
+            android:layout_width="match_parent"
+            android:layout_height="1.5dp"
+            android:layout_marginLeft="3dp"
+            android:layout_marginRight="3dp"
+            android:background="@color/devide_line"
+            />
+    </RelativeLayout>
+
+    <!--用于约球详情的介绍内容-->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3.9"
+        android:fillViewport="true">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/search_dating_separator"
+        >
+        <TextView
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_info_title"
+            android:layout_marginTop="2dp"
+            android:text="@string/search_dating_detailed_title_test"
+            />
+
+        <TextView
+            android:layout_below="@id/tv_search_dating_info_title"
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_address_indi"
+            android:text="@string/search_dating_detailed_address_indi"
+            />
+
+        <TextView
+            android:text="@string/search_dating_detailed_address_indi_test"
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_address"
+            android:layout_toRightOf="@id/tv_search_dating_detailed_address_indi"
+            android:layout_alignTop="@id/tv_search_dating_detailed_address_indi"
+            />
+
+        <TextView
+            android:layout_below="@id/tv_search_dating_detailed_address_indi"
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_starttime_indi"
+            android:text="@string/search_dating_detailed_starttime_indi"
+            />
+
+        <TextView
+            android:layout_toRightOf="@id/tv_search_dating_detailed_starttime_indi"
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_starttime"
+            android:text="@string/search_dating_detailed_starttime_indi_test"
+            android:layout_alignTop="@id/tv_search_dating_detailed_starttime_indi"
+            />
+
+        <TextView
+            android:layout_below="@id/tv_search_dating_detailed_starttime_indi"
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_endtime_indi"
+            android:text="@string/search_dating_detailed_endtime_indi"
+            />
+
+        <TextView
+            android:layout_toRightOf="@id/tv_search_dating_detailed_endtime_indi"
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_endtime"
+            android:text="@string/search_dating_detailed_endtime_indi_test"
+            android:layout_alignTop="@id/tv_search_dating_detailed_endtime_indi"
+            />
+
+        <TextView
+            android:layout_below="@id/tv_search_dating_detailed_endtime_indi"
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_model_indi"
+            android:text="@string/search_dating_detailed_model_indi"
+            />
+
+        <TextView
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_model"
+            android:text="@string/search_dating_detailed_model_indi_test"
+            android:layout_toRightOf="@id/tv_search_dating_detailed_model_indi"
+            android:layout_alignTop="@id/tv_search_dating_detailed_model_indi"
+            />
+
+        <TextView
+            android:layout_below="@id/tv_search_dating_detailed_model_indi"
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_contact_indi"
+            android:text="@string/search_dating_detailed_contact_indi"
+            />
+
+        <TextView
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_contact"
+            android:text="@string/search_dating_detailed_contact_indi_test"
+            android:layout_toRightOf="@id/tv_search_dating_detailed_contact_indi"
+            android:layout_alignTop="@id/tv_search_dating_detailed_contact_indi"
+            android:layout_alignLeft="@id/tv_search_dating_detailed_model"
+            />
+
+        <TextView
+            android:layout_below="@id/tv_search_dating_detailed_contact_indi"
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_phonenum_indi"
+            android:text="@string/search_dating_detailed_phone_indi"
+            />
+
+        <TextView
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_phonenum"
+            android:text="@string/search_dating_detailed_phone_indi_test"
+            android:autoLink="phone"
+            android:layout_toRightOf="@id/tv_search_dating_detailed_phonenum_indi"
+            android:layout_alignTop="@id/tv_search_dating_detailed_phonenum_indi"
+            />
+
+        <TextView
+            android:layout_below="@id/tv_search_dating_detailed_phonenum_indi"
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_activity_intro_indi"
+            android:text="@string/search_dating_detailed_activity_intro_indi"
+            />
+
+        <TextView
+            style="@style/SearchRoomActivityTvStyle"
+            android:id="@+id/tv_search_dating_detailed_activity_intro"
+            android:text="@string/search_dating_detailed_activity_intro_indi_test"
+            android:layout_toRightOf="@id/tv_search_dating_detailed_activity_intro_indi"
+            android:layout_alignTop="@id/tv_search_dating_detailed_activity_intro_indi"
+            />
+    </RelativeLayout>
+    </ScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        >
+
+        <TextView
+            android:id="@+id/tv_indicator"
+            style="@style/ListItemTvStyle"
+            android:layout_width="match_parent"
+            android:gravity="left"
+            android:background="@color/devide_line"
+            android:layout_margin="2dp"
+            android:text="@string/search_dating_detailed_tv_already_in"
+            android:textSize="18sp"
+            android:paddingLeft="15dp"
+            android:paddingBottom="7dp"
+            android:paddingTop="7dp"
+            />
+
+        <!--以下应该列出来的是所有已经参加的用户的头像，这里我们应该使用一个GridView，
+            应为已经参加的用户的数目是无法确定的 -->
+        <GridView
+            android:numColumns="5"
+            android:layout_below="@id/tv_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/gridview_search_dating_detailed_already_flow"
+            android:layout_margin="10dp"
+            android:horizontalSpacing="2dp"
+            android:verticalSpacing="5dp"
+
+            >
+        </GridView>
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/btn_search_dating_detailed_iwantin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/search_dating_detailed_btn_i_want_in"
+        android:layout_alignParentBottom="true"
+        android:padding="5dp"
+        android:layout_margin="6dp"
+        android:textStyle="normal"
+        android:textColor="@android:color/white"
+        android:background="@drawable/login_button_bg"
+        />
+    <!--android:background="@drawable/login_button_bg"-->
+
+</LinearLayout>
+
+
+

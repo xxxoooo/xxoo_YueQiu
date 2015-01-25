@@ -11,17 +11,15 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
 import com.yueqiu.activity.GroupIssueTopic;
-import com.yueqiu.activity.SearchResultActivity;
+import com.yueqiu.activity.NearbyResultActivity;
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.GroupInfoDao;
@@ -119,7 +117,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.group_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
         return true;
     }
 

@@ -3,7 +3,6 @@ package com.yueqiu.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,7 +27,7 @@ public class SelectChargeModuleActivity extends Activity implements View.OnClick
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_select_charge_module);
+        setContentView(R.layout.activity_play_select_charge_module);
 
         mActionBar = getActionBar();
         mActionBar.setTitle(getString(R.string.activities_charge_module));

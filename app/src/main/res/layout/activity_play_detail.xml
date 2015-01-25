@@ -273,15 +273,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         />
-    <TextView
-        android:id="@+id/play_detail_no_result_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textColor="@color/md__defaultBackground"
-        android:textSize="18sp"
-        android:text="@string/sorry_no_info"
-        android:visibility="gone"/>
+
 </RelativeLayout>
 
 
