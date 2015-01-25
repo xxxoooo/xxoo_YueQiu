@@ -11,10 +11,6 @@ import java.util.List;
 public interface SearchDatingDao
 {
 
-    public long insertDatingItem(SearchDatingSubFragmentDatingBean datingItem);
-
-    public long updateDatingItem(SearchDatingSubFragmentDatingBean datingItem);
-
     public long insertDatingItemBatch(List<SearchDatingSubFragmentDatingBean> datingList);
 
     public long updateDatingItemBatch(List<SearchDatingSubFragmentDatingBean> datingList);
@@ -25,6 +21,12 @@ public interface SearchDatingDao
      * @return
      */
     public List<SearchDatingSubFragmentDatingBean> getDatingList(final int startNum, final int limit);
+
+    /**
+     *
+     * @return 我们所有的已经插入到的数据库当中的数据，没有数目限制
+     */
+    public List<SearchDatingSubFragmentDatingBean> getAllDatingList();
 
     public static final String[] columns = {
             DatabaseConstant.FavorInfoItemTable.SearchDatingTable._ID,

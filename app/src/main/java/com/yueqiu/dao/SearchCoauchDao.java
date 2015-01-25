@@ -11,15 +11,14 @@ import java.util.List;
 public interface SearchCoauchDao
 {
 
-    public long insertCoauchItem(SearchCoauchSubFragmentCoauchBean coauchItem);
-
-    public long updateCoauchItem(SearchCoauchSubFragmentCoauchBean coauchItem);
 
     public long insertCoauchItemBatch(List<SearchCoauchSubFragmentCoauchBean> coauchList);
 
     public long updateCoauchItemBatch(List<SearchCoauchSubFragmentCoauchBean> coauchList);
 
     public List<SearchCoauchSubFragmentCoauchBean> getCoauchList(final int startNum, final int limit);
+
+    public List<SearchCoauchSubFragmentCoauchBean> getAllCoauchList();
 
     // 这是我们对于教练Fragment当中的List所有都可用的Columns(由于我们无论在何时进行何种筛选，所需要获取的都是全部的columns，
     // 所以我们在这里都是全部获取)

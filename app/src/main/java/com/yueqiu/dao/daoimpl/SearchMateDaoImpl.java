@@ -33,52 +33,44 @@ public class SearchMateDaoImpl implements SearchMateDao
     {
         this.mContext = context;
         this.mDBUtils = DBUtils.getInstance(context);
-
-
     }
 
-    @Override
-    public synchronized long insertMateItem(SearchMateSubFragmentUserBean mateItem)
-    {
-        this.mSQLdatabase = mDBUtils.getWritableDatabase();
-        ContentValues values = new ContentValues();
-
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID, mateItem.getUserId());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.NAME, mateItem.getUserNickName());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.PHOTO_URL, mateItem.getUserPhotoUrl());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.SEX, mateItem.getUserGender());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DISTRICT, mateItem.getUserDistrict());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.RANGE, mateItem.getUserDistance());
-
-        mSQLdatabase = mDBUtils.getWritableDatabase();
-        long insertId = mSQLdatabase.insert(
-                DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE,
-                null,
-                values
-        );
-
-        return insertId;
-    }
-
-    @Override
-    public synchronized long updateMateInfo(SearchMateSubFragmentUserBean mateItem)
-    {
-        this.mSQLdatabase = mDBUtils.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID, mateItem.getUserId());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.NAME, mateItem.getUserNickName());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.PHOTO_URL, mateItem.getUserPhotoUrl());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.SEX, mateItem.getUserGender());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DISTRICT, mateItem.getUserDistrict());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.RANGE, mateItem.getUserDistance());
-
-        return 0;
-    }
 
     @Override
     public synchronized long updateMateInfoBatch(List<SearchMateSubFragmentUserBean> mateList)
     {
-        return 0;
+        long result = -1;
+        mSQLdatabase = mDBUtils.getWritableDatabase();
+        mSQLdatabase.beginTransaction();
+
+        if (mateList != null)
+        {
+            try
+            {
+                for (SearchMateSubFragmentUserBean userBean : mateList)
+                {
+                    ContentValues values = new ContentValues();
+                    values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID, userBean.getUserId());
+                    values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.NAME, userBean.getUserNickName());
+                    values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.PHOTO_URL, userBean.getUserPhotoUrl());
+                    values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.SEX, userBean.getUserGender());
+                    values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DISTRICT, userBean.getUserDistrict());
+                    values.put(DatabaseConstant.FavorInfoItemTable.SearchMateTable.RANGE, userBean.getUserDistance());
+
+                    result = mSQLdatabase.update(DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE,
+                            values,
+                            DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID + " =? ",
+                            new String[]{userBean.getUserId()});
+                }
+                mSQLdatabase.setTransactionSuccessful();
+            } catch (final Exception e)
+            {
+                Log.d(TAG, " exception happened while we updating the Search mate table, and the detailed reason are : " + e.toString());
+            } finally {
+                mSQLdatabase.endTransaction();
+            }
+        }
+        return result;
     }
 
     /**
@@ -139,7 +131,6 @@ public class SearchMateDaoImpl implements SearchMateDao
         this.mSQLdatabase = mDBUtils.getReadableDatabase();
         List<SearchMateSubFragmentUserBean> mateList = new ArrayList<SearchMateSubFragmentUserBean>();
 
-
         String mateInfoSql = " SELECT * FROM " + DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE
                 + " ORDER BY " + DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID
                 + " DESC LIMIT " + startNum + " , " + limit;
@@ -148,21 +139,55 @@ public class SearchMateDaoImpl implements SearchMateDao
                 mateInfoSql,
                 null
         );
-
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast())
+        
+        if (cursor != null && cursor.getCount() != 0)
         {
-            SearchMateSubFragmentUserBean mateBean = cursorToMateBean(cursor);
-            mateList.add(mateBean);
-            cursor.moveToNext();
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast())
+            {
+                SearchMateSubFragmentUserBean mateBean = cursorToMateBean(cursor);
+                mateList.add(mateBean);
+                cursor.moveToNext();
+            }
+            cursor.close();
         }
-        cursor.close();
-
-
         return mateList;
     }
 
+    /**
+     * 这个是没有数目限制的，我们可以一次性的将我们在mate table当中保存的所有的数据一次性全部取出来
+     *
+     * @return 返回我们在mateTable当中保存的所有的数据
+     */
+    @Override
+    public List<SearchMateSubFragmentUserBean> getAllMateList()
+    {
+        this.mSQLdatabase = mDBUtils.getReadableDatabase();
+        List<SearchMateSubFragmentUserBean> resultMateList = new ArrayList<SearchMateSubFragmentUserBean>();
 
+        String allMateInfoSql = " SELECT * FROM " + DatabaseConstant.FavorInfoItemTable.SearchMateTable.MATE_TABLE
+                + " ORDER BY " + DatabaseConstant.FavorInfoItemTable.SearchMateTable.USER_ID
+                + " DESC ";
+
+        Cursor cursor = mSQLdatabase.rawQuery(
+                allMateInfoSql,
+                null
+        );
+
+        if (null != cursor && cursor.getCount() != 0)
+        {
+            cursor.moveToFirst();
+            while (cursor.isAfterLast())
+            {
+                SearchMateSubFragmentUserBean userBean = cursorToMateBean(cursor);
+                resultMateList.add(userBean);
+                cursor.moveToNext();
+            }
+            cursor.close();
+        }
+
+        return resultMateList;
+    }
 
 
     /**

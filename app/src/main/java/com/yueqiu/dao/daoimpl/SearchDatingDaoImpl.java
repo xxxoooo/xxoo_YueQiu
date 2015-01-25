@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 
 import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
 import com.yueqiu.constant.DatabaseConstant;
@@ -32,54 +33,18 @@ public class SearchDatingDaoImpl implements SearchDatingDao
 
     }
 
-    /**
-     * 插入一条约球数据
-     *
-     * @param datingItem
-     * @return
-     */
-    @Override
-    public synchronized long insertDatingItem(SearchDatingSubFragmentDatingBean datingItem)
-    {
-        this.mDatabase = mDBUtils.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.NAME, datingItem.getUserName());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.PHOTO_URL, datingItem.getUserPhoto());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.TITLE, datingItem.getUserDeclare());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.RANGE, datingItem.getUserDistance());
-
-        this.mDatabase = mDBUtils.getWritableDatabase();
-        long insertId = mDatabase.insert(
-                DatabaseConstant.FavorInfoItemTable.SearchDatingTable.DATING_TABLE_NAME,
-                null,
-                values
-        );
-
-        return insertId;
-    }
-
-
-
-    @Override
-    public synchronized long updateDatingItem(SearchDatingSubFragmentDatingBean datingItem)
-    {
-        return 0;
-    }
-
     @Override
     public synchronized long insertDatingItemBatch(List<SearchDatingSubFragmentDatingBean> datingList)
     {
         this.mDatabase = mDBUtils.getWritableDatabase();
-        final int size = datingList.size();
         long result = 0;
         mDatabase.beginTransaction();
-        int i;
         try
         {
-            for (i = 0; i < size; ++i)
+            for (SearchDatingSubFragmentDatingBean datingItem : datingList)
             {
                 ContentValues values = new ContentValues();
-                SearchDatingSubFragmentDatingBean datingItem = datingList.get(i);
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.USER_ID, datingItem.getId());
                 values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.NAME, datingItem.getUserName());
                 values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.PHOTO_URL, datingItem.getUserPhoto());
                 values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.TITLE, datingItem.getUserDeclare());
@@ -106,7 +71,40 @@ public class SearchDatingDaoImpl implements SearchDatingDao
     @Override
     public synchronized long updateDatingItemBatch(List<SearchDatingSubFragmentDatingBean> datingList)
     {
-        return 0;
+        long result = -1;
+        mDatabase = mDBUtils.getWritableDatabase();
+        mDatabase.beginTransaction();
+
+        if (datingList != null)
+        {
+            try
+            {
+                for (SearchDatingSubFragmentDatingBean datingItem : datingList)
+                {
+                    ContentValues values = new ContentValues();
+
+                    values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.USER_ID, datingItem.getId());
+                    values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.NAME, datingItem.getUserName());
+                    values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.PHOTO_URL, datingItem.getUserPhoto());
+                    values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.TITLE, datingItem.getUserDeclare());
+                    values.put(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.RANGE, datingItem.getUserDistance());
+
+                    result = mDatabase.update(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.DATING_TABLE_NAME,
+                            values,
+                            DatabaseConstant.FavorInfoItemTable.SearchDatingTable.USER_ID + " =? ",
+                            new String[]{datingItem.getId()});
+                }
+                mDatabase.setTransactionSuccessful();
+
+            } catch (final Exception e)
+            {
+                Log.d(TAG, " exception happened while we updating the dating table, and the reason goes to : " + e.toString());
+            } finally
+            {
+                mDatabase.endTransaction();
+            }
+        }
+        return result;
     }
 
     @Override
@@ -124,17 +122,48 @@ public class SearchDatingDaoImpl implements SearchDatingDao
                 null
         );
 
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast())
+        if (cursor != null && cursor.getCount() != 0)
         {
-            SearchDatingSubFragmentDatingBean bean = cursorToDatingBean(cursor);
-            datingBeanList.add(bean);
-            cursor.moveToNext();
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast())
+            {
+                SearchDatingSubFragmentDatingBean bean = cursorToDatingBean(cursor);
+                datingBeanList.add(bean);
+                cursor.moveToNext();
+            }
+            cursor.close();
         }
-        cursor.close();
-
 
         return datingBeanList;
+    }
+
+    /**
+     * @return 我们所有的已经插入到的数据库当中的数据，没有数目限制
+     */
+    @Override
+    public List<SearchDatingSubFragmentDatingBean> getAllDatingList()
+    {
+        List<SearchDatingSubFragmentDatingBean> datingList = new ArrayList<SearchDatingSubFragmentDatingBean>();
+
+        mDatabase = mDBUtils.getReadableDatabase();
+        String allDatingInfoSql = " SELECT * FROM " + DatabaseConstant.FavorInfoItemTable.SearchDatingTable.DATING_TABLE_NAME
+                + " ORDER BY " + DatabaseConstant.FavorInfoItemTable.SearchDatingTable.USER_ID
+                + " DESC ";
+
+        Cursor resultCursor = mDatabase.rawQuery(allDatingInfoSql,
+                null);
+        if (resultCursor != null && resultCursor.getCount() != 0)
+        {
+            resultCursor.moveToFirst();
+            while (resultCursor.isAfterLast())
+            {
+                SearchDatingSubFragmentDatingBean datingBean = cursorToDatingBean(resultCursor);
+                datingList.add(datingBean);
+                resultCursor.moveToNext();
+            }
+            resultCursor.close();
+        }
+        return datingList;
     }
 
     /**

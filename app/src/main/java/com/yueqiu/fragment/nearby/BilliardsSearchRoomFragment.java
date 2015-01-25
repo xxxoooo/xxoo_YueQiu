@@ -31,6 +31,8 @@ import com.yueqiu.adapter.SearchRoomSubFragmentListAdapter;
 import com.yueqiu.bean.SearchRoomSubFragmentRoomBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.SearchRoomDao;
 import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
@@ -97,6 +99,8 @@ public class BilliardsSearchRoomFragment extends Fragment
 
     private static WorkerHandlerThread sWorkerThread;
 
+    private static SearchRoomDao sRoomDao;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -104,7 +108,7 @@ public class BilliardsSearchRoomFragment extends Fragment
         mIsHead = false;
         sNetworkAvailable = Utils.networkAvaiable(sContext);
         sWorkerThread = new WorkerHandlerThread();
-
+        sRoomDao = DaoFactory.getSearchRoomDao(sContext);
     }
 
     private static Button sBtnDistrict, sBtnDistan, sBtnPrice, sBtnApprisal;
@@ -123,8 +127,6 @@ public class BilliardsSearchRoomFragment extends Fragment
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-
-
         mView = inflater.inflate(R.layout.search_room_fragment_layout, container, false);
 
         SubFragmentsCommonUtils.initViewPager(sContext, mView, R.id.room_fragment_gallery_pager, R.id.room_fragment_gallery_pager_indicator_group);

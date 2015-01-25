@@ -29,6 +29,8 @@ import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchAssistCoauchSubFragmentBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.SearchAssistCoauchDao;
 import com.yueqiu.fragment.nearby.common.SearchParamsPreference;
 import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
@@ -85,6 +87,8 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
 
     private static BackgroundWorkerHandler sWorker;
 
+    private static SearchAssistCoauchDao sASCoauchDao;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -94,6 +98,7 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
         sNetworkAvailable = Utils.networkAvaiable(sContext);
         sWorker = new BackgroundWorkerHandler();
 
+        sASCoauchDao = DaoFactory.getSearchASCoauchDao(sContext);
     }
 
     private View mView;
@@ -734,7 +739,7 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
         {
             String label = SubFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-            sUIEventsHandler.postDelayed(new Runnable()
+            new Thread((new Runnable()
             {
                 @Override
                 public void run()
@@ -750,16 +755,16 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
                     }
 
                     Log.d(TAG, " loading more data --> the start num are : " + sStartNum + " , and the end are : " + sEndNum);
-                    if (Utils.networkAvaiable(sContext)) {
+                    if (Utils.networkAvaiable(sContext))
+                    {
                         retrieveAllInitialAssistCoauchInfo(sStartNum, sEndNum);
-                    } else {
+                    } else
+                    {
                         // TODO: 从本地的数据库当中进行检索
 
                     }
-
                 }
-            }, 1000);
-
+            })).start();
         }
     };
 
@@ -769,7 +774,8 @@ public class BilliardsSearchAssistCoauchFragment extends Fragment
     private void initTestData()
     {
         int i;
-        for (i = 0; i < 100; i++) {
+        for (i = 0; i < 100; i++)
+        {
             sAssistCoauchList.add(new SearchAssistCoauchSubFragmentBean("", "", "月夜刘莎", "女", "斯诺克", "38", "1000米"));
         }
     }

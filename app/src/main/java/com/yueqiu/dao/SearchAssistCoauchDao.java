@@ -10,11 +10,6 @@ import java.util.List;
  */
 public interface SearchAssistCoauchDao
 {
-
-    public long insertAssistCoauchItem(SearchAssistCoauchSubFragmentBean assistCoauchItem);
-
-    public long updateAssistCoauchItem(SearchAssistCoauchSubFragmentBean assistCoauchItem);
-
     public long insertAssistCoauchItemBatch(List<SearchAssistCoauchSubFragmentBean> assistCoauchList);
 
     public long updateAssistCoauchItemBatch(List<SearchAssistCoauchSubFragmentBean> assistCoauchList);
@@ -26,6 +21,8 @@ public interface SearchAssistCoauchDao
      * @return
      */
     public List<SearchAssistCoauchSubFragmentBean> getAssistCoauchList(final int startNum, final int limit);
+
+    public List<SearchAssistCoauchSubFragmentBean> getAllASCoauchList();
 
     public static final String[] allColumns = {
             DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable._ID,

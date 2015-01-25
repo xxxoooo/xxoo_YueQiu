@@ -29,6 +29,8 @@ import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchCoauchSubFragmentCoauchBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.SearchCoauchDao;
 import com.yueqiu.fragment.nearby.common.SearchParamsPreference;
 import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
@@ -41,7 +43,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.interfaces.RSAKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -91,6 +92,8 @@ public class BilliardsSearchCoauchFragment extends Fragment
 
     private static BackgroundWorkerThread sWorker;
 
+    private static SearchCoauchDao sCoauchDao;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -99,6 +102,8 @@ public class BilliardsSearchCoauchFragment extends Fragment
         mIsHead = false;
         sNetworkAvailable = Utils.networkAvaiable(sContext);
         sWorker = new BackgroundWorkerThread();
+
+        sCoauchDao = DaoFactory.getSearchCoauchDao(sContext);
 
     }
 

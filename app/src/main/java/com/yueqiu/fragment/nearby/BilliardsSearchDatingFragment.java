@@ -27,10 +27,11 @@ import com.yueqiu.R;
 import com.yueqiu.activity.SearchBilliardsDatingActivity;
 import com.yueqiu.adapter.SearchDatingSubFragmentListAdapter;
 import com.yueqiu.adapter.SearchPopupBaseAdapter;
-import com.yueqiu.bean.SearchDatingDetailedAlreadyBean;
 import com.yueqiu.bean.SearchDatingSubFragmentDatingBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.SearchDatingDao;
 import com.yueqiu.fragment.nearby.common.SearchParamsPreference;
 import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
@@ -89,6 +90,8 @@ public class BilliardsSearchDatingFragment extends Fragment
 
     private static SearchParamsPreference sParamsPreference = SearchParamsPreference.getInstance();
 
+    private static SearchDatingDao sDatingDao;
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -99,6 +102,9 @@ public class BilliardsSearchDatingFragment extends Fragment
         // TODO: 我们最好将判断网络状况的变量放到onResume()方法当中进行判断，而不是放到onCreate()方法，因为这里调用的次数有限
         // TODO: 但是将她直接放到onResume()方法当中又会使Fragment之间的切换变的卡。稍后在做决定？？？？
         sNetworkAvailable = Utils.networkAvaiable(sContext);
+
+        sDatingDao = DaoFactory.getSearchDatingDao(sContext);
+
     }
 
     public static final String KEY_DATING_FRAGMENT = "BilliardsSearchDatingFragment";
@@ -326,6 +332,8 @@ public class BilliardsSearchDatingFragment extends Fragment
         requestParams.put("start_no", startNum + "");
         requestParams.put("end_no", endNum + "");
 
+        List<SearchDatingSubFragmentDatingBean> resultCacheDatingList = new ArrayList<SearchDatingSubFragmentDatingBean>();
+
         String rawResult = HttpUtil.urlClient(HttpConstants.SearchDating.URL, requestParams, HttpConstants.RequestMethod.GET);
         Log.d(TAG, " the raw result we get for the dating info are : " + rawResult);
         if (!TextUtils.isEmpty(rawResult)) {
@@ -354,12 +362,12 @@ public class BilliardsSearchDatingFragment extends Fragment
                                 SearchDatingSubFragmentDatingBean datingBean = new SearchDatingSubFragmentDatingBean(datingId, imgUrl, userName, title, String.valueOf(distance));
 
                                 // 将我们解析得到的datingBean插入到我们创建的数据库当中
-                                sDatingList.add(datingBean);
+//                                sDatingList.add(datingBean);
+                                resultCacheDatingList.add(datingBean);
                             }
 
                             // TODO: 我们应该在这里通知UI主线程数据请求工作已经全部完成了，停止显示ProgressBar或者显示一个Toast全部数据已经加载完的提示
-                            sUIEventsHandler.obtainMessage(FETCH_DATA_SUCCESSED, sDatingList).sendToTarget();
-                            sUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                            sUIEventsHandler.obtainMessage(FETCH_DATA_SUCCESSED, resultCacheDatingList).sendToTarget();
                         } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
                         {
                             sUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
@@ -459,6 +467,7 @@ public class BilliardsSearchDatingFragment extends Fragment
                         loadEmptyTv();
                     }
 
+                    hideProgress();
                     break;
 
                 case RETRIEVE_DATA_WITH_RANGE_FILTERED:
@@ -484,16 +493,20 @@ public class BilliardsSearchDatingFragment extends Fragment
                 case PublicConstant.TIME_OUT:
                     // 超时之后的处理策略
                     Utils.showToast(sContext, sContext.getString(R.string.http_request_time_out));
-                    if (sDatingList.isEmpty()) {
+                    if (sDatingList.isEmpty())
+                    {
                         loadEmptyTv();
                     }
                     break;
 
                 case PublicConstant.NO_RESULT:
-                    if (sDatingList.isEmpty()) {
+                    if (sDatingList.isEmpty())
+                    {
                         loadEmptyTv();
-                    } else {
-                        if (sLoadMore) {
+                    } else
+                    {
+                        if (sLoadMore)
+                        {
                             Utils.showToast(sContext, sContext.getString(R.string.no_more_info));
                         }
                     }

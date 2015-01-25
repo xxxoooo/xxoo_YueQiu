@@ -13,10 +13,6 @@ import java.util.List;
  */
 public interface SearchRoomDao
 {
-    public long insertRoomItem(SearchRoomSubFragmentRoomBean roomItem);
-
-    public long updateRoomItem(SearchRoomSubFragmentRoomBean roomItem);
-
     public long updateRoomItemBatch(List<SearchRoomSubFragmentRoomBean> roomList);
 
     public long insertRoomItemBatch(List<SearchRoomSubFragmentRoomBean> roomList);
@@ -29,6 +25,14 @@ public interface SearchRoomDao
      *
      */
     public List<SearchRoomSubFragmentRoomBean> getRoomList(final int startNum, final int limit);
+
+    /**
+     * 直接返回我们存储的所有的List，没有条数限制，用于判断我们
+     * 是否重复插入了某些数据
+     *
+     * @return
+     */
+    public List<SearchRoomSubFragmentRoomBean> getAllRoomList();
 
     public static final String[] allColumns = {
             DatabaseConstant.FavorInfoItemTable.SearchRoomTable._ID,

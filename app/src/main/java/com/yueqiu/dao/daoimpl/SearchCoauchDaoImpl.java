@@ -36,40 +36,6 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
 
     }
 
-    /**
-     * 插入一条完整的教练信息
-     *
-     * @param coauchItem
-     * @return
-     */
-    @Override
-    public synchronized long insertCoauchItem(SearchCoauchSubFragmentCoauchBean coauchItem)
-    {
-        this.mDatabase = mDBUtils.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.NAME, coauchItem.getUserName());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.PHOTO_URL, coauchItem.getUserPhoto());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.SEX, coauchItem.getUserGender());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.RANGE, coauchItem.getUserDistance());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.CLASS, coauchItem.getmBilliardKind());
-        values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.LEVEL, coauchItem.getUserLevel());
-
-        this.mDatabase = mDBUtils.getWritableDatabase();
-        long insertId = mDatabase.insert(
-                DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME,
-                null,
-                values
-        );
-
-        return insertId;
-    }
-
-    @Override
-    public synchronized long updateCoauchItem(SearchCoauchSubFragmentCoauchBean coauchItem)
-    {
-        return 0;
-    }
-
     @Override
     public synchronized long insertCoauchItemBatch(List<SearchCoauchSubFragmentCoauchBean> coauchList)
     {
@@ -88,9 +54,9 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
                 values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.NAME, coauchItem.getUserName());
                 values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.PHOTO_URL, coauchItem.getUserPhoto());
                 values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.SEX, coauchItem.getUserGender());
-                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.RANGE, coauchItem.getUserDistance());
                 values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.CLASS, coauchItem.getmBilliardKind());
                 values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.LEVEL, coauchItem.getUserLevel());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.RANGE, coauchItem.getUserDistance());
 
                 insertResult = mDatabase.insert(
                         DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME,
@@ -114,7 +80,36 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
     @Override
     public synchronized long updateCoauchItemBatch(List<SearchCoauchSubFragmentCoauchBean> coauchList)
     {
-        return 0;
+        long result = -1;
+        mDatabase = mDBUtils.getWritableDatabase();
+        mDatabase.beginTransaction();
+        try
+        {
+            for (SearchCoauchSubFragmentCoauchBean coauchItem : coauchList)
+            {
+                ContentValues values = new ContentValues();
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.NAME, coauchItem.getUserName());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.PHOTO_URL, coauchItem.getUserPhoto());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.SEX, coauchItem.getUserGender());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.CLASS, coauchItem.getmBilliardKind());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.LEVEL, coauchItem.getUserLevel());
+                values.put(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.RANGE, coauchItem.getUserDistance());
+
+                result = mDatabase.update(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME,
+                        values,
+                        DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.USER_ID + " =? ",
+                        new String[]{coauchItem.getId()});
+            }
+            mDatabase.setTransactionSuccessful();
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we updating the coauch table, and the reason goes to : " + e.toString());
+        } finally
+        {
+            mDatabase.endTransaction();
+        }
+
+        return result;
     }
 
     @Override
@@ -122,7 +117,6 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
     {
         this.mDatabase = mDBUtils.getReadableDatabase();
         List<SearchCoauchSubFragmentCoauchBean> coauchList = new ArrayList<SearchCoauchSubFragmentCoauchBean>();
-
 
         String coauchInfoSql = " SELECT * FROM " + DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME
                 + " ORDER BY " + DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.USER_ID
@@ -146,20 +140,36 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
         return coauchList;
     }
 
+    @Override
+    public List<SearchCoauchSubFragmentCoauchBean> getAllCoauchList()
+    {
+        this.mDatabase = mDBUtils.getReadableDatabase();
+        List<SearchCoauchSubFragmentCoauchBean> coauchList = new ArrayList<SearchCoauchSubFragmentCoauchBean>();
 
+        String coauchInfoSql = " SELECT * FROM " + DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.COAUCH_TABLE_NAME
+                + " ORDER BY " + DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.USER_ID
+                + " DESC ";
 
+        Cursor cursor = mDatabase.rawQuery(
+                coauchInfoSql,
+                null
+        );
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast())
+        {
+            SearchCoauchSubFragmentCoauchBean coauchBean = cursorToCoauchBean(cursor);
+            coauchList.add(coauchBean);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        Log.d(TAG, " the finally coauch list we get from the coauch table are : " + coauchList.size());
+        return coauchList;
+
+    }
 
     /**
-     *
-     * 以下是我们创建Coauch表的时候，创建Columns的顺序
-     * 0. public static final String _ID = "_id";
-     * 1. public static final String USER_ID = "user_id";
-     * 2. public static final String NAME = "username";
-     * 3. public static final String PHOTO_URL = "photo_url";
-     * 4. public static final String CLASS = "class"; // 球种(例如九球，斯诺克等)
-     * 5. public static final String LEVEL = "level"; // 教练的资质(例如国家队还是北京队)
-     * 6. public static final String RANGE = "range";
-     * 7. public static final String SEX = "sex";
      *
      * @param cursor
      * @return
@@ -167,12 +177,13 @@ public class SearchCoauchDaoImpl implements SearchCoauchDao
     private SearchCoauchSubFragmentCoauchBean cursorToCoauchBean(Cursor cursor)
     {
         SearchCoauchSubFragmentCoauchBean coauchBean = new SearchCoauchSubFragmentCoauchBean();
+        coauchBean.setId(cursor.getString(1));
         coauchBean.setUserName(cursor.getString(2));
         coauchBean.setUserPhoto(cursor.getString(3));
-        coauchBean.setBilliardKind(cursor.getString(4));
-        coauchBean.setUserLevel(cursor.getString(5));
-        coauchBean.setUserDistance(cursor.getString(6));
-        coauchBean.setUserGender(cursor.getString(7));
+        coauchBean.setUserGender(cursor.getString(4));
+        coauchBean.setBilliardKind(cursor.getString(5));
+        coauchBean.setUserLevel(cursor.getString(6));
+        coauchBean.setUserDistance(cursor.getString(7));
 
         return coauchBean;
     }

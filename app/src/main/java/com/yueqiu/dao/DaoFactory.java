@@ -8,6 +8,11 @@ import com.yueqiu.dao.daoimpl.ContactsDaoImpl;
 import com.yueqiu.dao.daoimpl.FavorDaoImpl;
 import com.yueqiu.dao.daoimpl.GroupInfoDaoImpl;
 import com.yueqiu.dao.daoimpl.PublishedImpl;
+import com.yueqiu.dao.daoimpl.SearchAssistCoauchDaoImpl;
+import com.yueqiu.dao.daoimpl.SearchCoauchDaoImpl;
+import com.yueqiu.dao.daoimpl.SearchDatingDaoImpl;
+import com.yueqiu.dao.daoimpl.SearchMateDaoImpl;
+import com.yueqiu.dao.daoimpl.SearchRoomDaoImpl;
 import com.yueqiu.dao.daoimpl.UserDaoImpl;
 
 /**
@@ -47,4 +52,30 @@ public class DaoFactory {
 
         return new GroupInfoDaoImpl(context);
     }
+
+    public static SearchMateDao getSearchMateDao(Context context)
+    {
+        return new SearchMateDaoImpl(context);
+    }
+
+    public static SearchAssistCoauchDao getSearchASCoauchDao(Context context)
+    {
+        return new SearchAssistCoauchDaoImpl(context);
+    }
+
+    public static SearchCoauchDao getSearchCoauchDao(Context context)
+    {
+        return new SearchCoauchDaoImpl(context);
+    }
+
+    public static SearchDatingDao getSearchDatingDao(Context context)
+    {
+        return new SearchDatingDaoImpl(context);
+    }
+
+    public static SearchRoomDao getSearchRoomDao(Context context)
+    {
+        return new SearchRoomDaoImpl(context);
+    }
+
 }

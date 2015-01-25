@@ -1,12 +1,14 @@
 package com.yueqiu.fragment.nearby;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.support.v4.app.Fragment;
@@ -30,7 +32,8 @@ import com.yueqiu.adapter.SearchPopupBaseAdapter;
 import com.yueqiu.bean.SearchMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.dao.daoimpl.SearchMateDaoImpl;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.SearchMateDao;
 import com.yueqiu.fragment.nearby.common.SearchParamsPreference;
 import com.yueqiu.fragment.nearby.common.SubFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
@@ -67,7 +70,7 @@ public class BilliardsSearchMateFragment extends Fragment
     private String mArgs;
     private static Context sContext;
 
-    private static PullToRefreshListView sSubFragmentList;
+    private static PullToRefreshListView sSubFragmentListView;
 
     private static Button sBtnDistanceFilter, sBtnGenderFilter;
 
@@ -91,29 +94,26 @@ public class BilliardsSearchMateFragment extends Fragment
         return fragment;
     }
 
-    private static SearchMateDaoImpl sMateDaoImpl;
-
-    // mIsHead用于控制数据的加载到List当中的方向(即加载到头部还是加载到尾部)
-    private boolean mIsHead;
-    private boolean mIsNetworkAvailable;
+    private static SearchMateDao sMateDao;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        //sWorker = new BackgroundWorker();
+        sWorker = new BackgroundWorker();
 
-        sMateDaoImpl = new SearchMateDaoImpl(sContext);
-
-        mIsHead = false;
-        mIsNetworkAvailable = Utils.networkAvaiable(sContext);
-
+        sMateDao = DaoFactory.getSearchMateDao(sContext);
     }
 
     private static ProgressBar sPreProgress;
     private static TextView sPreTextView;
     private static Drawable sProgressDrawable;
     private static List<SearchMateSubFragmentUserBean> sUserList = new ArrayList<SearchMateSubFragmentUserBean>();
+
+    // 以下的三个List都是与我们创建的mateTable相关的
+    private static List<SearchMateSubFragmentUserBean> sInsertList = new ArrayList<SearchMateSubFragmentUserBean>();
+    private static List<SearchMateSubFragmentUserBean> sUpdateList = new ArrayList<SearchMateSubFragmentUserBean>();
+    private static List<SearchMateSubFragmentUserBean> sDBList = new ArrayList<SearchMateSubFragmentUserBean>();
 
     private static SearchMateSubFragmentListAdapter sMateListAdapter;
 
@@ -124,9 +124,10 @@ public class BilliardsSearchMateFragment extends Fragment
         // then, inflate the image view pager
         SubFragmentsCommonUtils.initViewPager(sContext, mView, R.id.mate_fragment_gallery_pager, R.id.mate_fragment_gallery_pager_indicator_group);
 
-        sSubFragmentList = (PullToRefreshListView) mView.findViewById(R.id.search_sub_fragment_list);
-        sSubFragmentList.setMode(PullToRefreshBase.Mode.BOTH);
-        sSubFragmentList.setOnRefreshListener(mOnRefreshListener);
+        sSubFragmentListView = (PullToRefreshListView) mView.findViewById(R.id.search_sub_fragment_list);
+
+        sSubFragmentListView.setMode(PullToRefreshBase.Mode.BOTH);
+        sSubFragmentListView.setOnRefreshListener(mOnRefreshListener);
 
         sPreProgress = (ProgressBar) mView.findViewById(R.id.pre_progress);
         sPreTextView = (TextView) mView.findViewById(R.id.pre_text);
@@ -142,11 +143,29 @@ public class BilliardsSearchMateFragment extends Fragment
         mArgs = args.getString(BILLIARD_SEARCH_TAB_NAME);
 
         // TODO: 以下加载是测试数据，暂时不能删除(因为现在的数据不完整，我们还需要这些测试数据来查看数据加载完整的具体的具体的UI效果)
-//        initListViewDataSrc();
+        initListViewDataSrc();
+
+        // 加载数据库当中的全部数据
+        // TODO: 我们在这里暂时先采用一个不是太好的实现策略，即直接采用粗糙的 new Thread()的方式
+        // TODO: 这样创建线程不太好管理，所以我们应该优化一下这里，将这里创建的thread移到Handler当中进行统一管理
+        new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                sDBList = sMateDao.getMateList(sStartNum, sEndNum + 1);
+                if (! sDBList.isEmpty())
+                {
+                    sUIEventsHandler.obtainMessage(USE_CACHE, sDBList).sendToTarget();
+                }
+            }
+        }).start();
 
         // TODO: 暂时定于在这里进行Adapter的更新操作
+        Log.d(TAG, " onCreateView --> the adapter is notified here ");
+
         sMateListAdapter = new SearchMateSubFragmentListAdapter(sContext, (ArrayList<SearchMateSubFragmentUserBean>) sUserList);
-        sSubFragmentList.setAdapter(sMateListAdapter);
+        sSubFragmentListView.setAdapter(sMateListAdapter);
         sMateListAdapter.notifyDataSetChanged();
 
         return mView;
@@ -174,7 +193,8 @@ public class BilliardsSearchMateFragment extends Fragment
     {
         // TODO: 如果此时我们请求到新的数据或者服务器端提供了消息推送的服务，我们这个时候需要
         // TODO: 以Notification的方式来通知用户消息的接收
-
+        if (sSubFragmentListView.isRefreshing())
+            sSubFragmentListView.onRefreshComplete();
         super.onPause();
     }
 
@@ -184,7 +204,6 @@ public class BilliardsSearchMateFragment extends Fragment
         // TODO: 我们在这里进行一些停止数据更新的操作，即停止任何同数据请求和处理的相关工作,然后再调用super.onStop()
         // TODO: 我们目前采用的策略只是简单的直接获取数据的方式，如果需要升级我们还需要通过添加BroadcastReceiver来
         // TODO: 监听数据的获取状态，然后在onStop()方法当中解注册这个BroadcastReceiver
-
         super.onStop();
     }
 
@@ -277,6 +296,11 @@ public class BilliardsSearchMateFragment extends Fragment
         }
     }
 
+    // TODO: 但是对于PopupWindow当中的button的点击是否进行处理，暂时还没有确定是否要对里面的点击事件
+    // TODO: 进行响应
+    /**
+     * 用于处理当popupWindow当中的Button(也就是显示(智能筛选)的button的点击时间)
+     */
     private static final class MatePopupInternalItemHandler implements View.OnClickListener
     {
         @Override
@@ -317,6 +341,7 @@ public class BilliardsSearchMateFragment extends Fragment
         }
 
         String rawResult = HttpUtil.urlClient(HttpConstants.SearchMate.URL, requestParams, HttpConstants.RequestMethod.GET);
+        List<SearchMateSubFragmentUserBean> resultCacheList = new ArrayList<SearchMateSubFragmentUserBean>();
 
         Log.d(TAG, " the raw result we get for the mate fragment are : " + rawResult);
         if (!TextUtils.isEmpty(rawResult)) {
@@ -332,7 +357,6 @@ public class BilliardsSearchMateFragment extends Fragment
                     Log.d(TAG, " the initial json object we get are : " + initialObj + " ; and the result are : " + resultJson);
                     if (statusCode == HttpConstants.ResponseCode.NORMAL)
                     {
-                        Log.d(TAG, " all are ok in for now ");
                         final int dataCount = resultJson.getInt("count");
                         Log.d(TAG, " the dataCount we get are : " + dataCount);
                         JSONArray dataList = resultJson.getJSONArray("list_data");
@@ -348,12 +372,14 @@ public class BilliardsSearchMateFragment extends Fragment
                             String district = dataObj.getString("district");
                             SearchMateSubFragmentUserBean mateUserBean = new SearchMateSubFragmentUserBean(userId, imgUrl, userName, SubFragmentsCommonUtils.parseGenderStr(sContext, sex), district, String.valueOf(range));
 
-                            sUserList.add(mateUserBean);
+                            resultCacheList.add(mateUserBean);
+                            // TODO: fuck goes here
+//                            sUserList.add(mateUserBean);
                         }
                         // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
-                        sUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, sUserList).sendToTarget();
+                        sUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, resultCacheList).sendToTarget();
+                        sUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
 
-                        //sUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                     } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
                     {
                         sUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
@@ -374,7 +400,8 @@ public class BilliardsSearchMateFragment extends Fragment
                 }
 
 
-            } catch (JSONException e) {
+            } catch (JSONException e)
+            {
                 e.printStackTrace();
                 Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
             }
@@ -390,9 +417,6 @@ public class BilliardsSearchMateFragment extends Fragment
 
     private static final int START_RETRIEVE_ALL_DATA = 1 << 1;
 
-    // 这里的KEY_MATE_LIST是用于向Bundle当中存储和获取我们从SQLite当中以及从网络当中获取到的mateList的内容
-    private static final String KEY_MATE_LIST = "keyMateList";
-
     private static final int DATA_RETRIEVE_SUCCESS = 1 << 2;
     private static final int DATA_RETRIEVE_FAILED = 1 << 3;
 
@@ -405,12 +429,23 @@ public class BilliardsSearchMateFragment extends Fragment
 
     private static final int UPDATE_LOCAL_MATE_TABLE = 1 << 9;
 
+    // 主要对应于当前用户进行数据请求时，但是网络不可行的情况
+    private static final int NO_NETWORK = 1 << 10;
+
+    // 我们采用本地数据库当中存取的静态数据，而不是从Server端获取到的数据
+    private static final int USE_CACHE = 1 << 11;
+
     // 这个Handler主要是用于处理UI相关的事件,例如涉及到UI的事件的直接处理，例如Toast或者ProgressBar的显示控制
     private static Handler sUIEventsHandler = new Handler()
     {
         @Override
         public void handleMessage(Message msg)
         {
+            if (sSubFragmentListView.isRefreshing())
+            {
+                sSubFragmentListView.onRefreshComplete();
+            }
+
             switch (msg.what)
             {
                 case DATA_RETRIEVE_FAILED:
@@ -418,27 +453,83 @@ public class BilliardsSearchMateFragment extends Fragment
                     hideProgress();
                     break;
                 case DATA_RETRIEVE_SUCCESS:
-                    // TODO: 我们会将我们从网络上以及从本地数据库当中检索到的数据
-                    // TODO: 都会通过消息通知的形式发送到这里，因为这样就可以保证我们所有的涉及到UI工作都是在UI线程当中完成的
+                    Log.d(TAG, " sUIEventsHandler --> have received the data from the network ");
+                    // 我们会将我们从网络上以及从本地数据库当中检索到的数据
+                    // 都会通过消息通知的形式发送到这里，因为这样就可以保证我们所有的涉及到UI工作都是在UI线程当中完成的
+                    // 使用sBeforeCount来保存还没有更新过的List的size值
                     sBeforeCount = sUserList.size();
                     List<SearchMateSubFragmentUserBean> mateList = (ArrayList<SearchMateSubFragmentUserBean>) msg.obj;
-                    final int size = mateList.size();
-                    int i;
-                    for (i = 0; i < size; ++i)
+                    for (SearchMateSubFragmentUserBean userBean : mateList)
                     {
-                        if (! sUserList.contains(mateList.get(i)))
+                        // TODO: 这里存在的问题就是，如果server端已经将数据删除了，但是Local DB当中还有
+                        // TODO: 这个的数据的备份, 我们需要更改一些逻辑
+                        if (! sUserList.contains(userBean))
                         {
-                            sUserList.add(mateList.get(i));
+                            sUserList.add(userBean);
+                        }
+
+                        // 当数据库中都不包含这条数据时，我们才将这条数据插入到数据库当中
+                        // 如果本地数据库当中已经包含了这个数据，那么我们就直接更新这条已有的数据就可以了
+                        // 我们并不是直接在这里(UI线程)直接进行数据库的数据插入和更新操作
+                        // 我们只是将我们得到的需要插入和更新的数据放入到list当中，然后发送到sWorker当中进行具体的更新过程
+                        if (! sDBList.isEmpty())
+                        {
+                            if (! sDBList.contains(userBean))
+                            {
+                                sInsertList.add(userBean);
+                            } else
+                            {
+                                sUpdateList.add(userBean);
+                            }
+                        }
+                    }
+
+                    // 保存更新完的List的size
+                    sAfterCount = sUserList.size();
+                    Log.d(TAG, " sUiEventHandler --> the user list size are : " + sAfterCount);
+
+                    if (sUserList.isEmpty())
+                    {
+                        loadEmptyTv();
+                    } else
+                    {
+                        // 如果触发DATA_RETRIEVE_SUCCESS的事件是来自用户的下拉刷新
+                        // 事件，那么我们需要根据我们得到更新后的List来判断数据的加载是否是成功的(上拉刷新是不需要判断的，
+                        // TODO: 上拉刷新理论上所有的数据都应该保存到本地的数据库当中,如果没有保存的话，那么就是我们程序的问题了)
+                        if (sRefresh)
+                        {
+                            if (sAfterCount == sBeforeCount)
+                            {
+                                Utils.showToast(sContext, sContext.getString(R.string.no_newer_info));
+                            } else
+                            {
+                                Utils.showToast(sContext, sContext.getString(R.string.have_already_update_info, sAfterCount - sBeforeCount));
+                            }
                         }
                     }
 
                     // 更新一下本地数据库
-                    //sWorker.updateMateTable(sUserList);
+                    sWorker.updateMateTable();
+                    sMateListAdapter.notifyDataSetChanged();
+                    Log.d(TAG, " sUiEventHandler --> have notified the dataSet change event for the adapter ");
+                    sUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                    break;
+                case NO_NETWORK:
+                    Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
 
                     if (sUserList.isEmpty())
                     {
                         loadEmptyTv();
                     }
+                    break;
+
+                case USE_CACHE:
+                    List<SearchMateSubFragmentUserBean> localMateList = (ArrayList<SearchMateSubFragmentUserBean>) msg.obj;
+                    sUserList.addAll(localMateList);
+
+                    // TODO: 注意我们在这里进行更新Adapter的操作，注意测试是否会引发异常
+                    sMateListAdapter.notifyDataSetChanged();
+
                     break;
                 case SHOW_PROGRESSBAR:
                     showProgress();
@@ -446,7 +537,8 @@ public class BilliardsSearchMateFragment extends Fragment
 
                     break;
                 case HIDE_PROGRESSBAR:
-                    //sMateListAdapter.notifyDataSetChanged();
+
+                    sMateListAdapter.notifyDataSetChanged();
                     hideProgress();
                     Log.d(TAG, " hiding the progress bar ");
                     break;
@@ -466,7 +558,6 @@ public class BilliardsSearchMateFragment extends Fragment
                     break;
 
                 case DATA_HAS_BEEN_UPDATED:
-
                     sMateListAdapter.notifyDataSetChanged();
                     Log.d(TAG, " the adapter has been notified ");
                     break;
@@ -500,16 +591,16 @@ public class BilliardsSearchMateFragment extends Fragment
                     if (sUserList.isEmpty()) {
                         loadEmptyTv();
                     }
-
                     break;
             }
+
 
         }
     };
 
     private static void loadEmptyTv()
     {
-        SubFragmentsCommonUtils.setFragmentEmptyTextView(sContext, sSubFragmentList, sContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+        SubFragmentsCommonUtils.setFragmentEmptyTextView(sContext, sSubFragmentListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str));
     }
 
     private static void showProgress()
@@ -524,6 +615,9 @@ public class BilliardsSearchMateFragment extends Fragment
         Log.d(TAG, " hiding the progress bar ");
         sPreProgress.setVisibility(View.GONE);
         sPreTextView.setVisibility(View.GONE);
+
+        if (sSubFragmentListView.isRefreshing())
+            sSubFragmentListView.onRefreshComplete();
     }
 
     private static final String WORKER_NAME = "BackgroundWorker";
@@ -587,9 +681,21 @@ public class BilliardsSearchMateFragment extends Fragment
                             break;
 
                         case UPDATE_LOCAL_MATE_TABLE:
-                            // 更新我们所获得的本地的数据库
-                            List<SearchMateSubFragmentUserBean> mateListToLocal = (ArrayList<SearchMateSubFragmentUserBean>) msg.obj;
-                            // TODO: 同本地数据库建立连接，用于更新我们的本地数据
+                            if (! sUpdateList.isEmpty())
+                            {
+                                sMateDao.updateMateInfoBatch(sUpdateList);
+                            }
+
+                            if (! sInsertList.isEmpty())
+                            {
+                                long insertResult = sMateDao.insertMateItemBatch(sInsertList);
+                                if (insertResult == -1)
+                                {
+                                    // TODO: 我们应该在这里添加插入数据的异常处理机制
+                                    // TODO: 我们这里的暂时的处理机制就是简单不能插入就更新
+                                    sMateDao.updateMateInfoBatch(sInsertList);
+                                }
+                            }
 
                             break;
 
@@ -601,7 +707,16 @@ public class BilliardsSearchMateFragment extends Fragment
 
         public void fetchAllData()
         {
-            mBackgroundHandler.sendEmptyMessage(START_RETRIEVE_ALL_DATA);
+            Log.d(TAG, " sWorker : fetchAllData() --> Work has started ");
+            if (Utils.networkAvaiable(sContext))
+            {
+                sLoadMore = false;
+                sRefresh = false;
+                mBackgroundHandler.sendEmptyMessage(START_RETRIEVE_ALL_DATA);
+            } else
+            {
+                sUIEventsHandler.sendEmptyMessage(NO_NETWORK);
+            }
         }
 
         public void fetchDataWithRangeFilter(String range)
@@ -624,18 +739,9 @@ public class BilliardsSearchMateFragment extends Fragment
             mBackgroundHandler.sendMessage(msg);
         }
 
-
-        /**
-         * 用于将我们得到的mateList来更新我们创建的本地数据库
-         *
-         * @param mateList
-         */
-        public void updateMateTable(final List<SearchMateSubFragmentUserBean> mateList)
+        public void updateMateTable()
         {
-            if (mateList != null && ! mateList.isEmpty())
-            {
-                mBackgroundHandler.obtainMessage(UPDATE_LOCAL_MATE_TABLE, mateList);
-            }
+            mBackgroundHandler.sendEmptyMessage(UPDATE_LOCAL_MATE_TABLE);
         }
 
         public void exit()
@@ -656,6 +762,7 @@ public class BilliardsSearchMateFragment extends Fragment
     private static boolean sRefresh;
     private static boolean sLoadMore;
 
+    // 我们在整个类初始化时，就已经将sStartNum和sEndNum初始化为0和9
     private static int sStartNum = 0;
     private static int sEndNum = 9;
     // 用于定义当前MateList当中的list的position，帮助我们确定从第几条开始请求数据
@@ -670,26 +777,23 @@ public class BilliardsSearchMateFragment extends Fragment
             String lable = SubFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(lable);
 
-            new Thread(new Runnable()
+            sRefresh = true;
+            sLoadMore = false;
+            sInsertList.clear();
+            sUpdateList.clear();
+            if (Utils.networkAvaiable(sContext))
             {
-                @Override
-                public void run()
-                {
-                    if (Utils.networkAvaiable(sContext))
-                    {
-                        sRefresh = true;
-                        sLoadMore = false;
-                        // 跟分析球厅RoomFragment当中请求最新数据的原理一样，当用户进行下拉刷新
-                        // 的时候，一定是再要求最新的数据，那么我们一定是要从第0条开始加载，一次加载10条，
-                        // 即从0到9
-                        retrieveInitialMateInfoList(0, 9, "", "");
-                    } else
-                    {
-                        Toast.makeText(sContext, sContext.getString(R.string.network_not_available), Toast.LENGTH_LONG).show();
-                    }
+                // TODO: 直接在这里进行网络请求，由于是在请求最新的数据，所以我们直接将我们
+                // TODO: 的数据的startNum置为0，请求的是0~9条数据就是符合下拉刷新的逻辑过程的
+                // TODO: 但是我们在这里请求时，也是要考虑到用户的筛选参数的请求
 
-                }
-            }).start();
+
+            } else
+            {
+                // 下拉刷新的过程代表用户请求的是最新的数据，如果没有网络的话，那就是确定请求不到了，本地数据库
+                // 保存都是我们请求过的历史数据,所以在这里，我们直接告诉用户没有网络就可以了
+                sUIEventsHandler.sendEmptyMessage(NO_NETWORK);
+            }
         }
 
         @Override
@@ -699,60 +803,57 @@ public class BilliardsSearchMateFragment extends Fragment
             String label = SubFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
-            new Thread(new Runnable()
+            sLoadMore = true;
+            sRefresh = false;
+            sCurrentPos = sUserList.size();
+            sInsertList.clear();
+            sUpdateList.clear();
+
+            if (sBeforeCount != sAfterCount)
             {
-                @Override
-                public void run()
+                sStartNum = sEndNum + (sAfterCount - sBeforeCount);
+                sEndNum += 10 + (sAfterCount - sBeforeCount);
+            } else
+            {
+                sStartNum = sEndNum + 1;
+                sEndNum += 10;
+            }
+
+            if (Utils.networkAvaiable(sContext))
+            {
+                // 网络可行的情况
+                // TODO: 我们应该在这里首先判断，用户是都已经添加了筛选参数，
+                // TODO: 如果用户已经添加了筛选参数，则我们需要在筛选参数的基础之上进行网络请求的工作
+                // TODO: 用户的请求应该是累加的，即用户真正希望的效果是用户在选择了"500米以内"之后
+                // TODO: 再选择"男"是可以选出“500米以内的男性球友”,而不是每次只能选出一个
+                // TODO: ??????????Implemented??????????????
+
+            } else
+            {
+                // 网络暂时不可行，我们需要从本地的数据库进行数据的请求工作
+                // 在进行本地请求时，我们要注意不能阻塞当前的主线程(上拉刷新的过程是运行于主线程当中的)
+                List<SearchMateSubFragmentUserBean> localRetrievedList = sMateDao.getMateList(sStartNum, 10);
+                if (! localRetrievedList.isEmpty())
                 {
-                    sLoadMore = true;
-                    sCurrentPos = sUserList.size();
-                    if (sBeforeCount != sAfterCount)
-                    {
-                        sStartNum = sEndNum + (sAfterCount - sBeforeCount);
-                        sEndNum += 10 - (sAfterCount - sBeforeCount);
-                    } else {
-                        sStartNum = sEndNum + 1;
-                        sEndNum += 10;
-                    }
+                    Log.d(TAG, " onPullUpToRefresh --> we have send the list that we retrieved from the local list to the sUIEvensHandler, and" +
+                            "the list size are : " + localRetrievedList.size());
 
-                    if (Utils.networkAvaiable(sContext))
-                    {
-                        retrieveInitialMateInfoList(sStartNum, sEndNum, "", "");
-                    } else
-                    {
-                        // 从数据库当中进行检索
-                        // 此时用于不一定已经滑动了最底部，而只是可能我们一开始只是加载了10条，我们现在
-                        // 需要加载更多，但是如果网络不行的话，我们不能通过下拉刷新加载更新的数据，但是我们
-                        // 还是可以通过数据库检索我们之前加载过的历史数据(如果我们发现数据库当中也没有更多的数据可供加载了，那么我们就要
-                        // 告诉用户没有可用的数据供加载了)
-                        // 所以以下就是我们加载历史数据的过程
-                        // 因为我们对历史数据的加载也是有条数限制的，在这里我们也是限制为一次加载10条
-                        Log.d(TAG, " have touch the end of the list--> we need to fetch data from database , " +
-                                "and the startNumber are : " + sStartNum + " , and the endNumber are : " + sEndNum);
-                        List<SearchMateSubFragmentUserBean> mateList = sMateDaoImpl.getMateList(sStartNum, (sEndNum - sStartNum) + 1);
-                        Log.d(TAG, " the mate list we get from the SQLite are : " + mateList.size());
-                        if (! mateList.isEmpty())
-                        {
-                            sUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, mateList).sendToTarget();
-                        } else
-                        {
-                            sUIEventsHandler.obtainMessage(DATA_RETRIEVE_FAILED, mateList).sendToTarget();
-                        }
-                    }
+                    sUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, localRetrievedList).sendToTarget();
+                } else
+                {
+                    // 我们没有检索到任何数据，用户还没有插入任何数据，我们现在，仅仅需要告诉用户没有检索到数据就可以了
+                    sUIEventsHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
                 }
-            }).start();
-
+            }
         }
     };
-
-
 
     // TODO: the following are just for testing
     // TODO: and remove all of them out with the true data we retrieved from RESTful WebService
     private void initListViewDataSrc()
     {
         int i;
-        for (i = 0; i < 100; ++i) {
+        for (i = 0; i < 2; ++i) {
             sUserList.add(new SearchMateSubFragmentUserBean("", "", "月夜流沙", "男", "昌平区", "20000米以内"));
         }
     }
