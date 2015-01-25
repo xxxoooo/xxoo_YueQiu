@@ -65,7 +65,9 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:drawableTop="@drawable/ic_launcher"
-                android:text="该位置暂无球友"/>
+                android:text="暂无查询结果"
+                android:textSize="16sp"
+                android:textColor="@color/md__defaultBackground"/>
         </RelativeLayout>
 
     </LinearLayout>

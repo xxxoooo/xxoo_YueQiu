@@ -87,6 +87,9 @@ public class AddPersonFragment extends Fragment {
             mActionBar = getActivity().getActionBar();
         }
         init(view);
+        //初始化查询
+        showProgressBar(true);
+        getActivity().startService(new Intent(getActivity(), LocationUtil.class));
         return view;
     }
 
@@ -159,9 +162,7 @@ public class AddPersonFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity())
                 .registerReceiver(mBroadcastReceiver, new IntentFilter(LocationUtil.BROADCAST_FILTER));
 
-        //初始化查询
-        showProgressBar(true);
-        getActivity().startService(new Intent(getActivity(), LocationUtil.class));
+
     }
 
     @Override
