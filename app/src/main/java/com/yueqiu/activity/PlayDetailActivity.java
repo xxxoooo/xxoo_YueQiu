@@ -68,6 +68,7 @@ public class PlayDetailActivity extends Activity {
         mInfoType = Integer.parseInt(args.getString(DatabaseConstant.PlayTable.TYPE));
         mPlayDao = DaoFactory.getPlay(this);
 
+        //TODO://从缓存中读取
 
         if(Utils.networkAvaiable(this)){
             requestDetail();
@@ -246,6 +247,7 @@ public class PlayDetailActivity extends Activity {
                 case PublicConstant.GET_SUCCESS:
                     PlayInfo info = (PlayInfo) msg.obj;
                     updateUI(info);
+                    //TODO:针对数据库的操作
                     break;
                 case PublicConstant.TIME_OUT:
                     mNoResultTv.setVisibility(View.VISIBLE);
