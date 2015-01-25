@@ -4,9 +4,11 @@ import android.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.view.KeyEvent;
 
 import com.yueqiu.R;
-import com.yueqiu.fragment.requestaddfriend.FriendsApplicationFragment;
+import com.yueqiu.fragment.addfriend.FriendManageFragment;
+import com.yueqiu.fragment.addfriend.FriendsApplicationFragment;
 
 /**
  * Created by doushuqi on 15/1/7.
@@ -46,5 +48,27 @@ public class FriendsApplicationActivity extends SingleFragmentActivity {
         if (fragment instanceof FriendsApplicationFragment)
             mActionBar.setTitle(R.string.qiuyou_application);
         else mActionBar.setTitle(R.string.qiuyou_manage);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                doBack();
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void doBack(){
+        Fragment currentFragment = mFragmentManager.findFragmentById(R.id.fragment_container);
+        if (currentFragment instanceof FriendsApplicationFragment) {
+            finish();
+            overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+        } else if (currentFragment instanceof FriendManageFragment) {
+            //fixme:fragment 之间的切换（需修改）
+            finish();
+            overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+        }
     }
 }

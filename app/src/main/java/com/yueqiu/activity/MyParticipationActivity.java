@@ -12,7 +12,7 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 
 import com.yueqiu.R;
-import com.yueqiu.fragment.myparticipation.MyActivitiesFragment;
+import com.yueqiu.fragment.participation.MyPlayFragment;
 
 /**
  * created by doushuqi on 14/12/19.
@@ -28,14 +28,14 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_myparticipation);
+        setContentView(R.layout.activity_billiard_group);
         initActionBar();
         mTitles = new String[]{
                 getString(R.string.billiard_dating),
                 getString(R.string.participation_activities)
         };
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.myparticipation_container);
+        mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -100,10 +100,10 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
             switch (i) {
                 case 0:
 //                    mFragment = new BilliardDatingFragment();
-                    mFragment = new MyActivitiesFragment();//should to be replaced!
+                    mFragment = new MyPlayFragment();//should to be replaced!
                     break;
                 case 1:
-                    mFragment = new MyActivitiesFragment();
+                    mFragment = new MyPlayFragment();
                     break;
             }
             return mFragment;

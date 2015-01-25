@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/YueQiu.iml" filepath="$PROJECT_DIR$/YueQiu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/datetimepicker-library/datetimepicker-library.iml" filepath="$PROJECT_DIR$/datetimepicker-library/datetimepicker-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/emoji-library/emoji-library.iml" filepath="$PROJECT_DIR$/emoji-library/emoji-library.iml" />
+      <module fileurl="file://$PROJECT_DIR$/xxoo_YueQiu.iml" filepath="$PROJECT_DIR$/xxoo_YueQiu.iml" />
+    </modules>
+  </component>
+</project>
+

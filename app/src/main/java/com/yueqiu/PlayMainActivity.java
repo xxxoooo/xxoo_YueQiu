@@ -17,9 +17,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
+import com.yueqiu.activity.NearbyResultActivity;
 import com.yueqiu.activity.PlayBusinessActivity;
 import com.yueqiu.activity.PlayIssueActivity;
-import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.bean.PlayIdentity;
 import com.yueqiu.bean.PlayInfo;
 import com.yueqiu.dao.DaoFactory;
@@ -132,7 +132,7 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
                     Utils.showToast(this,getString(R.string.please_login_first));
                 }else{
                     startActivity(new Intent(this, PlayIssueActivity.class));
-                    overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                    overridePendingTransition(R.anim.group_in_to_left,R.anim.group_out_to_left);
                 }
 
                 break;
@@ -146,7 +146,7 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
         return true;
     }
 

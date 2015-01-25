@@ -1,10 +1,7 @@
 package com.yueqiu.activity;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -20,7 +17,6 @@ import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.UserDao;
-import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 
@@ -32,15 +28,11 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -315,11 +307,13 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         switch (v.getId()) {
             case R.id.update_assistant_btn:
                 //TODO:升级助教界面
-                startActivity(new Intent(this, UpdateAssistantActivity.class));
+                startActivity(new Intent(this, UpgradeAssistantActivity.class));
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case R.id.update_coach_btn:
                 //TODO:升级教练界面
-                startActivity(new Intent(this, UpdateAssistantActivity.class));
+                startActivity(new Intent(this, UpgradeAssistantActivity.class));
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case R.id.my_profile_photo:
                 startMyActivity(0);

@@ -9,10 +9,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -41,7 +39,7 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_myfavor_coll);
+        setContentView(R.layout.activity_billiard_group);
         /**
          * 获取数据库中全部的数据
          */
@@ -71,7 +69,7 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
                 getString(R.string.tab_title_activity),
                 getString(R.string.billiard_group)
         };
-        mViewPager = (ViewPager) findViewById(R.id.favor_coll_pager);
+        mViewPager = (ViewPager) findViewById(R.id.pager);
 
     }
 
@@ -151,7 +149,7 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
         return true;
     }
 

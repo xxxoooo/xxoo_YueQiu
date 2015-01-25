@@ -58,6 +58,7 @@
         <item name="android:textColor">@color/md__defaultBackground</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
+
     </style>
 
     <style name="ActionBar.TitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
@@ -118,7 +119,7 @@
         <item name="android:dividerHeight">0.5dp</item>
         <item name="android:divider">@color/search_list_divider</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
         <item name="android:padding">2dp</item>
     </style>
 
@@ -181,7 +182,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">22sp</item>
-        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_marginBottom">3dp</item>
 
     </style>
 

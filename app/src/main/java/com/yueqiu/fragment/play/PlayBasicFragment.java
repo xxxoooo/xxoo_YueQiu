@@ -10,7 +10,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -77,7 +76,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.activity_play,null);
+        mView = inflater.inflate(R.layout.activity_play_bussiness,null);
         mPlayType = getArguments().getInt("type");
         mPlayDao = DaoFactory.getPlay(mActivity);
         mAdapter = new PlayListViewAdapter(mActivity,mList);
@@ -147,8 +146,13 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
         mEmptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
-        mEmptyView.setText(getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+        mEmptyView.setText(mActivity.getString(R.string.no_play_info, mEmptyTypeStr));
         mPullToRefreshListView.setEmptyView(mEmptyView);
+    }
+    protected void setEmptyViewGone(){
+        if(null != mEmptyView){
+            mEmptyView.setVisibility(View.GONE);
+        }
     }
 
     private void requestPlay(){
@@ -250,10 +254,12 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                 mPullToRefreshListView.onRefreshComplete();
             switch (msg.what){
                 case PublicConstant.USE_CACHE:
+                    setEmptyViewGone();
                     List<PlayInfo> cacheList = (List<PlayInfo>) msg.obj;
                     mList.addAll(cacheList);
                     break;
                 case PublicConstant.GET_SUCCESS:
+                    setEmptyViewGone();
                     mBeforeCount = mList.size();
                     List<PlayInfo> list = (List<PlayInfo>) msg.obj;
                     for(PlayInfo info : list){

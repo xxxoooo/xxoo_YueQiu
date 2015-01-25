@@ -9,9 +9,7 @@ import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,26 +36,21 @@ import android.widget.Toast;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.RequestAddFriendActivity;
-import com.yueqiu.bean.SearchPeopleInfo;
+import com.yueqiu.bean.NearbyPeopleInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
-import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by doushuqi on 14/12/17.
@@ -70,13 +63,15 @@ public class AddPersonFragment extends Fragment {
     private ActionBar mActionBar;
     private LinearLayout mLinearLayout;
     private ProgressBar mProgressBar;
-    private List<SearchPeopleInfo.SearchPeopleItemInfo> mList;
+    private List<NearbyPeopleInfo.SearchPeopleItemInfo> mList;
     private ListView mListView;
     private LocationManager mLocationManager;
     private Drawable mProgressDrawable;
     private double mLatitude, mLongitude;
     public static final String FRIEND_INFO_USER_ID = "com.yueqiu.fragment.chatbar.friend_info.user_id";
     public static final String FRIEND_INFO_USERNAME = "com.yueqiu.fragment.chatbar.friend_info.username";
+    private View mEmptyView;
+    private TextView mProgressBarText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -91,8 +86,16 @@ public class AddPersonFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             mActionBar = getActivity().getActionBar();
         }
+        init(view);
+        return view;
+    }
+
+    private void init(View view) {
+        mEmptyView = view.findViewById(R.id.empty_view);
         mListView = (ListView) view.findViewById(R.id.search_result_container);
         mProgressBar = (ProgressBar) view.findViewById(R.id.pre_progress);
+        mProgressBarText = (TextView) view.findViewById(R.id.pre_text);
+        mProgressBarText.setText(getString(R.string.search_nearby));
         mProgressDrawable = new FoldingCirclesDrawable.Builder(getActivity()).build();
         Rect bounds = mProgressBar.getIndeterminateDrawable().getBounds();
         mProgressBar.setIndeterminateDrawable(mProgressDrawable);
@@ -105,11 +108,26 @@ public class AddPersonFragment extends Fragment {
                     Utils.showToast(getActivity(), getString(R.string.network_not_available));
                     return;
                 }
-                mProgressBar.setVisibility(View.VISIBLE);
+                if (mList != null && mList.size() > 0) {
+                    mList.clear();
+
+                }
+
+                showProgressBar(true);
                 getActivity().startService(new Intent(getActivity(), LocationUtil.class));
             }
         });
-        return view;
+    }
+
+    private void showProgressBar(boolean isShow) {
+        mEmptyView.setVisibility(View.GONE);
+        if (isShow) {
+            mProgressBar.setVisibility(View.VISIBLE);
+            mProgressBarText.setVisibility(View.VISIBLE);
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+            mProgressBarText.setVisibility(View.GONE);
+        }
     }
 
     BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -118,7 +136,7 @@ public class AddPersonFragment extends Fragment {
             Bundle bundle = intent.getExtras();
             boolean isTimeout = bundle.getBoolean(LocationUtil.ISTIMEOUT_KEY);
             if (isTimeout) {
-                mProgressBar.setVisibility(View.GONE);
+                showProgressBar(false);
             } else {
                 Location location = bundle.getParcelable(LocationUtil.LOCATION_KEY);
                 mLatitude = location.getLatitude();
@@ -140,6 +158,10 @@ public class AddPersonFragment extends Fragment {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity())
                 .registerReceiver(mBroadcastReceiver, new IntentFilter(LocationUtil.BROADCAST_FILTER));
+
+        //初始化查询
+        showProgressBar(true);
+        getActivity().startService(new Intent(getActivity(), LocationUtil.class));
     }
 
     @Override
@@ -169,7 +191,7 @@ public class AddPersonFragment extends Fragment {
                     mList.clear();
                     mListView.deferNotifyDataSetChanged();
                 }
-                mProgressBar.setVisibility(View.VISIBLE);
+                showProgressBar(true);
                 ((InputMethodManager) getActivity()
                         .getSystemService(Context.INPUT_METHOD_SERVICE))
                         .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
@@ -189,9 +211,12 @@ public class AddPersonFragment extends Fragment {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case PublicConstant.GET_SUCCESS:
-                    mProgressBar.setVisibility(View.GONE);
-                    SearchPeopleInfo searchPeopleInfo = (SearchPeopleInfo) msg.obj;
+                    showProgressBar(false);
+                    NearbyPeopleInfo searchPeopleInfo = (NearbyPeopleInfo) msg.obj;
                     mList = searchPeopleInfo.mList;
+                    if (mList.size() > 0)
+                        mEmptyView.setVisibility(View.GONE);
+                    else mEmptyView.setVisibility(View.VISIBLE);
                     MyAdapter adapter = new MyAdapter(getActivity(), mList);
                     mListView.setAdapter(adapter);
                     mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -203,12 +228,13 @@ public class AddPersonFragment extends Fragment {
                             intent.putExtra(FRIEND_INFO_USER_ID, friendUserId);
                             intent.putExtra(FRIEND_INFO_USERNAME, username);
                             startActivity(intent);
+                            getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         }
                     });
                     break;
                 case PublicConstant.NO_RESULT:
-                    mProgressBar.setVisibility(View.GONE);
-                    Toast.makeText(getActivity(), "当前位置暂无球友！", Toast.LENGTH_LONG).show();
+                    showProgressBar(false);
+                    Toast.makeText(getActivity(), "未查询到球友！", Toast.LENGTH_LONG).show();
                     break;
                 case PublicConstant.TIME_OUT:
                     Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
@@ -223,6 +249,9 @@ public class AddPersonFragment extends Fragment {
                 default:
                     break;
             }
+            if (mList == null || mList.size() <= 0) {
+                mEmptyView.setVisibility(View.VISIBLE);
+            }
         }
     };
 
@@ -236,11 +265,11 @@ public class AddPersonFragment extends Fragment {
             JSONObject jsonResult = new JSONObject(result);
             if (!jsonResult.isNull("code")) {
                 if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                    SearchPeopleInfo searchPeople = new SearchPeopleInfo();
+                    NearbyPeopleInfo searchPeople = new NearbyPeopleInfo();
 //                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
                     JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
                     for (int i = 0; i < list_data.length(); i++) {
-                        SearchPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
+                        NearbyPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
                         itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
                         itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
                         itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
@@ -264,7 +293,8 @@ public class AddPersonFragment extends Fragment {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mProgressBar.setVisibility(View.GONE);
+                    showProgressBar(false);
+                    mEmptyView.setVisibility(View.VISIBLE);
                     Utils.showToast(getActivity(), getString(R.string.no_data));
                 }
             }, 100);
@@ -287,11 +317,11 @@ public class AddPersonFragment extends Fragment {
             JSONObject jsonResult = new JSONObject(result);
             if (!jsonResult.isNull("code")) {
                 if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                    SearchPeopleInfo searchPeople = new SearchPeopleInfo();
+                    NearbyPeopleInfo searchPeople = new NearbyPeopleInfo();
 //                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
                     JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
                     for (int i = 0; i < list_data.length(); i++) {
-                        SearchPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
+                        NearbyPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
                         itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
                         itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
                         itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
@@ -319,10 +349,10 @@ public class AddPersonFragment extends Fragment {
 
     class MyAdapter extends BaseAdapter {
         private Context mContext;
-        private List<SearchPeopleInfo.SearchPeopleItemInfo> mList;
+        private List<NearbyPeopleInfo.SearchPeopleItemInfo> mList;
         private LayoutInflater mInflater;
 
-        MyAdapter(Context context, List<SearchPeopleInfo.SearchPeopleItemInfo> list) {
+        MyAdapter(Context context, List<NearbyPeopleInfo.SearchPeopleItemInfo> list) {
             this.mContext = context;
             this.mList = list;
             mInflater = LayoutInflater.from(mContext);

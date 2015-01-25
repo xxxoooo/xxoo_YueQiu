@@ -73,7 +73,7 @@
     <string name="search_billiard_dating_str">约球</string>
 
     <!--用于SearchActivity当中的各个Fragment为空时，显示的TextView-->
-    <string name="search_activity_subfragment_empty_tv_str">对不起，暂时没有加载到任何数据</string>
+    <string name="search_activity_subfragment_empty_tv_str">抱歉，暂时没有加载到任何数据</string>
     <!-- 以下是位于SearchActivity当中的各个子Fragment当中的不同的listView展示的title -->
     <!-- 1.球友子Fragment中的title -->
     <string name="search_mate_subfragment_title_distance">距离</string>
@@ -188,7 +188,6 @@
     <string name="search_room_detailedactivity_address_test">苏州街29号维亚大厦B1楼(苏州街地铁站北侧)</string>
     <!-- 需要注意的是以下的是电话号码字段，我们需要做成超链接的形式，即可以调用implicit intent的链接 -->
     <string name="search_room_detailedactivity_phone_test">(010)52712345</string>
-    <string name="network_unavailable_hint_info_str">当前的网络状况不好，请您打开网络设置重新设置网络连接，或者到信号强的地方</string>
 
     <!-- TOOD: 以下的测试字符串都是需要在正式发布时删掉的 -->
     <!-- 用于测试的默认字符串 -->
@@ -304,6 +303,9 @@
     <string name="send">发送</string>
     <string name="set_group">移至分组</string>
     <string name="message_more">查看更多消息</string>
+    <string name="ignore">忽略</string>
+    <string name="agree">通过</string>
+    <string name="search_nearby">正在努力查找附近的球友....</string>
 
     <!-- 活动 -->
     <string name="xlistview_header_hint_normal">下拉刷新</string>
@@ -364,6 +366,7 @@
     <string name="star_meet">球星汇</string>
     <string name="no_detail_info">没有该活动的详情信息</string>
     <string name="no_business_activity">未获取商家活动信息</string>
+    <string name="no_play_info">未获取<xliff:g id="type">%1$s</xliff:g>信息</string>
     <string name="no_more_type_activity">没有更多<xliff:g id="number" example="15">%1$s</xliff:g>信息了</string>
     <string name="no_more_business_activity">没有更多商家活动信息了</string>
     <string name="activity_issuing">发布中...</string>
@@ -373,6 +376,7 @@
     <string name="retry_after_seconds">获取验证码失败，请在<xliff:g id="number" example="15">%1$s</xliff:g></string>
     <string name="activity_no_result">抱歉，未获取到<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
     <string name="sorry_no_info">抱歉，没有获取到详情信息</string>
+    <string name="store_success">收藏成功，可以进入我的收藏查看</string>
 
     <!-- 我的资料 -->
     <string name="photo">头像</string>

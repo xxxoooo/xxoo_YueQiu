@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -32,7 +33,10 @@ import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,7 +47,7 @@ public class PlayDetailActivity extends Activity {
     private ActionBar mActionBar;
     private TextView mUserNameTv,mSexTv,mBrowseCountTv,mCreateTimeTv;
     private TextView mTitleTv,mTypeTv,mAddressTv,mBeginTimeTv,mEndTimeTv,
-            mModuleTv,mContactTv,mPhoneTv,mContentTv,mPreText,mNoResultTv;
+            mModuleTv,mContactTv,mPhoneTv,mContentTv,mPreText;
     private ImageView mHeadImgIv;
     private PlayDao mPlayDao;
     private ProgressBar mPreProgressBar;
@@ -51,9 +55,11 @@ public class PlayDetailActivity extends Activity {
     private GridView mPartInGridView;
     private int mTableId,mInfoType;
     private String mCreateTime;
+    private boolean mStroe = false;
 
     private Map<String,Integer> mParamMap = new HashMap<String, Integer>();
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
+    private PlayInfo mCachePlayInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +72,17 @@ public class PlayDetailActivity extends Activity {
         mCreateTime = args.getString(DatabaseConstant.PlayTable.CREATE_TIME);
         mInfoType = Integer.parseInt(args.getString(DatabaseConstant.PlayTable.TYPE));
         mPlayDao = DaoFactory.getPlay(this);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mCachePlayInfo = mPlayDao.getPlayInfoById(mTableId,mInfoType);
+                if(!TextUtils.isEmpty(mCachePlayInfo.getUsername())){
+                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mCachePlayInfo).sendToTarget();
+                }
+            }
+        }).start();
 
+        //TODO://从缓存中读取
 
         if(Utils.networkAvaiable(this)){
             requestDetail();
@@ -99,7 +115,6 @@ public class PlayDetailActivity extends Activity {
         mPhoneTv = Utils.$(this,R.id.play_detail_phone_info);
         mContentTv = Utils.$(this,R.id.play_detail_illustration_info);
         mPartInGridView = Utils.$(this,R.id.play_detail_gridview);
-        mNoResultTv = Utils.$(this,R.id.play_detail_no_result_tv);
 
         mPreProgressBar = Utils.$(this,R.id.pre_progress);
         mPreText = Utils.$(this,R.id.pre_text);
@@ -134,6 +149,8 @@ public class PlayDetailActivity extends Activity {
             info.setLook_num(result.getInt("look_num"));
             info.setAddress(result.getString("address"));
             info.setSex(result.getString("sex"));
+            info.setContact(result.getString("name"));
+            info.setPhone(result.getString("phone"));
 
         }catch(JSONException e){
             e.printStackTrace();
@@ -186,6 +203,11 @@ public class PlayDetailActivity extends Activity {
     private void updateUI(PlayInfo info){
         mUserNameTv.setText(info.getUsername());
         mSexTv.setText(info.getSex().equals("1") ? getString(R.string.man) : getString(R.string.woman));
+        if(info.getSex().equals("1")){
+            mSexTv.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.male,0);
+        }else{
+            mSexTv.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.female,0);
+        }
         mBrowseCountTv.setText(info.getLook_num() + "");
         mCreateTimeTv.setText(mCreateTime);
         mTitleTv.setText(info.getTitle());
@@ -195,6 +217,8 @@ public class PlayDetailActivity extends Activity {
         mEndTimeTv.setText(info.getEnd_time());
         mModuleTv.setText(getModeStr(Integer.parseInt(info.getModel())));
         mContentTv.setText(info.getContent());
+        mContactTv.setText(info.getContact());
+        mPhoneTv.setText(info.getPhone());
     }
     private String getDetailTypeStr(String type){
         String typeStr;
@@ -235,36 +259,52 @@ public class PlayDetailActivity extends Activity {
         }
         return resId;
     }
-    private Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch(msg.what){
-                case PublicConstant.USE_CACHE:
-                    break;
-                case PublicConstant.GET_SUCCESS:
-                    PlayInfo info = (PlayInfo) msg.obj;
-                    updateUI(info);
-                    break;
-                case PublicConstant.TIME_OUT:
-                    mNoResultTv.setVisibility(View.VISIBLE);
-                    Utils.showToast(PlayDetailActivity.this,getString(R.string.http_request_time_out));
-                    break;
-                case PublicConstant.REQUEST_ERROR:
-                    mNoResultTv.setVisibility(View.VISIBLE);
-                    Utils.showToast(PlayDetailActivity.this,getString(R.string.http_request_error));
-                    break;
-                case PublicConstant.NO_RESULT:
-                    mNoResultTv.setVisibility(View.VISIBLE);
-                    Utils.showToast(PlayDetailActivity.this,getString(R.string.no_detail_info));
-                    break;
-                case PublicConstant.NO_NETWORK:
-                    mNoResultTv.setVisibility(View.VISIBLE);
-                    Utils.showToast(PlayDetailActivity.this,getString(R.string.network_not_available));
-                    break;
+    private Handler mHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                super.handleMessage(msg);
+                switch (msg.what) {
+                    case PublicConstant.USE_CACHE:
+                        PlayInfo cacheInfo = (PlayInfo) msg.obj;
+                        updateUI(cacheInfo);
+                        break;
+                    case PublicConstant.GET_SUCCESS:
+                        final PlayInfo info = (PlayInfo) msg.obj;
+                        updateUI(info);
+                        //TODO:更新数据库
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                updatePlayInfoDb(info);
+                            }
+                        }).start();
+                        break;
+                    case PublicConstant.TIME_OUT:
+                        Utils.showToast(PlayDetailActivity.this, getString(R.string.http_request_time_out));
+                        break;
+                    case PublicConstant.REQUEST_ERROR:
+                        Utils.showToast(PlayDetailActivity.this, getString(R.string.http_request_error));
+                        break;
+                    case PublicConstant.NO_RESULT:
+                        Utils.showToast(PlayDetailActivity.this, getString(R.string.no_detail_info));
+                        break;
+                    case PublicConstant.NO_NETWORK:
+                        if(TextUtils.isEmpty(mCachePlayInfo.getUsername()))
+                        Utils.showToast(PlayDetailActivity.this, getString(R.string.network_not_available));
+                        break;
+                    case PublicConstant.SHARE_SUCCESS:
+                            Utils.showToast(PlayDetailActivity.this, getString(R.string.store_success));
+                        break;
+                }
             }
-        }
     };
+
+
+    private void updatePlayInfoDb(PlayInfo info){
+        List<PlayInfo> list = new ArrayList<PlayInfo>();
+        list.add(info);
+        mPlayDao.updatesPlayInfo(list);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -281,11 +321,16 @@ public class PlayDetailActivity extends Activity {
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
             case R.id.menu_activities_collect:
+                //TODO:收藏完后要更新数据库
                 int user_id = YueQiuApp.sUserInfo.getUser_id();
                 if(user_id < 1) {
                     Utils.showToast(this,getString(R.string.please_login_first));
                 }else{
-
+                    if(Utils.networkAvaiable(this)){
+                        store();
+                    }else{
+                        mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
+                    }
                 }
                 break;
             case R.id.menu_activities_share:
@@ -305,5 +350,54 @@ public class PlayDetailActivity extends Activity {
                 break;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void store(){
+        mParamMap.put(HttpConstants.Play.TYPE,PublicConstant.PLAY);
+        mParamMap.put(HttpConstants.Play.ID,mTableId);
+        mParamMap.put(HttpConstants.Play.USER_ID,YueQiuApp.sUserInfo.getUser_id());
+
+        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Play.GETDETAIL);
+        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.GET);
+        mStroe = true;
+
+        new StoreTask(mParamMap).execute(mUrlAndMethodMap);
+    }
+
+    private class StoreTask extends AsyncTaskUtil<Integer>{
+
+        public StoreTask(Map<String, Integer> map) {
+            super(map);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mPreProgressBar.setVisibility(View.VISIBLE);
+            mPreText.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
+            super.onPostExecute(jsonObject);
+            mPreProgressBar.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
+
+            try{
+                if(!jsonObject.isNull("code")){
+                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                        mHandler.sendEmptyMessage(PublicConstant.SHARE_SUCCESS);
+                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                        mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                    }else{
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonObject.getString("msg")).sendToTarget();
+                    }
+                }else{
+                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                }
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+        }
     }
 }
