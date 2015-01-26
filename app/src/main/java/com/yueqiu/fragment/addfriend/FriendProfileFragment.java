@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -85,7 +86,10 @@ public class FriendProfileFragment extends Fragment {
                 args.putString(FRIEND_USER_ID, user_id);
                 Fragment fragment = new VerificationFragment();
                 fragment.setArguments(args);
-                mFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
+                FragmentTransaction ft = mFragmentManager.beginTransaction();
+                ft.setCustomAnimations(R.anim.push_left_in, R.anim.push_left_out);
+                ft.addToBackStack("com.yueqiu.activity.RequestAddFriendActivity");
+                ft.replace(R.id.fragment_container, fragment).commit();
             }
         });
         return view;
@@ -197,4 +201,6 @@ public class FriendProfileFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
 }

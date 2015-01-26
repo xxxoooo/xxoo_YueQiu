@@ -55,9 +55,10 @@ public class FriendsApplicationActivity extends SingleFragmentActivity {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 doBack();
-                break;
+                return true;
+            default:
+                return super.onKeyDown(keyCode, event);
         }
-        return super.onKeyDown(keyCode, event);
     }
 
     private void doBack(){
@@ -67,8 +68,10 @@ public class FriendsApplicationActivity extends SingleFragmentActivity {
             overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
         } else if (currentFragment instanceof FriendManageFragment) {
             //fixme:fragment 之间的切换（需修改）
-            finish();
-            overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+            mFragmentManager.beginTransaction()
+                    .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
+                    .remove(currentFragment).commit();
+            mFragmentManager.popBackStack();
         }
     }
 }

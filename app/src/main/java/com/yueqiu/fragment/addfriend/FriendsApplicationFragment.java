@@ -252,9 +252,10 @@ public class FriendsApplicationFragment extends Fragment {
                         fragment.setArguments(args);
 //                        ((FriendsApplicationActivity) getActivity()).switchFragment(fragment);
                         FragmentTransaction ft = mFragmentManager.beginTransaction();
-//                        ft.addToBackStack("FriendsApplicationActivity");
+                        ft.addToBackStack("com.yueqiu.fragment.addfriend.FriendsApplicationActivity");
+                        ft.setCustomAnimations(R.anim.push_left_in, R.anim.push_left_out);
                         ft.replace(R.id.fragment_container, fragment).commit();
-                        getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+//                        getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                     }
                 });
                 convertView.setTag(viewHolder);

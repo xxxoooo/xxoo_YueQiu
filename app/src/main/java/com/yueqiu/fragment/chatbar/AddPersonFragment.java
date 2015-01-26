@@ -343,7 +343,15 @@ public class AddPersonFragment extends Fragment {
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showProgressBar(false);
+                    mEmptyView.setVisibility(View.VISIBLE);
+                    Utils.showToast(getActivity(), getString(R.string.no_data));
+                }
+            }, 100);
+            Log.e(TAG, "JSONException>>" + e.toString());
         }
     }
 

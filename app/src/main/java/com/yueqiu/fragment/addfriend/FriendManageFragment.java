@@ -154,17 +154,20 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
 //                if (whoCreate == 0)
 //                    ((FriendsApplicationActivity) getActivity()).switchFragment(FriendsApplicationActivity.sFriendsApplication);
 //                else getActivity().finish();
-                getActivity().finish();
-                getActivity().overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                mFragmentManager.beginTransaction()
+                        .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
+                        .remove(this).commit();
+                mFragmentManager.popBackStackImmediate();
                 return true;
             case R.id.qiuyou_manage_finish:
                 //TODO:
                 mApplicationDao.updateFriendsApplication(mFriendUserId, 1);
-                mFragmentManager.beginTransaction().
-                        replace(R.id.fragment_container, new FriendsApplicationFragment()).commit();
+                mFragmentManager.beginTransaction()
+                        .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
+                        .replace(R.id.fragment_container, new FriendsApplicationFragment())
+                        .commit();
                 //处理好友请求
                 handleRequest();
-                getActivity().overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 return true;
             case R.id.send:
                 //发送好友请求
