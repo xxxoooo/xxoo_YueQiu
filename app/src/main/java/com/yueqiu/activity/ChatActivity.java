@@ -237,6 +237,7 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
         switch (id) {
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
         }
         return true;
@@ -268,5 +269,22 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
     @Override
     public void onEmojiconClicked(Emojicon emojicon) {
         EmojiconsFragment.input(mEditText, emojicon);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                if (isShowExtension) {
+                    isShowExtension = false;
+                    showExtension(isShowExtension);
+                }else {
+                    finish();
+                    overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                }
+                return true;
+            default:
+                return super.onKeyDown(keyCode, event);
+        }
     }
 }

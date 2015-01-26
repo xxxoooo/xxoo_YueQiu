@@ -305,6 +305,7 @@
     <string name="message_more">查看更多消息</string>
     <string name="ignore">忽略</string>
     <string name="agree">通过</string>
+    <string name="search_nearby">正在努力查找附近的球友....</string>
 
     <!-- 活动 -->
     <string name="xlistview_header_hint_normal">下拉刷新</string>

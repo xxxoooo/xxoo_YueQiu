@@ -70,6 +70,8 @@ public class AddPersonFragment extends Fragment {
     private double mLatitude, mLongitude;
     public static final String FRIEND_INFO_USER_ID = "com.yueqiu.fragment.chatbar.friend_info.user_id";
     public static final String FRIEND_INFO_USERNAME = "com.yueqiu.fragment.chatbar.friend_info.username";
+    private View mEmptyView;
+    private TextView mProgressBarText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,8 +86,19 @@ public class AddPersonFragment extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             mActionBar = getActivity().getActionBar();
         }
+        init(view);
+        //初始化查询
+        showProgressBar(true);
+        getActivity().startService(new Intent(getActivity(), LocationUtil.class));
+        return view;
+    }
+
+    private void init(View view) {
+        mEmptyView = view.findViewById(R.id.empty_view);
         mListView = (ListView) view.findViewById(R.id.search_result_container);
         mProgressBar = (ProgressBar) view.findViewById(R.id.pre_progress);
+        mProgressBarText = (TextView) view.findViewById(R.id.pre_text);
+        mProgressBarText.setText(getString(R.string.search_nearby));
         mProgressDrawable = new FoldingCirclesDrawable.Builder(getActivity()).build();
         Rect bounds = mProgressBar.getIndeterminateDrawable().getBounds();
         mProgressBar.setIndeterminateDrawable(mProgressDrawable);
@@ -98,11 +111,26 @@ public class AddPersonFragment extends Fragment {
                     Utils.showToast(getActivity(), getString(R.string.network_not_available));
                     return;
                 }
-                mProgressBar.setVisibility(View.VISIBLE);
+                if (mList != null && mList.size() > 0) {
+                    mList.clear();
+
+                }
+
+                showProgressBar(true);
                 getActivity().startService(new Intent(getActivity(), LocationUtil.class));
             }
         });
-        return view;
+    }
+
+    private void showProgressBar(boolean isShow) {
+        mEmptyView.setVisibility(View.GONE);
+        if (isShow) {
+            mProgressBar.setVisibility(View.VISIBLE);
+            mProgressBarText.setVisibility(View.VISIBLE);
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+            mProgressBarText.setVisibility(View.GONE);
+        }
     }
 
     BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -111,7 +139,7 @@ public class AddPersonFragment extends Fragment {
             Bundle bundle = intent.getExtras();
             boolean isTimeout = bundle.getBoolean(LocationUtil.ISTIMEOUT_KEY);
             if (isTimeout) {
-                mProgressBar.setVisibility(View.GONE);
+                showProgressBar(false);
             } else {
                 Location location = bundle.getParcelable(LocationUtil.LOCATION_KEY);
                 mLatitude = location.getLatitude();
@@ -133,6 +161,8 @@ public class AddPersonFragment extends Fragment {
         super.onResume();
         LocalBroadcastManager.getInstance(getActivity())
                 .registerReceiver(mBroadcastReceiver, new IntentFilter(LocationUtil.BROADCAST_FILTER));
+
+
     }
 
     @Override
@@ -162,7 +192,7 @@ public class AddPersonFragment extends Fragment {
                     mList.clear();
                     mListView.deferNotifyDataSetChanged();
                 }
-                mProgressBar.setVisibility(View.VISIBLE);
+                showProgressBar(true);
                 ((InputMethodManager) getActivity()
                         .getSystemService(Context.INPUT_METHOD_SERVICE))
                         .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
@@ -182,9 +212,12 @@ public class AddPersonFragment extends Fragment {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case PublicConstant.GET_SUCCESS:
-                    mProgressBar.setVisibility(View.GONE);
+                    showProgressBar(false);
                     NearbyPeopleInfo searchPeopleInfo = (NearbyPeopleInfo) msg.obj;
                     mList = searchPeopleInfo.mList;
+                    if (mList.size() > 0)
+                        mEmptyView.setVisibility(View.GONE);
+                    else mEmptyView.setVisibility(View.VISIBLE);
                     MyAdapter adapter = new MyAdapter(getActivity(), mList);
                     mListView.setAdapter(adapter);
                     mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -196,12 +229,13 @@ public class AddPersonFragment extends Fragment {
                             intent.putExtra(FRIEND_INFO_USER_ID, friendUserId);
                             intent.putExtra(FRIEND_INFO_USERNAME, username);
                             startActivity(intent);
+                            getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         }
                     });
                     break;
                 case PublicConstant.NO_RESULT:
-                    mProgressBar.setVisibility(View.GONE);
-                    Toast.makeText(getActivity(), "当前位置暂无球友！", Toast.LENGTH_LONG).show();
+                    showProgressBar(false);
+                    Toast.makeText(getActivity(), "未查询到球友！", Toast.LENGTH_LONG).show();
                     break;
                 case PublicConstant.TIME_OUT:
                     Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
@@ -215,6 +249,9 @@ public class AddPersonFragment extends Fragment {
                     break;
                 default:
                     break;
+            }
+            if (mList == null || mList.size() <= 0) {
+                mEmptyView.setVisibility(View.VISIBLE);
             }
         }
     };
@@ -257,7 +294,8 @@ public class AddPersonFragment extends Fragment {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    mProgressBar.setVisibility(View.GONE);
+                    showProgressBar(false);
+                    mEmptyView.setVisibility(View.VISIBLE);
                     Utils.showToast(getActivity(), getString(R.string.no_data));
                 }
             }, 100);
@@ -305,7 +343,15 @@ public class AddPersonFragment extends Fragment {
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    showProgressBar(false);
+                    mEmptyView.setVisibility(View.VISIBLE);
+                    Utils.showToast(getActivity(), getString(R.string.no_data));
+                }
+            }, 100);
+            Log.e(TAG, "JSONException>>" + e.toString());
         }
     }
 

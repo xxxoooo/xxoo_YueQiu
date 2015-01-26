@@ -41,6 +41,21 @@ public class FriendSetGroupFragment extends Fragment implements View.OnClickList
         mAssistCoachImageView = (ImageView) view.findViewById(R.id.friends_group_assist_coach_iv);
         mCoachImageView = (ImageView) view.findViewById(R.id.friends_group_coach_iv);
 
+        group_id = getActivity().getIntent().getIntExtra(RESULT_KEY, -1);
+        switch (group_id) {
+            case 0:
+                mQiuyouImageView.setVisibility(View.VISIBLE);
+                break;
+            case 1:
+                mAssistCoachImageView.setVisibility(View.VISIBLE);
+                break;
+            case 2:
+                mCoachImageView.setVisibility(View.VISIBLE);
+                break;
+            default:
+                break;
+        }
+
         mQiuyou = view.findViewById(R.id.friends_group_qiuyou);
         mAssistCoach = view.findViewById(R.id.friends_group_assist_coach);
         mCoach = view.findViewById(R.id.friends_group_coach);
@@ -53,11 +68,16 @@ public class FriendSetGroupFragment extends Fragment implements View.OnClickList
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                dismiss();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void dismiss() {
+        finish();
+        getActivity().overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
     }
 
     public void finish(){
@@ -75,24 +95,25 @@ public class FriendSetGroupFragment extends Fragment implements View.OnClickList
                 mQiuyouImageView.setVisibility(View.VISIBLE);
                 mAssistCoachImageView.setVisibility(View.GONE);
                 mCoachImageView.setVisibility(View.GONE);
-                finish();
+                dismiss();
                 break;
             case R.id.friends_group_assist_coach:
                 group_id = 1;
                 mQiuyouImageView.setVisibility(View.GONE);
                 mAssistCoachImageView.setVisibility(View.VISIBLE);
                 mCoachImageView.setVisibility(View.GONE);
-                finish();
+                dismiss();
                 break;
             case R.id.friends_group_coach:
                 group_id = 2;
                 mQiuyouImageView.setVisibility(View.GONE);
                 mAssistCoachImageView.setVisibility(View.GONE);
                 mCoachImageView.setVisibility(View.VISIBLE);
-                finish();
+                dismiss();
                 break;
             default:
                 break;
         }
     }
+
 }

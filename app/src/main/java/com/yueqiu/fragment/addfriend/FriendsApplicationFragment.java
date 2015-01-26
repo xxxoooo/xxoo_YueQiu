@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -101,6 +102,7 @@ public class FriendsApplicationFragment extends Fragment {
         switch (item.getItemId()) {
             case android.R.id.home:
                 getActivity().finish();
+                getActivity().overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 return true;
             case R.id.qiuyou_application_clear:
                 mList.clear();
@@ -200,6 +202,7 @@ public class FriendsApplicationFragment extends Fragment {
         }
     };
 
+
     private class MyAdapter extends BaseAdapter {
         private Context mContext;
         private List<FriendsApplication> mList;
@@ -249,8 +252,10 @@ public class FriendsApplicationFragment extends Fragment {
                         fragment.setArguments(args);
 //                        ((FriendsApplicationActivity) getActivity()).switchFragment(fragment);
                         FragmentTransaction ft = mFragmentManager.beginTransaction();
-//                        ft.addToBackStack("FriendsApplicationActivity");
+                        ft.addToBackStack("com.yueqiu.fragment.addfriend.FriendsApplicationActivity");
+                        ft.setCustomAnimations(R.anim.push_left_in, R.anim.push_left_out);
                         ft.replace(R.id.fragment_container, fragment).commit();
+//                        getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                     }
                 });
                 convertView.setTag(viewHolder);
