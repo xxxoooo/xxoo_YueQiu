@@ -59,14 +59,19 @@ public class FriendProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             mActionBar = getActivity().getActionBar();
-            String username = getActivity().getIntent().getStringExtra(AddPersonFragment.FRIEND_INFO_USERNAME);
-            mActionBar.setTitle(username);
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
 
         setHasOptionsMenu(true);
         mFragmentManager = getActivity().getSupportFragmentManager();
         mUserId = getActivity().getIntent().getIntExtra(AddPersonFragment.FRIEND_INFO_USER_ID, 0);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        String username = getActivity().getIntent().getStringExtra(AddPersonFragment.FRIEND_INFO_USERNAME);
+        mActionBar.setTitle(username);
     }
 
     @Override
