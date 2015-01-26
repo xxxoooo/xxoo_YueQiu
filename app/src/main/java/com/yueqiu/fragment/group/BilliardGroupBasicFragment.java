@@ -130,6 +130,7 @@ public class BilliardGroupBasicFragment extends Fragment {
         mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
         mListView = mPullToRefreshListView.getRefreshableView();
         mPullToRefreshListView.setOnRefreshListener(mOnRefreshListener);
+        mEmptyView = new TextView(mActivity);
 
         mProgressDrawable = new FoldingCirclesDrawable.Builder(mActivity).build();
         Rect bounds = mPreProgress.getIndeterminateDrawable().getBounds();
@@ -157,32 +158,32 @@ public class BilliardGroupBasicFragment extends Fragment {
     private void setEmptyTypeStr(){
         switch(mGroupType){
             case PublicConstant.GROUP_GET_MASTER:
-                mEmptyTypeStr = getString(R.string.billiard_get_master);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_get_master);
                 break;
             case PublicConstant.GROUP_BE_MASTER:
-                mEmptyTypeStr = getString(R.string.billiard_be_master);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_be_master);
                 break;
             case PublicConstant.GROUP_GET_FRIEND:
-                mEmptyTypeStr = getString(R.string.billiard_find_friend);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_find_friend);
                 break;
             case PublicConstant.GROUP_EQUIP:
-                mEmptyTypeStr = getString(R.string.billiard_equipment);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_equipment);
                 break;
             case PublicConstant.GROUP_OTHER:
-                mEmptyTypeStr = getString(R.string.billiard_other);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_other);
                 break;
 
         }
     }
     private void setEmptyViewVisible(){
-        mEmptyView = new TextView(mActivity);
+
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
         mEmptyView.setTextColor(mActivity.getResources().getColor(R.color.md__defaultBackground));
         if(mGroupType == PublicConstant.GROUP_ALL) {
-            mEmptyView.setText(getString(R.string.no_group_info));
+            mEmptyView.setText(mActivity.getString(R.string.no_group_info));
         }else{
-            mEmptyView.setText(getString(R.string.no_group_type_info,mEmptyTypeStr));
+            mEmptyView.setText(mActivity.getString(R.string.no_group_type_info,mEmptyTypeStr));
         }
         mPullToRefreshListView.setEmptyView(mEmptyView);
     }
@@ -339,9 +340,9 @@ public class BilliardGroupBasicFragment extends Fragment {
                     }else {
                         if (mRefresh) {
                             if (mAfterCount == mBeforeCount) {
-                                Utils.showToast(mActivity, getString(R.string.no_newer_info));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.no_newer_info));
                             } else {
-                                Utils.showToast(mActivity, getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }
@@ -357,14 +358,14 @@ public class BilliardGroupBasicFragment extends Fragment {
 
                     break;
                 case PublicConstant.TIME_OUT:
-                    Utils.showToast(mActivity,getString(R.string.http_request_time_out));
+                    Utils.showToast(mActivity,mActivity.getString(R.string.http_request_time_out));
                     if(mList.isEmpty()) {
                         setEmptyViewVisible();
                     }
                     break;
                 case PublicConstant.REQUEST_ERROR:
                     if(null == msg.obj){
-                        Utils.showToast(mActivity,getString(R.string.http_request_error));
+                        Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
                     }else{
                         Utils.showToast(mActivity, (String) msg.obj);
                     }
@@ -381,15 +382,15 @@ public class BilliardGroupBasicFragment extends Fragment {
                          */
                         if(mLoadMore) {
                             if(mGroupType == PublicConstant.GROUP_ALL) {
-                                Utils.showToast(mActivity, getString(R.string.no_more_group_info));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.no_more_group_info));
                             }else{
-                                Utils.showToast(mActivity,getString(R.string.no_more_info,mEmptyTypeStr));
+                                Utils.showToast(mActivity,mActivity.getString(R.string.no_more_info,mEmptyTypeStr));
                             }
                         }
                     }
                     break;
                 case PublicConstant.NO_NETWORK:
-                    Utils.showToast(mActivity,getString(R.string.network_not_available));
+                    Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
                     if(mList.isEmpty())
                         setEmptyViewVisible();
                     break;

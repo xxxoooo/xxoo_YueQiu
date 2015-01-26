@@ -1,15 +1,18 @@
 package com.yueqiu.fragment.slidemenu;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.activity.PlayDetailActivity;
 import com.yueqiu.adapter.FavorBasicAdapter;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.Identity;
@@ -31,10 +34,9 @@ import java.util.List;
 /**
  * Created by wangyun on 15/1/16.
  */
-public class FavorBasicFragment extends SlideMenuBasicFragment {
+public class FavorBasicFragment extends SlideMenuBasicFragment implements AdapterView.OnItemClickListener{
     private FavorBasicAdapter mAdapter;
     private FavorDao mFavorDao;
-
     //跟数据库相关的list
     private List<FavorInfo> mDBList;
 
@@ -45,6 +47,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
         View view = super.onCreateView(inflater,container,savedInstanceState);
         mFavorDao = DaoFactory.getFavor(mActivity);
         mAdapter = new FavorBasicAdapter(mActivity,mList);
+        mListView.setOnItemClickListener(this);
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -80,16 +83,16 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
     protected void setEmptyViewText(){
         switch(mType){
             case PublicConstant.FAVOR_DATE_TYPE:
-                mEmptyTypeStr = getString(R.string.search_billiard_dating_str);
+                mEmptyTypeStr = mActivity.getString(R.string.search_billiard_dating_str);
                 break;
             case PublicConstant.FAVPR_ROOM_TYPE:
-                mEmptyTypeStr = getString(R.string.search_billiard_room_str);
+                mEmptyTypeStr = mActivity.getString(R.string.search_billiard_room_str);
                 break;
-            case PublicConstant.FAVOR_ACTIVITY_TYPE:
-                mEmptyTypeStr = getString(R.string.tab_title_activity);
+            case PublicConstant.FAVOR_PLAY_TYPE:
+                mEmptyTypeStr = mActivity.getString(R.string.tab_title_activity);
                 break;
             case PublicConstant.FAVOR_GROUP_TYPR:
-                mEmptyTypeStr = getString(R.string.tab_title_billiards_circle);
+                mEmptyTypeStr = mActivity.getString(R.string.tab_title_billiards_circle);
                 break;
         }
     }
@@ -126,6 +129,8 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
                     itemInfo.setCreateTime(list_data.getJSONObject(i).getString("create_time"));
                     itemInfo.setUserName(list_data.getJSONObject(i).getString("username"));
                     itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type")));
+                    //TODO:根据服务器确定的字段
+                    itemInfo.setSubType(list_data.getJSONObject(i).getInt("subtype"));
                     itemInfo.setChecked(false);
                     list.add(itemInfo);
                 }
@@ -160,7 +165,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
     @Override
     protected void setEmptyViewVisible(){
         super.setEmptyViewVisible();
-        mEmptyView.setText(getString(R.string.your_favor_is_empty,mEmptyTypeStr));
+        mEmptyView.setText(mActivity.getString(R.string.your_favor_is_empty,mEmptyTypeStr));
         mPullToRefreshListView.setEmptyView(mEmptyView);
 
     }
@@ -216,9 +221,9 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
                     }else{
                         if(mRefresh){
                             if (mAfterCount == mBeforeCount) {
-                                Utils.showToast(mActivity, getString(R.string.no_newer_info));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.no_newer_info));
                             } else {
-                                Utils.showToast(mActivity, getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }
@@ -229,6 +234,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
                             updateDB();
                         }
                     }).start();
+
                     break;
             }
             mListView.setAdapter(mAdapter);
@@ -239,10 +245,30 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
         }
     };
 
-
-
-
-
-
-
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent;
+        FavorInfo info = (FavorInfo) mAdapter.getItem(position-1);
+        int subType = info.getSubType();
+        String tableId = info.getTable_id();
+        String createTime = info.getCreateTime();
+        Bundle args = new Bundle();
+        args.putInt(DatabaseConstant.PlayTable.TABLE_ID,Integer.parseInt(tableId));
+        args.putString(DatabaseConstant.PlayTable.CREATE_TIME,createTime);
+        args.putString(DatabaseConstant.PlayTable.TYPE,String.valueOf(subType));
+        switch(mType){
+            case PublicConstant.FAVOR_GROUP_TYPR:
+                break;
+            case PublicConstant.FAVPR_ROOM_TYPE:
+                break;
+            case PublicConstant.PUBLISHED_DATE_TYPE:
+                break;
+            case PublicConstant.FAVOR_PLAY_TYPE:
+                intent = new Intent(mActivity, PlayDetailActivity.class);
+                intent.putExtras(args);
+                startActivity(intent);
+                mActivity.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                break;
+        }
+    }
 }

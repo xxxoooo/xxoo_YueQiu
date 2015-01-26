@@ -103,6 +103,8 @@ public class PublishedFragment extends SlideMenuBasicFragment {
                     itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
                     itemInfo.setDateTime(list_data.getJSONObject(i).getString("create_time"));
                     itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type_id")));
+                    //TODO:根据服务器确定的字段
+                    itemInfo.setSubType(list_data.getJSONObject(i).getInt("subtype"));
                     itemInfo.setChecked(false);
                     list.add(itemInfo);
                 }
@@ -138,7 +140,7 @@ public class PublishedFragment extends SlideMenuBasicFragment {
 
     protected void setEmptyViewVisible(){
         super.setEmptyViewVisible();
-        mEmptyView.setText(getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+        mEmptyView.setText(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
         mPullToRefreshListView.setEmptyView(mEmptyView);
     }
 
@@ -206,9 +208,9 @@ public class PublishedFragment extends SlideMenuBasicFragment {
                     }else{
                         if(mRefresh){
                             if (mAfterCount == mBeforeCount) {
-                                Utils.showToast(mActivity, getString(R.string.no_newer_info));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.no_newer_info));
                             } else {
-                                Utils.showToast(mActivity, getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }

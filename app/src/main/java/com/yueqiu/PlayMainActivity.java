@@ -6,6 +6,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -22,6 +23,7 @@ import com.yueqiu.activity.PlayBusinessActivity;
 import com.yueqiu.activity.PlayIssueActivity;
 import com.yueqiu.bean.PlayIdentity;
 import com.yueqiu.bean.PlayInfo;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.PlayDao;
 import com.yueqiu.fragment.play.PlayBasicFragment;
@@ -40,6 +42,7 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
     private ActionBar mActionBar;
     private PlayDao mPlayDao;
     private List<PlayInfo> mDBAllList;
+    private static int sCurrentItem = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +69,28 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
                 getString(R.string.complete),
                 getString(R.string.billiard_other)
         };
+
+        mActionBar = getActionBar();
+
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar.setTitle(getString(R.string.tab_title_activity));
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+            @Override
+            public void onPageSelected(int position) {
+                mActionBar.setSelectedNavigationItem(position);
+            }
+        });
+
+        ActionBar.Tab tab;
+        for(int i=0; i<mPagerAdapter.getCount();i++){
+            tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
+
+            mActionBar.addTab(tab);
+        }
     }
 
 
@@ -153,33 +178,16 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
     @Override
     protected void onResume() {
         super.onResume();
-        mActionBar = getActionBar();
 
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.setTitle(getString(R.string.tab_title_activity));
-        mActionBar.setDisplayHomeAsUpEnabled(true);
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
-            @Override
-            public void onPageSelected(int position) {
-                mActionBar.setSelectedNavigationItem(position);
-            }
-        });
-
-        ActionBar.Tab tab;
-        for(int i=0; i<mPagerAdapter.getCount();i++){
-            tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
-
-            mActionBar.addTab(tab);
-        }
+        mViewPager.setCurrentItem(sCurrentItem);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         mActionBar.removeAllTabs();
+        sCurrentItem = mViewPager.getCurrentItem();
     }
 
     @Override

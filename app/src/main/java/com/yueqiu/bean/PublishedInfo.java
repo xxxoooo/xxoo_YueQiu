@@ -15,6 +15,7 @@ public class PublishedInfo {
     private String title;/*标题*/
     private String content;/*内容*/
     private String dateTime;/*时间*/
+    private int subType;
     private boolean checked;
 
 
@@ -72,6 +73,14 @@ public class PublishedInfo {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public int getSubType() {
+        return subType;
+    }
+
+    public void setSubType(int subtype) {
+        this.subType = subtype;
     }
 
     @Override

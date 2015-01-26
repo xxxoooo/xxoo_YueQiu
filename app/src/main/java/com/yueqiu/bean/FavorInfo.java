@@ -16,6 +16,7 @@ public class FavorInfo {
     private String content;
     private String createTime;
     private String userName;
+    private int subType;
     private boolean checked;
 
     public int getUser_id() {
@@ -80,6 +81,14 @@ public class FavorInfo {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public int getSubType() {
+        return subType;
+    }
+
+    public void setSubType(int subType) {
+        this.subType = subType;
     }
 
     @Override

@@ -36,6 +36,7 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
     private ActionBar mActionBar;
     private List<PublishedInfo> mDBAllList;
     private PublishedDao mPublishedDao;
+    private static int sCurrentItem = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,12 +72,6 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
         };
         mViewPager = (ViewPager) findViewById(R.id.pager);
 
-    }
-
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
             @Override
@@ -89,12 +84,22 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
             tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
             mActionBar.addTab(tab);
         }
+
+
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mViewPager.setCurrentItem(sCurrentItem);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mActionBar.removeAllTabs();
+//        mActionBar.removeAllTabs();
+        sCurrentItem = mViewPager.getCurrentItem();
     }
 
     @Override

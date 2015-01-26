@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -112,6 +113,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         mPullToRefreshListView.setOnRefreshListener(mRefreshListener);
         mPreProgressBar = (ProgressBar) mView.findViewById(R.id.pre_progress);
         mPreTextView = (TextView) mView.findViewById(R.id.pre_text);
+        mEmptyView = new TextView(mActivity);
 
         mProgressDrawable = new FoldingCirclesDrawable.Builder(mActivity).build();
         Rect bounds = mPreProgressBar.getIndeterminateDrawable().getBounds();
@@ -124,25 +126,25 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     private void setmEmptyStr(){
         switch(mPlayType){
             case PublicConstant.PLAY_GROUP:
-                mEmptyTypeStr = getString(R.string.group_activity);
+                mEmptyTypeStr = mActivity.getString(R.string.group_activity);
                 break;
             case PublicConstant.PLAY_MEET_STAR:
-                mEmptyTypeStr = getString(R.string.star_meet);
+                mEmptyTypeStr = mActivity.getString(R.string.star_meet);
                 break;
             case PublicConstant.PLAY_BILLIARD_SHOW:
-                mEmptyTypeStr = getString(R.string.billiard_show);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_show);
                 break;
             case PublicConstant.PLAY_COMPETITION:
-                mEmptyTypeStr = getString(R.string.complete);
+                mEmptyTypeStr = mActivity.getString(R.string.complete);
                 break;
             case PublicConstant.PLAY_OTHER_ACTIVITY:
-                mEmptyTypeStr = getString(R.string.billiard_other);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_other);
                 break;
         }
     }
 
     private void setEmptyViewVisible(){
-        mEmptyView = new TextView(mActivity);
+
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
         mEmptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
@@ -274,7 +276,6 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                         }else{
                             mUpdateList.add(info);
                         }
-
                         YueQiuApp.sPlayMap.put(identity,info);
                     }
                     mAfterCount = mList.size();
@@ -283,9 +284,9 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                     }else{
                         if(mRefresh){
                             if (mAfterCount == mBeforeCount) {
-                                Utils.showToast(mActivity, getString(R.string.no_newer_info));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.no_newer_info));
                             } else {
-                                Utils.showToast(mActivity, getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }
@@ -296,25 +297,27 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                             updatePlayInfoDB();
                         }
                     }).start();
+
+
                     break;
                 case PublicConstant.NO_RESULT:
                     if(mList.isEmpty()) {
                         setEmptyViewVisible();
                     }else{
                         if(mLoadMore) {
-                            Utils.showToast(mActivity,getString(R.string.no_more_info,mEmptyTypeStr));
+                            Utils.showToast(mActivity,mActivity.getString(R.string.no_more_info,mEmptyTypeStr));
                         }
                     }
                     break;
                 case PublicConstant.TIME_OUT:
-                    Utils.showToast(mActivity, getString(R.string.http_request_time_out));
+                    Utils.showToast(mActivity, mActivity.getString(R.string.http_request_time_out));
                     if(mList.isEmpty()) {
                         setEmptyViewVisible();
                     }
                     break;
                 case PublicConstant.REQUEST_ERROR:
                     if(null == msg.obj){
-                        Utils.showToast(mActivity,getString(R.string.http_request_error));
+                        Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
                     }else{
                         Utils.showToast(mActivity, (String) msg.obj);
                     }
@@ -323,7 +326,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                     }
                     break;
                 case PublicConstant.NO_NETWORK:
-                    Utils.showToast(mActivity,getString(R.string.network_not_available));
+                    Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
                     if(mList.isEmpty())
                         setEmptyViewVisible();
                     break;

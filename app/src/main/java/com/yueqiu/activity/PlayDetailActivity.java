@@ -22,10 +22,12 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.PlayInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.FavorDao;
 import com.yueqiu.dao.PlayDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.AsyncTaskUtil;
@@ -59,7 +61,8 @@ public class PlayDetailActivity extends Activity {
 
     private Map<String,Integer> mParamMap = new HashMap<String, Integer>();
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
-    private PlayInfo mCachePlayInfo;
+    private PlayInfo mCachePlayInfo,mPlayInfo;
+    private FavorDao mFavorDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +74,7 @@ public class PlayDetailActivity extends Activity {
         mTableId = args.getInt(DatabaseConstant.PlayTable.TABLE_ID);
         mCreateTime = args.getString(DatabaseConstant.PlayTable.CREATE_TIME);
         mInfoType = Integer.parseInt(args.getString(DatabaseConstant.PlayTable.TYPE));
+        mFavorDao = DaoFactory.getFavor(this);
         mPlayDao = DaoFactory.getPlay(this);
         new Thread(new Runnable() {
             @Override
@@ -269,13 +273,13 @@ public class PlayDetailActivity extends Activity {
                         updateUI(cacheInfo);
                         break;
                     case PublicConstant.GET_SUCCESS:
-                        final PlayInfo info = (PlayInfo) msg.obj;
-                        updateUI(info);
+                        mPlayInfo = (PlayInfo) msg.obj;
+                        updateUI(mPlayInfo);
                         //TODO:更新数据库
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                updatePlayInfoDb(info);
+                                updatePlayInfoDb(mPlayInfo);
                             }
                         }).start();
                         break;
@@ -289,8 +293,9 @@ public class PlayDetailActivity extends Activity {
                         Utils.showToast(PlayDetailActivity.this, getString(R.string.no_detail_info));
                         break;
                     case PublicConstant.NO_NETWORK:
+                        //TODO:有问题
                         if(TextUtils.isEmpty(mCachePlayInfo.getUsername()))
-                        Utils.showToast(PlayDetailActivity.this, getString(R.string.network_not_available));
+                            Utils.showToast(PlayDetailActivity.this, getString(R.string.network_not_available));
                         break;
                     case PublicConstant.SHARE_SUCCESS:
                             Utils.showToast(PlayDetailActivity.this, getString(R.string.store_success));
@@ -303,7 +308,7 @@ public class PlayDetailActivity extends Activity {
     private void updatePlayInfoDb(PlayInfo info){
         List<PlayInfo> list = new ArrayList<PlayInfo>();
         list.add(info);
-        mPlayDao.updatesPlayInfo(list);
+        mPlayDao.updatesDetailPlayInfo(list);
     }
 
     @Override
@@ -328,6 +333,15 @@ public class PlayDetailActivity extends Activity {
                 }else{
                     if(Utils.networkAvaiable(this)){
                         store();
+                        //TODO:插入到本地数据库后可以，但是接口那边现在还没更新
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                FavorInfo favor = setFavorInfo(mPlayInfo);
+                                insertFavorDB(favor);
+                            }
+                        }).start();
+
                     }else{
                         mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
                     }
@@ -350,6 +364,25 @@ public class PlayDetailActivity extends Activity {
                 break;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    private FavorInfo setFavorInfo(PlayInfo info){
+        FavorInfo favor = new FavorInfo();
+        favor.setUser_id(YueQiuApp.sUserInfo.getUser_id());
+        favor.setTable_id(info.getTable_id());
+        favor.setType(PublicConstant.FAVOR_PLAY_TYPE);
+        favor.setTitle(info.getTitle());
+        favor.setContent(info.getContent());
+        favor.setCreateTime(info.getCreate_time());
+        favor.setUserName(info.getUsername());
+        favor.setSubType(Integer.parseInt(info.getType()));
+        return favor;
+    }
+
+    private void insertFavorDB(FavorInfo info){
+        List<FavorInfo> list = new ArrayList<FavorInfo>();
+        list.add(info);
+        mFavorDao.insertFavorInfo(list);
     }
 
     private void store(){

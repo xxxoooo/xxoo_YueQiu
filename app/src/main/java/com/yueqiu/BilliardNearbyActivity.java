@@ -75,6 +75,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private static final int NUM_OF_FRAGMENTS = 5;
 
     private static final String FRAGMENT_PAGER_LAST_POSITION = "fragmentPagerLastPosition";
+    private static final String CURRENT_KEY = "nearby_current_item";
 
     private static final int LOGOUT_SUCCESS = 0;
     private static final int LOGOUT_FAILED = 1;
@@ -157,7 +158,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
             }
         });
-        mViewPager.setCurrentItem(sPagerPos);
+        setupTabs();
 
     }
 
@@ -165,7 +166,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     protected void onResume()
     {
         super.onResume();
-        setupTabs();
+//        setupTabs();
         initDrawer();
         mNearbyRadio.setChecked(true);
         mViewPager.setCurrentItem(sPagerPos);
@@ -175,7 +176,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     protected void onPause()
     {
         super.onPause();
-        mActionBar.removeAllTabs();
+        //mActionBar.removeAllTabs();
         sPagerPos = mViewPager.getCurrentItem();
     }
 

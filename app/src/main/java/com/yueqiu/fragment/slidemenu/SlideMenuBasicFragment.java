@@ -96,6 +96,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
         mListView = mPullToRefreshListView.getRefreshableView();
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListView.setMultiChoiceModeListener(new ActionModeCallback());
+        mEmptyView = new TextView(mActivity);
 
 
         mPreText = (TextView) mView.findViewById(R.id.pre_text);
@@ -109,11 +110,11 @@ public abstract class SlideMenuBasicFragment extends Fragment {
 
     }
     protected void setEmptyViewVisible(){
-        mEmptyView = new TextView(mActivity);
+
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
-        mEmptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
-        mEmptyView.setText(getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+        mEmptyView.setTextColor(mActivity.getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setText(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
         mPullToRefreshListView.setEmptyView(mEmptyView);
     }
 
@@ -199,12 +200,12 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                         setEmptyViewVisible();
                     }else{
                         if(mLoadMore)
-                            Utils.showToast(mActivity, getString(R.string.no_more_info, mEmptyTypeStr));
+                            Utils.showToast(mActivity, mActivity.getString(R.string.no_more_info, mEmptyTypeStr));
                     }
                     break;
                 case PublicConstant.REQUEST_ERROR:
                     if(null == msg.obj){
-                        Utils.showToast(mActivity,getString(R.string.http_request_error));
+                        Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
                     }else{
                         Utils.showToast(mActivity, (String) msg.obj);
                     }
@@ -213,13 +214,13 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                     }
                     break;
                 case PublicConstant.TIME_OUT:
-                    Utils.showToast(mActivity,getString(R.string.http_request_time_out));
+                    Utils.showToast(mActivity,mActivity.getString(R.string.http_request_time_out));
                     if(mList.isEmpty()) {
                         setEmptyViewVisible();
                     }
                     break;
                 case PublicConstant.NO_NETWORK:
-                    Utils.showToast(mActivity,getString(R.string.network_not_available));
+                    Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
                     if(mList.isEmpty())
                         setEmptyViewVisible();
                     break;
@@ -283,12 +284,12 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                     mode.finish();
                     View contents = View.inflate(mActivity,R.layout.dialog_delete_content_layout, null);
                     TextView msg = (TextView) contents.findViewById(R.id.confir_dialog_message);
-                    msg.setText(getString(R.string.published_delete_content,mSelectedItems.size()));
+                    msg.setText(mActivity.getString(R.string.published_delete_content,mSelectedItems.size()));
                     YueQiuDialogBuilder builder = new YueQiuDialogBuilder(mActivity);
                     builder.setTitle(R.string.action_delete);
                     builder.setIcon(R.drawable.warning_white);
                     builder.setView(contents);
-                    SpannableString confirmSpanStr = new SpannableString(getString(R.string.published_confirm_str));
+                    SpannableString confirmSpanStr = new SpannableString(mActivity.getString(R.string.published_confirm_str));
                     confirmSpanStr.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.md__defaultBackground)), 0, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     builder.setPositiveButton(confirmSpanStr,new DialogInterface.OnClickListener() {
                         @Override
@@ -296,7 +297,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                             dialog.dismiss();
                         }
                     });
-                    SpannableString cancelSpanStr = new SpannableString(getString(R.string.published_cancel_str));
+                    SpannableString cancelSpanStr = new SpannableString(mActivity.getString(R.string.published_cancel_str));
                     cancelSpanStr.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.md__defaultBackground)), 0, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     builder.setNegativeButton(cancelSpanStr,null);
                     builder.show();

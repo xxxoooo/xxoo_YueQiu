@@ -2,9 +2,6 @@ package com.yueqiu.bean;
 
 import java.util.List;
 
-/**
- * Created by yinfeng on 15/1/3.
- */
 public class PlayInfo {
     private String table_id;
     private String username;

@@ -43,6 +43,7 @@ public class FavorDaoImpl implements FavorDao {
                 values.put(DatabaseConstant.FavorInfoItemTable.CONTENT, info.getContent());
                 values.put(DatabaseConstant.FavorInfoItemTable.DATETIME, info.getCreateTime());
                 values.put(DatabaseConstant.FavorInfoItemTable.USER_NAME,info.getUserName());
+                values.put(DatabaseConstant.FavorInfoItemTable.SUBTYPE,info.getSubType());
                 result = mDB.insert(DatabaseConstant.FavorInfoItemTable.TABLE, null, values);
             }
             mDB.setTransactionSuccessful();
@@ -68,6 +69,7 @@ public class FavorDaoImpl implements FavorDao {
                 values.put(DatabaseConstant.FavorInfoItemTable.DATETIME, info.getCreateTime());
                 values.put(DatabaseConstant.FavorInfoItemTable.USER_NAME,info.getUserName());
                 values.put(DatabaseConstant.FavorInfoItemTable.TYPE,info.getType());
+                values.put(DatabaseConstant.FavorInfoItemTable.SUBTYPE,info.getSubType());
                 result = mDB.update(DatabaseConstant.FavorInfoItemTable.TABLE, values, DatabaseConstant.FavorInfoItemTable.USER_ID + "=? and " +
                                 DatabaseConstant.FavorInfoItemTable.TABLE_ID + "=? and " + DatabaseConstant.FavorInfoItemTable.TYPE + "=?",
                         new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()), String.valueOf(info.getTable_id()),String.valueOf(info.getType())});
@@ -98,6 +100,7 @@ public class FavorDaoImpl implements FavorDao {
                 item.setCreateTime(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.FavorInfoItemTable.DATETIME)));
                 item.setTable_id(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.FavorInfoItemTable.TABLE_ID)));
                 item.setUserName(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.FavorInfoItemTable.USER_NAME)));
+                item.setSubType(itemCursor.getInt(itemCursor.getColumnIndexOrThrow(DatabaseConstant.FavorInfoItemTable.SUBTYPE)));
                 list.add(item);
             }while(itemCursor.moveToNext());
         }
@@ -123,6 +126,7 @@ public class FavorDaoImpl implements FavorDao {
                 item.setCreateTime(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.FavorInfoItemTable.DATETIME)));
                 item.setTable_id(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.FavorInfoItemTable.TABLE_ID)));
                 item.setUserName(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.FavorInfoItemTable.USER_NAME)));
+                item.setSubType(itemCursor.getInt(itemCursor.getColumnIndexOrThrow(DatabaseConstant.FavorInfoItemTable.SUBTYPE)));
                 list.add(item);
             }while(itemCursor.moveToNext());
         }

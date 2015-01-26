@@ -7,6 +7,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -21,6 +22,7 @@ import android.widget.SearchView;
 import com.yueqiu.activity.GroupIssueTopic;
 import com.yueqiu.activity.NearbyResultActivity;
 import com.yueqiu.bean.GroupNoteInfo;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.GroupInfoDao;
 import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
@@ -39,6 +41,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
     private ActionBar mActionBar;
     private GroupInfoDao mGroupDao;
     private List<GroupNoteInfo> mDBAllList;
+    private static int sCurrentItem = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +69,30 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
                 getString(R.string.billiard_equipment),
                 getString(R.string.billiard_other)
         };
+        mActionBar = getActionBar();
+
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar.setTitle(getString(R.string.billiard_group));
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+            @Override
+            public void onPageSelected(int position) {
+                mActionBar.setSelectedNavigationItem(position);
+            }
+        });
+
+        Tab tab;
+        for(int i=0; i<mPagerAdapter.getCount();i++){
+            tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
+
+            mActionBar.addTab(tab);
+        }
+        //mViewPager.setCurrentItem(sCurrentItem);
+
+
     }
 
     public class SectionPagerAdapter extends FragmentStatePagerAdapter {
@@ -146,35 +173,13 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
     @Override
     protected void onResume() {
         super.onResume();
-        mActionBar = getActionBar();
-
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.setTitle(getString(R.string.billiard_group));
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
-            @Override
-            public void onPageSelected(int position) {
-                mActionBar.setSelectedNavigationItem(position);
-            }
-        });
-
-
-
-        Tab tab;
-        for(int i=0; i<mPagerAdapter.getCount();i++){
-            tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
-
-            mActionBar.addTab(tab);
-        }
+        mViewPager.setCurrentItem(sCurrentItem);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mActionBar.removeAllTabs();
+        sCurrentItem = mViewPager.getCurrentItem();
     }
 
     @Override
