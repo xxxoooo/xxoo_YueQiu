@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -84,6 +85,8 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
                     mPreProgress.setVisibility(View.GONE);
                     mPreTextView.setVisibility(View.GONE);
                     //TODO:向publish数据库插入数据
+                    //TODO:由于目前不需要缓存，所以这里先不操作数据库，后期
+                    //TODO:再需要缓存时，再加入，不过这里的服务器返回的字段值缺少
 //                    new Thread(new Runnable() {
 //                        @Override
 //                        public void run() {
@@ -397,6 +400,8 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         }
     }
 
+
+
     private String getType(String type)
     {
         if(type.equals(getString(R.string.group_activity)))
@@ -454,6 +459,7 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         return super.onKeyDown(keyCode, event);
     }
 
+    //TODO:由于目前不需要缓存，所以暂时先不调用该方法
     private List<PublishedInfo> setPublishInfo(PlayInfo info){
         List<PublishedInfo> list = new ArrayList<PublishedInfo>();
         PublishedInfo publishedInfo = new PublishedInfo();
@@ -463,7 +469,8 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         publishedInfo.setTitle(info.getTitle());
         publishedInfo.setContent(info.getContent());
         publishedInfo.setDateTime(info.getCreate_time());
-        publishedInfo.setSubType(Integer.parseInt(info.getType()));
+        //TODO:加入缓存后这个字段肯定要加入
+//        publishedInfo.setSubType(Integer.parseInt(info.getType()));
         list.add(publishedInfo);
         return list;
     }

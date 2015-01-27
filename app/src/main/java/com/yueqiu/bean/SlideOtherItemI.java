@@ -3,11 +3,11 @@ package com.yueqiu.bean;
 /**
  * Created by wangyun on 14/12/29.
  */
-public class SlideOtherItem implements ListItem{
+public class SlideOtherItemI implements IListItem {
     private String mName;
     private boolean mHasMsg;
     private int mResId;
-    public SlideOtherItem(int res,String name,boolean hasMsg){
+    public SlideOtherItemI(int res, String name, boolean hasMsg){
         this.mName = name;
         this.mHasMsg = hasMsg;
         this.mResId = res;

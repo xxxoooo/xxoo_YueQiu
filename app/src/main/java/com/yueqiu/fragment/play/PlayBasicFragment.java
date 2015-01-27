@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 
 public class PlayBasicFragment extends Fragment implements AdapterView.OnItemClickListener{
+    private static final String SAVED_KEY = "saved_play";
     private Activity mActivity;
     private View mView;
     private PullToRefreshListView mPullToRefreshListView;
@@ -65,14 +66,22 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     private int mCurrPosition;
     private Map<String,Integer> mParamMap = new HashMap<String, Integer>();
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
-    private List<PlayInfo> mList = new ArrayList<PlayInfo>();
+    private ArrayList<PlayInfo> mList = new ArrayList<PlayInfo>();
     private List<PlayInfo> mInsertList = new ArrayList<PlayInfo>();
     private List<PlayInfo> mUpdateList = new ArrayList<PlayInfo>();
-    private List<PlayInfo> mDBList = new ArrayList<PlayInfo>();
+    private List<PlayInfo> mCacheList = new ArrayList<PlayInfo>();
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = activity;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //TODO:是否需要在这里保存数据？如果在滑动过程中断网了，那么在滑回来的时候
+        //TODO:按照现在不用缓存的逻辑页面就是空的
+        outState.putParcelableArrayList(SAVED_KEY, mList);
     }
 
     @Override
@@ -83,17 +92,38 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         mAdapter = new PlayListViewAdapter(mActivity,mList);
         initView();
         setmEmptyStr();
+        //////////////////////////////////////////////////////////////////////////////////
+        //TODO:先去掉缓存功能，后期再根据需求加回来，目前逻辑没问题
+        //TODO:同样是可以考虑用更有效率的loader或其他异步方法，而不是
+        //TODO:简单地用线程，线程的生命周期不可控
+        /**
+         * mCacheList是缓存list，从数据库中根据当前type值获取到前十条
+         * 如果mCacheList不为空就先使用该list填充listview
+         */
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                mCacheList = mPlayDao.getPlayInfoLimit(mPlayType,mStart,10);
+//                if(!mCacheList.isEmpty()){
+//                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
+//                }
+//            }
+//        }).start();
+        //////////////////////////////////////////////////////////////////////////////////
+        if(savedInstanceState != null){
+            mCacheList = savedInstanceState.getParcelableArrayList(SAVED_KEY);
+            mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
+        }
+        //TODO:savedInstance为null证明该是第一次进入到viewpager,需要从数据库中读缓存
+        //TODO:后期要做缓存的时候可以将上面读缓存的代码放到else里面
+//        else{
+//
+//        }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mDBList = mPlayDao.getPlayInfoLimit(mPlayType,mStart,10);
-                if(!mDBList.isEmpty()){
-                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mDBList).sendToTarget();
-                }
-            }
-        }).start();
 
+        /**
+         * 如果网络正常，就向网络请求数据
+         */
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
@@ -104,6 +134,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
 
         return mView;
     }
+
 
     private void initView()
     {
@@ -123,6 +154,10 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         mListView.setOnItemClickListener(this);
 
     }
+
+    /**
+     * 根据不同的type值设定EmptyView显示的文字
+     */
     private void setmEmptyStr(){
         switch(mPlayType){
             case PublicConstant.PLAY_GROUP:
@@ -143,8 +178,10 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         }
     }
 
+    /**
+     * 为pull-to-refresh-listview设定EmptyView
+     */
     private void setEmptyViewVisible(){
-
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
         mEmptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
@@ -157,6 +194,10 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         }
     }
 
+    /**
+     * 向网络请求数据，mParamMap是传递参数的map，mUrlAndMap存放
+     * 请求的url和method
+     */
     private void requestPlay(){
         mParamMap.put(HttpConstants.Play.TYPE, mPlayType);
         mParamMap.put(HttpConstants.Play.START_NO,mStart);
@@ -262,21 +303,40 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                     break;
                 case PublicConstant.GET_SUCCESS:
                     setEmptyViewGone();
+                    /**
+                     * mBeforeCount是从网络成功获取数据前的list的size
+                     * mAfterCount是成功获取数据后的list的size
+                     * 这两个值是用来判断更新了多少条
+                     */
                     mBeforeCount = mList.size();
                     List<PlayInfo> list = (List<PlayInfo>) msg.obj;
                     for(PlayInfo info : list){
                         if(!mList.contains(info)){
                             mList.add(info);
                         }
-                        PlayIdentity identity = new PlayIdentity();
-                        identity.type = info.getType();
-                        identity.table_id = info.getTable_id();
-                        if(!YueQiuApp.sPlayMap.containsKey(identity)){
-                            mInsertList.add(info);
-                        }else{
-                            mUpdateList.add(info);
-                        }
-                        YueQiuApp.sPlayMap.put(identity,info);
+
+                        //TODO:下面的逻辑是用来更新缓存的，不过目前先不需要缓存
+                        //TODO:如果后期功能需要加缓存再加回来，目前的逻辑暂时没问题
+                        /**
+                         * 根据这条playinfo的type和tableId值生成唯一的key值
+                         * 如果全局的playMap里有这条数据，则将这条数据加入
+                         * updateList，如果这条数据在playMap里不存在将将这条数据加入insertList
+                         */
+//                        PlayIdentity identity = new PlayIdentity();
+//                        identity.type = info.getType();
+//                        identity.table_id = info.getTable_id();
+//                        if(!YueQiuApp.sPlayMap.containsKey(identity)){
+//                            mInsertList.add(info);
+//                        }else{
+//                            mUpdateList.add(info);
+//                        }
+                        /**
+                         * Map在put值的时候，如果key值已经存在则会用新的value覆盖
+                         * 原先的value，如果key值不存在则直接放入，所以这里playInfo是
+                         * 放入updateList还是insertList，这里都要执行以下put操作，用来更新
+                         * 全局的map
+                         */
+//                        YueQiuApp.sPlayMap.put(identity,info);
                     }
                     mAfterCount = mList.size();
                     if(mList.isEmpty()){
@@ -290,13 +350,17 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                             }
                         }
                     }
-                    //TODO:
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updatePlayInfoDB();
-                        }
-                    }).start();
+                    //TODO:是否有更有效率的异步方法？
+                    //TODO:而不是简单地用线程，不过插入和更新操作都是使用事务，效率已经很高了
+                    /**
+                     * 异步更新数据库
+                     */
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            updatePlayInfoDB();
+//                        }
+//                    }).start();
 
 
                     break;
@@ -339,6 +403,10 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         }
     };
 
+    /**
+     * 用来更新数据库的函数
+     */
+    //TODO：由于暂时不需要缓存功能，所以该方法暂时不执行
     private void updatePlayInfoDB(){
         if(!mUpdateList.isEmpty()){
             mPlayDao.updatesPlayInfo(mUpdateList);
@@ -366,6 +434,9 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
             mLoadMore = false;
             mInsertList.clear();
             mUpdateList.clear();
+            /**
+             * 下拉刷新始终都是请求最新的数据,无网络时无法使用缓存
+             */
             if(Utils.networkAvaiable(mActivity)){
                 mParamMap.put(HttpConstants.GroupList.STAR_NO,0);
                 mParamMap.put(HttpConstants.GroupList.END_NO,9);
@@ -387,9 +458,15 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
             mLoadMore = true;
             mRefresh = false;
             mCurrPosition = mList.size() ;
+            /**
+             * 将用来插入和更新数据库的两个list清空，以免之前的数据重复插入
+             */
             mInsertList.clear();
             mUpdateList.clear();
-
+            /**
+             * 如果要加载前先进行过下拉刷新，同时数据有更新，则此时再加载时分页的
+             * start，end应该相应的增加
+             */
             if(mBeforeCount != mAfterCount){
                 mStart = mEnd + (mAfterCount - mBeforeCount);
                 mEnd += 10 + (mAfterCount - mBeforeCount);
@@ -402,15 +479,22 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                 mParamMap.put(HttpConstants.GroupList.END_NO,mEnd);
                 requestPlay();
             }
+            //TODO:由于目前不需要缓存功能，所以当没有网络时就直接toast无网络
+            //TODO:如果后期需要缓存功能再重新加回来
+            /**
+             * 无网络时从当前最后一条数据之后再查十条数据
+             */
+//            else{
+//                List<PlayInfo> list = mPlayDao.getPlayInfoLimit(mPlayType, mStart, 10);
+//                if(list.isEmpty()){
+//                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+//                }else{
+//                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list);
+//                }
+//            }
             else{
-                List<PlayInfo> list = mPlayDao.getPlayInfoLimit(mPlayType, mStart, 10);
-                if(list.isEmpty()){
-                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                }else{
-                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list);
-                }
+                mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
             }
-
 
         }
     };

@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.bean.FavorInfo;
+import com.yueqiu.bean.ISlideMenuBasic;
 import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -64,7 +65,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
     protected int mStart_no = 0,mEnd_no = 9;
     protected int mCurrPosition;
     protected int mAfterCount,mBeforeCount;
-    protected List<Object> mList = new ArrayList<Object>();
+    protected ArrayList<ISlideMenuBasic> mList = new ArrayList<ISlideMenuBasic>();
     protected Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
     protected Map<String,Integer> mParamsMap = new HashMap<String, Integer>();
     protected List<PublishedInfo> mPublishInsertList = new ArrayList<PublishedInfo>();

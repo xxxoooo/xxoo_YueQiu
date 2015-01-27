@@ -167,6 +167,7 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
             super.handleMessage(msg);
             switch(msg.what){
                 case PublicConstant.GET_SUCCESS:
+                    //TODO:如果后期需要缓存的话，这里还需要多做几步操作，向group表插入缓存数据同时还得向publish表插入数据
                     Utils.showToast(GroupIssueTopic.this,getString(R.string.activity_submit_success));
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);

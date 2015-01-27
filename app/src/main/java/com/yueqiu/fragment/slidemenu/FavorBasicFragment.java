@@ -35,12 +35,21 @@ import java.util.List;
  * Created by wangyun on 15/1/16.
  */
 public class FavorBasicFragment extends SlideMenuBasicFragment implements AdapterView.OnItemClickListener{
+    private static final String SAVE_FAVOR_KEY = "save_favor";
     private FavorBasicAdapter mAdapter;
     private FavorDao mFavorDao;
     //跟数据库相关的list
-    private List<FavorInfo> mDBList;
+    private List<FavorInfo> mCacheList;
 
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //TODO:是否需要在这里保存数据？如果在滑动过程中断网了，那么在滑回来的时候
+        //TODO:按照现在不用缓存的逻辑页面就是空的
+        outState.putParcelableArrayList(SAVE_FAVOR_KEY, mList);
+    }
+    
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -48,15 +57,34 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
         mFavorDao = DaoFactory.getFavor(mActivity);
         mAdapter = new FavorBasicAdapter(mActivity,mList);
         mListView.setOnItemClickListener(this);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mDBList = mFavorDao.getFavorLimit(YueQiuApp.sUserInfo.getUser_id(),mType,mStart_no,10);
-                if(!mDBList.isEmpty()){
-                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mDBList).sendToTarget();
-                }
-            }
-        }).start();
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        //TODO:先去掉缓存功能，后期再根据需求加回来，目前逻辑没问题
+        //TODO:同样是可以考虑用更有效率的loader或其他异步方法，而不是
+        //TODO:简单地用线程，线程的生命周期不可控
+        /**
+         * mCacheList是缓存list，从数据库中根据当前type值获取到前十条
+         * 如果mCacheList不为空就先使用该list填充listview
+         */
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                mCacheList = mFavorDao.getFavorLimit(YueQiuApp.sUserInfo.getUser_id(),mType,mStart_no,10);
+//                if(!mCacheList.isEmpty()){
+//                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
+//                }
+//            }
+//        }).start();
+        ///////////////////////////////////////////////////////////////////////////////////////////
+
+        if(savedInstanceState != null){
+            mCacheList = savedInstanceState.getParcelableArrayList(SAVE_FAVOR_KEY);
+            mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
+        }
+        //TODO:savedInstance为null证明该是第一次进入到viewpager,需要从数据库中读缓存
+        //TODO:后期要做缓存的时候可以将上面读缓存的代码放到else里面
+//        else{
+//
+//        }
 
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
@@ -129,8 +157,8 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                     itemInfo.setCreateTime(list_data.getJSONObject(i).getString("create_time"));
                     itemInfo.setUserName(list_data.getJSONObject(i).getString("username"));
                     itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type")));
-                    //TODO:根据服务器确定的字段
-                    itemInfo.setSubType(list_data.getJSONObject(i).getInt("subtype"));
+                    //TODO:根据服务器确定的字段,如果不做缓存这个字段不需要，但是如果后期要加缓存，这个字段必须有
+//                    itemInfo.setSubType(list_data.getJSONObject(i).getInt("subtype"));
                     itemInfo.setChecked(false);
                     list.add(itemInfo);
                 }
@@ -154,12 +182,15 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
 
     @Override
     protected void onPullUpWhenNetNotAvailable() {
-        List<FavorInfo> list= mFavorDao.getFavorLimit(YueQiuApp.sUserInfo.getUser_id(), mType, mStart_no, 10);
-        if(!list.isEmpty()) {
-            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, list).sendToTarget();
-        }else{
-            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-        }
+        //TODO:由于不用缓存，所以直接toast无网络，如果后期需要缓存了，再换回这段代码
+//        List<FavorInfo> list= mFavorDao.getFavorLimit(YueQiuApp.sUserInfo.getUser_id(), mType, mStart_no, 10);
+//        if(!list.isEmpty()) {
+//            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, list).sendToTarget();
+//        }else{
+//            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+//        }
+
+        mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
     }
 
     @Override
@@ -169,7 +200,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
         mPullToRefreshListView.setEmptyView(mEmptyView);
 
     }
-
+    //TODO:目前不需要缓存，所以这个方法先不调用
     private void updateDB(){
         if(!mFavorUpdateList.isEmpty()){
             mFavorDao.updateFavorInfo(mFavorUpdateList);
@@ -204,16 +235,31 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                         if(!mList.contains(info)){
                             mList.add(info);
                         }
-                        Identity identity = new Identity();
-                        identity.user_id = YueQiuApp.sUserInfo.getUser_id();
-                        identity.table_id = info.getTable_id();
-                        identity.type = info.getType();
-                        if(!YueQiuApp.sFavorMap.containsKey(identity)){
-                            mFavorInsertList.add(info);
-                        }else{
-                            mFavorUpdateList.add(info);
-                        }
-                        YueQiuApp.sFavorMap.put(identity,info);
+                        //////////////////////////////////////////////////////
+                        //TODO:下面的逻辑是用来更新缓存的，不过目前先不需要缓存
+                        //TODO:如果后期功能需要加缓存再加回来，目前的逻辑暂时没问题
+                        /**
+                         * 根据这条favorinfo的type和tableId,以及userId值生成唯一的key值
+                         * 如果全局的favorMap里有这条数据，则将这条数据加入
+                         * updateList，如果这条数据在favorMap里不存在将将这条数据加入insertList
+                         */
+//                        Identity identity = new Identity();
+//                        identity.user_id = YueQiuApp.sUserInfo.getUser_id();
+//                        identity.table_id = info.getTable_id();
+//                        identity.type = info.getType();
+//                        if(!YueQiuApp.sFavorMap.containsKey(identity)){
+//                            mFavorInsertList.add(info);
+//                        }else{
+//                            mFavorUpdateList.add(info);
+//                        }
+                        /**
+                         * Map在put值的时候，如果key值已经存在则会用新的value覆盖
+                         * 原先的value，如果key值不存在则直接放入，所以这里favorInfo是
+                         * 放入updateList还是insertList，这里都要执行以下put操作，用来更新
+                         * 全局的map
+                         */
+//                        YueQiuApp.sFavorMap.put(identity,info);
+                        //////////////////////////////////////////////////////
                     }
                     mAfterCount = mList.size();
                     if(mList.isEmpty()){
@@ -228,12 +274,13 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                         }
                     }
 
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateDB();
-                        }
-                    }).start();
+                    //TODO:由于目前不需要做缓存，所以先不操作数据库，后期需要缓存的时候再改回来
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            updateDB();
+//                        }
+//                    }).start();
 
                     break;
             }
@@ -249,13 +296,14 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Intent intent;
         FavorInfo info = (FavorInfo) mAdapter.getItem(position-1);
-        int subType = info.getSubType();
+        //TODO:不做缓存，所以这个字段先不要
+//        int subType = info.getSubType();
         String tableId = info.getTable_id();
         String createTime = info.getCreateTime();
         Bundle args = new Bundle();
         args.putInt(DatabaseConstant.PlayTable.TABLE_ID,Integer.parseInt(tableId));
         args.putString(DatabaseConstant.PlayTable.CREATE_TIME,createTime);
-        args.putString(DatabaseConstant.PlayTable.TYPE,String.valueOf(subType));
+//        args.putString(DatabaseConstant.PlayTable.TYPE,String.valueOf(subType));
         switch(mType){
             case PublicConstant.FAVOR_GROUP_TYPR:
                 break;

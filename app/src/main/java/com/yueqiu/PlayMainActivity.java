@@ -41,19 +41,28 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
     private SectionPagerAdapter mPagerAdapter;
     private ActionBar mActionBar;
     private PlayDao mPlayDao;
-    private List<PlayInfo> mDBAllList;
+    private List<PlayInfo> mCacheAllList;
     private static int sCurrentItem = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_billiard_group);
-
+        /////////////////////////////////////////////////
+        //TODO:由于IOS那边没做缓存功能，这里先不做缓存，缓存属于
+        //TODO:后期功能，不过这里可以考虑一下用更好的异步方法，而不是简单地线程
+        /**
+         * 逻辑：从数据库中读取出play表的全部信息，并根据tableId和type生成唯一的key
+         * 存入全局的play map中，这个map保存全部play信息，并保证每条play信息都是唯一的
+         * ps:由于有5个type，所以type必然是一个区分不同play信息的判断条件，另外从服务器返回
+         * 的每条play信息的tableId肯定是唯一的，所以这里用tableId和type生成一个对象作为
+         * 唯一标识的key，该对象一定要覆盖equals和hashCode方法
+         */
         mPlayDao = DaoFactory.getPlay(this);
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mDBAllList = mPlayDao.getAllPlayInfo();
-                for(PlayInfo info : mDBAllList){
+                mCacheAllList = mPlayDao.getAllPlayInfo();
+                for(PlayInfo info : mCacheAllList){
                     PlayIdentity identity = new PlayIdentity();
                     identity.table_id = info.getTable_id();
                     identity.type = info.getType();
@@ -61,6 +70,8 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
                 }
             }
         }).start();
+        //////////////////////////////////////////////////
+
 
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
         mTitles = new String[]{getString(R.string.group_activity),
@@ -186,7 +197,7 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
     @Override
     protected void onPause() {
         super.onPause();
-        mActionBar.removeAllTabs();
+        //mActionBar.removeAllTabs();
         sCurrentItem = mViewPager.getCurrentItem();
     }
 

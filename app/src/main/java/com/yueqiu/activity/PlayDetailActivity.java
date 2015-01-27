@@ -76,6 +76,10 @@ public class PlayDetailActivity extends Activity {
         mInfoType = Integer.parseInt(args.getString(DatabaseConstant.PlayTable.TYPE));
         mFavorDao = DaoFactory.getFavor(this);
         mPlayDao = DaoFactory.getPlay(this);
+        //////////////////////////////////////////////////////////////////////
+        //TODO:先去掉缓存功能，后期再根据需求加回来，目前逻辑没问题
+        //TODO:同样是可以考虑用更有效率的loader或其他异步方法，而不是
+        //TODO:简单地用线程，线程的生命周期不可控
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -85,8 +89,7 @@ public class PlayDetailActivity extends Activity {
                 }
             }
         }).start();
-
-        //TODO://从缓存中读取
+        //////////////////////////////////////////////////////////////////////
 
         if(Utils.networkAvaiable(this)){
             requestDetail();
@@ -275,13 +278,14 @@ public class PlayDetailActivity extends Activity {
                     case PublicConstant.GET_SUCCESS:
                         mPlayInfo = (PlayInfo) msg.obj;
                         updateUI(mPlayInfo);
-                        //TODO:更新数据库
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                updatePlayInfoDb(mPlayInfo);
-                            }
-                        }).start();
+                        //TODO:更新数据库,由于目前不需要缓存的功能
+                        //TODO:所以先注释掉，后期需要缓存的时候再加入
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                updatePlayInfoDb(mPlayInfo);
+//                            }
+//                        }).start();
                         break;
                     case PublicConstant.TIME_OUT:
                         Utils.showToast(PlayDetailActivity.this, getString(R.string.http_request_time_out));
@@ -293,7 +297,7 @@ public class PlayDetailActivity extends Activity {
                         Utils.showToast(PlayDetailActivity.this, getString(R.string.no_detail_info));
                         break;
                     case PublicConstant.NO_NETWORK:
-                        //TODO:有问题
+                        //TODO:如果用缓存的话，这里是有逻辑上的问题，但是目前不需要缓存，所以暂时没问题
                         if(TextUtils.isEmpty(mCachePlayInfo.getUsername()))
                             Utils.showToast(PlayDetailActivity.this, getString(R.string.network_not_available));
                         break;
@@ -304,7 +308,7 @@ public class PlayDetailActivity extends Activity {
             }
     };
 
-
+    //TODO:目前不需要缓存，所以先不调用
     private void updatePlayInfoDb(PlayInfo info){
         List<PlayInfo> list = new ArrayList<PlayInfo>();
         list.add(info);
@@ -334,13 +338,14 @@ public class PlayDetailActivity extends Activity {
                     if(Utils.networkAvaiable(this)){
                         store();
                         //TODO:插入到本地数据库后可以，但是接口那边现在还没更新
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                FavorInfo favor = setFavorInfo(mPlayInfo);
-                                insertFavorDB(favor);
-                            }
-                        }).start();
+                        //TODO:目前不需要缓存，后期需要缓存的时候再加上
+//                        new Thread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                FavorInfo favor = setFavorInfo(mPlayInfo);
+//                                insertFavorDB(favor);
+//                            }
+//                        }).start();
 
                     }else{
                         mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
@@ -365,7 +370,7 @@ public class PlayDetailActivity extends Activity {
         }
         return super.onKeyDown(keyCode, event);
     }
-
+    //TODO:由于目前不需要缓存，这个方法暂时不调用
     private FavorInfo setFavorInfo(PlayInfo info){
         FavorInfo favor = new FavorInfo();
         favor.setUser_id(YueQiuApp.sUserInfo.getUser_id());
@@ -375,10 +380,11 @@ public class PlayDetailActivity extends Activity {
         favor.setContent(info.getContent());
         favor.setCreateTime(info.getCreate_time());
         favor.setUserName(info.getUsername());
-        favor.setSubType(Integer.parseInt(info.getType()));
+        //TODO:加入缓存后这个字段肯定要有
+//        favor.setSubType(Integer.parseInt(info.getType()));
         return favor;
     }
-
+    //TODO:由于目前不需要缓存，这个方法暂时不调用
     private void insertFavorDB(FavorInfo info){
         List<FavorInfo> list = new ArrayList<FavorInfo>();
         list.add(info);

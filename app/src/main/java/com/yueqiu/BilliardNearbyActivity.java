@@ -38,9 +38,9 @@ import com.yueqiu.activity.MyParticipationActivity;
 import com.yueqiu.activity.MyProfileActivity;
 import com.yueqiu.activity.PublishedInfoActivity;
 import com.yueqiu.adapter.SlideViewAdapter;
-import com.yueqiu.bean.ListItem;
-import com.yueqiu.bean.SlideAccountItem;
-import com.yueqiu.bean.SlideOtherItem;
+import com.yueqiu.bean.IListItem;
+import com.yueqiu.bean.SlideAccountItemI;
+import com.yueqiu.bean.SlideOtherItemI;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -93,7 +93,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private ListView mMenuList;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
-    private List<ListItem> mItemList = new ArrayList<ListItem>();
+    private List<IListItem> mItemList = new ArrayList<IListItem>();
 
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
@@ -372,7 +372,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     {
 
         mItemList.clear();
-        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
+        SlideAccountItemI accountItem = new SlideAccountItemI(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
                 100, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(accountItem);
 
@@ -395,9 +395,9 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                 R.drawable.more_exit
         };
 
-        SlideOtherItem otherItem;
+        SlideOtherItemI otherItem;
         for (int i = 0; i < values.length; i++) {
-            otherItem = new SlideOtherItem(resIds[i], values[i], false);
+            otherItem = new SlideOtherItemI(resIds[i], values[i], false);
             mItemList.add(otherItem);
         }
 
@@ -554,7 +554,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
 
         mItemList.remove(0);
-        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
+        SlideAccountItemI accountItem = new SlideAccountItemI(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
                 0, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(0, accountItem);
         mAdapter.notifyDataSetChanged();
