@@ -2,7 +2,7 @@ package com.yueqiu.activity;
 
 import android.support.v4.app.Fragment;
 
-import com.yueqiu.fragment.requestaddfriend.FriendSetGroupFragment;
+import com.yueqiu.fragment.addfriend.FriendSetGroupFragment;
 
 /**
  * Created by doushuqi on 15/1/8.

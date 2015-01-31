@@ -9,9 +9,7 @@ import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,26 +36,21 @@ import android.widget.Toast;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.RequestAddFriendActivity;
-import com.yueqiu.bean.SearchPeopleInfo;
+import com.yueqiu.bean.NearbyPeopleInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
-import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by doushuqi on 14/12/17.
@@ -70,7 +63,7 @@ public class AddPersonFragment extends Fragment {
     private ActionBar mActionBar;
     private LinearLayout mLinearLayout;
     private ProgressBar mProgressBar;
-    private List<SearchPeopleInfo.SearchPeopleItemInfo> mList;
+    private List<NearbyPeopleInfo.SearchPeopleItemInfo> mList;
     private ListView mListView;
     private LocationManager mLocationManager;
     private Drawable mProgressDrawable;
@@ -130,7 +123,6 @@ public class AddPersonFragment extends Fragment {
                         searchFriendsByLocation(mLatitude, mLongitude);
                     }
                 }).start();
-
             }
 
         }
@@ -191,7 +183,7 @@ public class AddPersonFragment extends Fragment {
             switch (msg.what) {
                 case PublicConstant.GET_SUCCESS:
                     mProgressBar.setVisibility(View.GONE);
-                    SearchPeopleInfo searchPeopleInfo = (SearchPeopleInfo) msg.obj;
+                    NearbyPeopleInfo searchPeopleInfo = (NearbyPeopleInfo) msg.obj;
                     mList = searchPeopleInfo.mList;
                     MyAdapter adapter = new MyAdapter(getActivity(), mList);
                     mListView.setAdapter(adapter);
@@ -237,11 +229,11 @@ public class AddPersonFragment extends Fragment {
             JSONObject jsonResult = new JSONObject(result);
             if (!jsonResult.isNull("code")) {
                 if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                    SearchPeopleInfo searchPeople = new SearchPeopleInfo();
+                    NearbyPeopleInfo searchPeople = new NearbyPeopleInfo();
 //                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
                     JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
                     for (int i = 0; i < list_data.length(); i++) {
-                        SearchPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
+                        NearbyPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
                         itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
                         itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
                         itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
@@ -262,7 +254,14 @@ public class AddPersonFragment extends Fragment {
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mProgressBar.setVisibility(View.GONE);
+                    Utils.showToast(getActivity(), getString(R.string.no_data));
+                }
+            }, 100);
+            Log.e(TAG, "JSONException>>" + e.toString());
         }
     }
 
@@ -281,11 +280,11 @@ public class AddPersonFragment extends Fragment {
             JSONObject jsonResult = new JSONObject(result);
             if (!jsonResult.isNull("code")) {
                 if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                    SearchPeopleInfo searchPeople = new SearchPeopleInfo();
+                    NearbyPeopleInfo searchPeople = new NearbyPeopleInfo();
 //                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
                     JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
                     for (int i = 0; i < list_data.length(); i++) {
-                        SearchPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
+                        NearbyPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
                         itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
                         itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
                         itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
@@ -313,10 +312,10 @@ public class AddPersonFragment extends Fragment {
 
     class MyAdapter extends BaseAdapter {
         private Context mContext;
-        private List<SearchPeopleInfo.SearchPeopleItemInfo> mList;
+        private List<NearbyPeopleInfo.SearchPeopleItemInfo> mList;
         private LayoutInflater mInflater;
 
-        MyAdapter(Context context, List<SearchPeopleInfo.SearchPeopleItemInfo> list) {
+        MyAdapter(Context context, List<NearbyPeopleInfo.SearchPeopleItemInfo> list) {
             this.mContext = context;
             this.mList = list;
             mInflater = LayoutInflater.from(mContext);

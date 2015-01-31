@@ -16,57 +16,45 @@
         android:layout_centerInParent="true"
         android:src="@drawable/default_head"/>
 
-    <LinearLayout
-        android:layout_toRightOf="@id/chatbar_item_account_iv"
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true">
+    <TextView
+        android:id="@+id/chatbar_item_account_tv"
+        android:layout_toRightOf="@+id/chatbar_item_account_iv"
+        android:layout_alignTop="@+id/chatbar_item_account_iv"
+        android:textSize="18sp"
+        style="@style/ListItemTvStyle"
+        android:text="雪花飘落"/>
 
-        <TextView
-            android:id="@+id/chatbar_item_account_tv"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="4dp"
-            android:layout_marginRight="4dp"
-            android:textSize="18sp"
-            style="@style/ListItemTvStyle"
-            android:text="雪花飘落"/>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                style="@style/TimeTextStyle"
-                android:layout_margin="4dp"
-                android:id="@+id/chatbar_item_gender_tv"
-                android:drawablePadding="2dp"
-                android:padding="2dp"
-                android:text="男"
-                android:drawableRight="@drawable/male"
-                android:background="@color/devide_line"
-                android:textSize="14sp"/>
-            <TextView
-                android:id="@+id/chatbar_item_district_tv"
-                style="@style/TimeTextStyle"
-                android:layout_margin="4dp"
-                android:padding="2dp"
-                android:text="海淀区"
-                android:textSize="14sp"
-                android:background="@color/devide_line"/>
-            <TextView
-                style="@style/TimeTextStyle"
-                android:id="@+id/friends_application_verify_message"
-                android:visibility="invisible"
-                android:layout_margin="4dp"
-                android:textSize="14sp"
-                />
-            </LinearLayout>
-
-
-
-    </LinearLayout>
+    <TextView
+        style="@style/TimeTextStyle"
+        android:layout_below="@+id/chatbar_item_account_tv"
+        android:layout_toRightOf="@+id/chatbar_item_account_iv"
+        android:layout_margin="4dp"
+        android:id="@+id/chatbar_item_gender_tv"
+        android:drawablePadding="2dp"
+        android:padding="2dp"
+        android:text="男"
+        android:drawableRight="@drawable/male"
+        android:background="@color/devide_line"
+        android:textSize="14sp"/>
+    <TextView
+        android:id="@+id/chatbar_item_district_tv"
+        style="@style/TimeTextStyle"
+        android:layout_margin="4dp"
+        android:padding="2dp"
+        android:text="海淀区"
+        android:textSize="14sp"
+        android:layout_toRightOf="@+id/chatbar_item_gender_tv"
+        android:layout_below="@+id/chatbar_item_account_tv"
+        android:background="@color/devide_line"/>
+    <TextView
+        style="@style/TimeTextStyle"
+        android:id="@+id/friends_application_verify_message"
+        android:visibility="invisible"
+        android:layout_margin="4dp"
+        android:textSize="14sp"
+        android:layout_toRightOf="@+id/chatbar_item_district_tv"
+        android:layout_below="@+id/chatbar_item_account_tv"
+        />
 
     <TextView
         android:id="@+id/chatbar_item_sendtime_tv"

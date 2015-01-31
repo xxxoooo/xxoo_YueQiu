@@ -176,10 +176,12 @@ public class PublishedFragment extends SlideMenuBasicFragment {
             super.handleMessage(msg);
             switch(msg.what){
                 case PublicConstant.USE_CACHE:
+                    setEmptyViewGone();
                     List<PublishedInfo> cacheList = (List<PublishedInfo>) msg.obj;
                     mList.addAll(cacheList);
                     break;
                 case PublicConstant.GET_SUCCESS:
+                    setEmptyViewGone();
                     mBeforeCount = mList.size();
                     List<PublishedInfo> list = (List<PublishedInfo>) msg.obj;
                     for(PublishedInfo info : list){
@@ -190,7 +192,6 @@ public class PublishedFragment extends SlideMenuBasicFragment {
                         identity.user_id = YueQiuApp.sUserInfo.getUser_id();
                         identity.table_id = info.getTable_id();
                         identity.type = info.getType();
-                        Log.d("wy",YueQiuApp.sPublishMap.containsKey(identity) + "");
                         if(!YueQiuApp.sPublishMap.containsKey(identity)){
                             mPublishInsertList.add(info);
                         }else{

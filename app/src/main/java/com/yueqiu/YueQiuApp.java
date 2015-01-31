@@ -9,6 +9,8 @@ import android.util.Log;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.bean.Identity;
+import com.yueqiu.bean.PlayIdentity;
+import com.yueqiu.bean.PlayInfo;
 import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
@@ -54,6 +56,11 @@ public class YueQiuApp extends Application
      * 用于存放从数据库中查询得到的全部Favor信息
      */
     public static Map<Identity,FavorInfo> sFavorMap = new LinkedHashMap<Identity, FavorInfo>();
+
+    /**
+     * 用于存放数据库中查询得到的全部Activitie信息
+     */
+    public static Map<PlayIdentity,PlayInfo> sPlayMap = new LinkedHashMap<PlayIdentity, PlayInfo>();
 
     @Override
     public void onCreate()

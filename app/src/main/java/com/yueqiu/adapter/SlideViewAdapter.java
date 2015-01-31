@@ -9,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.os.Build;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -113,7 +112,7 @@ public class SlideViewAdapter extends BaseAdapter {
         switch (type) {
            case ListItem.ITEM_ACCOUNT:
                if(convertView == null) {
-                   convertView = mInflater.inflate(R.layout.more_account_layout, null);
+                   convertView = mInflater.inflate(R.layout.item_more_account_layout, null);
                    accountHolder = new ViewAccountHolder();
                    accountHolder.image = (ImageView) convertView.findViewById(R.id.account_image);
                    accountHolder.name = (TextView) convertView.findViewById(R.id.account_name);
@@ -169,7 +168,7 @@ public class SlideViewAdapter extends BaseAdapter {
                break;
             case ListItem.ITEM_BASIC:
                 if(convertView == null){
-                    convertView = mInflater.inflate(R.layout.more_other_layout,null);
+                    convertView = mInflater.inflate(R.layout.item_more_other_layout,null);
                     holder = new ViewHolder();
                     holder.image = (ImageView) convertView.findViewById(R.id.other_image);
                     holder.name = (TextView) convertView.findViewById(R.id.other_name);

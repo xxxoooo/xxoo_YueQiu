@@ -2,17 +2,17 @@ package com.yueqiu.dao;
 
 import android.content.Context;
 
-import com.yueqiu.dao.daoimpl.ActivitiesDaoImpl;
 import com.yueqiu.dao.daoimpl.ApplicationDaoImpl;
 import com.yueqiu.dao.daoimpl.ContactsDaoImpl;
 import com.yueqiu.dao.daoimpl.FavorDaoImpl;
 import com.yueqiu.dao.daoimpl.GroupInfoDaoImpl;
+import com.yueqiu.dao.daoimpl.NearbyAssistCoauchDaoImpl;
+import com.yueqiu.dao.daoimpl.NearbyCoauchDaoImpl;
+import com.yueqiu.dao.daoimpl.NearbyDatingDaoImpl;
+import com.yueqiu.dao.daoimpl.NearbyMateDaoImpl;
+import com.yueqiu.dao.daoimpl.NearbyRoomDaoImpl;
+import com.yueqiu.dao.daoimpl.PlayDaoImpl;
 import com.yueqiu.dao.daoimpl.PublishedImpl;
-import com.yueqiu.dao.daoimpl.SearchAssistCoauchDaoImpl;
-import com.yueqiu.dao.daoimpl.SearchCoauchDaoImpl;
-import com.yueqiu.dao.daoimpl.SearchDatingDaoImpl;
-import com.yueqiu.dao.daoimpl.SearchMateDaoImpl;
-import com.yueqiu.dao.daoimpl.SearchRoomDaoImpl;
 import com.yueqiu.dao.daoimpl.UserDaoImpl;
 
 /**
@@ -20,8 +20,8 @@ import com.yueqiu.dao.daoimpl.UserDaoImpl;
  */
 public class DaoFactory {
 
-    public static ActivitiesDao getActivities(Context context) {
-        return new ActivitiesDaoImpl(context);
+    public static PlayDao getPlay(Context context) {
+        return new PlayDaoImpl(context);
     }
 
     public static UserDao getUser(Context context) {
@@ -53,29 +53,29 @@ public class DaoFactory {
         return new GroupInfoDaoImpl(context);
     }
 
-    public static SearchMateDao getSearchMateDao(Context context)
+    public static NearbyMateDao getSearchMateDao(Context context)
     {
-        return new SearchMateDaoImpl(context);
+        return new NearbyMateDaoImpl(context);
     }
 
-    public static SearchAssistCoauchDao getSearchASCoauchDao(Context context)
+    public static NearbyAssistCoauchDao getSearchASCoauchDao(Context context)
     {
-        return new SearchAssistCoauchDaoImpl(context);
+        return new NearbyAssistCoauchDaoImpl(context);
     }
 
-    public static SearchCoauchDao getSearchCoauchDao(Context context)
+    public static NearbyCoauchDao getSearchCoauchDao(Context context)
     {
-        return new SearchCoauchDaoImpl(context);
+        return new NearbyCoauchDaoImpl(context);
     }
 
-    public static SearchDatingDao getSearchDatingDao(Context context)
+    public static NearbyDatingDao getSearchDatingDao(Context context)
     {
-        return new SearchDatingDaoImpl(context);
+        return new NearbyDatingDaoImpl(context);
     }
 
-    public static SearchRoomDao getSearchRoomDao(Context context)
+    public static NearbyRoomDao getSearchRoomDao(Context context)
     {
-        return new SearchRoomDaoImpl(context);
+        return new NearbyRoomDaoImpl(context);
     }
 
 }

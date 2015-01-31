@@ -3,6 +3,7 @@ package com.yueqiu.fragment.slidemenu;
 
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -120,10 +121,11 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
                     FavorInfo itemInfo = new FavorInfo();
                     itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
                     itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
+
                     itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
                     itemInfo.setCreateTime(list_data.getJSONObject(i).getString("create_time"));
                     itemInfo.setUserName(list_data.getJSONObject(i).getString("username"));
-                    itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type_id")));
+                    itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type")));
                     itemInfo.setChecked(false);
                     list.add(itemInfo);
                 }
@@ -185,10 +187,12 @@ public class FavorBasicFragment extends SlideMenuBasicFragment {
             super.handleMessage(msg);
             switch(msg.what){
                 case PublicConstant.USE_CACHE:
+                    setEmptyViewGone();
                     List<FavorInfo> cacheList = (List<FavorInfo>) msg.obj;
                     mList.addAll(cacheList);
                     break;
                 case PublicConstant.GET_SUCCESS:
+                    setEmptyViewGone();
                     mBeforeCount = mList.size();
                     List<FavorInfo> list = (List<FavorInfo>) msg.obj;
                     for(FavorInfo info : list){

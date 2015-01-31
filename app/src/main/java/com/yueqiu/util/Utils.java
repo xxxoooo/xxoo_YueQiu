@@ -9,21 +9,17 @@ import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.os.Build;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -36,34 +32,16 @@ import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.PublicConstant;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.RandomAccessFile;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
-import org.json.JSONTokener;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -117,6 +95,8 @@ public class Utils {
             }
         } catch (JSONException e) {
             object = new JSONObject();
+        } catch (NumberFormatException e){
+            object = new JSONObject();
         }
         return object;
     }
@@ -129,11 +109,15 @@ public class Utils {
      * @param context
      * @return
      */
-    public static boolean networkAvaiable(Context context) {
-        ConnectivityManager connManager = (ConnectivityManager) context.
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connManager.getActiveNetworkInfo() != null)
-            return connManager.getActiveNetworkInfo().isAvailable();
+    public static boolean networkAvaiable(Context context)
+    {
+        if (null != context)
+        {
+            ConnectivityManager connManager = (ConnectivityManager) context.
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connManager.getActiveNetworkInfo() != null)
+                return connManager.getActiveNetworkInfo().isAvailable();
+        }
         return false;
     }
 
@@ -389,13 +373,13 @@ public class Utils {
      * @param context
      * @return
      */
-    public static Dialog showSheet(Context context) {
+    public static Dialog showSheet(Context context)
+    {
         final Dialog dlg = new Dialog(context, R.style.ActionSheet);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.search_dating_detail_popupwindow, null);
+        RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.dialog_share, null);
         final int cFullFillWidth = 10000;
         layout.setMinimumWidth(cFullFillWidth);
-
 
         Window window = dlg.getWindow();
         WindowManager.LayoutParams lp = window.getAttributes();
@@ -510,5 +494,10 @@ public class Utils {
 //    }
     public static void showToast(Context context,String msg){
         Toast.makeText(context,msg,Toast.LENGTH_SHORT).show();
+    }
+
+    public static <T extends View> T $(Activity activity,int resId){
+        T t = (T) activity.findViewById(resId);
+        return t;
     }
 }

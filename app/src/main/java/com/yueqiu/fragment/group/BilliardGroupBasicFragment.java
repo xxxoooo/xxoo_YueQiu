@@ -1,7 +1,6 @@
 package com.yueqiu.fragment.group;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -9,13 +8,11 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
@@ -24,7 +21,6 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
-import com.yueqiu.activity.BilliardGroupDetailActivity;
 import com.yueqiu.adapter.GroupBasicAdapter;
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.constant.HttpConstants;
@@ -46,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -88,7 +83,7 @@ public class BilliardGroupBasicFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.fragment_billard_group_basic,null);
+        mView = inflater.inflate(R.layout.fragment_billiard_group_basic,null);
         Bundle args = getArguments();
         mGroupType = args.getInt("type");
         mGroupDao = DaoFactory.getGroupDao(mActivity);
@@ -100,13 +95,12 @@ public class BilliardGroupBasicFragment extends Fragment {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                //mDBAllList = mGroupDao.getAllGroupInfo();
 
                 //TODO:缓存的list，
                 if(mGroupType == PublicConstant.GROUP_ALL) {
-                    mDBList = mGroupDao.getAllGroupInfoLimit(mStart_no, mEnd_no + 1);
+                    mDBList = mGroupDao.getAllGroupInfoLimit(mStart_no, 10);
                 }else{
-                    mDBList = mGroupDao.getGroupInfoByType(mGroupType,mStart_no,mEnd_no + 1);
+                    mDBList = mGroupDao.getGroupInfoByType(mGroupType,mStart_no,10);
                 }
                 if(!mDBList.isEmpty()){
                     mHandler.obtainMessage(PublicConstant.USE_CACHE,mDBList).sendToTarget();
@@ -184,13 +178,19 @@ public class BilliardGroupBasicFragment extends Fragment {
         mEmptyView = new TextView(mActivity);
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
-        mEmptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setTextColor(mActivity.getResources().getColor(R.color.md__defaultBackground));
         if(mGroupType == PublicConstant.GROUP_ALL) {
             mEmptyView.setText(getString(R.string.no_group_info));
         }else{
             mEmptyView.setText(getString(R.string.no_group_type_info,mEmptyTypeStr));
         }
         mPullToRefreshListView.setEmptyView(mEmptyView);
+    }
+
+    private void setmEmptyViewGone(){
+        if(null != mEmptyView){
+            mEmptyView.setVisibility(View.GONE);
+        }
     }
 
     private void requestGroup(){
@@ -270,7 +270,7 @@ public class BilliardGroupBasicFragment extends Fragment {
                     }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
                         mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                     }else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonObject.getString("msg")).sendToTarget();
                     }
                 } else {
                     mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
@@ -293,10 +293,13 @@ public class BilliardGroupBasicFragment extends Fragment {
                 mPullToRefreshListView.onRefreshComplete();
             switch(msg.what){
                 case PublicConstant.USE_CACHE:
+                    setmEmptyViewGone();
                     List<GroupNoteInfo> cacheList = (List<GroupNoteInfo>) msg.obj;
                     mList.addAll(cacheList);
                     break;
                 case PublicConstant.GET_SUCCESS:
+
+                    setmEmptyViewGone();
                     /**
                      * 保存还未更新的list的size
                      */
@@ -351,8 +354,6 @@ public class BilliardGroupBasicFragment extends Fragment {
                             updateGroupInfoDB();
                         }
                     }).start();
-
-
 
                     break;
                 case PublicConstant.TIME_OUT:

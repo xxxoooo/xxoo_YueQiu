@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context="com.yueqiu.BilliardSearchActivity" >
+      tools:context="com.yueqiu.BilliardNearbyActivity" >
     <item android:id="@+id/send"
           android:title="@string/send"
           android:showAsAction="collapseActionView|ifRoom"/>

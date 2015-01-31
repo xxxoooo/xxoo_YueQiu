@@ -27,7 +27,7 @@ public class LoadingView extends RelativeLayout {
 	}
 	
 	private void initView(){
-		LayoutInflater.from(mContext).inflate(R.layout.common_loading_view, this);
+		LayoutInflater.from(mContext).inflate(R.layout.pre_loading_view, this);
 		mImageView=(ImageView) findViewById(R.id.iv_loading);
 		mTextView=(TextView) findViewById(R.id.tv_loading);
 	}

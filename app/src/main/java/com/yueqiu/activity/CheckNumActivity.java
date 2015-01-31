@@ -2,8 +2,6 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,16 +10,13 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.URLSpan;
 import android.view.KeyEvent;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.constant.HttpConstants;
@@ -29,7 +24,6 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.MyURLSpan;
-import com.yueqiu.view.YueQiuDialogBuilder;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -81,7 +75,7 @@ public class CheckNumActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_checkphone);
+        setContentView(R.layout.activity_register_with_captcha);
         mCode = new String();
         mEtPhone = (EditText) findViewById(R.id.activity_checkphone_et_phone);
         mEtCheckNum = (EditText) findViewById(R.id.activity_checkphone_et_password);

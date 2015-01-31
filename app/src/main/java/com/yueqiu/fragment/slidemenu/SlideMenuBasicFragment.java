@@ -26,9 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.yueqiu.R;
-import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.FavorInfo;
-import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -117,6 +115,12 @@ public abstract class SlideMenuBasicFragment extends Fragment {
         mEmptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
         mEmptyView.setText(getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
         mPullToRefreshListView.setEmptyView(mEmptyView);
+    }
+
+    protected void setEmptyViewGone(){
+        if(null != mEmptyView){
+            mEmptyView.setVisibility(View.GONE);
+        }
     }
 
 
@@ -277,7 +281,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
             switch(item.getItemId()){
                 case R.id.delete:
                     mode.finish();
-                    View contents = View.inflate(mActivity,R.layout.confirm_delete_content_layout, null);
+                    View contents = View.inflate(mActivity,R.layout.dialog_delete_content_layout, null);
                     TextView msg = (TextView) contents.findViewById(R.id.confir_dialog_message);
                     msg.setText(getString(R.string.published_delete_content,mSelectedItems.size()));
                     YueQiuDialogBuilder builder = new YueQiuDialogBuilder(mActivity);

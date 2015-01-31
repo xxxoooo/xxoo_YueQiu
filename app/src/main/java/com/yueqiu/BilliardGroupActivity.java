@@ -11,21 +11,20 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
 
 import com.yueqiu.activity.GroupIssueTopic;
-import com.yueqiu.activity.SearchResultActivity;
+import com.yueqiu.activity.NearbyResultActivity;
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.GroupInfoDao;
 import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
+import com.yueqiu.util.Utils;
 
 import java.util.List;
 
@@ -34,7 +33,6 @@ import java.util.List;
  * 台球圈Activity
  */
 public class BilliardGroupActivity extends FragmentActivity implements ActionBar.TabListener{
-    public static final String BILLIARD_TAB_NAME = "billiard_tab_name";
     private ViewPager mViewPager;
     private String[] mTitles;
     private SectionPagerAdapter mPagerAdapter;
@@ -119,7 +117,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.group_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
         return true;
     }
 
@@ -131,9 +129,15 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
             case R.id.group_menu_editor:
-                Intent intent = new Intent(this, GroupIssueTopic.class);
-                startActivity(intent);
-                overridePendingTransition(R.anim.group_in_to_left,R.anim.group_out_to_left);
+                int user_id = YueQiuApp.sUserInfo.getUser_id();
+                if(user_id < 1){
+                    Utils.showToast(this, getString(R.string.please_login_first));
+                }else{
+                    Intent intent = new Intent(this, GroupIssueTopic.class);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.group_in_to_left,R.anim.group_out_to_left);
+                }
+
                 break;
         }
         return super.onOptionsItemSelected(item);

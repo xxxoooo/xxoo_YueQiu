@@ -2,11 +2,9 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -29,7 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.yueqiu.BilliardSearchActivity;
+import com.yueqiu.BilliardNearbyActivity;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.DatabaseConstant;
@@ -37,9 +35,7 @@ import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.UserDao;
 import com.yueqiu.dao.daoimpl.UserDaoImpl;
-import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.AsyncTaskUtil;
-import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
@@ -100,7 +96,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                     mEditor.apply();
 
                     mUserDao.insertUserInfo(map);
-                    Intent intent = new Intent(RegisterActivity.this, BilliardSearchActivity.class);
+                    Intent intent = new Intent(RegisterActivity.this, BilliardNearbyActivity.class);
                     startActivity(intent);
                     RegisterActivity.this.finish();
                     overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);
@@ -220,7 +216,7 @@ public class RegisterActivity extends Activity  implements View.OnClickListener{
                 break;
             case R.id.activity_register_et_sex:
                 Intent intent = new Intent();
-                intent.setClass(RegisterActivity.this,ActivitySelectSex.class);
+                intent.setClass(RegisterActivity.this,PlaySelectSex.class);
                 Log( mEtSex.getText().toString().trim());
                 if( mEtSex.getText().toString().trim().equals(getString(R.string.man)))
                 {    intent.putExtra("sex",CODE_MAN); }

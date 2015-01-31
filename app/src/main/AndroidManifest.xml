@@ -8,7 +8,6 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 
-
     <application
         android:name=".YueQiuApp"
         android:allowBackup="true"
@@ -20,24 +19,34 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"/>
 
+        <!--程序初始启动时显示的SplashScreen-->
         <activity
-            android:name=".BilliardSearchActivity"
+            android:theme="@android:style/Theme.Wallpaper.NoTitleBar.Fullscreen"
+            android:name=".YueQiuSplashScreen"
+            android:label="@string/title_activity_yue_qiu_splash_screen"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
-
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".activity.SearchResultActivity"
+            android:name=".BilliardNearbyActivity"
+            android:screenOrientation="portrait">
+
+        </activity>
+
+        <activity
+            android:name=".activity.NearbyResultActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
@@ -60,19 +69,19 @@
         <!-- 聊吧 END -->
 
         <activity
-            android:name=".ActivitiesActivity"
+            android:name=".activity.PlayBusinessActivity"
             android:screenOrientation="portrait"/>
 
         <!-- 侧滑Menu -->
         <activity
-            android:name=".activity.ActivitiesIssueActivity"
+            android:name=".activity.PlayIssueActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
         <activity
             android:name=".activity.FeedbackActivity"
             android:windowSoftInputMode="adjustUnspecified|stateHidden"/>
         <activity
-            android:name=".activity.UpdateAssistantActivity"
+            android:name=".activity.UpgradeAssistantActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.ProfileSetupActivity"
@@ -84,18 +93,17 @@
             android:name=".activity.MyProfileActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".activity.MyfavorCollActivity"
+            android:name=".activity.FavorActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.PublishedInfoActivity"
             android:screenOrientation="portrait"/>
-
         <activity
-            android:name=".activity.ActivitiesDetail"
+            android:name=".activity.PlayDetailActivity"
             android:label="@string/activities_detail"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".activity.ActivitySelectType"
+            android:name=".activity.PlaySelectType"
             android:label="@string/type"
             android:screenOrientation="portrait"/>
         <activity
@@ -108,18 +116,17 @@
             android:name=".activity.LoginActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".activity.ActivitySelectSex"
+            android:name=".activity.PlaySelectSex"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".activity.SearchBilliardsDatingActivity"
+            android:name=".activity.NearbyBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating"
-            android:parentActivityName=".BilliardSearchActivity"
+            android:parentActivityName=".BilliardNearbyActivity"
             android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".activity.ActivitiesMain"
+            android:name=".PlayMainActivity"
             android:screenOrientation="portrait"/>
-
         <activity
             android:name=".activity.GroupIssueTopic"
             android:label="@string/billiard_group_issue_article"
@@ -129,32 +136,30 @@
             android:name=".activity.GroupSelectTopicTypeActivity"
             android:parentActivityName=".activity.GroupIssueTopic"
             android:screenOrientation="portrait"/>
-
         <activity
             android:name=".activity.ChatActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden"/>
         <activity
             android:name=".activity.CheckNumActivity"
-
             android:screenOrientation="portrait"/>
-
         <activity
             android:name=".activity.Register1Activity"
             android:screenOrientation="portrait"/>
-        <activity
-            android:name=".activity.ArticleReadActivity"
-            >
+        <activity android:name=".activity.ArticleReadActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
+
                 <data android:scheme="file"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.SearchBilliardRoomActivity"
+        <activity
+            android:name=".activity.NearbyBilliardRoomActivity"
             android:screenOrientation="portrait"/>
 
-        <!--服务组件-->
+        <!-- 服务组件 -->
         <service android:name=".util.LocationUtil"/>
+
     </application>
 
 </manifest>

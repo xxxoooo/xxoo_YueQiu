@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <!--用于SearchActivity当中的球厅子Fragment当中的
+        ViewPager的加载-->
+    <LinearLayout
+        android:id="@+id/room_gallery_view_pager_zone"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/room_fragment_gallery_pager"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            >
+
+        </android.support.v4.view.ViewPager>
+
+        <!-- the indicator -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_marginLeft="14dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:id="@+id/tv_room_gallery_view_pager_indication"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_centerHorizontal="true"
+                android:text="@string/search_gallery_pager_test_str"
+                android:textStyle="normal"
+                android:textColor="@color/md__defaultBackground"
+                android:padding="2dp"
+                android:textSize="13sp"
+                />
+
+            <LinearLayout
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="5dp"
+                android:id="@+id/room_fragment_gallery_pager_indicator_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+
+    <!--用于SearchActivity当中的球厅的子Fragment的布局文件-->
+    <LinearLayout
+        android:layout_below="@id/room_gallery_view_pager_zone"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/nearby_subfragment_filter_btn_height"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:id="@+id/room_filter_group"
+        android:background="@drawable/btn_bg">
+
+        <Button
+            android:id="@+id/btn_room_district"
+            android:layout_weight="0.25"
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:text="@string/search_room_subfragment_title_zone"/>
+
+        <View
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:padding="5dp"
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:background="@color/search_distance_color"
+            >
+        </View>
+
+        <Button
+            android:id="@+id/btn_room_distance"
+            android:layout_weight="0.25"
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:text="@string/search_mate_subfragment_title_distance"/>
+
+        <View
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:padding="5dp"
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:background="@color/search_distance_color"
+            >
+        </View>
+
+        <Button
+            android:id="@+id/btn_room_price"
+            android:layout_weight="0.25"
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:text="@string/search_room_subfragment_title_price"/>
+
+        <View
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:padding="5dp"
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:background="@color/search_distance_color"
+            >
+        </View>
+
+        <Button
+            android:id="@+id/btn_room_apprisal"
+            android:layout_weight="0.25"
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:text="@string/search_room_subfragment_title_review"/>
+
+    </LinearLayout>
+
+    <com.yueqiu.view.pullrefresh.PullToRefreshListView
+        style="@style/SearchSubActivityListViewStyle"
+        android:layout_below="@id/room_filter_group"
+        android:id="@+id/search_room_subfragment_listview"
+        android:layout_marginBottom="@dimen/nearby_subfragment_listview_margin_bottom">
+
+    </com.yueqiu.view.pullrefresh.PullToRefreshListView>
+
+
+    <!--用于加载ProgressBar,这些ProgressBar的初始属性都被设置成GONG，即不占用任何位置，直到
+        开始加载为止-->
+    <include
+        layout="@layout/pre_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+    </include>
+
+
+</RelativeLayout>

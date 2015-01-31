@@ -19,7 +19,7 @@ public class YueQiuDialogBuilder extends AlertDialog.Builder{
     public YueQiuDialogBuilder(Context context) {
         super(context);
 
-        mTitleView = View.inflate(context,R.layout.confirm_delete_title_layout,null);
+        mTitleView = View.inflate(context,R.layout.dialog_delete_title_layout,null);
         this.setCustomTitle(mTitleView);
 
     }

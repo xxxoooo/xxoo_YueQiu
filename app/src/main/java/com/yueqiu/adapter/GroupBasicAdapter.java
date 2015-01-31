@@ -46,7 +46,7 @@ public class GroupBasicAdapter extends BaseAdapter{
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if(convertView == null){
-            convertView = mInflater.inflate(R.layout.billiard_group_item_layout,null);
+            convertView = mInflater.inflate(R.layout.item_billiard_group_layout,null);
             holder = new ViewHolder();
             holder.image = (ImageView) convertView.findViewById(R.id.group_item_image);
             holder.title = (TextView) convertView.findViewById(R.id.billiard_group_title);

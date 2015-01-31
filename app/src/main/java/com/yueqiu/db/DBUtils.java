@@ -29,17 +29,17 @@ public class DBUtils extends SQLiteOpenHelper {
         db.execSQL(DatabaseConstant.ChatMessageTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.FriendsTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.FriendsApplication.CREATE_SQL);
-        db.execSQL(DatabaseConstant.ActivitiesTable.SQL);
+        db.execSQL(DatabaseConstant.PlayTable.SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
         db.execSQL(DatabaseConstant.FavorInfoItemTable.CREATE_SQL);
         db.execSQL(DatabaseConstant.GroupInfo.CREATE_SQL);
 
         // 加载用于SearchActivity当中的Fragment的table
-        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchMateTable.CREATE_SQL);
-        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.CREATE_SQL);
-        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.CREATE_SQL);
-        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.CREATE_SQL);
-        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.SearchMateTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.SearchDatingTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.SearchAssistCoauchTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.SearchCoauchTable.CREATE_SQL);
+        db.execSQL(DatabaseConstant.SearchRoomTable.CREATE_SQL);
 
     }
 
@@ -48,18 +48,18 @@ public class DBUtils extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL(DatabaseConstant.UserTable.DROP_SQL);
         db.execSQL(DatabaseConstant.PublishInfoTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.ActivitiesTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.PlayTable.DROP_SQL);
         db.execSQL(DatabaseConstant.RefreshTime.SQL);
         db.execSQL(DatabaseConstant.ChatMessageTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FriendsTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FriendsApplication.DROP_SQL);
 
         // 加载用于SearchActivity当中的Fragment的Drop sql
-        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchMateTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchDatingTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchAssistCoauchTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchCoauchTable.DROP_SQL);
-        db.execSQL(DatabaseConstant.FavorInfoItemTable.SearchRoomTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.SearchMateTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.SearchDatingTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.SearchAssistCoauchTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.SearchCoauchTable.DROP_SQL);
+        db.execSQL(DatabaseConstant.SearchRoomTable.DROP_SQL);
         db.execSQL(DatabaseConstant.FavorInfoItemTable.DROP_SQL);
         db.execSQL(DatabaseConstant.GroupInfo.DROP_SQL);
         onCreate(db);

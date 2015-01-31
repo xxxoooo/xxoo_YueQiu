@@ -15,7 +15,6 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.URLSpan;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,9 +23,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.yueqiu.BilliardSearchActivity;
+import com.yueqiu.BilliardNearbyActivity;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.DatabaseConstant;
@@ -35,7 +33,6 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.UserDao;
 import com.yueqiu.util.AsyncTaskUtil;
-import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.MyURLSpan;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
@@ -107,7 +104,7 @@ public class Register1Activity extends Activity implements View.OnClickListener 
                     mEditor.apply();
 
                     mUserDao.insertUserInfo(map);
-                    Intent intent = new Intent(Register1Activity.this, BilliardSearchActivity.class);
+                    Intent intent = new Intent(Register1Activity.this, BilliardNearbyActivity.class);
                     startActivity(intent);
                     Register1Activity.this.finish();
                     overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);
@@ -246,7 +243,7 @@ public class Register1Activity extends Activity implements View.OnClickListener 
 
             case R.id.activity_register1_et_sex:
                 Intent intent = new Intent();
-                intent.setClass(Register1Activity.this, ActivitySelectSex.class);
+                intent.setClass(Register1Activity.this, PlaySelectSex.class);
                 if (mTvSex.getText().toString().trim().equals(getString(R.string.man))) {
                     intent.putExtra(HttpConstants.RegisterConstant.SEX, CODE_MAN);
                 } else {

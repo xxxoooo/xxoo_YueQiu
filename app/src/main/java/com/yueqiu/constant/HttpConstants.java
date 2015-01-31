@@ -17,25 +17,6 @@ public class HttpConstants
         public static final String POST = "POST";
     }
 
-    /*
-    请求公共参数
-     */
-    public static final class PublicConstant
-    {
-        /*
-         * 应用类型
-         * 1、WebApp
-         * 2、Android
-         * 3、IOS
-         */
-        public static final String APP_TYPE = "app_type";
-
-        /*
-         *
-         */
-        public static final String TOKEN = "token";
-    }
-
 
 
     /**
@@ -156,7 +137,7 @@ public class HttpConstants
      * 球友的请求参数
      * 发送Get请求
      */
-    public static final class SearchMate
+    public static final class NearbyMate
     {
         public static final String URL = "/home/friend";
     }
@@ -165,7 +146,7 @@ public class HttpConstants
      * 约球的请求参数
      * 发送GET请求
      */
-    public static final class SearchDating
+    public static final class NearbyDating
     {
         public static final String URL = "/home/appointBall";
 
@@ -180,7 +161,7 @@ public class HttpConstants
      * 助教的请求参数
      *
      */
-    public static final class SearchAssistCoauch
+    public static final class NearbyAssistCoauch
     {
        public static final String URL = "/home/tutor";
     }
@@ -188,7 +169,7 @@ public class HttpConstants
     /**
      * 用于请求教练的相关信息的Http url常量
      */
-    public static final class SearchCoauch
+    public static final class NearbyCoauch
     {
         public static final String URL = "/home/coach";
 
@@ -200,7 +181,7 @@ public class HttpConstants
      * 大众点评的接口来获得大众点评推荐的所有的球厅的列表的信息
      * 也就是说这里我们SearchRoom使用的是大众点评的接口，而不是服务器端的同志开发的接口
      */
-    public static final class SearchRoom
+    public static final class NearbyRoom
     {
         public static final String URL = "";
     }
@@ -210,7 +191,7 @@ public class HttpConstants
      * 我们通过这个接口获得的信息主要是用于显示球厅Fragment上面显示的Image Gallery列表
      *
      */
-    public static final class SearchRoomRecommendation
+    public static final class NearbyRoomRecommendation
     {
         public static final String URL = "/home/GetBallHall";
     }
@@ -380,6 +361,16 @@ public class HttpConstants
         public static final String GETLISTEE = "/play/getList";
 
         public static final String GETDETAIL = "/play/deatil";
+
+        public static final String TYPE = "type";
+
+        public static final String ID = "id";
+
+        public static final String START_NO = "start_no";
+
+        public static final String END_NO = "end_no";
+
+        public static final String USER_ID = "user_id";
     }
 
     /**
@@ -412,6 +403,10 @@ public class HttpConstants
         public static final String END_NO   = "end_no";
 
 
+    }
+
+    public static class StroeSave{
+        public static final String URL      = "/store/storeSave";
     }
 
     /**
