@@ -92,9 +92,11 @@ public class DatabaseConstant
 
         public static final String DATETIME = "datetime";
 
+        public static final String SUBTYPE = "sub_type";
+
         public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + TABLE_ID + " INTEGER, " + TYPE + " INTEGER DEFAULT 1, "
-                + TITLE + " VARCHAR(255), " + CONTENT + " VARCHAR(500), " + DATETIME + " VARCHAR(50)" + ")";
+                + TITLE + " VARCHAR(255), " + CONTENT + " VARCHAR(500), " + DATETIME + " VARCHAR(50), " + SUBTYPE + " INTEGER" + ")";
         public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
 
@@ -403,9 +405,12 @@ public class DatabaseConstant
 
         public static final String USER_NAME = "username";
 
+        public static final String SUBTYPE = "sub_type";
+
         public static final String CREATE_SQL = "CREATE TABLE IF NOT EXISTS " + TABLE + " ( " + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + USER_ID + " INTEGER NOT NULL, " + TABLE_ID + " INTEGER, " + TYPE + " INTEGER DEFAULT 1, "
-                + TITLE + " VARCHAR(255), " + CONTENT + " VARCHAR(500), " + DATETIME + " VARCHAR(50), " + USER_NAME + " VARCHAR(255)" + ")";
+                + TITLE + " VARCHAR(255), " + CONTENT + " VARCHAR(500), " + DATETIME + " VARCHAR(50), " + USER_NAME + " VARCHAR(255), "
+                + SUBTYPE + " INTEGER" + ")";
         public static final String DROP_SQL = "DROP TABLE IF EXISTS " + TABLE;
 
 

@@ -19,9 +19,9 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.activity.LoginActivity;
-import com.yueqiu.bean.ListItem;
-import com.yueqiu.bean.SlideAccountItem;
-import com.yueqiu.bean.SlideOtherItem;
+import com.yueqiu.bean.IListItem;
+import com.yueqiu.bean.SlideAccountItemI;
+import com.yueqiu.bean.SlideOtherItemI;
 
 import java.util.List;
 
@@ -30,10 +30,10 @@ import java.util.List;
  */
 public class SlideViewAdapter extends BaseAdapter {
     private Context mContext;
-    private List<ListItem> mList;
+    private List<IListItem> mList;
     private LayoutInflater mInflater;
 
-    public SlideViewAdapter(Context context,List<ListItem> list){
+    public SlideViewAdapter(Context context,List<IListItem> list){
         this.mContext = context;
         this.mList = list;
         this.mInflater = LayoutInflater.from(context);
@@ -74,7 +74,7 @@ public class SlideViewAdapter extends BaseAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        ListItem item = (ListItem) getItem(position);
+        IListItem item = (IListItem) getItem(position);
         int type = item.getType();
         return type;
     }
@@ -105,12 +105,12 @@ public class SlideViewAdapter extends BaseAdapter {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ListItem item = (ListItem) getItem(position);
+        IListItem item = (IListItem) getItem(position);
         int type = item.getType();
         ViewAccountHolder accountHolder;
         ViewHolder holder;
         switch (type) {
-           case ListItem.ITEM_ACCOUNT:
+           case IListItem.ITEM_ACCOUNT:
                if(convertView == null) {
                    convertView = mInflater.inflate(R.layout.item_more_account_layout, null);
                    accountHolder = new ViewAccountHolder();
@@ -121,7 +121,7 @@ public class SlideViewAdapter extends BaseAdapter {
                }else{
                    accountHolder = (ViewAccountHolder) convertView.getTag();
                }
-               SlideAccountItem accountItem = (SlideAccountItem) item;
+               SlideAccountItemI accountItem = (SlideAccountItemI) item;
                int embedResId = R.drawable.lable_friend;
                if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_assist_coauch_str))){
                    embedResId = R.drawable.lable_assistant;
@@ -166,7 +166,7 @@ public class SlideViewAdapter extends BaseAdapter {
 
                //accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accountItem.getGolden());
                break;
-            case ListItem.ITEM_BASIC:
+            case IListItem.ITEM_BASIC:
                 if(convertView == null){
                     convertView = mInflater.inflate(R.layout.item_more_other_layout,null);
                     holder = new ViewHolder();
@@ -179,7 +179,7 @@ public class SlideViewAdapter extends BaseAdapter {
                     holder = (ViewHolder) convertView.getTag();
                 }
 
-                SlideOtherItem otherItem = (SlideOtherItem) item;
+                SlideOtherItemI otherItem = (SlideOtherItemI) item;
                 holder.image.setImageResource(otherItem.getImgId());
                 holder.name.setText(otherItem.getName());
                 if(otherItem.hasMsg()){

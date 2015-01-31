@@ -7,6 +7,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -21,6 +22,7 @@ import android.widget.SearchView;
 import com.yueqiu.activity.GroupIssueTopic;
 import com.yueqiu.activity.NearbyResultActivity;
 import com.yueqiu.bean.GroupNoteInfo;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.GroupInfoDao;
 import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
@@ -38,27 +40,35 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
     private SectionPagerAdapter mPagerAdapter;
     private ActionBar mActionBar;
     private GroupInfoDao mGroupDao;
-    private List<GroupNoteInfo> mDBAllList;
+    private List<GroupNoteInfo> mCacheList;
+    private static int sCurrentItem = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_billiard_group);
 
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
+        ////////////////////////////////////////////////////////////////////
+        //TODO:由于目前不需要缓存，这里先将缓存的功能去掉，这里考虑可以使用loader等
+        //TODO:更有效率的异步方式
         /**
-         * 获取全部数据库的数据
+         * 逻辑：从数据库中读取出group表的全部信息，这里使用noteId作为唯一的key
+         * 存入全局的group map中，这个map保存全部group信息，并保证每条group信息都是唯一的
+         * ps:这里使用noteId作为key值是因为，服务器返回的noteId值是唯一的，而台球圈第一个fragment的type为全部，
+         * 也就是说后面几个fragment的数据有可能和第一个fragment重合，所以没使用noteId和type联合的方式作为key作为
+         * 唯一标识的key，该对象一定要覆盖equals和hashCode方法
          */
-        mGroupDao = DaoFactory.getGroupDao(this);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mDBAllList = mGroupDao.getAllGroupInfo();
-                for(GroupNoteInfo info : mDBAllList){
-                    YueQiuApp.sGroupDbMap.put(info.getNoteId(),info);
-                }
-            }
-        }).start();
-
+//        mGroupDao = DaoFactory.getGroupDao(this);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                mCacheList = mGroupDao.getAllGroupInfo();
+//                for(GroupNoteInfo info : mCacheList){
+//                    YueQiuApp.sGroupDbMap.put(info.getNoteId(),info);
+//                }
+//            }
+//        }).start();
+        ////////////////////////////////////////////////////////////////////
         mTitles = new String[]{getString(R.string.billiard_all),
                 getString(R.string.billiard_get_master),
                 getString(R.string.billiard_be_master),
@@ -66,6 +76,30 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
                 getString(R.string.billiard_equipment),
                 getString(R.string.billiard_other)
         };
+        mActionBar = getActionBar();
+
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        mActionBar.setTitle(getString(R.string.billiard_group));
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
+            @Override
+            public void onPageSelected(int position) {
+                mActionBar.setSelectedNavigationItem(position);
+            }
+        });
+
+        Tab tab;
+        for(int i=0; i<mPagerAdapter.getCount();i++){
+            tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
+
+            mActionBar.addTab(tab);
+        }
+        //mViewPager.setCurrentItem(sCurrentItem);
+
+
     }
 
     public class SectionPagerAdapter extends FragmentStatePagerAdapter {
@@ -146,35 +180,13 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
     @Override
     protected void onResume() {
         super.onResume();
-        mActionBar = getActionBar();
-
-        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        mActionBar.setTitle(getString(R.string.billiard_group));
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-
-        mViewPager = (ViewPager) findViewById(R.id.pager);
-        mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
-            @Override
-            public void onPageSelected(int position) {
-                mActionBar.setSelectedNavigationItem(position);
-            }
-        });
-
-
-
-        Tab tab;
-        for(int i=0; i<mPagerAdapter.getCount();i++){
-            tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
-
-            mActionBar.addTab(tab);
-        }
+        mViewPager.setCurrentItem(sCurrentItem);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mActionBar.removeAllTabs();
+        sCurrentItem = mViewPager.getCurrentItem();
     }
 
     @Override

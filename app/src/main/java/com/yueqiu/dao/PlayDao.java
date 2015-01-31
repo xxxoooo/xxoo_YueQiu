@@ -11,6 +11,8 @@ public interface PlayDao {
 
     public long insertPlayInfo(List<PlayInfo> list);
 
+    public long updatesDetailPlayInfo(List<PlayInfo> list);
+
     public long updatesPlayInfo(List<PlayInfo> list);
 
     public List<PlayInfo> getAllPlayInfo();

@@ -29,26 +29,54 @@ import java.util.List;
  * Created by wangyun on 15/1/15.
  */
 public class PublishedFragment extends SlideMenuBasicFragment {
+    private static final String SAVE_PUBLISH_KEY = "save_publish";
     private PublishedBasicAdapter mPublishedAdapter;
     private PublishedDao mPublishedDao;
     //跟数据库相关的list
-    private List<PublishedInfo> mDBList;
+    private ArrayList<PublishedInfo> mCacheList;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //TODO:是否需要在这里保存数据？如果在滑动过程中断网了，那么在滑回来的时候
+        //TODO:按照现在不用缓存的逻辑页面就是空的
+        outState.putParcelableArrayList(SAVE_PUBLISH_KEY, mList);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater,container,savedInstanceState);
         mPublishedAdapter = new PublishedBasicAdapter(mActivity,mList);
         mPublishedDao = DaoFactory.getPublished(mActivity);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mDBList = mPublishedDao.getPublishedInfo(YueQiuApp.sUserInfo.getUser_id(),mType,mStart_no,10);
-                if(!mDBList.isEmpty()){
-                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mDBList).sendToTarget();
-                }
-            }
-        }).start();
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //TODO:先去掉缓存功能，后期再根据需求加回来，目前逻辑没问题
+        //TODO:同样是可以考虑用更有效率的loader或其他异步方法，而不是
+        //TODO:简单地用线程，线程的生命周期不可控
+        /**
+         * mCacheList是缓存list，从数据库中根据当前type值获取到前十条
+         * 如果mCacheList不为空就先使用该list填充listview
+         */
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                mCacheList = mPublishedDao.getPublishedInfo(YueQiuApp.sUserInfo.getUser_id(),mType,mStart_no,10);
+//                if(!mCacheList.isEmpty()){
+//                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
+//                }
+//            }
+//        }).start();
+        //////////////////////////////////////////////////////////////////////////////////////////////////
 
+        if(savedInstanceState != null){
+            mCacheList = savedInstanceState.getParcelableArrayList(SAVE_PUBLISH_KEY);
+            mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
+        }
+        //TODO:savedInstance为null证明该是第一次进入到viewpager,需要从数据库中读缓存
+        //TODO:后期要做缓存的时候可以将上面读缓存的代码放到else里面
+//        else{
+//
+//        }
+        
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
@@ -103,6 +131,9 @@ public class PublishedFragment extends SlideMenuBasicFragment {
                     itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
                     itemInfo.setDateTime(list_data.getJSONObject(i).getString("create_time"));
                     itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type_id")));
+                    //TODO:根据服务器确定的字段,如果需要缓存应该再加一个字段subtype,代表这条数据是type中的那个子类型
+                    //TODO:不过目前服务器那边说不传，不做缓存的话，倒是用不到这个字段
+                    //itemInfo.setSubType(list_data.getJSONObject(i).getInt("subtype"));
                     itemInfo.setChecked(false);
                     list.add(itemInfo);
                 }
@@ -127,18 +158,20 @@ public class PublishedFragment extends SlideMenuBasicFragment {
 
     @Override
     protected void onPullUpWhenNetNotAvailable() {
-        //TODO:有错误,还要改，limit的number不应该用mEnd,固定为10条
-        List<PublishedInfo> info = mPublishedDao.getPublishedInfo(YueQiuApp.sUserInfo.getUser_id(),mType,mStart_no,10);
-        if(!info.isEmpty()) {
-            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, info).sendToTarget();
-        }else{
-            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-        }
+        //TODO:由于不用缓存，所以直接toast无网络，如果后期需要缓存了，再换回这段代码
+
+//        List<PublishedInfo> info = mPublishedDao.getPublishedInfo(YueQiuApp.sUserInfo.getUser_id(),mType,mStart_no,10);
+//        if(!info.isEmpty()) {
+//            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, info).sendToTarget();
+//        }else{
+//            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+//        }
+        mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
     }
 
     protected void setEmptyViewVisible(){
         super.setEmptyViewVisible();
-        mEmptyView.setText(getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+        mEmptyView.setText(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
         mPullToRefreshListView.setEmptyView(mEmptyView);
     }
 
@@ -153,7 +186,7 @@ public class PublishedFragment extends SlideMenuBasicFragment {
     protected String getActionModeTitle() {
         return mActivity.getString(R.string.published_action_mode_title);
     }
-
+    //TODO:目前不需要缓存，所以这个方法暂时不调用
     private void updatePublishDB(){
         if(!mPublishUpdateList.isEmpty()){
             mPublishedDao.updatePublishInfo(mPublishUpdateList);
@@ -188,16 +221,31 @@ public class PublishedFragment extends SlideMenuBasicFragment {
                         if(!mList.contains(info)){
                             mList.add(info);
                         }
-                        Identity identity = new Identity();
-                        identity.user_id = YueQiuApp.sUserInfo.getUser_id();
-                        identity.table_id = info.getTable_id();
-                        identity.type = info.getType();
-                        if(!YueQiuApp.sPublishMap.containsKey(identity)){
-                            mPublishInsertList.add(info);
-                        }else{
-                            mPublishUpdateList.add(info);
-                        }
-                        YueQiuApp.sPublishMap.put(identity,info);
+                        //////////////////////////////////////////////////
+                        //TODO:下面的逻辑是用来更新缓存的，不过目前先不需要缓存
+                        //TODO:如果后期功能需要加缓存再加回来，目前的逻辑暂时没问题
+                        /**
+                         * 根据这条publishinfo的type和tableId,以及userId值生成唯一的key值
+                         * 如果全局的publishMap里有这条数据，则将这条数据加入
+                         * updateList，如果这条数据在playMap里不存在将将这条数据加入insertList
+                         */
+//                        Identity identity = new Identity();
+//                        identity.user_id = YueQiuApp.sUserInfo.getUser_id();
+//                        identity.table_id = info.getTable_id();
+//                        identity.type = info.getType();
+//                        if(!YueQiuApp.sPublishMap.containsKey(identity)){
+//                            mPublishInsertList.add(info);
+//                        }else{
+//                            mPublishUpdateList.add(info);
+//                        }
+                        /**
+                         * Map在put值的时候，如果key值已经存在则会用新的value覆盖
+                         * 原先的value，如果key值不存在则直接放入，所以这里publishInfo是
+                         * 放入updateList还是insertList，这里都要执行以下put操作，用来更新
+                         * 全局的map
+                         */
+//                        YueQiuApp.sPublishMap.put(identity,info);
+                        /////////////////////////////////////////////////////
                     }
 
                     mAfterCount = mList.size();
@@ -206,21 +254,21 @@ public class PublishedFragment extends SlideMenuBasicFragment {
                     }else{
                         if(mRefresh){
                             if (mAfterCount == mBeforeCount) {
-                                Utils.showToast(mActivity, getString(R.string.no_newer_info));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.no_newer_info));
                             } else {
-                                Utils.showToast(mActivity, getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }
 
-                    //TODO:更新数据库
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                           updatePublishDB();
-
-                        }
-                    }).start();
+                    //TODO:更新数据库,目前不需要缓存，所以先不用执行这一步
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                           updatePublishDB();
+//
+//                        }
+//                    }).start();
 
 
                     break;

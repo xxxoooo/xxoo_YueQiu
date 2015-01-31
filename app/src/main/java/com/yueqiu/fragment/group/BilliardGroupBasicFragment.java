@@ -50,7 +50,7 @@ import java.util.Map;
  * 台球圈基础的Fragment
  */
 public class BilliardGroupBasicFragment extends Fragment {
-    private static final String TAG = "wy";
+    private static final String SAVE_GROUP_KEY = "save_group";
     private View mView;
     private Activity mActivity;
     private RadioGroup mGroup;
@@ -70,8 +70,8 @@ public class BilliardGroupBasicFragment extends Fragment {
 
     private Map<String,Integer> mParamMap = new HashMap<String, Integer>();
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
-    private List<GroupNoteInfo> mList = new ArrayList<GroupNoteInfo>();
-    private List<GroupNoteInfo> mDBList;
+    private ArrayList<GroupNoteInfo> mList = new ArrayList<GroupNoteInfo>();
+    private List<GroupNoteInfo> mCacheList;
     private List<GroupNoteInfo> mInsertList = new ArrayList<GroupNoteInfo>();
     private List<GroupNoteInfo> mUpdateList = new ArrayList<GroupNoteInfo>();
 
@@ -79,6 +79,12 @@ public class BilliardGroupBasicFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mActivity = getActivity();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(SAVE_GROUP_KEY,mList);
     }
 
     @Override
@@ -91,22 +97,34 @@ public class BilliardGroupBasicFragment extends Fragment {
         initView();
         setEmptyTypeStr();
 
-        //TODO:获取数据库的全部内容,要放在线程中
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+        /////////////////////////////////////////////////////////////////////////////////////
+        //TODO:目前不需要缓存，后期需要缓存的时候再把这段代码加上
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                //TODO:缓存的list，
+//                if(mGroupType == PublicConstant.GROUP_ALL) {
+//                    mCacheList = mGroupDao.getAllGroupInfoLimit(mStart_no, 10);
+//                }else{
+//                    mCacheList = mGroupDao.getGroupInfoByType(mGroupType,mStart_no,10);
+//                }
+//                if(!mCacheList.isEmpty()){
+//                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
+//                }
+//            }
+//        }).start();
+        /////////////////////////////////////////////////////////////////////////////////////
 
-                //TODO:缓存的list，
-                if(mGroupType == PublicConstant.GROUP_ALL) {
-                    mDBList = mGroupDao.getAllGroupInfoLimit(mStart_no, 10);
-                }else{
-                    mDBList = mGroupDao.getGroupInfoByType(mGroupType,mStart_no,10);
-                }
-                if(!mDBList.isEmpty()){
-                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mDBList).sendToTarget();
-                }
-            }
-        }).start();
+        if(savedInstanceState != null){
+            mCacheList = savedInstanceState.getParcelableArrayList(SAVE_GROUP_KEY);
+            mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
+        }
+        //TODO:savedInstance为null证明该是第一次进入到viewpager,需要从数据库中读缓存
+        //TODO:后期要做缓存的时候可以将上面读缓存的代码放到else里面
+//        else{
+//
+//        }
 
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
@@ -130,6 +148,7 @@ public class BilliardGroupBasicFragment extends Fragment {
         mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
         mListView = mPullToRefreshListView.getRefreshableView();
         mPullToRefreshListView.setOnRefreshListener(mOnRefreshListener);
+        mEmptyView = new TextView(mActivity);
 
         mProgressDrawable = new FoldingCirclesDrawable.Builder(mActivity).build();
         Rect bounds = mPreProgress.getIndeterminateDrawable().getBounds();
@@ -157,32 +176,32 @@ public class BilliardGroupBasicFragment extends Fragment {
     private void setEmptyTypeStr(){
         switch(mGroupType){
             case PublicConstant.GROUP_GET_MASTER:
-                mEmptyTypeStr = getString(R.string.billiard_get_master);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_get_master);
                 break;
             case PublicConstant.GROUP_BE_MASTER:
-                mEmptyTypeStr = getString(R.string.billiard_be_master);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_be_master);
                 break;
             case PublicConstant.GROUP_GET_FRIEND:
-                mEmptyTypeStr = getString(R.string.billiard_find_friend);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_find_friend);
                 break;
             case PublicConstant.GROUP_EQUIP:
-                mEmptyTypeStr = getString(R.string.billiard_equipment);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_equipment);
                 break;
             case PublicConstant.GROUP_OTHER:
-                mEmptyTypeStr = getString(R.string.billiard_other);
+                mEmptyTypeStr = mActivity.getString(R.string.billiard_other);
                 break;
 
         }
     }
     private void setEmptyViewVisible(){
-        mEmptyView = new TextView(mActivity);
+
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
         mEmptyView.setTextColor(mActivity.getResources().getColor(R.color.md__defaultBackground));
         if(mGroupType == PublicConstant.GROUP_ALL) {
-            mEmptyView.setText(getString(R.string.no_group_info));
+            mEmptyView.setText(mActivity.getString(R.string.no_group_info));
         }else{
-            mEmptyView.setText(getString(R.string.no_group_type_info,mEmptyTypeStr));
+            mEmptyView.setText(mActivity.getString(R.string.no_group_type_info,mEmptyTypeStr));
         }
         mPullToRefreshListView.setEmptyView(mEmptyView);
     }
@@ -298,7 +317,6 @@ public class BilliardGroupBasicFragment extends Fragment {
                     mList.addAll(cacheList);
                     break;
                 case PublicConstant.GET_SUCCESS:
-
                     setmEmptyViewGone();
                     /**
                      * 保存还未更新的list的size
@@ -315,16 +333,17 @@ public class BilliardGroupBasicFragment extends Fragment {
                          if (!mList.contains(info)) {
                              mList.add(info);
                          }
+                        //TODO:目前不需要缓存，所以这块先不需要操作数据库
                         /**
                          * 数据库里的所有数据都不包含这条数据才插入数据,否则应该更新数据库
                          * 这里用全局map来保存数据库内容，避免每次创建都去读取数据库
                          */
-                        if(!YueQiuApp.sGroupDbMap.containsKey(info.getNoteId())){
-                            mInsertList.add(info);
-                        }else{
-                            mUpdateList.add(info);
-                        }
-                        YueQiuApp.sGroupDbMap.put(info.getNoteId(),info);
+//                        if(!YueQiuApp.sGroupDbMap.containsKey(info.getNoteId())){
+//                            mInsertList.add(info);
+//                        }else{
+//                            mUpdateList.add(info);
+//                        }
+//                        YueQiuApp.sGroupDbMap.put(info.getNoteId(),info);
                     }
                     /**
                      * 保存更新完list以后的size,如果更新完以后的list的size没有变化
@@ -339,32 +358,33 @@ public class BilliardGroupBasicFragment extends Fragment {
                     }else {
                         if (mRefresh) {
                             if (mAfterCount == mBeforeCount) {
-                                Utils.showToast(mActivity, getString(R.string.no_newer_info));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.no_newer_info));
                             } else {
-                                Utils.showToast(mActivity, getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }
+                    //TODO:目前不需要缓存，所以这块先不需要操作数据库
                     /**
                      * 另起线程更新数据库
                      */
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updateGroupInfoDB();
-                        }
-                    }).start();
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            updateGroupInfoDB();
+//                        }
+//                    }).start();
 
                     break;
                 case PublicConstant.TIME_OUT:
-                    Utils.showToast(mActivity,getString(R.string.http_request_time_out));
+                    Utils.showToast(mActivity,mActivity.getString(R.string.http_request_time_out));
                     if(mList.isEmpty()) {
                         setEmptyViewVisible();
                     }
                     break;
                 case PublicConstant.REQUEST_ERROR:
                     if(null == msg.obj){
-                        Utils.showToast(mActivity,getString(R.string.http_request_error));
+                        Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
                     }else{
                         Utils.showToast(mActivity, (String) msg.obj);
                     }
@@ -381,15 +401,15 @@ public class BilliardGroupBasicFragment extends Fragment {
                          */
                         if(mLoadMore) {
                             if(mGroupType == PublicConstant.GROUP_ALL) {
-                                Utils.showToast(mActivity, getString(R.string.no_more_group_info));
+                                Utils.showToast(mActivity, mActivity.getString(R.string.no_more_group_info));
                             }else{
-                                Utils.showToast(mActivity,getString(R.string.no_more_info,mEmptyTypeStr));
+                                Utils.showToast(mActivity,mActivity.getString(R.string.no_more_info,mEmptyTypeStr));
                             }
                         }
                     }
                     break;
                 case PublicConstant.NO_NETWORK:
-                    Utils.showToast(mActivity,getString(R.string.network_not_available));
+                    Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
                     if(mList.isEmpty())
                         setEmptyViewVisible();
                     break;
@@ -402,7 +422,7 @@ public class BilliardGroupBasicFragment extends Fragment {
         }
     };
 
-
+    //TODO:由于目前不需要缓存，所以暂时先不调用该方法
     private void updateGroupInfoDB(){
         if(!mUpdateList.isEmpty()){
             mGroupDao.updateGroupInfo(mUpdateList);
@@ -469,25 +489,30 @@ public class BilliardGroupBasicFragment extends Fragment {
                 mParamMap.put(HttpConstants.GroupList.END_NO,mEnd_no);
                 requestGroup();
             }
-            /**
-             * 没有网络的时候，应该从数据库中加载
-             */
+            //TODO:由于目前不需要缓存，所以当没有网络时，就直接toast无网络
+            //TODO:如果后面需要缓存，再替换成注释掉的代码
             else{
-                List<GroupNoteInfo> list;
-                /**
-                * 如果type为0，则查全部，否则查相应的类型
-                */
-                if(mGroupType == PublicConstant.GROUP_ALL){
-                    list = mGroupDao.getAllGroupInfoLimit(mStart_no,10);
-                }else{
-                    list = mGroupDao.getGroupInfoByType(mGroupType,mStart_no,10);
-                }
-                if(list.isEmpty()){
-                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                }else{
-                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list);
-                }
-             }
+                mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
+            }
+//            /**
+//             * 没有网络的时候，应该从数据库中加载
+//             */
+//            else{
+//                List<GroupNoteInfo> list;
+//                /**
+//                * 如果type为0，则查全部，否则查相应的类型
+//                */
+//                if(mGroupType == PublicConstant.GROUP_ALL){
+//                    list = mGroupDao.getAllGroupInfoLimit(mStart_no,10);
+//                }else{
+//                    list = mGroupDao.getGroupInfoByType(mGroupType,mStart_no,10);
+//                }
+//                if(list.isEmpty()){
+//                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+//                }else{
+//                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list);
+//                }
+//             }
         }
     };
 

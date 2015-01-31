@@ -43,6 +43,8 @@ public class PublishedImpl implements PublishedDao{
                 values.put(DatabaseConstant.PublishInfoTable.TITLE, info.getTitle());
                 values.put(DatabaseConstant.PublishInfoTable.CONTENT, info.getContent());
                 values.put(DatabaseConstant.PublishInfoTable.DATETIME, info.getDateTime());
+                //TODO:加入缓存后可定得加入这个字段
+//                values.put(DatabaseConstant.PublishInfoTable.SUBTYPE,info.getSubType());
                 result = mDB.insert(DatabaseConstant.PublishInfoTable.TABLE, null, values);
             }
             mDB.setTransactionSuccessful();
@@ -68,7 +70,8 @@ public class PublishedImpl implements PublishedDao{
                 values.put(DatabaseConstant.PublishInfoTable.CONTENT, info.getContent());
                 values.put(DatabaseConstant.PublishInfoTable.DATETIME, info.getDateTime());
                 values.put(DatabaseConstant.PublishInfoTable.TYPE,info.getType());
-
+                //TODO:加入缓存后可定得加入这个字段
+//                values.put(DatabaseConstant.PublishInfoTable.SUBTYPE,info.getSubType());
                 result = mDB.update(DatabaseConstant.PublishInfoTable.TABLE, values, DatabaseConstant.PublishInfoTable.USER_ID + "=? and " +
                                 DatabaseConstant.PublishInfoTable.TABLE_ID + "=? and " + DatabaseConstant.PublishInfoTable.TYPE + "=?",
                         new String[]{String.valueOf(YueQiuApp.sUserInfo.getUser_id()), String.valueOf(info.getTable_id()),String.valueOf(info.getType())});
@@ -99,6 +102,8 @@ public class PublishedImpl implements PublishedDao{
                 info.setContent(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.CONTENT)));
                 info.setDateTime(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.DATETIME)));
                 info.setTable_id(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.TABLE_ID)));
+                //TODO:加入缓存后可定得加入这个字段
+//                info.setSubType(itemCursor.getInt(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.SUBTYPE)));
                 list.add(info);
             }while(itemCursor.moveToNext());
         }
@@ -122,6 +127,8 @@ public class PublishedImpl implements PublishedDao{
                 info.setContent(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.CONTENT)));
                 info.setDateTime(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.DATETIME)));
                 info.setTable_id(itemCursor.getString(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.TABLE_ID)));
+                //TODO:加入缓存后可定得加入这个字段
+//                info.setSubType(itemCursor.getInt(itemCursor.getColumnIndexOrThrow(DatabaseConstant.PublishInfoTable.SUBTYPE)));
                 list.add(info);
             }while(itemCursor.moveToNext());
         }
