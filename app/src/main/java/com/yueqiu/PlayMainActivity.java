@@ -57,19 +57,19 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
          * 的每条play信息的tableId肯定是唯一的，所以这里用tableId和type生成一个对象作为
          * 唯一标识的key，该对象一定要覆盖equals和hashCode方法
          */
-        mPlayDao = DaoFactory.getPlay(this);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mCacheAllList = mPlayDao.getAllPlayInfo();
-                for(PlayInfo info : mCacheAllList){
-                    PlayIdentity identity = new PlayIdentity();
-                    identity.table_id = info.getTable_id();
-                    identity.type = info.getType();
-                    YueQiuApp.sPlayMap.put(identity,info);
-                }
-            }
-        }).start();
+//        mPlayDao = DaoFactory.getPlay(this);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                mCacheAllList = mPlayDao.getAllPlayInfo();
+//                for(PlayInfo info : mCacheAllList){
+//                    PlayIdentity identity = new PlayIdentity();
+//                    identity.table_id = info.getTable_id();
+//                    identity.type = info.getType();
+//                    YueQiuApp.sPlayMap.put(identity,info);
+//                }
+//            }
+//        }).start();
         //////////////////////////////////////////////////
 
 
