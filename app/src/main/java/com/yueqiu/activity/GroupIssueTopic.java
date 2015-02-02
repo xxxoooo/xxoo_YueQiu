@@ -2,12 +2,14 @@ package com.yueqiu.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,11 +23,12 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
-import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.view.CustomDialogBuilder;
+import com.yueqiu.view.dlgeffect.EffectsType;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONException;
@@ -37,7 +40,7 @@ import java.util.Map;
 public class GroupIssueTopic extends Activity implements View.OnClickListener{
 
     private EditText    mTitleEdit,mContentEdit;
-    private TextView    mTopicTypeTv;
+    private TextView    mTopicTypeTv,mTakePhoto,mSelectPhoto;
     private ImageView   mIvExpression,mIvAddImg;
     private View        mLinearType;
 
@@ -48,6 +51,9 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
     private String mTitle;
     private String mContent;
     private int mTopicType;
+
+    private CustomDialogBuilder mDlgBuilder;
+
     private Map<String,String> mParamsMap = new HashMap<String, String>();
     private Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
 
@@ -82,6 +88,7 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
         mPreText.setText(getString(R.string.activity_issuing));
 
         mLinearType.setOnClickListener(this);
+        mIvAddImg.setOnClickListener(this);
     }
     private void requestPublish(){
 
@@ -245,6 +252,37 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
                 }
                 startActivityForResult(intent,0);
                 overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                break;
+            case R.id.group_issue_add_img:
+                mDlgBuilder = CustomDialogBuilder.getsInstance(this);
+                mDlgBuilder.withTitle(getString(R.string.select_photo))
+                        .withTitleColor(Color.WHITE)
+                        .withDividerColor(getResources().getColor(R.color.search_distance_color))
+                        .withMessage(null)
+                        .isCancelableOnTouchOutside(true)
+                        .isCancelable(true)
+                        .withDialogColor(R.color.actionbar_color)
+                        .withDuration(700)
+                        .withEffect(EffectsType.NewsPaper)
+                        .setSureButtonVisible(false)
+                        .withCancelButtonText(getString(R.string.btn_message_cancel))
+                        .setCustomView(R.layout.dialog_select_photo, v.getContext())
+                        .setCancelButtonClick(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDlgBuilder.dismiss();
+                            }
+                        })
+                        .show();
+
+                mTakePhoto = (TextView) mDlgBuilder.findViewById(R.id.take_photo_now);
+                mSelectPhoto = (TextView) mDlgBuilder.findViewById(R.id.select_photo_from_album);
+                mTakePhoto.setOnClickListener(this);
+                mSelectPhoto.setOnClickListener(this);
+                break;
+            case R.id.take_photo_now:
+                break;
+            case R.id.select_photo_from_album:
                 break;
         }
 

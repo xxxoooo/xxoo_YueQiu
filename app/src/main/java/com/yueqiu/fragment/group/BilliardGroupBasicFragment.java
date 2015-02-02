@@ -1,6 +1,7 @@
 package com.yueqiu.fragment.group;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
@@ -21,8 +23,12 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.activity.BilliardGroupDetailActivity;
+import com.yueqiu.activity.PlayDetailActivity;
 import com.yueqiu.adapter.GroupBasicAdapter;
 import com.yueqiu.bean.GroupNoteInfo;
+import com.yueqiu.bean.PlayInfo;
+import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
@@ -37,6 +43,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.security.acl.Group;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,7 +56,7 @@ import java.util.Map;
  * Created by wangyun on 14/12/17.
  * 台球圈基础的Fragment
  */
-public class BilliardGroupBasicFragment extends Fragment {
+public class BilliardGroupBasicFragment extends Fragment implements AdapterView.OnItemClickListener{
     private static final String SAVE_GROUP_KEY = "save_group";
     private View mView;
     private Activity mActivity;
@@ -172,6 +179,8 @@ public class BilliardGroupBasicFragment extends Fragment {
                 }
             }
         });
+
+        mListView.setOnItemClickListener(this);
     }
     private void setEmptyTypeStr(){
         switch(mGroupType){
@@ -248,6 +257,19 @@ public class BilliardGroupBasicFragment extends Fragment {
             e.printStackTrace();
         }
         return infos;
+    }
+
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        GroupNoteInfo info = (GroupNoteInfo) mAdapter.getItem(position-1);
+        Intent intent = new Intent(mActivity, BilliardGroupDetailActivity.class);
+        Bundle args = new Bundle();
+        args.putInt(DatabaseConstant.GroupInfo.NOTE_ID,info.getNoteId());
+        args.putInt(DatabaseConstant.GroupInfo.COMMENT_COUNT,info.getCommentCount());
+        intent.putExtras(args);
+        startActivity(intent);
+        mActivity.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
     }
 
     private class RequestGroupTask extends AsyncTaskUtil<Integer>{

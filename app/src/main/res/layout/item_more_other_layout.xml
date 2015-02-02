@@ -10,7 +10,7 @@
         android:id="@+id/other_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"
+        android:src="@drawable/logo"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/button_tool"
         android:layout_marginRight="20dp"
