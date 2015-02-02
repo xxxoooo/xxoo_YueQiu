@@ -166,9 +166,9 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
                 break;
             case R.id.chat_container_send_btn:
                 sendMessage();
-                if (isShowExtension) {
-                    showExtension(false);
-                }
+//                if (isShowExtension) {
+//                    showExtension(false);
+//                }
                 break;
             case R.id.chat_container_message_more:
                 //查看更多消息

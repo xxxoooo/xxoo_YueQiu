@@ -499,6 +499,11 @@ public class Utils {
         return t;
     }
 
+    /**
+     * 隐藏软键盘
+     * @param context
+     * @param ed
+     */
     public static void dismissInputMethod(Context context, EditText ed) {
         InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(ed.getWindowToken(), 0);
