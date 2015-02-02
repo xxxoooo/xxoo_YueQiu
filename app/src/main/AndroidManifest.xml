@@ -21,7 +21,6 @@
 
         <!--程序初始启动时显示的SplashScreen-->
         <activity
-            android:theme="@android:style/Theme.Wallpaper.NoTitleBar.Fullscreen"
             android:name=".YueQiuSplashScreen"
             android:label="@string/title_activity_yue_qiu_splash_screen"
             android:screenOrientation="portrait">
@@ -33,7 +32,8 @@
 
         <activity
             android:name=".BilliardNearbyActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            >
 
         </activity>
 
