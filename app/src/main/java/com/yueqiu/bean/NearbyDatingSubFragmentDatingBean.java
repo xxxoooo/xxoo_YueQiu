@@ -1,5 +1,7 @@
 package com.yueqiu.bean;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,6 +14,8 @@ import org.json.JSONObject;
  */
 public class NearbyDatingSubFragmentDatingBean
 {
+    private final static String TAG = "NearbyDatingSubFragmentDatingBean";
+
     private String mId;
     private String mUserPhoto;
     private String mUserName;
@@ -109,5 +113,39 @@ public class NearbyDatingSubFragmentDatingBean
         return new NearbyDatingSubFragmentDatingBean(mId, mUserPhoto, mUserName, mUserDeclare, mUserDistance);
     }
 
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        try
+        {
+            int idVal = Integer.parseInt(this.getId());
+            hash *= idVal;
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while parse the id value : " + e.toString());
+        }
+        return hash;
+    }
 
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean result = false;
+
+        if (object == null || object.getClass() != this.getClass())
+        {
+            result = false;
+        } else
+        {
+            NearbyDatingSubFragmentDatingBean thatObj = (NearbyDatingSubFragmentDatingBean) object;
+            if (thatObj.getId().equals(this.getId()) && thatObj.getUserName().equals(this.getUserName())
+                    && thatObj.getUserPhoto().equals(this.getUserPhoto())
+                    && thatObj.getUserDeclare().equals(this.getUserDeclare()))
+            {
+                result = true;
+            }
+        }
+        return result;
+    }
 }

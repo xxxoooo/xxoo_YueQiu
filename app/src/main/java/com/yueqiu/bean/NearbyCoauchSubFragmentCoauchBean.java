@@ -1,5 +1,7 @@
 package com.yueqiu.bean;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,6 +12,8 @@ import org.json.JSONObject;
  */
 public class NearbyCoauchSubFragmentCoauchBean
 {
+    private static final String TAG = "NearbyCoauchSubFragmentCoauchBean";
+
     private String mId;
     private String mUserPhoto;
     private String mUserName;
@@ -141,4 +145,40 @@ public class NearbyCoauchSubFragmentCoauchBean
         return new NearbyCoauchSubFragmentCoauchBean(mId, mUserPhoto, mUserName, mUserGender, mUserDistance, mUserLevel, mBilliardKind);
     }
 
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        try
+        {
+            int userId = Integer.parseInt(this.getId());
+            hash *= userId;
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we parse the userId, " + e.toString());
+        }
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean result = false;
+
+        if (object == null || object.getClass() != this.getClass())
+        {
+            result = false;
+        } else
+        {
+            NearbyCoauchSubFragmentCoauchBean thatObj = (NearbyCoauchSubFragmentCoauchBean) object;
+            if (thatObj.getId().equals(this.getId()) && thatObj.getUserPhoto().equals(this.getUserPhoto())
+                    && thatObj.getUserName().equals(this.getUserName())
+                    && thatObj.getUserDistance().equals(this.getUserDistance())
+                    && thatObj.getmBilliardKind().equals(this.getmBilliardKind()))
+            {
+                result = true;
+            }
+        }
+        return result;
+    }
 }

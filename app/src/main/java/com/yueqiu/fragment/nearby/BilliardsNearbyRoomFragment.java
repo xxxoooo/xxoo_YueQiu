@@ -162,7 +162,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
         mRoomListView.requestLayout();
         mSearchRoomAdapter.notifyDataSetChanged();
 
-        // TODO: 初始化测试数据
+        // TODO: 初始化测试数据,在正式发布时，将这个过程删掉。现在我们可能还需要看一下具体的
+        // TODO: 效果，所以暂时不删除
 //        initListStaticTestData();
 
         mRoomListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -234,7 +235,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
      */
     private void retrieveRoomListInfo(final String city, final String region, final String range, final String sort, final int limit, final int page)
     {
-        if (!mNetworkAvailable) {
+        if (!mNetworkAvailable)
+        {
             Log.d(TAG, " the network are really sucked off, and we have to stop fetching any more data from the server any more ");
             mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_FAILED,
                     sContext.getResources().getString(R.string.network_not_available)).sendToTarget();
@@ -271,13 +273,17 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
         String rawResult = HttpUtil.dpUrlClient(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams);
         Log.d(TAG, " the raw result we get are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult)) {
-            try {
+        if (!TextUtils.isEmpty(rawResult))
+        {
+            try
+            {
                 JSONObject resultJsonObj = new JSONObject(rawResult);
                 Log.d(TAG, " the initial json data of the room fragment we get are : " + resultJsonObj.toString());
-                if (!resultJsonObj.isNull("status")) {
+                if (!resultJsonObj.isNull("status"))
+                {
                     String status = resultJsonObj.getString("status");
-                    if (status.equals("OK")) {
+                    if (status.equals("OK"))
+                    {
                         // TODO: 现阶段，由于返回的原始的Json包含了两个int值，一个是total_count,一个是count
                         // TODO: 但是我们不确定究竟是哪一个代表的是我们获得的数据的条数，我们暂时先使用total_count这个值作为数据的条数
                         final int count = resultJsonObj.getInt("total_count");
@@ -285,7 +291,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         final int size = businessJsonArr.length();
                         Log.d(TAG, " the total json objects we get are : " + size);
                         int i;
-                        for (i = 0; i < size; ++i) {
+                        for (i = 0; i < size; ++i)
+                        {
                             JSONObject businessObj = (JSONObject) businessJsonArr.get(i);
                             Log.d(TAG, " the sub json object we parsed out are : " + businessObj.toString());
                             final long businessId = businessObj.getLong("business_id");
@@ -328,12 +335,14 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
                         mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR, errorInfo.toString()).sendToTarget();
                     }
-                } else {
+                } else
+                {
                     // 什么错误信息都没有获取到，甚至连error都没有
                     mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                 }
 
-            } catch (JSONException e) {
+            } catch (JSONException e)
+            {
                 e.printStackTrace();
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                 Log.d(TAG, " Exception happened in parsing the resulted json object we get, and the detailed reason are : " + e.toString());
@@ -440,16 +449,14 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
                     List<NearbyRoomSubFragmentRoomBean> roomList = (ArrayList<NearbyRoomSubFragmentRoomBean>) msg.obj;
-                    Log.d(TAG, " inside the roomFragment UIEventsHandler --> the list we get from the background are : " + roomList.size());
                     mBeforeCount = mRoomList.size();
                     for (NearbyRoomSubFragmentRoomBean roomBean : roomList)
                     {
-                        if (!mRoomList.contains(roomBean))
+                        if (! mRoomList.contains(roomBean))
                         {
                             mRoomList.add(roomBean);
                         }
                     }
-
                     mAfterCount = mRoomList.size();
                     if (mRoomList.isEmpty())
                     {
@@ -468,6 +475,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             }
                         }
                     }
+
+                    mSearchRoomAdapter.notifyDataSetChanged();
 
                     break;
 
@@ -775,6 +784,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 // TODO: 来进行提供的，也就是说我们不能传递startNum和endNum，而是直接传入page值
                 if (null != mWorkerThread)
                 {
+                    Log.d(TAG, "PullToRefresh --> have touched the end of the list, and the pageNum we need to request are : " + mPage);
                     mWorkerThread.fetchRoomData(mPage);
                 }
             }
@@ -798,7 +808,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
         String roomTag = "西城区 五道口 清华大学旁边厕所附近";
         String roomDetailedInfo = "办会员卡，容声VIP会员。我是屌丝，我为屌丝代言";
         int i;
-        for (i = 0; i < 100; ++i) {
+        for (i = 0; i < 100; ++i)
+        {
             mRoomList.add(new NearbyRoomSubFragmentRoomBean("", "", roomName, level, price, address, distance, roomPhoneNum, roomTag, roomDetailedInfo));
         }
     }
