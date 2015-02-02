@@ -82,8 +82,8 @@ public class ContactFragment extends Fragment {
     }
 
     private void init() {
-        mIphoneTreeView.setHeaderView(LayoutInflater.from(mContext).inflate(
-                R.layout.fragment_constact_head_view, mIphoneTreeView, false));
+//        mIphoneTreeView.setHeaderView(LayoutInflater.from(mContext).inflate(
+//                R.layout.fragment_constact_head_view, mIphoneTreeView, false));
         mIphoneTreeView.setGroupIndicator(null);
 //		mExpAdapter = new ExpAdapter(mContext, maps, mIphoneTreeView,mSearchView);
         mExpAdapter = new ExpAdapter(mContext, mIphoneTreeView);
@@ -94,15 +94,13 @@ public class ContactFragment extends Fragment {
         mIphoneTreeView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Toast.makeText(getActivity(),
-                        "你点击了" + mExpAdapter.getChild(groupPosition, childPosition),
-                        Toast.LENGTH_SHORT).show();
                 ContactsList.Contacts contacts = (ContactsList.Contacts) mExpAdapter.getChild(groupPosition, childPosition);
                 //TODO:传入待聊天好友的userid
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
                 intent.putExtra(MessageFragment.FRIEND_USER_ID, contacts.getUser_id());//fake date
                 intent.putExtra(MessageFragment.FRIEND_USER_NAME, contacts.getUsername());
                 startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 return true;
             }
         });

@@ -42,7 +42,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.awt.font.TextAttribute;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -196,13 +200,13 @@ public class BilliardsNearbyDatingFragment extends Fragment
     /**
      * @param userId
      * @param range    发布约球信息的大致距离,距离范围。例如1000米以内,具体传递的形式例如range=100
-     * @param date     发布日期，例如date=2014-04-04
+     * @param date     发布日期，例如date=2014-04-04，在这里，我们默认的就选择今天就可以了
      * @param startNum 请求信息的开始的条数的数目(当我们进行分页请求的时候，我们就会用到这个特性，即每次当用户滑动到列表低端或者当用户滑动更新的时候，我们需要
      *                 通过更改startNum的值来进行分页加载的具体实现)
      *                 例如start_no=0
      * @param endNum   请求列表信息的结束条目，例如我们可以一次只加载10条，当用户请求的时候再加载更多的数据,例如end_no=9
      */
-    private void retrieveDatingInfo(final String userId, final String range, final int date, final int startNum, final int endNum)
+    private void retrieveDatingInfo(final String userId, final String range, final String date, final int startNum, final int endNum)
     {
         if (!mNetworkAvailable) {
             mUIEventsHandler.obtainMessage(FETCH_DATA_FAILED,
@@ -212,8 +216,17 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
         requestParams.put("user_id", userId);
-        requestParams.put("range", range);
-        requestParams.put("date", date + "");
+        // 我们将range的默认值置为1000
+        String rangeVal = TextUtils.isEmpty(range) ? "1000" : range;
+        requestParams.put("range", rangeVal);
+        // 我们将date的默认值设置为当前的请求时间，日期格式设置为2015-01-31
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+        calendar.setTime(new Date());
+        String currentDateStr = dateFormatter.format(calendar.getTime());
+        Log.d(TAG, " the detailed date we get for today are : " + currentDateStr);
+        String dateStr = TextUtils.isEmpty(date) ? currentDateStr : date;
+        requestParams.put("date", dateStr);
         requestParams.put("start_no", startNum + "");
         requestParams.put("end_no", endNum + "");
 
@@ -263,21 +276,35 @@ public class BilliardsNearbyDatingFragment extends Fragment
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                         } else
                         {
-                            mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR,rawJsonObj.getString("msg")).sendToTarget();                            
+                            Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                            Bundle errorData = new Bundle();
+                            String errorStr = rawJsonObj.getString("msg");
+                            if (! TextUtils.isEmpty(errorStr))
+                            {
+                                errorData.putString(KEY_REQUEST_ERROR_DATING, errorStr);
+                            }
+                            errorMsg.setData(errorData);
+                            mUIEventsHandler.sendMessage(errorMsg);
                         }
                     } else
                     {
                         mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                     }
                 }
-            } catch (JSONException e) {
+            } catch (JSONException e)
+            {
                 e.printStackTrace();
+                // 发生异常了之后，我们应该准确的通知UIHandler没有获取到任何的数据
+                mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                 Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
             }
         }
     }
 
     private static final String KEY_REQUEST_ERROR_DATING = "keyRequestErrorDating";
+
+    private static final String KEY_REQUEST_START_NUM = "keyDatingRequestStartNum";
+    private static final String KEY_REQUEST_END_NUM = "keyDatingRequestEndNum";
 
     private static final int DATA_HAS_BEEN_UPDATED = 1 << 8;
 
@@ -303,10 +330,10 @@ public class BilliardsNearbyDatingFragment extends Fragment
             switch (msg.what)
             {
                 case UI_HIDE_DIALOG:
-
                     mDatingListAdapter.notifyDataSetChanged();
                     hideProgress();
                     Log.d(TAG, " hiding the dialog ");
+
                     break;
                 case UI_SHOW_DIALOG:
                     showProgress();
@@ -333,14 +360,11 @@ public class BilliardsNearbyDatingFragment extends Fragment
                         }
                     }
 
-
                     if (mDatingList.isEmpty())
                     {
                         loadEmptyTv();
                     }
-
                     break;
-
                 case RETRIEVE_DATA_WITH_RANGE_FILTERED:
                     String range = (String) msg.obj;
                     mBackgroundHandler.fetchDatingWithRangeFilter(range);
@@ -357,6 +381,11 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     break;
 
                 case NETWORK_UNAVAILABLE:
+                    hideProgress();
+                    if (mDatingList.isEmpty())
+                    {
+                        loadEmptyTv();
+                    }
                     Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
 
                     break;
@@ -366,8 +395,8 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     if (mDatingList.isEmpty()) {
                         loadEmptyTv();
                     }
+                    hideProgress();
                     break;
-
                 case PublicConstant.NO_RESULT:
                     if (mDatingList.isEmpty()) {
                         loadEmptyTv();
@@ -376,13 +405,17 @@ public class BilliardsNearbyDatingFragment extends Fragment
                             Utils.showToast(sContext, sContext.getString(R.string.no_more_info));
                         }
                     }
+                    hideProgress();
                     break;
 
                 case PublicConstant.REQUEST_ERROR:
                     Bundle errorData = msg.getData();
-                    if (null != errorData) {
-                        Utils.showToast(sContext, errorData.getString(KEY_REQUEST_ERROR_DATING));
-                    } else {
+                    String errorInfo = errorData.getString(KEY_REQUEST_ERROR_DATING);
+                    if (! TextUtils.isEmpty(errorInfo))
+                    {
+                        Utils.showToast(sContext, errorInfo);
+                    } else
+                    {
                         Utils.showToast(sContext, sContext.getString(R.string.http_request_error));
                     }
 
@@ -391,6 +424,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                         loadEmptyTv();
                     }
 
+                    hideProgress();
                     break;
             }
             mDatingListAdapter.notifyDataSetChanged();
@@ -443,39 +477,54 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     switch (msg.what) {
                         case START_RETRIEVE_ALL_DATA:
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            retrieveDatingInfo("1", "", 1, 1, 1);
+                            Bundle requestInfo = msg.getData();
+                            final int startNum = requestInfo.getInt(KEY_REQUEST_START_NUM);
+                            final int endNum = requestInfo.getInt(KEY_REQUEST_END_NUM);
+                            Log.d(TAG, " inside the dating fragment, in the workHandler --> and the startNum : " + startNum + " , the endNum : " + endNum);
+                            String cacheRange = sParamsPreference.getDatingRange(sContext);
+                            String cacheDate = sParamsPreference.getDatingPublishedDate(sContext);
+                            retrieveDatingInfo("1", cacheRange, cacheDate, startNum, endNum);
+
                             break;
                         case RETRIEVE_DATA_WITH_DATE_FILTERED:                           
                             String publishDate = (String) msg.obj;
                             Log.d(TAG, " inside the dating fragment BackgroundHandlerThread --> the publishDate we need to filter are : " + publishDate);
+                            String dateCacheRange = sParamsPreference.getDatingRange(sContext);
+                            // 每次筛选请求都是从零开始的重新请求
+                            retrieveDatingInfo("1", dateCacheRange, publishDate, 0, 9);
                             break;
                         case RETRIEVE_DATA_WITH_RANGE_FILTERED:                          
                             String range = (String) msg.obj;
                             Log.d(TAG, " inside the dating fragment BackgroundHandlerThread --> the range we need to filter are : " + range);
+                            String rangeCacheDate = sParamsPreference.getDatingPublishedDate(sContext);
+                            // 我们需要从0开始重新请求
+                            retrieveDatingInfo("1", range, rangeCacheDate, 0, 9);
                             break;
                     }
                 }
             };
-
-            fetchDatingData();
+            fetchDatingData(0, 9);
         }
 
-        public void fetchDatingData()
+        public void fetchDatingData(final int startNum, final int endNum)
         {
-            mWorkerHandler.sendEmptyMessage(START_RETRIEVE_ALL_DATA);
+            Message requestMsg = mWorkerHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
+            Bundle data = new Bundle();
+            data.putInt(KEY_REQUEST_START_NUM, startNum);
+            data.putInt(KEY_REQUEST_END_NUM, endNum);
+            requestMsg.setData(data);
+            mWorkerHandler.sendMessage(requestMsg);
         }
 
         public void fetchDatingWithRangeFilter(String range)
         {
-            mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_RANGE_FILTERED,range).sendToTarget();
-                  
+            mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_RANGE_FILTERED, range).sendToTarget();
         }
 
         public void fetchDatingWithPublishDateFilter(String publishDate)
         {
             Log.d(TAG, " inside the method of BackgroundHandler --> the published date we get are : " + publishDate);
-            mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_DATE_FILTERED,publishDate).sendToTarget();
-          
+            mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_DATE_FILTERED, publishDate).sendToTarget();
         }
     }
 
@@ -498,21 +547,18 @@ public class BilliardsNearbyDatingFragment extends Fragment
             String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
-            new Thread(new Runnable()
+            if (Utils.networkAvaiable(sContext))
             {
-                @Override
-                public void run()
+                mRefresh = true;
+                mLoadMore = false;
+                if (null != mBackgroundHandler)
                 {
-                    if (Utils.networkAvaiable(sContext)) {
-                        mRefresh = true;
-                        mLoadMore = false;
-                        retrieveDatingInfo("1", "", 1, 0, 9);
-                    } else {
-                        //TODO:不能在线程中toast
-                        mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
-                    }
+                    mBackgroundHandler.fetchDatingData(0, 9);
                 }
-            }).start();
+            } else
+            {
+                mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
+            }
         }
 
         @Override
@@ -521,31 +567,30 @@ public class BilliardsNearbyDatingFragment extends Fragment
             String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
-            new Thread(new Runnable()
+            mLoadMore = true;
+            mRefresh = false;
+            mCurrentPos = mDatingList.size();
+            if (mBeforeCount != mAfterCount)
             {
-                @Override
-                public void run()
+                mStarNum = mEndNum + (mAfterCount - mBeforeCount);
+                mEndNum += 10 + (mAfterCount - mBeforeCount);
+            } else
+            {
+                mStarNum = mEndNum + 1;
+                mEndNum += 10;
+            }
+
+            if (Utils.networkAvaiable(sContext))
+            {
+                if (null != mBackgroundHandler)
                 {
-                    mLoadMore = true;
-                    mCurrentPos = mDatingList.size();
-                    if (mBeforeCount != mAfterCount) {
-                        mStarNum = mEndNum + (mAfterCount - mBeforeCount);
-                        mEndNum += 10 + (mAfterCount - mBeforeCount);
-                    } else {
-                        mStarNum = mEndNum + 1;
-                        mEndNum += 10;
-                    }
-
-                    if (Utils.networkAvaiable(sContext)) {
-                        retrieveDatingInfo("1", "", 1, mStarNum, mEndNum);
-                    } else
-                    {
-                        mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
-                    }
-
+                    Log.d(TAG, " in the dating fragment --> loading more data --> startNum : " + mStarNum + " , and the endNum : " + mEndNum);
+                    mBackgroundHandler.fetchDatingData(mStarNum, mEndNum);
                 }
-            }).start();
-
+            } else
+            {
+                mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
+            }
         }
     };
 

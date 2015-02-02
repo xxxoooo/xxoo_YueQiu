@@ -66,6 +66,7 @@ public class MessageFragment extends Fragment {
                     intent.putExtra(FRIEND_USER_NAME, "小明");
                     startActivity(intent);
                 }
+                getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }
         });
         return view;

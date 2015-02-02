@@ -68,7 +68,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
     private List<PlayInfo> mList = new ArrayList<PlayInfo>();
     private List<PlayInfo> mInsertList = new ArrayList<PlayInfo>();
     private List<PlayInfo> mUpdateList = new ArrayList<PlayInfo>();
-    private List<PlayInfo> mDBList = new ArrayList<PlayInfo>();
+    private List<PlayInfo> mCacheList = new ArrayList<PlayInfo>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,15 +79,25 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         mPlayDao = DaoFactory.getPlay(this);
         mAdapter = new PlayListViewAdapter(this,mList);
 
+        /////////////////////////////////////////////////////////////////////////////////
+        //TODO:先去掉缓存功能，后期再根据需求加回来，目前逻辑没问题
+        //TODO:同样是可以考虑用更有效率的loader或其他异步方法，而不是
+        //TODO:简单地用线程，线程的生命周期不可控
+        /**
+         * mCacheList是缓存list，从数据库中根据当前type值获取到前十条
+         * 如果mCacheList不为空就先使用该list填充listview
+         */
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mDBList = mPlayDao.getPlayInfoLimit(PublicConstant.PLAY_BUSSINESS,mStart,10);
-                if(!mDBList.isEmpty()){
-                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mDBList).sendToTarget();
+                mCacheList = mPlayDao.getPlayInfoLimit(PublicConstant.PLAY_BUSSINESS,mStart,10);
+                if(!mCacheList.isEmpty()){
+                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
                 }
             }
         }).start();
+        ///////////////////////////////////////////////////////////////////////////////////
+
 
         if(Utils.networkAvaiable(this)){
             mLoadMore = false;
@@ -232,22 +242,39 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
                     mList.addAll(cacheList);
                     break;
                 case PublicConstant.GET_SUCCESS:
+                    /**
+                     * mBeforeCount是从网络成功获取数据前的list的size
+                     * mAfterCount是成功获取数据后的list的size
+                     * 这两个值是用来判断更新了多少条
+                     */
                     mBeforeCount = mList.size();
                     List<PlayInfo> list = (List<PlayInfo>) msg.obj;
                     for(PlayInfo info : list){
                         if(!mList.contains(info)){
                             mList.add(info);
                         }
-                        PlayIdentity identity = new PlayIdentity();
-                        identity.type = info.getType();
-                        identity.table_id = info.getTable_id();
-                        if(!YueQiuApp.sPlayMap.containsKey(identity)){
-                            mInsertList.add(info);
-                        }else{
-                            mUpdateList.add(info);
-                        }
-
-                        YueQiuApp.sPlayMap.put(identity,info);
+                        //TODO:下面的逻辑是用来更新缓存的，不过目前先不需要缓存
+                        //TODO:如果后期功能需要加缓存再加回来，目前的逻辑暂时没问题
+                        /**
+                         * 根据这条playinfo的type和tableId值生成唯一的key值
+                         * 如果全局的playMap里有这条数据，则将这条数据加入
+                         * updateList，如果这条数据在playMap里不存在将将这条数据加入insertList
+                         */
+//                        PlayIdentity identity = new PlayIdentity();
+//                        identity.type = info.getType();
+//                        identity.table_id = info.getTable_id();
+//                        if(!YueQiuApp.sPlayMap.containsKey(identity)){
+//                            mInsertList.add(info);
+//                        }else{
+//                            mUpdateList.add(info);
+//                        }
+                        /**
+                         * Map在put值的时候，如果key值已经存在则会用新的value覆盖
+                         * 原先的value，如果key值不存在则直接放入，所以这里playInfo是
+                         * 放入updateList还是insertList，这里都要执行以下put操作，用来更新
+                         * 全局的map
+                         */
+//                        YueQiuApp.sPlayMap.put(identity,info);
                     }
                     mAfterCount = mList.size();
                     if(mList.isEmpty()){
@@ -261,12 +288,17 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
                             }
                         }
                     }
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            updatePlayInfoDB();
-                        }
-                    }).start();
+                    //TODO:是否有更有效率的异步方法？
+                    //TODO:而不是简单地用线程，不过插入和更新操作都是使用事务，效率已经很高了
+                    /**
+                     * 异步更新数据库
+                     */
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            updatePlayInfoDB();
+//                        }
+//                    }).start();
                     break;
                 case PublicConstant.NO_RESULT:
                     if(mList.isEmpty()) {
@@ -306,6 +338,11 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
             }
         }
     };
+
+    /**
+     * 用来更新数据库的函数
+     */
+    //TODO：由于暂时不需要缓存功能，所以该方法暂时不执行
     private void updatePlayInfoDB(){
         if(!mUpdateList.isEmpty()){
             mPlayDao.updatesPlayInfo(mUpdateList);
@@ -365,6 +402,9 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
             mLoadMore = false;
             mInsertList.clear();
             mUpdateList.clear();
+            /**
+             * 下拉刷新始终都是请求最新的数据,无网络时无法使用缓存
+             */
             if(Utils.networkAvaiable(PlayBusinessActivity.this)){
                 mParamMap.put(HttpConstants.GroupList.STAR_NO,0);
                 mParamMap.put(HttpConstants.GroupList.END_NO,9);
@@ -398,13 +438,21 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
                 requestPlay();
             }
             else{
-                List<PlayInfo> list = mPlayDao.getPlayInfoLimit(PublicConstant.PLAY_BUSSINESS,mStart,10);
-                if(list.isEmpty()){
-                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                }else{
-                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list);
-                }
+                mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
             }
+            //TODO:由于目前不需要缓存功能，所以当没有网络时就直接toast无网络
+            //TODO:如果后期需要缓存功能再重新加回来
+            /**
+             * 无网络时从当前最后一条数据之后再查十条数据
+             */
+//            else{
+//                List<PlayInfo> list = mPlayDao.getPlayInfoLimit(PublicConstant.PLAY_BUSSINESS,mStart,10);
+//                if(list.isEmpty()){
+//                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+//                }else{
+//                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list);
+//                }
+//            }
 
         }
     };

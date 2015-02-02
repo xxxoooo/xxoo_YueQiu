@@ -2,6 +2,7 @@ package com.yueqiu.fragment.addfriend;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -62,12 +64,18 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         mActionBar = getActivity().getActionBar();
-        mActionBar.setTitle(R.string.qiuyou_manage);
+
         mFragmentManager = getActivity().getSupportFragmentManager();
         whoCreate = getArguments().getInt(VerificationFragment.ARGUMENTS_KEY);
         mFriendUserId = getArguments().getString(FriendProfileFragment.FRIEND_USER_ID);
         if (whoCreate == 0)
             mApplicationDao = DaoFactory.getApplication(getActivity());
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mActionBar.setTitle(R.string.qiuyou_manage);
     }
 
     @Override
@@ -94,7 +102,9 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), FriendSetGroupActivity.class);
+                intent.putExtra(FriendSetGroupFragment.RESULT_KEY, mGroupId);
                 startActivityForResult(intent, REQUEST_CODE);
+                getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }
         });
         return view;
@@ -152,22 +162,32 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
 //                if (whoCreate == 0)
 //                    ((FriendsApplicationActivity) getActivity()).switchFragment(FriendsApplicationActivity.sFriendsApplication);
 //                else getActivity().finish();
-                getActivity().finish();
+                mFragmentManager.beginTransaction()
+                        .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
+                        .remove(this).commit();
+                mFragmentManager.popBackStackImmediate();
+                Utils.dismissInputMethod(getActivity(), mEditText);
                 return true;
             case R.id.qiuyou_manage_finish:
                 //TODO:
                 mApplicationDao.updateFriendsApplication(mFriendUserId, 1);
-                mFragmentManager.beginTransaction().
-                        replace(R.id.fragment_container, new FriendsApplicationFragment()).commit();
+                mFragmentManager.beginTransaction()
+                        .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
+                        .replace(R.id.fragment_container, new FriendsApplicationFragment())
+                        .commit();
                 //处理好友请求
                 handleRequest();
+                Utils.dismissInputMethod(getActivity(), mEditText);
                 return true;
             case R.id.send:
                 //发送好友请求
                 sendRequest();
                 getActivity().finish();
+                getActivity().overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                Utils.dismissInputMethod(getActivity(), mEditText);
                 return true;
             default:
+                Utils.dismissInputMethod(getActivity(), mEditText);
                 return super.onOptionsItemSelected(item);
         }
     }

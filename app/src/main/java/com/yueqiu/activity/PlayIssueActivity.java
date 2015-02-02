@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -24,8 +25,12 @@ import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 
+import com.yueqiu.bean.PlayInfo;
+import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.PublishedDao;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
@@ -34,8 +39,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PlayIssueActivity extends FragmentActivity implements View.OnClickListener,DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
@@ -60,6 +67,9 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
 
     private ProgressBar mPreProgress;
     private Drawable mProgressDrawable;
+    private PublishedDao mPublishedDao;
+    //TODO:发布成功后他应该把发布成功的table_id返回来
+    private PlayInfo mInfo;
 
 
     private Handler mHandler = new Handler()
@@ -74,6 +84,15 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
                             getString(R.string.activity_submit_success),Toast.LENGTH_SHORT).show();
                     mPreProgress.setVisibility(View.GONE);
                     mPreTextView.setVisibility(View.GONE);
+                    //TODO:向publish数据库插入数据
+                    //TODO:由于目前不需要缓存，所以这里先不操作数据库，后期
+                    //TODO:再需要缓存时，再加入，不过这里的服务器返回的字段值缺少
+//                    new Thread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            mPublishedDao.insertPublishInfo(setPublishInfo())
+//                        }
+//                    }).start();
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                     break;
@@ -104,6 +123,7 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         setContentView(R.layout.activity_play_issues);
         initActionBar();
         initView();
+        mPublishedDao = DaoFactory.getPublished(this);
     }
     private void initActionBar(){
         ActionBar actionBar = getActionBar();
@@ -380,6 +400,8 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         }
     }
 
+
+
     private String getType(String type)
     {
         if(type.equals(getString(R.string.group_activity)))
@@ -435,5 +457,21 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
                 break;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    //TODO:由于目前不需要缓存，所以暂时先不调用该方法
+    private List<PublishedInfo> setPublishInfo(PlayInfo info){
+        List<PublishedInfo> list = new ArrayList<PublishedInfo>();
+        PublishedInfo publishedInfo = new PublishedInfo();
+        publishedInfo.setUser_id(YueQiuApp.sUserInfo.getUser_id());
+        publishedInfo.setTable_id(info.getTable_id());
+        publishedInfo.setType(PublicConstant.PUBLISHED_ACTIVITY_TYPE);
+        publishedInfo.setTitle(info.getTitle());
+        publishedInfo.setContent(info.getContent());
+        publishedInfo.setDateTime(info.getCreate_time());
+        //TODO:加入缓存后这个字段肯定要加入
+//        publishedInfo.setSubType(Integer.parseInt(info.getType()));
+        list.add(publishedInfo);
+        return list;
     }
 }

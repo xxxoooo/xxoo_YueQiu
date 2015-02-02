@@ -33,6 +33,11 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
     private static final String KEY_COUCH_CLAZZ_PARAMS = "keyCouchClazz";
 
     // **对于球厅当中的筛选参数，我们需要根据大众点评提供的接口单独进行筛选** //
+    private static final String KEY_ROOM_REGION = "keyRoomRegion";
+    private static final String KEY_ROOM_RANGE = "keyRoomRange";
+    private static final String KEY_ROOM_PRICE = "keyRoomPrice";
+    private static final String KEY_ROOM_APPRISAL = "keyRoomApprisal";
+
 
     private SharedPreferences mSharedPreference = null;
 
@@ -187,6 +192,61 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_COUCH_CLAZZ_PARAMS, clazz);
+        editor.commit();
+    }
+
+    public String getRoomRange(Context context)
+    {
+        ensurePreference(context);
+        return mSharedPreference.getString(KEY_ROOM_RANGE, "");
+    }
+    public void setRoomRange(Context context, String range)
+    {
+        ensurePreference(context);
+        SharedPreferences.Editor editor = mSharedPreference.edit();
+        editor.putString(KEY_ROOM_RANGE, range);
+        editor.commit();
+    }
+
+    public String getRoomRegion(Context context)
+    {
+        ensurePreference(context);
+        return mSharedPreference.getString(KEY_ROOM_REGION, "");
+    }
+
+    public void setRoomRegion(Context context, String region)
+    {
+        ensurePreference(context);
+        SharedPreferences.Editor editor = mSharedPreference.edit();
+        editor.putString(KEY_ROOM_REGION, region);
+        editor.commit();
+    }
+
+    public String getRoomPrice(Context context)
+    {
+        ensurePreference(context);
+        return mSharedPreference.getString(KEY_ROOM_PRICE, "");
+    }
+
+    public void setRoomPrice(Context context, String price)
+    {
+        ensurePreference(context);
+        SharedPreferences.Editor editor = mSharedPreference.edit();
+        editor.putString(KEY_ROOM_PRICE, price);
+        editor.commit();
+    }
+
+    public String getRoomApprisal(Context context)
+    {
+        ensurePreference(context);
+        return mSharedPreference.getString(KEY_ROOM_APPRISAL, "");
+    }
+
+    public void setRoomApprisal(Context context, String apprisal)
+    {
+        ensurePreference(context);
+        SharedPreferences.Editor editor = mSharedPreference.edit();
+        editor.putString(KEY_ROOM_APPRISAL, apprisal);
         editor.commit();
     }
 

@@ -22,7 +22,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -38,9 +40,9 @@ import com.yueqiu.activity.MyParticipationActivity;
 import com.yueqiu.activity.MyProfileActivity;
 import com.yueqiu.activity.PublishedInfoActivity;
 import com.yueqiu.adapter.SlideViewAdapter;
-import com.yueqiu.bean.ListItem;
-import com.yueqiu.bean.SlideAccountItem;
-import com.yueqiu.bean.SlideOtherItem;
+import com.yueqiu.bean.IListItem;
+import com.yueqiu.bean.SlideAccountItemI;
+import com.yueqiu.bean.SlideOtherItemI;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -59,6 +61,7 @@ import com.yueqiu.view.menudrawer.Position;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,6 +79,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private static final int NUM_OF_FRAGMENTS = 5;
 
     private static final String FRAGMENT_PAGER_LAST_POSITION = "fragmentPagerLastPosition";
+    private static final String CURRENT_KEY = "nearby_current_item";
 
     private static final int LOGOUT_SUCCESS = 0;
     private static final int LOGOUT_FAILED = 1;
@@ -93,7 +97,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private ListView mMenuList;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
-    private List<ListItem> mItemList = new ArrayList<ListItem>();
+    private List<IListItem> mItemList = new ArrayList<IListItem>();
 
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
@@ -158,7 +162,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
             }
         });
-        mViewPager.setCurrentItem(sPagerPos);
+        setupTabs();
 
     }
 
@@ -166,7 +170,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     protected void onResume()
     {
         super.onResume();
-        setupTabs();
+//        setupTabs();
         initDrawer();
         mNearbyRadio.setChecked(true);
         mViewPager.setCurrentItem(sPagerPos);
@@ -176,7 +180,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     protected void onPause()
     {
         super.onPause();
-        mActionBar.removeAllTabs();
+        //mActionBar.removeAllTabs();
         sPagerPos = mViewPager.getCurrentItem();
     }
 
@@ -339,6 +343,34 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
         searchEditText.setTextColor(Color.WHITE);
         searchEditText.setHintTextColor(Color.LTGRAY);
+
+        // TODO: 以下的设置是为了改变SearchView底部的bottom line的颜色的
+        // TODO: 按StackOverflow上面的教程时可以实现我们的需求的，但是需要美工提供的EditText的bottom Line的
+        // TODO: 图片才可以完成，现在还是不可以完成的,仅仅是测试
+        // 得到'search_plate'的background
+//        View searchPlate = searchView.findViewById(searchSrcTextId);
+//        searchPlate.setBackgroundResource(R.drawable.edit_test);
+
+        searchView.setIconifiedByDefault(false);
+        try {
+            Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
+            searchField.setAccessible(true);
+            ImageView searchHintIcon = (ImageView) searchField.get(searchView);
+            searchHintIcon.setImageResource(R.drawable.search);
+        } catch (NoSuchFieldException e)
+        {
+            Log.d(TAG, " Exception happened while we retrieving the mSearchHintIcon, and the reason goes to : " + e.toString());
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
+        {
+            Log.d(TAG, " Exception happened as we have no right to access this filed, and the reason goes to : " + e.toString());
+            e.printStackTrace();
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we make the search button : " + e.toString());
+        }
+
+
 //
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
 
@@ -371,7 +403,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     {
 
         mItemList.clear();
-        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
+        SlideAccountItemI accountItem = new SlideAccountItemI(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
                 100, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(accountItem);
 
@@ -394,9 +426,9 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                 R.drawable.more_exit
         };
 
-        SlideOtherItem otherItem;
+        SlideOtherItemI otherItem;
         for (int i = 0; i < values.length; i++) {
-            otherItem = new SlideOtherItem(resIds[i], values[i], false);
+            otherItem = new SlideOtherItemI(resIds[i], values[i], false);
             mItemList.add(otherItem);
         }
 
@@ -553,7 +585,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
 
         mItemList.remove(0);
-        SlideAccountItem accountItem = new SlideAccountItem(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
+        SlideAccountItemI accountItem = new SlideAccountItemI(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
                 0, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(0, accountItem);
         mAdapter.notifyDataSetChanged();

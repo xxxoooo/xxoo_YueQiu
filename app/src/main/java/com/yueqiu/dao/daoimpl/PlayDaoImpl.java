@@ -33,7 +33,7 @@ public class PlayDaoImpl implements PlayDao {
     }
 
     @Override
-    public long insertPlayInfo(List<PlayInfo> list) {
+    public synchronized long insertPlayInfo(List<PlayInfo> list) {
         long result = -1;
         mDB = mDBUtils.getWritableDatabase();
         mDB.beginTransaction();
@@ -68,6 +68,32 @@ public class PlayDaoImpl implements PlayDao {
 
     @Override
     public long updatesPlayInfo(List<PlayInfo> list) {
+        long result = -1;
+        mDB = mDBUtils.getWritableDatabase();
+        mDB.beginTransaction();
+        try{
+            for(PlayInfo info : list){
+                ContentValues values = new ContentValues();
+                values.put(DatabaseConstant.PlayTable.TABLE_ID,info.getTable_id());
+                values.put(DatabaseConstant.PlayTable.TYPE,checkIsEmpty(info.getType()));
+                values.put(DatabaseConstant.PlayTable.TITLE,info.getTitle());
+                values.put(DatabaseConstant.PlayTable.CONTENT,info.getContent());
+                values.put(DatabaseConstant.PlayTable.CREATE_TIME,info.getCreate_time());
+                result = mDB.update(DatabaseConstant.PlayTable.TABLENAME, values, DatabaseConstant.PublishInfoTable.TABLE_ID + "=? and "
+                                + DatabaseConstant.PublishInfoTable.TYPE + "=?",
+                        new String[]{String.valueOf(info.getTable_id()), String.valueOf(info.getType())});
+            }
+            mDB.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            mDB.endTransaction();
+        }
+        return result;
+    }
+
+    @Override
+    public synchronized long updatesDetailPlayInfo(List<PlayInfo> list) {
         long result = -1;
         mDB = mDBUtils.getWritableDatabase();
         mDB.beginTransaction();

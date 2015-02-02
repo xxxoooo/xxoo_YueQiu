@@ -308,10 +308,12 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             case R.id.update_assistant_btn:
                 //TODO:升级助教界面
                 startActivity(new Intent(this, UpgradeAssistantActivity.class));
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case R.id.update_coach_btn:
                 //TODO:升级教练界面
                 startActivity(new Intent(this, UpgradeAssistantActivity.class));
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case R.id.my_profile_photo:
                 startMyActivity(0);

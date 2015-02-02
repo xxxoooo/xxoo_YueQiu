@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.bean.FavorInfo;
+import com.yueqiu.bean.ISlideMenuBasic;
 
 import java.util.List;
 
@@ -17,11 +18,11 @@ import java.util.List;
  * Created by wangyun on 15/1/4.
  */
 public class FavorBasicAdapter extends BaseAdapter {
-    private List<Object> mList;
+    private List<ISlideMenuBasic> mList;
     private Context mContext;
     private LayoutInflater mInflater;
 
-    public FavorBasicAdapter(Context context,List<Object> list){
+    public FavorBasicAdapter(Context context,List<ISlideMenuBasic> list){
         this.mContext = context;
         this.mList = list;
         mInflater = LayoutInflater.from(mContext);

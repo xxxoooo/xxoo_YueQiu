@@ -41,6 +41,7 @@ import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -209,7 +210,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
     // TODO: 以下是用于从大众点评的接里面请求的关键字
     private static final String REQUEST_KEYWORD = "台球,桌球室,台球室,桌球";
-    private static ConcurrentHashMap<String, String> sRequestParams = new ConcurrentHashMap<String, String>();
+
 
     /**
      * 对于大众点评提供的接口，我们默认的category是“台球”
@@ -223,13 +224,15 @@ public class BilliardsNearbyRoomFragment extends Fragment
      *               对应于大众点评可以接受的参数则是1. 默认，2. 星级高优先(也就是好评度)，8. 人均价格低优先，9. 人均价格高优先
      *               也就是说区域是通过region指定的，距离是通过radius来指定的(单位为米，最小值为1，最大值为5000，默认是1000)
      *               价格对应于sort的8和9，好评对应于sort的2.
+     *               但是这样就有一个限制，那就是我们一旦设置了价格的筛选策略，那么我们就不能按照好评度来进行筛选了。也就是说
+     *               只能选一个
      *               我们在请求所有参数的时候默认sort为1
      * @param limit  我们在请求所有参数的时候，默认limit的值为40，然后每次用户滑动的时候再进行加载(这个值默认为20，最小为1，最大为40)
      *               注意，这个值指定是每一个page当中所包含的准确的item的数目
      * @param page   在我们向大众点评的Service请求数据时，他是不提供我们请求的开始条数，和结束条数的，提供的仅仅是页数，即我们可以指定
      *               请求的页面的数目
      */
-    private void retrieveRoomListInfo(final String city, final String region, final String range, final int sort, final int limit, final int page)
+    private void retrieveRoomListInfo(final String city, final String region, final String range, final String sort, final int limit, final int page)
     {
         if (!mNetworkAvailable) {
             Log.d(TAG, " the network are really sucked off, and we have to stop fetching any more data from the server any more ");
@@ -240,22 +243,33 @@ public class BilliardsNearbyRoomFragment extends Fragment
         }
 
         List<NearbyRoomSubFragmentRoomBean> cacheRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
+        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
 
-        sRequestParams.put("keyword", REQUEST_KEYWORD);
-        sRequestParams.put("city", city);
-        sRequestParams.put("region", region);
-        sRequestParams.put("sort", sort + "");
-        sRequestParams.put("limit", limit + "");
+        requestParams.put("keyword", REQUEST_KEYWORD);
+        requestParams.put("city", city);
+        // 我们这里采用默认的策略，因为有些参数还是要添加的，如果用户没有设置的话，我们就直接赋予一个默认值就可以了
+        // 比如说用户没有指定region，那么我们就将默认的区域设置为“朝阳区”(当然我们也可以设置成昌平区)
+        String regionVal = TextUtils.isEmpty(region) ? "朝阳区" : region;
+        requestParams.put("region", regionVal);
+
         // TODO: 以下是添加我们所挑选的商店的附近的商店列表的参数值(但是我们传递这个参数的前提是先要将用户当前的经度和纬度信息作为参数传递到Server端)
-//        requestParams.put("range", "");
-        sRequestParams.put("format", "json");
-        sRequestParams.put("has_coupon", 0 + "");
-        sRequestParams.put("page", page + "");
+        String rangeVal = TextUtils.isEmpty(range) ? "1000" : range;
+//        sRequestParams.put("range", range);
+
+        // 这里的sort值很特殊，因为sort的值可以决定两个筛选，一个是价格(当值为8和9时)，还有一个就是好评度(例如值为1和2)
+        // 如果用户没有指定，则我们直接将这个值置为1，即默认排序的情况
+        String sortVal = TextUtils.isEmpty(sort) ? "1" : sort;
+        requestParams.put("sort", sortVal);
+        requestParams.put("limit", limit + "");
+
+        requestParams.put("format", "json");
+        requestParams.put("has_coupon", 0 + "");
+        requestParams.put("page", page + "");
 
         // TODO: 得到当前用户的经纬度信息,因为我们需要这两个值才能获得以当前用户为中心，附近指定范围内的球店信息
 
 
-        String rawResult = HttpUtil.dpUrlClient(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, sRequestParams);
+        String rawResult = HttpUtil.dpUrlClient(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams);
         Log.d(TAG, " the raw result we get are : " + rawResult);
         if (!TextUtils.isEmpty(rawResult)) {
             try {
@@ -304,7 +318,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
                         mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
 
-                    } else if (status.equals("ERROR")) {
+                    } else if (status.equals("ERROR"))
+                    {
                         JSONObject errorObj = resultJsonObj.getJSONObject("error");
                         int errorCode = errorObj.getInt("errorCode");
                         String errorMsgStr = errorObj.getString("errorMessage");
@@ -320,6 +335,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
             } catch (JSONException e) {
                 e.printStackTrace();
+                mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                 Log.d(TAG, " Exception happened in parsing the resulted json object we get, and the detailed reason are : " + e.toString());
             }
         }
@@ -376,6 +392,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
         super.onStop();
     }
 
+    private static final String KEY_REQUEST_PAGE_NUM = "keyRequestPageNum";
     private static final String KEY_FETCH_DATA_FAILED = "keyFetchDataFailed";
     private static final String WORKER_HANDLER_THREAD_NAME = "workerHandlerThread";
 
@@ -484,9 +501,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     break;
 
                 case DATA_HAS_BEEN_UPDATED:
-                    // TODO: 考虑移除这个标签，因为这会使Adapter的更新发生异常
+                    mSearchRoomAdapter.notifyDataSetChanged();
                     break;
-
                 // 对于大众点评的服务牛逼的一点在于所有的请求错误，会有详细的错误信息供我们向用户展示
                 // 所以我们不需要单独的额外的判断errorCode来判断具体的错误信息，我们只需要定义一条信息就可以了
                 // 所以我们不用像其他的四个Fragment当中的UIEventsHandler那样需要处理三种情况，我们仅需要一种就可以了
@@ -521,6 +537,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
         {
             mRoomListView.onRefreshComplete();
         }
+        Log.d(TAG, "inside the roomFragment --> we have load the EmptyView ");
         NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mRoomListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str));
     }
 
@@ -538,7 +555,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
     private class WorkerHandlerThread extends HandlerThread
     {
-
         public WorkerHandlerThread()
         {
             super(WORKER_HANDLER_THREAD_NAME, Process.THREAD_PRIORITY_BACKGROUND);
@@ -562,66 +578,118 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         case REQUEST_ALL_ROOM_INFO:
                             // 通知UI线程开始显示dialog
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
+                            Bundle pageData = msg.getData();
+                            final int pageNum = pageData.getInt(KEY_REQUEST_PAGE_NUM);
+                            Log.d(TAG, " inside the WorkThreadHandler, and the pageNum we get are : " + pageNum);
                             // 然后开始正式的加载数据
-                            retrieveRoomListInfo("北京", "海淀区", "1000", 2, 20, 1);
+                            String cachedRegion = sParamsPreference.getRoomRegion(sContext);
+                            String cachedRange = sParamsPreference.getRoomRange(sContext);
+                            // 因为按照好评度排序和按照价格排序这两种排序规则只能存在一种，
+                            // 因为请求函数一次只能接受一个参数，要么星级要么价格排序，所以我们选择不为空的那一个
+                            // 当然如果两个都为空的话，那么我们就都传空的参数，然后由具体的请求函数做判断
+                            // 因为我们这里只要保证只传递一个参数就可以了
+                            String cachedApprisal = sParamsPreference.getRoomApprisal(sContext);
+                            String cachedPrice = sParamsPreference.getRoomPrice(sContext);
+                            String sortFilterVal = TextUtils.isEmpty(cachedApprisal) ? cachedPrice : cachedApprisal;
+                            retrieveRoomListInfo("北京", cachedRegion, cachedRange, sortFilterVal, 20, pageNum);
                             break;
                         case REQUEST_ROOM_INFO_APPRISAL_FILTERED:
-                            // TODO: 按商家的好评度来进行筛选
-                            // TODO: 我们可以避免再次进行网络请求来进行筛选，因为这样太耗费时间了，而且用户体验也特别差，我们应该是
-                            // TODO: 将所有的数据获取之后保存到本地，也就是SQLite当中，然后在进行筛选才可以
-                            // TODO: 这也是SearchActivity当中所有的数据请求所遵循的设计原则
+                            if (!mRoomList.isEmpty())
+                            {
+                                mRoomList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+                            // 得到好评度
                             String apprisalStr = (String) msg.obj;
                             Log.d(TAG, " in the internal mWorkThread --> the data we received to fetch the data based on the apprisal rule are : " + apprisalStr);
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            // TODO: 具体的请求方法
+                            // 由于大众点评的所有的参数都是可选的，所以我们将所有的判断参数的可行性的过程都放到具体的请求方法当中
+                            // 由于价格和好评度只能选一个，所以这里由于我们是按好评度来选择的话，就把价格的筛选因素干脆不予考虑
+                            // 同时，一旦到了我们筛选距离和区域的时候，我们可能会碰到价格和好评度同时存在的情况，
+                            // 所以我们这里决定一旦筛选了价格，那么就把ParamsPreference当中的好评度的值清零，同样的对于好评度筛选
+                            // 时，我们也需要将价格在ParamsPreference当中存储的值情况
+                            // 这样，当我们进行距离和区域的筛选时，就会发现价格和好评度只有一个存在，而不是两个，方便筛选(当然如果大众点评同时提供两个接口就不用这么麻烦了)
+                            sParamsPreference.setRoomPrice(sContext, "");
+                            String apprisalRangeStr = sParamsPreference.getRoomRange(sContext);
+                            String apprisalRegionStr = sParamsPreference.getRoomRegion(sContext);
 
-                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                            // 每次都是重新请求，所以我们将页码的数目设置为1
+                            retrieveRoomListInfo("北京", apprisalRegionStr, apprisalRangeStr, apprisalStr, 20, 1);
 
                             break;
                         case REQUEST_ROOM_INFO_PRICE_FILTERED:
+                            if (!mRoomList.isEmpty())
+                            {
+                                mRoomList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
                             String priceStr = (String) msg.obj;
                             Log.d(TAG, "in the internal mWorkThread --> the price data we get are : " + priceStr);
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-
-                            // TODO:
-
-                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                            // 由于价格和好评度每次只能选择一个，这里按用户的要求是进行价格的筛选，所以我们干脆就把好评度不管了
+                            // 首先将好评度在ParamsPreference当中的值清空
+                            sParamsPreference.setRoomApprisal(sContext, "");
+                            String priceRangeStr = sParamsPreference.getRoomRange(sContext);
+                            String priceRegionStr = sParamsPreference.getRoomRegion(sContext);
+                            // 每次筛选都是重新进行筛选的，所以我们将页码的数目设置为1
+                            retrieveRoomListInfo("北京", priceRegionStr, priceRangeStr, priceStr, 20, 1);
 
                             break;
                         case REQUEST_ROOM_INFO_RANGE_FILTERED:
+                            if (!mRoomList.isEmpty())
+                            {
+                                mRoomList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
                             String rangeStr = (String) msg.obj;
                             Log.d(TAG, " in the internal mWorkThread --> the range string we get are : " + rangeStr);
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            // TODO:
+                            String rangePriceStr = sParamsPreference.getRoomPrice(sContext);
+                            String rangeApprisalStr = sParamsPreference.getRoomApprisal(sContext);
+                            String rangeRegionStr = sParamsPreference.getRoomRegion(sContext);
+                            String rangeSortStr = TextUtils.isEmpty(rangePriceStr) ? rangeApprisalStr : rangePriceStr;
+                            Log.d(TAG, " the sort value we get are " + rangeSortStr);
 
-                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                            retrieveRoomListInfo("北京", rangeRegionStr, rangeStr, rangeSortStr, 20, 1);
+
                             break;
-
                         case REQUEST_ROOM_INFO_REGION_FILTERED:
+                            // 在筛选之前，我们需要首先将我们已经获得到的roomList清空
+                            if (!mRoomList.isEmpty())
+                            {
+                                mRoomList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
                             Log.d(TAG, " In the mWorkerHandler : we have received the message to handle the task of region filtering ");
                             String regionStr = (String) msg.obj;
                             Log.d(TAG, " we have received the string to send the message, and the string are : " + regionStr);
                             // 我们在这里开始真正的请求过程(即进行网络请求，请求参数即为我们这里获取到的region字符串)
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
+                            String regionPriceStr = sParamsPreference.getRoomPrice(sContext);
+                            String regionApprisalStr = sParamsPreference.getRoomApprisal(sContext);
+                            String regionRangeStr = sParamsPreference.getRoomRange(sContext);
 
-                            // 在筛选之前，我们需要首先将我们已经获得到的roomList清空
-                            if (! mRoomList.isEmpty())
-                            {
-                                mRoomList.clear();
-                            }
-                            retrieveRoomListInfo("北京", regionStr, "1000", 2, 20, 1);
+                            String regionSortVal = TextUtils.isEmpty(regionPriceStr) ? regionApprisalStr : regionPriceStr;
+
+                            retrieveRoomListInfo("北京", regionStr, regionRangeStr, regionSortVal, 20, 1);
                             mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                             break;
 
                     }
                 }
             };
-            fetchRoomData();
+            // 我们初始情况下的数据请求都是请求最新的数据
+            fetchRoomData(1);
         }
 
-        public void fetchRoomData()
+        public void fetchRoomData(final int pageNum)
         {
-            mWorkerHandler.sendEmptyMessage(REQUEST_ALL_ROOM_INFO);
+            Log.d(TAG, " the room data we need to retrieve are from page : " + pageNum);
+            Message pageMsg = mWorkerHandler.obtainMessage(REQUEST_ALL_ROOM_INFO);
+            Bundle pageData = new Bundle();
+            pageData.putInt(KEY_REQUEST_PAGE_NUM, pageNum);
+            pageMsg.setData(pageData);
+            mWorkerHandler.sendMessage(pageMsg);
         }
 
         public void fetchRoomDataRegionFiltered(String regionStr)
@@ -673,8 +741,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 // 我们将我们的page数增加
                 // 因为我们向下拉的时候，加载的总是最新的数据，所以我们将这里的page的数目置成1，
                 // 因为第一页当中的数据总是最新的
-                sRequestParams.put("page", 1 + "");
-                retrieveRoomListInfo("北京", "海淀区", "1000", 2, 20, 1);
+                if (mWorkerThread != null)
+                {
+                    mWorkerThread.fetchRoomData(1);
+                }
             } else
             {
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
@@ -703,7 +773,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 // TODO: 我们在这里进行网络更新的请求
                 // TODO: 只是大众点评并没有提供完整的开始请求条数和结束请求条数，而是直接的按分页
                 // TODO: 来进行提供的，也就是说我们不能传递startNum和endNum，而是直接传入page值
-
+                if (null != mWorkerThread)
+                {
+                    mWorkerThread.fetchRoomData(mPage);
+                }
             }
         }
     };

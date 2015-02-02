@@ -4,13 +4,13 @@ package com.yueqiu.bean;
 /**
  * Created by wangyun on 14/12/29.
  */
-public class SlideAccountItem implements ListItem{
+public class SlideAccountItemI implements IListItem {
     private String mName;
     private int mGolden;
     private String mTitle;
     private String mImg;
     private int mUserId;
-    public SlideAccountItem(String img,String name,int golden,String title,int userId){
+    public SlideAccountItemI(String img, String name, int golden, String title, int userId){
         this.mImg = img;
         this.mName = name;
         this.mGolden = golden;

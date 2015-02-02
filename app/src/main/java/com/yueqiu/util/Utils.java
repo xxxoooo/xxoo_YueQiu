@@ -22,7 +22,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -499,5 +501,15 @@ public class Utils {
     public static <T extends View> T $(Activity activity,int resId){
         T t = (T) activity.findViewById(resId);
         return t;
+    }
+
+    /**
+     * 隐藏软键盘
+     * @param context
+     * @param ed
+     */
+    public static void dismissInputMethod(Context context, EditText ed) {
+        InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(ed.getWindowToken(), 0);
     }
 }

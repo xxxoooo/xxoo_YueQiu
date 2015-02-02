@@ -10,6 +10,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yueqiu.R;
+import com.yueqiu.bean.ISlideMenuBasic;
 import com.yueqiu.bean.PublishedInfo;
 
 import java.util.List;
@@ -18,11 +19,11 @@ import java.util.List;
  * Created by wangyun on 15/1/15.
  */
 public class PublishedBasicAdapter extends BaseAdapter {
-    private List<Object> mList;
+    private List<ISlideMenuBasic> mList;
     private Context mContext;
     private LayoutInflater mInflater;
 
-    public PublishedBasicAdapter(Context context,List<Object> list){
+    public PublishedBasicAdapter(Context context,List<ISlideMenuBasic> list){
         this.mContext = context;
         this.mList = list;
         mInflater = LayoutInflater.from(mContext);

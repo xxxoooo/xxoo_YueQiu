@@ -10,6 +10,7 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.os.Process;
 import android.support.v4.app.Fragment;
+import android.text.LoginFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,6 +39,7 @@ import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.util.ArrayList;
@@ -100,9 +102,11 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     private NearbyAssistCoauchSubFragmentListAdapter mAssistCoauchListAdapter;
 
     private List<NearbyAssistCoauchSubFragmentBean> mAssistCoauchList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
-    private List<NearbyAssistCoauchSubFragmentBean> mUpdateList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
-    private List<NearbyAssistCoauchSubFragmentBean> mInsertList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
-    private List<NearbyAssistCoauchSubFragmentBean> mDbList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
+    // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
+//    private List<NearbyAssistCoauchSubFragmentBean> mUpdateList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
+//    private List<NearbyAssistCoauchSubFragmentBean> mInsertList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
+//    private List<NearbyAssistCoauchSubFragmentBean> mDbList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
+    // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 
     private NearbyPopBasicClickListener mClickListener;
 
@@ -179,8 +183,17 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
     private NearbyParamsPreference sParamsPreference = NearbyParamsPreference.getInstance();
 
-
-    private void retrieveAllInitialAssistCoauchInfo(final int startNo, final int endNo)
+    /**
+     * 对于可选参数，如果不为空的话，我们才进行参数的插入，否则我们直接采用默认值即“”就可以完成请求过程
+     *
+     * @param rangeParam 可选参数，主要是用于按距离进行筛选
+     * @param priceParam 可选参数，主要是用于按价格花费进行筛选
+     * @param clazzParam 可选参数，主要是用于按球种进行筛选
+     * @param levelParam 可选参数，主要是用于按助教的水平筛选
+     * @param startNo
+     * @param endNo
+     */
+    private void retrieveAllInitialAssistCoauchInfo(String rangeParam, String priceParam, String clazzParam, String levelParam, final int startNo, final int endNo)
     {
         if (!mNetworkAvailable) {
             mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_FAILED,
@@ -192,6 +205,25 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         List<NearbyAssistCoauchSubFragmentBean> cacheASCoauchList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
 
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
+        if (! TextUtils.isEmpty(rangeParam))
+        {
+            requestParams.put("range", rangeParam);
+        }
+        if (! TextUtils.isEmpty(priceParam))
+        {
+            requestParams.put("price", priceParam);
+        }
+
+        if (! TextUtils.isEmpty("clazz"))
+        {
+            requestParams.put("clazz", clazzParam);
+        }
+
+        if (! TextUtils.isEmpty("level"))
+        {
+            requestParams.put("level", levelParam);
+        }
+
         requestParams.put("start_no", startNo + "");
         requestParams.put("end_no", endNo + "");
         String rawResult = HttpUtil.urlClient(HttpConstants.NearbyAssistCoauch.URL, requestParams, HttpConstants.RequestMethod.GET);
@@ -254,10 +286,19 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                         mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                     } else
                     {
-                        mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR,
-                                initialResultJsonObj.getString("msg")).sendToTarget();
-
                         // 这里需要注意的是，服务器端可能会把msg内容置为null，即错误了，但是没有返回任何内容
+                        // 如果我们采用下面的方法，空的bundle会被传输，然后就显示一个空的Toast
+//                        mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR,
+//                                initialResultJsonObj.getString("msg")).sendToTarget();
+                        Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                        Bundle errorData = new Bundle();
+                        String errorStr = initialResultJsonObj.getString("msg");
+                        if (! TextUtils.isEmpty(errorStr))
+                        {
+                            errorData.putString(KEY_REQUEST_ERROR_MSG, errorStr);
+                        }
+                        errorMsg.setData(errorData);
+                        mUIEventsHandler.sendMessage(errorMsg);
                     }
                     // TODO: 到这里，我们基本上就已经完成了数据检索的工作了，现在我们需要的就是通知用户已经完成数据检索工作，我们可以取消ProgressDialog的显示了
                     mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
@@ -265,6 +306,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             } catch (JSONException e)
             {
                 e.printStackTrace();
+                mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                 Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
             }
         }
@@ -279,6 +321,10 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
         NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str));
     }
+
+    private static final String KEY_REQUEST_ERROR_MSG = "keyRequestErrorMsg";
+    private static final String KEY_REQUEST_START_NUM = "keyRequestStartNum";
+    private static final String KEY_REQUEST_END_NUM = "keyRequestEndNum";
 
     private static final int DATA_HAS_BEEN_UPDATED = 1 << 10;
 
@@ -317,6 +363,14 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
                 case STATE_FETCH_DATA_FAILED:
                     String reasonStr = (String) msg.obj;
+                    if (! TextUtils.isEmpty(reasonStr))
+                    {
+                        Utils.showToast(sContext, reasonStr);
+                    }
+                    if (mAssistCoauchList.isEmpty())
+                    {
+                        loadEmptyTv();
+                    }
                     Log.d(TAG, " fail to fetch the data, and the reason are : " + reasonStr);
                     break;
 
@@ -340,24 +394,33 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     break;
                 case RETRIEVE_INFO_WITH_DISTANCE_FILTERED:
                     String rangeStr = (String) msg.obj;
+                    Log.d(TAG, " inside the UIEventsHandler, and the range data we get are : " + rangeStr);
                     mWorker.fetchDataWithRangeFilter(rangeStr);
                     break;
                 case RETRIEVE_INFO_WITH_LEVEL_FILTERED:
                     String levelStr = (String) msg.obj;
+                    Log.d(TAG, " inside the UIEventsHandler, and the levelStr we get are : " + levelStr);
                     mWorker.fetchDataWithLevelFilter(levelStr);
                     break;
                 case RETRIEVE_INFO_WITH_PRICE_FILTERED:
                     String priceStr = (String) msg.obj;
+                    Log.d(TAG, " inside the UIEventsHandler, and the priceStr we get are : " + priceStr);
                     mWorker.fetchDataWithPriceFilter(priceStr);
                     break;
                 case RETREIVE_INFO_WITH_KINDS_FILTERED:
                     String clazz = (String) msg.obj;
+                    Log.d(TAG, " inside the UIEventsHandler, and the clazzStr we get are : " + clazz);
                     mWorker.fetchDataWithClazzFilter(clazz);
                     break;
 
                 case NETWORK_UNAVAILABLE:
+                    if (mAssistCoauchList.isEmpty())
+                    {
+                        loadEmptyTv();
+                    }
                     Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
-
+                    // 当网络不可行时，我们需要将ProgressBar不再显示
+                    hideProgress();
                     break;
                 case DATA_HAS_BEEN_UPDATED:
                     mAssistCoauchListAdapter.notifyDataSetChanged();
@@ -370,6 +433,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     {
                         loadEmptyTv();
                     }
+
+                    hideProgress();
                     break;
                 case PublicConstant.NO_RESULT:
                     if (mAssistCoauchList.isEmpty())
@@ -382,13 +447,15 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                             Utils.showToast(sContext, sContext.getString(R.string.no_more_info));
                         }
                     }
+                    hideProgress();
                     break;
 
                 case PublicConstant.REQUEST_ERROR:
                     Bundle errorData = msg.getData();
-                    if (null != errorData)
+                    String errorInfo = errorData.getString(KEY_REQUEST_ERROR_MSG);
+                    if (! TextUtils.isEmpty(errorInfo))
                     {
-                        Utils.showToast(sContext, (String) msg.obj);
+                        Utils.showToast(sContext, errorInfo);
                     } else
                     {
                         Utils.showToast(sContext, sContext.getString(R.string.http_request_error));
@@ -397,6 +464,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     {
                         loadEmptyTv();
                     }
+
+                    hideProgress();
                     break;
             }
 
@@ -443,43 +512,83 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     {
                         case RETRIEVE_ALL_RAW_INFO:
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            retrieveAllInitialAssistCoauchInfo(0, 9);
+                            Bundle requestData = msg.getData();
+                            final int startNum = requestData.getInt(KEY_REQUEST_START_NUM);
+                            final int endNum = requestData.getInt(KEY_REQUEST_END_NUM);
+                            String cacheRange = sParamsPreference.getAScouchRange(sContext);
+                            String cachePrice = sParamsPreference.getASCouchPrice(sContext);
+                            String cacheLevel = sParamsPreference.getASCouchLevel(sContext);
+                            String cacheClazz = sParamsPreference.getASCouchClazz(sContext);
+                            retrieveAllInitialAssistCoauchInfo(cacheRange, cachePrice, cacheClazz, cacheLevel, startNum, endNum);
 
                             break;
-
-                        // TODO: 以下的四种操作虽然耗时，但是都是不涉及到网络的操作，以下四种检索都是直接从本地的我们创建的数据库当中进行检索
                         case RETRIEVE_INFO_WITH_LEVEL_FILTERED:
-                            // TODO: 进行具体的本地数据库检索操作
+                            if (! mAssistCoauchList.isEmpty())
+                            {
+                                mAssistCoauchList.clear();
+                            }
                             String level = (String) msg.obj;
                             Log.d(TAG, " Inside the WorkerThread --> the level data we need to filter are : " + level);
+                            String levelCacheClazz = sParamsPreference.getASCouchClazz(sContext);
+                            String levelCachePrice = sParamsPreference.getASCouchPrice(sContext);
+                            String levelCacheRange = sParamsPreference.getAScouchRange(sContext);
+                            retrieveAllInitialAssistCoauchInfo(levelCacheRange, levelCachePrice, levelCacheClazz, level, 0, 9);
 
                             break;
                         case RETREIVE_INFO_WITH_KINDS_FILTERED:
-                            // TODO: 进行具体的本地数据库检索操作，以用户的选择的球种做为筛选条件
-                            // TODO: 在检索到相应的数据之后，还要对ListView进行相关的操作
+                            if (! mAssistCoauchList.isEmpty())
+                            {
+                                mAssistCoauchList.clear();
+                            }
                             String clazz = (String) msg.obj;
                             Log.d(TAG, " Inside the WorkerThread --> the clazz we need to filter are : " + clazz);
+                            String clazzCacheRange = sParamsPreference.getAScouchRange(sContext);
+                            String clazzCachePrice = sParamsPreference.getASCouchPrice(sContext);
+                            String clazzCacheLevel = sParamsPreference.getASCouchLevel(sContext);
+                            retrieveAllInitialAssistCoauchInfo(clazzCacheRange, clazzCachePrice, clazz, clazzCacheLevel, 0, 9);
 
                             break;
                         case RETRIEVE_INFO_WITH_PRICE_FILTERED:
+                            if (! mAssistCoauchList.isEmpty())
+                            {
+                                mAssistCoauchList.clear();
+                            }
                             String price = (String) msg.obj;
                             Log.d(TAG, " Inside the WorkerThread --> the price we need to filter are : " + price);
-
+                            String priceCacheRange = sParamsPreference.getAScouchRange(sContext);
+                            String priceCacheClazz = sParamsPreference.getASCouchClazz(sContext);
+                            String priceCacheLevel = sParamsPreference.getASCouchLevel(sContext);
+                            retrieveAllInitialAssistCoauchInfo(priceCacheRange, price, priceCacheClazz, priceCacheLevel, 0, 9);
 
                             break;
                         case RETRIEVE_INFO_WITH_DISTANCE_FILTERED:
+                            if (! mAssistCoauchList.isEmpty())
+                            {
+                                mAssistCoauchList.clear();
+                            }
                             String distance = (String) msg.obj;
                             Log.d(TAG, " Inside the WorkerThread --> the distance we need to filter are : " + distance);
+                            String rangeCachePrice = sParamsPreference.getASCouchPrice(sContext);
+                            String rangeCacheClazz = sParamsPreference.getASCouchClazz(sContext);
+                            String rangeCacheLevel = sParamsPreference.getASCouchLevel(sContext);
+                            retrieveAllInitialAssistCoauchInfo(distance, rangeCachePrice, rangeCacheClazz, rangeCacheLevel, 0, 9);
 
                             break;
                     }
                 }
             };
-            fetchAllData();
+            // 我们初始请求的数据肯定都是最新的数据，所以从0条开始请求
+            fetchAllData(0, 9);
         }
 
-        public void fetchAllData()
+        public void fetchAllData(final int startNum, final int endNum)
         {
+            Message msg = mBackgroundHandler.obtainMessage(RETRIEVE_ALL_RAW_INFO);
+            Bundle requestData = new Bundle();
+            requestData.putInt(KEY_REQUEST_START_NUM, startNum);
+            requestData.putInt(KEY_REQUEST_END_NUM, endNum);
+            msg.setData(requestData);
+
             mBackgroundHandler.sendEmptyMessage(RETRIEVE_ALL_RAW_INFO);
         }
 
@@ -523,20 +632,17 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
-            new Thread(new Runnable()
-            {
-                @Override
-                public void run()
+            if (Utils.networkAvaiable(sContext)) {
+                mLoadMore = false;
+                mRefresh = true;
+                if (mWorker != null)
                 {
-                    if (Utils.networkAvaiable(sContext)) {
-                        mLoadMore = false;
-                        mRefresh = true;
-                        retrieveAllInitialAssistCoauchInfo(0, 9);
-                    } else {
-                        mUIEventsHandler.sendEmptyMessage(STATE_FETCH_DATA_FAILED);
-                    }
+                    mWorker.fetchAllData(0, 9);
                 }
-            }).start();
+            } else
+            {
+                mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
+            }
         }
 
         @Override
@@ -549,15 +655,26 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             mRefresh = false;
             mCurrentPos = mAssistCoauchList.size();
 
-            new Thread(new Runnable()
+            if (mBeforeCount != mAfterCount)
             {
-                @Override
-                public void run()
-                {
-                    // TODO: 进行加载更多的请求工作
+                mStartNum = mEndNum + (mAfterCount - mBeforeCount);
+                mEndNum += 10 + (mAfterCount - mBeforeCount);
+            } else
+            {
+                mStartNum = mEndNum + 1;
+                mEndNum += 10;
+            }
 
+            if (Utils.networkAvaiable(sContext))
+            {
+                if (null != mWorker)
+                {
+                    mWorker.fetchAllData(mStartNum, mEndNum);
                 }
-            }).start();
+            } else
+            {
+                mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
+            }
 
         }
     };

@@ -24,6 +24,7 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
     private String mTitles[];
     private SectionPagerAdapter mPagerAdapter;
     private ActionBar mActionBar;
+    private static int sCurrentItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,7 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
         }
 
         mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setCurrentItem(sCurrentItem);
     }
 
     private void initActionBar() {
@@ -129,5 +131,12 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
                 break;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sCurrentItem = mViewPager.getCurrentItem();
+
     }
 }

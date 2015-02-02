@@ -5,12 +5,14 @@ import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +22,7 @@ import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.Identity;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.FavorDao;
 import com.yueqiu.fragment.slidemenu.FavorBasicFragment;
@@ -34,6 +37,7 @@ public class FavorActivity extends FragmentActivity implements ActionBar.TabList
     private ActionBar mActionBar;
     private List<FavorInfo> mDBAllList;
     private FavorDao mFavorDao;
+    private static int sCurrentItem = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,12 +72,6 @@ public class FavorActivity extends FragmentActivity implements ActionBar.TabList
         };
         mViewPager = (ViewPager) findViewById(R.id.pager);
 
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener(){
             @Override
@@ -86,13 +84,25 @@ public class FavorActivity extends FragmentActivity implements ActionBar.TabList
             tab = mActionBar.newTab().setText(mPagerAdapter.getPageTitle(i)).setTabListener(this);
             mActionBar.addTab(tab);
         }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+        mViewPager.setCurrentItem(sCurrentItem);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mActionBar.removeAllTabs();
+//        mActionBar.removeAllTabs();
+        sCurrentItem = mViewPager.getCurrentItem();
+
     }
+
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {

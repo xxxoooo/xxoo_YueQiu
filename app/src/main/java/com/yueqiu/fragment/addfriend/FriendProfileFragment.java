@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -58,14 +59,19 @@ public class FriendProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             mActionBar = getActivity().getActionBar();
-            String username = getActivity().getIntent().getStringExtra(AddPersonFragment.FRIEND_INFO_USERNAME);
-            mActionBar.setTitle(username);
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
 
         setHasOptionsMenu(true);
         mFragmentManager = getActivity().getSupportFragmentManager();
         mUserId = getActivity().getIntent().getIntExtra(AddPersonFragment.FRIEND_INFO_USER_ID, 0);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        String username = getActivity().getIntent().getStringExtra(AddPersonFragment.FRIEND_INFO_USERNAME);
+        mActionBar.setTitle(username);
     }
 
     @Override
@@ -85,7 +91,10 @@ public class FriendProfileFragment extends Fragment {
                 args.putString(FRIEND_USER_ID, user_id);
                 Fragment fragment = new VerificationFragment();
                 fragment.setArguments(args);
-                mFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
+                FragmentTransaction ft = mFragmentManager.beginTransaction();
+                ft.setCustomAnimations(R.anim.push_left_in, R.anim.push_left_out);
+                ft.addToBackStack("com.yueqiu.activity.RequestAddFriendActivity");
+                ft.replace(R.id.fragment_container, fragment).commit();
             }
         });
         return view;
@@ -197,4 +206,6 @@ public class FriendProfileFragment extends Fragment {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+
 }

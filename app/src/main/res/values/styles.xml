@@ -45,8 +45,8 @@
         <item name="android:background">@color/actionbar_color</item>
         <item name="android:icon">@android:color/transparent</item>
         <item name="android:titleTextStyle">@style/ActionBar.TitleText</item>
-
     </style>
+
 
     <style name="ActionBarTab" parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
         <item name="android:background">@drawable/tab_indicator_ab_example</item>

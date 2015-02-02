@@ -3,6 +3,7 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -36,12 +37,29 @@ public class UpgradeAssistantActivity extends Activity {
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 return true;
             case R.menu.commit:
                 //提交升级助教的资料
+
+                finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 return true;
             default:
                 return super.onMenuItemSelected(featureId, item);
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+            default:
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

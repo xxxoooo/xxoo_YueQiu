@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -57,7 +58,7 @@ public class VerificationFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             mActionBar = getActivity().getActionBar();
-            mActionBar.setTitle(R.string.identity_verify);
+
             mActionBar.setDisplayHomeAsUpEnabled(true);
         }
         setHasOptionsMenu(true);
@@ -90,6 +91,12 @@ public class VerificationFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        mActionBar.setTitle(R.string.identity_verify);
+    }
+
     private void init(View v) {
         mPhoto = (ImageView) v.findViewById(R.id.account_iv);
         mAccountTextView = (TextView) v.findViewById(R.id.account_tv);
@@ -104,8 +111,11 @@ public class VerificationFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                getActivity().finish();
-                getActivity().overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                mFragmentManager.beginTransaction()
+                        .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
+                        .remove(this).commit();
+                mFragmentManager.popBackStack();
+                Utils.dismissInputMethod(getActivity(), mEditText);
                 return true;
             case R.id.next:
                 sendRequest();
@@ -114,9 +124,14 @@ public class VerificationFragment extends Fragment {
                 args.putString(FriendProfileFragment.FRIEND_USER_ID, mFriendUserId);
                 Fragment fragment = new FriendManageFragment();
                 fragment.setArguments(args);
-                mFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment).commit();
+                FragmentTransaction ft = mFragmentManager.beginTransaction();
+                ft.addToBackStack("com.yueqiu.activity.RequestAddFriendActivity");
+                ft.setCustomAnimations(R.anim.push_left_in, R.anim.push_left_out);
+                ft.replace(R.id.fragment_container, fragment).commit();
+                Utils.dismissInputMethod(getActivity(), mEditText);
                 return true;
             default:
+                Utils.dismissInputMethod(getActivity(), mEditText);
                 return super.onOptionsItemSelected(item);
         }
     }
