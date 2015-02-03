@@ -45,8 +45,8 @@
         <item name="android:background">@color/actionbar_color</item>
         <item name="android:icon">@android:color/transparent</item>
         <item name="android:titleTextStyle">@style/ActionBar.TitleText</item>
-
     </style>
+
 
     <style name="ActionBarTab" parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
         <item name="android:background">@drawable/tab_indicator_ab_example</item>
@@ -106,9 +106,9 @@
     <!--用于SearchActivity定义PopupWindow当中的TextView的style-->
     <style name="PopupWindowTvStyle" parent="AppTheme">
         <item name="android:textStyle">normal</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">34dp</item>
         <item name="android:gravity">left|center_vertical</item>
         <item name="android:textColor">@color/login_btn_normal</item>
         <item name="android:background">@drawable/popup_window_item_bg</item>
@@ -125,7 +125,7 @@
 
     <!--定义SearchActivity当中的用于过滤的Button的style的控制-->
     <style name="SearchSubFragmentFilterBtnStyle" parent="AppTheme">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:background">@drawable/btn_bg</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>

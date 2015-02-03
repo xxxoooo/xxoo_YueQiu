@@ -1,11 +1,17 @@
 package com.yueqiu.fragment.nearby.common;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 
@@ -27,7 +33,9 @@ import static com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils.getFi
 /**
  * Created by wangyun on 15/1/24.
  */
-public class NearbyPopBasicClickListener implements View.OnClickListener{
+public class NearbyPopBasicClickListener implements View.OnClickListener, NearbyFragmentsCommonUtils.ControlPopupWindowCallback
+{
+    private static final String TAG = "NearbyPopBasicClickListener";
     private Context mContext;
     private LayoutInflater mInflater;
     private View mPopupBaseView;
@@ -36,18 +44,39 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
     private ListView mPopupListView;
     private Handler mUIEventsHandler;
     private NearbyParamsPreference mParamsPreference;
-    public NearbyPopBasicClickListener(Context context, Handler handler, NearbyParamsPreference preference){
+
+    public NearbyPopBasicClickListener(Context context, Handler handler, NearbyParamsPreference preference)
+    {
         this.mContext = context;
         this.mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        this.mPopupBaseView = mInflater.inflate(R.layout.popupwindow_basic_layout,null);
+        this.mPopupBaseView = mInflater.inflate(R.layout.popupwindow_basic_layout, null);
         this.mPopupTitleView = (Button) mPopupBaseView.findViewById(R.id.popup_base_button);
         this.mPopupListView = (ListView) mPopupBaseView.findViewById(R.id.popup_base_listview);
+
+        // 注意，我们只需要对Android 5.0需要设置这个额外的参数，5.0之前是不需要添加这个额外的参数的
+        // 对于Android 5.0，我们需要对这个ListView设置marginBottom参数，我们目前的值是@dimen/near_activity_subfragment_margin_botton
+        LinearLayout.LayoutParams listViewParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+        listViewParams.bottomMargin = (int) context.getResources().getDimension(R.dimen.nearby_subfragment_listview_margin_bottom);
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {
+            this.mPopupListView.setLayoutParams(listViewParams);
+        }
+
         this.mUIEventsHandler = handler;
         this.mParamsPreference = preference;
     }
+
+    /**
+     * 我们需要注意的是“所有的筛选过程都要是重新从网络上请求数据”来完成的，否则我们将不能完成筛选的过程
+     * 因为我们如果采用先将所有的数据保存到本地，然后进行筛选，我们是无法进行上拉刷新或者下拉刷新的
+     * 过程的，也就是说我们的List将会变成是死的，而不是活的。
+     * 所以我们只能采用全部的筛选过程都是直接从网络上获取
+     *
+     * @param view
+     */
     @Override
-    public void onClick(View view) {
-        
+    public void onClick(View view)
+    {
         switch (view.getId()) {
             //assistance
             case R.id.btn_assistcoauch_distance:
@@ -60,6 +89,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                 mPopupTitleView.setText(R.string.search_mate_popupmenu_item_filter_str);
                 mPopupListView.setAdapter(new NearbyPopupBaseAdapter(mContext, Arrays.asList(disStrList)));
                 mPopupWindow = getFilterPopupWindow(mContext, view, mPopupBaseView);
+
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                 {
                     @Override
@@ -69,7 +99,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                         final int len = rawDistance.length();
                         String distance = rawDistance.substring(0, len - 3);
                         mParamsPreference.setAScouchRange(mContext, distance);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_DISTANCE_FILTERED,distance);
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_DISTANCE_FILTERED, distance);
                         mPopupWindow.dismiss();
                     }
                 });
@@ -83,6 +113,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
 
                 mPopupTitleView.setText(R.string.search_room_price_popupwindow_no_filter);
                 mPopupListView.setAdapter(new NearbyPopupBaseAdapter(mContext, Arrays.asList(priceArr)));
+
                 mPopupWindow = getFilterPopupWindow(mContext, view, mPopupBaseView);
 
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -92,7 +123,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                     {
                         final String priceStr = String.valueOf(position + 1);
                         mParamsPreference.setAScouchPrice(mContext, priceStr);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_PRICE_FILTERED,priceStr).sendToTarget();
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_PRICE_FILTERED, priceStr).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -108,9 +139,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                 mPopupListView.setAdapter(new NearbyPopupBaseAdapter(mContext, Arrays.asList(kindsArr)));
 
                 mPopupWindow = getFilterPopupWindow(mContext, view, mPopupBaseView);
-                mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    {
                         final String clazzStr = String.valueOf(position + 1);
                         mParamsPreference.setAScouchLevel(mContext, clazzStr);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETREIVE_INFO_WITH_KINDS_FILTERED, clazzStr).sendToTarget();
@@ -133,9 +166,13 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
 
                 mPopupWindow = getFilterPopupWindow(mContext, view, mPopupBaseView);
 
-                mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                mPopupWindow.update();
+
+                mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    {
                         final String levelStr = String.valueOf(position + 1);
                         mParamsPreference.setAScouchLevel(mContext, levelStr);
 
@@ -144,7 +181,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                     }
                 });
                 break;
-             //mate
+            //mate
             case R.id.btn_mate_gender:
                 final String[] genderStrList = {
                         mContext.getResources().getString(R.string.man), // 对于男，我们不是直接传递“男”，而是传递“1”，可以减少我们转换的开销
@@ -154,9 +191,12 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                 mPopupTitleView.setText(R.string.gender);
                 mPopupListView.setAdapter(new NearbyPopupBaseAdapter(mContext, Arrays.asList(genderStrList)));
                 mPopupWindow = getFilterPopupWindow(mContext, view, mPopupBaseView);
-                mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    {
                         final String gender = String.valueOf(position + 1);
                         mParamsPreference.setMateGender(mContext, gender);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyMateFragment.START_RETRIEVE_DATA_WITH_GENDER_FILTER, gender).sendToTarget();
@@ -185,7 +225,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                         final int len = rawDistanceStr.length();
                         String distanceVal = rawDistanceStr.substring(0, len - 3);
                         mParamsPreference.setMateRange(mContext, distanceVal);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyMateFragment.START_RETRIEVE_DATA_WITH_RANGE_FILTER,distanceVal).sendToTarget();
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyMateFragment.START_RETRIEVE_DATA_WITH_RANGE_FILTER, distanceVal).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -193,7 +233,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
             //coach
             case R.id.btn_coauch_ability:
                 final String[] levelStrList = {
-                        mContext.getResources().getString(R.string.search_coauch_filter_level_guojiadui), // TODO: 现在服务端还没有定义每一个教练所对应的级别的具体的称号
+                        // TODO: 现在服务端还没有定义每一个教练所对应的级别的具体的称号
+                        mContext.getResources().getString(R.string.search_coauch_filter_level_guojiadui),
                         // TODO: 我们这里也是暂时命名 1
                         mContext.getResources().getString(R.string.search_coauch_filter_level_in_guojiadui), // TODO: 2
                         mContext.getResources().getString(R.string.search_coauch_filter_level_pre_guojiadui), // TODO: 3 注意这里的值还有待服务器端的确定
@@ -209,7 +250,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
                         String levelStr = levelStrList[position];
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyCoachFragment.RETRIEVE_COAUCH_WITH_LEVEL_FILTERED,levelStr).sendToTarget();
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyCoachFragment.RETRIEVE_COAUCH_WITH_LEVEL_FILTERED, levelStr).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -225,9 +266,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                 mPopupListView.setAdapter(new NearbyPopupBaseAdapter(mContext, Arrays.asList(kindsStrList)));
                 mPopupWindow = getFilterPopupWindow(mContext, view, mPopupBaseView);
 
-                mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    {
                         String clazzStr = String.valueOf(position + 1);
                         mParamsPreference.setCouchClazz(mContext, clazzStr);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyCoachFragment.RETRIEVE_COAUCH_WITH_CLASS_FILTERED, clazzStr).sendToTarget();
@@ -235,7 +278,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                     }
                 });
 
-                break;  
+                break;
             //dating
             case R.id.btn_dating_distance:
                 final String[] dating_distance = {
@@ -256,7 +299,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                         int len = rawRangeStr.length();
                         String range = rawRangeStr.substring(0, len - 3);
                         mParamsPreference.setDatingRange(mContext, range);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyDatingFragment.RETRIEVE_DATA_WITH_RANGE_FILTERED,range).sendToTarget();
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyDatingFragment.RETRIEVE_DATA_WITH_RANGE_FILTERED, range).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -272,7 +315,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                         mContext.getResources().getString(R.string.search_dating_popupwindow_five),
                         mContext.getResources().getString(R.string.search_dating_popupwindow_six),
                         mContext.getResources().getString(R.string.search_dating_popupwindow_seven),
-                        mContext.getResources().getString(R.string.billiard_other),
+                        mContext.getResources().getString(R.string.billiard_other)
                 };
 
                 mPopupTitleView.setText(R.string.search_dating_popupwindow_no_filter);
@@ -293,7 +336,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                         String specifiedDate = formatter.format(calendar.getTime());
                         mParamsPreference.setDatingPublishedDate(mContext, specifiedDate);
 
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyDatingFragment.RETRIEVE_DATA_WITH_DATE_FILTERED,specifiedDate).sendToTarget();
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyDatingFragment.RETRIEVE_DATA_WITH_DATE_FILTERED, specifiedDate).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -326,7 +369,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
                         String regionStr = regionStrList[position];
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_REGION_FILTERED,regionStr).sendToTarget();
+                        mParamsPreference.setRoomRegion(mContext, regionStr);
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_REGION_FILTERED, regionStr).sendToTarget();
                         // 当我们选择了一个条目之后，就需要将popupWindow dismiss掉
                         mPopupWindow.dismiss();
                     }
@@ -352,7 +396,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
                         String rangeStr = room_distance[position];
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_RANGE_FILTERED,rangeStr).sendToTarget();
+                        mParamsPreference.setRoomRange(mContext, rangeStr);
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_RANGE_FILTERED, rangeStr).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -361,8 +406,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                 break;
             case R.id.btn_room_price:
                 final String[] priceList = {
-                        mContext.getResources().getString(R.string.search_room_price_popupwindow_hightolow),
-                        mContext.getResources().getString(R.string.search_room_price_popupwindow_lowtohigh)
+                        mContext.getResources().getString(R.string.search_room_price_popupwindow_hightolow), // 对应于大众点评可以接受的sort值为9
+                        mContext.getResources().getString(R.string.search_room_price_popupwindow_lowtohigh) // 对应于大众点评可以接受的sort值为8
                 };
                 mPopupTitleView.setText(R.string.search_room_price_popupwindow_no_filter);
                 mPopupListView.setAdapter(new NearbyPopupBaseAdapter(mContext, Arrays.asList(priceList)));
@@ -373,8 +418,14 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        String priceStr = priceList[position];
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_PRICE_FILTERED,priceStr).sendToTarget();
+                        int priceSort = 8;
+                        if (position == 0)
+                        {
+                            priceSort = 9;
+                        }
+                        String priceStr = String.valueOf(priceSort);
+                        mParamsPreference.setRoomPrice(mContext, priceStr);
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_PRICE_FILTERED, priceStr).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -383,11 +434,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
             case R.id.btn_room_apprisal:
 
                 final String[] apprisalArr = {
-                        mContext.getResources().getString(R.string.search_room_filter_list_star),
-                        mContext.getResources().getString(R.string.search_room_filter_list_comment),
-                        mContext.getResources().getString(R.string.search_room_filter_list_environment),
-                        mContext.getResources().getString(R.string.search_room_filter_list_service),
-                        mContext.getResources().getString(R.string.search_room_filter_list_product)
+                        mContext.getResources().getString(R.string.search_room_filter_list_star), // 星级高2
+                        mContext.getResources().getString(R.string.search_room_filter_list_product), // 产品3
+                        mContext.getResources().getString(R.string.search_room_filter_list_environment), // 环境4
+                        mContext.getResources().getString(R.string.search_room_filter_list_service), // 服务5
+                        mContext.getResources().getString(R.string.search_room_filter_list_comment), //  点评数量6
                 };
                 mPopupTitleView.setText(R.string.search_room_filter_no_filter);
                 mPopupListView.setAdapter(new NearbyPopupBaseAdapter(mContext, Arrays.asList(apprisalArr)));
@@ -398,12 +449,24 @@ public class NearbyPopBasicClickListener implements View.OnClickListener{
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        String apprisalStr = apprisalArr[position];
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_APPRISAL_FILTERED,apprisalStr).sendToTarget();
+                        int apprisalValSort = position + 2;
+                        String apprisalStr = String.valueOf(apprisalValSort);
+                        mParamsPreference.setRoomApprisal(mContext, apprisalStr);
+                        Log.d(TAG, " inside the FilterOnClickListener --> the apprisal sort value we get from user are : " + apprisalValSort);
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_APPRISAL_FILTERED, apprisalStr).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
                 break;
+        }
+    }
+
+    @Override
+    public void closePopupWindow()
+    {
+        if (mPopupWindow != null && mPopupWindow.isShowing()) {
+            Log.d(TAG, " inside the popupWindow onclick listener --> and we dismiss the popupWindow ");
+            mPopupWindow.dismiss();
         }
     }
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 
 import com.yueqiu.bean.NearbyDatingSubFragmentDatingBean;
 import com.yueqiu.constant.DatabaseConstant;
@@ -68,16 +69,13 @@ public class NearbyDatingDaoImpl implements NearbyDatingDao
     public synchronized long insertDatingItemBatch(List<NearbyDatingSubFragmentDatingBean> datingList)
     {
         this.mDatabase = mDBUtils.getWritableDatabase();
-        final int size = datingList.size();
         long result = 0;
         mDatabase.beginTransaction();
-        int i;
         try
         {
-            for (i = 0; i < size; ++i)
+            for (NearbyDatingSubFragmentDatingBean datingItem : datingList)
             {
                 ContentValues values = new ContentValues();
-                NearbyDatingSubFragmentDatingBean datingItem = datingList.get(i);
                 values.put(DatabaseConstant.SearchDatingTable.NAME, datingItem.getUserName());
                 values.put(DatabaseConstant.SearchDatingTable.PHOTO_URL, datingItem.getUserPhoto());
                 values.put(DatabaseConstant.SearchDatingTable.TITLE, datingItem.getUserDeclare());
@@ -104,7 +102,40 @@ public class NearbyDatingDaoImpl implements NearbyDatingDao
     @Override
     public synchronized long updateDatingItemBatch(List<NearbyDatingSubFragmentDatingBean> datingList)
     {
-        return 0;
+        long result = -1;
+        mDatabase = mDBUtils.getWritableDatabase();
+        mDatabase.beginTransaction();
+
+        if (datingList != null)
+        {
+            try
+            {
+                for (NearbyDatingSubFragmentDatingBean datingItem : datingList)
+                {
+                    ContentValues values = new ContentValues();
+
+                    values.put(DatabaseConstant.SearchDatingTable.USER_ID, datingItem.getId());
+                    values.put(DatabaseConstant.SearchDatingTable.NAME, datingItem.getUserName());
+                    values.put(DatabaseConstant.SearchDatingTable.PHOTO_URL, datingItem.getUserPhoto());
+                    values.put(DatabaseConstant.SearchDatingTable.TITLE, datingItem.getUserDeclare());
+                    values.put(DatabaseConstant.SearchDatingTable.RANGE, datingItem.getUserDistance());
+
+                    result = mDatabase.update(DatabaseConstant.SearchDatingTable.DATING_TABLE_NAME,
+                            values,
+                            DatabaseConstant.SearchDatingTable.USER_ID + " =? ",
+                            new String[]{datingItem.getId()});
+                }
+                mDatabase.setTransactionSuccessful();
+
+            } catch (final Exception e)
+            {
+                Log.d(TAG, " exception happened while we updating the dating table, and the reason goes to : " + e.toString());
+            } finally
+            {
+                mDatabase.endTransaction();
+            }
+        }
+        return result;
     }
 
     @Override
@@ -122,17 +153,47 @@ public class NearbyDatingDaoImpl implements NearbyDatingDao
                 null
         );
 
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast())
+        if (cursor != null && cursor.getCount() != 0)
         {
-            NearbyDatingSubFragmentDatingBean bean = cursorToDatingBean(cursor);
-            datingBeanList.add(bean);
-            cursor.moveToNext();
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast())
+            {
+                NearbyDatingSubFragmentDatingBean bean = cursorToDatingBean(cursor);
+                datingBeanList.add(bean);
+                cursor.moveToNext();
+            }
+            cursor.close();
         }
-        cursor.close();
-
 
         return datingBeanList;
+    }
+
+    /**
+     * @return 我们所有的已经插入到的数据库当中的数据，没有数目限制
+     */
+    public List<NearbyDatingSubFragmentDatingBean> getAllDatingList()
+    {
+        List<NearbyDatingSubFragmentDatingBean> datingList = new ArrayList<NearbyDatingSubFragmentDatingBean>();
+
+        mDatabase = mDBUtils.getReadableDatabase();
+        String allDatingInfoSql = " SELECT * FROM " + DatabaseConstant.SearchDatingTable.DATING_TABLE_NAME
+                + " ORDER BY " + DatabaseConstant.SearchDatingTable.USER_ID
+                + " DESC ";
+
+        Cursor resultCursor = mDatabase.rawQuery(allDatingInfoSql,
+                null);
+        if (resultCursor != null && resultCursor.getCount() != 0)
+        {
+            resultCursor.moveToFirst();
+            while (resultCursor.isAfterLast())
+            {
+                NearbyDatingSubFragmentDatingBean datingBean = cursorToDatingBean(resultCursor);
+                datingList.add(datingBean);
+                resultCursor.moveToNext();
+            }
+            resultCursor.close();
+        }
+        return datingList;
     }
 
     /**

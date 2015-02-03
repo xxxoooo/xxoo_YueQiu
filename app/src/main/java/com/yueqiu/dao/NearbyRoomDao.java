@@ -13,13 +13,11 @@ import java.util.List;
  */
 public interface NearbyRoomDao
 {
-    public long insertRoomItem(NearbyRoomSubFragmentRoomBean roomItem);
-
-    public long updateRoomItem(NearbyRoomSubFragmentRoomBean roomItem);
 
     public long updateRoomItemBatch(List<NearbyRoomSubFragmentRoomBean> roomList);
 
     public long insertRoomItemBatch(List<NearbyRoomSubFragmentRoomBean> roomList);
+
 
     /**
      * 当用户进行球厅信息的获取时，会有根据球厅的区域，距离，价格以及好评度四项标准进行筛选

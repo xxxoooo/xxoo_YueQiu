@@ -1,8 +1,11 @@
 package com.yueqiu.bean;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.awt.font.TextAttribute;
 import java.io.StringReader;
 
 /**
@@ -161,5 +164,42 @@ public class NearbyRoomSubFragmentRoomBean
     public void setRoomId(String roomId)
     {
         this.mRoomId = roomId;
+    }
+
+    // 我们这里的HashCode的构建方法并不是最符合官方推荐的实现标准，但是用于实现
+    // RoomBean List当中重复元素的判断已经可以了
+    // 对于更为理想的实现，我们尽量还是参考<Effective Java>和Apache Commons当中实现的HashCodeBuilder的实现
+    // 采用两个质数结合Bean文件当中的相关字段构建而成。相对很稳定
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        // 我们在这里选取的是最不容易重复的四个字段，但是说实话，不太完美
+        hash = 7 * hash + this.mRoomName.hashCode();
+        hash = 7 * hash + this.mDetailedAddress.hashCode();
+        hash = 7 * hash + this.mRoomPhotoUrl.hashCode();
+        hash = 7 * hash + this.mRoomPhone.hashCode();
+        return hash;
+    }
+
+    // 我们需要重写equals方法，否则判断List元素重复的方法会出现异常
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean result = false;
+        if (object == null || object.getClass() != this.getClass())
+        {
+            result = false;
+        } else
+        {
+            NearbyRoomSubFragmentRoomBean thatObj = (NearbyRoomSubFragmentRoomBean) object;
+            if (this.mRoomName.equals(thatObj.mRoomName) && this.mDetailedAddress.equals(thatObj.mDetailedAddress)
+                    && this.mRoomPhotoUrl.equals(thatObj.mRoomPhotoUrl) && this.mRoomPhone.equals(thatObj.mRoomPhone))
+            {
+                result = true;
+            }
+        }
+        Log.d("room_bean", " and the final result we get are : " + result);
+        return result;
     }
 }

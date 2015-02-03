@@ -4,15 +4,19 @@ import android.app.ActionBar;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
@@ -21,6 +25,8 @@ import com.yueqiu.activity.NearbyResultActivity;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.chatbar.ContactFragment;
 import com.yueqiu.fragment.chatbar.MessageFragment;
+
+import java.lang.reflect.Field;
 
 /**
  * Created by doushuqi on 14/12/17.
@@ -111,6 +117,31 @@ public class ChatBarActivity extends FragmentActivity {
         getMenuInflater().inflate(R.menu.billiard_search, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+
+        int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
+        EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
+        searchEditText.setTextColor(Color.WHITE);
+        searchEditText.setHintTextColor(Color.LTGRAY);
+
+        searchView.setIconifiedByDefault(false);
+        try {
+            Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
+            searchField.setAccessible(true);
+            ImageView searchHintIcon = (ImageView) searchField.get(searchView);
+            searchHintIcon.setImageResource(R.drawable.search);
+        } catch (NoSuchFieldException e)
+        {
+            Log.d(TAG, " Exception happened while we retrieving the mSearchHintIcon, and the reason goes to : " + e.toString());
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
+        {
+            Log.d(TAG, " Exception happened as we have no right to access this filed, and the reason goes to : " + e.toString());
+            e.printStackTrace();
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we make the search button : " + e.toString());
+        }
+
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
         return true;
     }

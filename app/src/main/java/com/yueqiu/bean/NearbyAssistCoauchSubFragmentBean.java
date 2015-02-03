@@ -1,7 +1,11 @@
 package com.yueqiu.bean;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.awt.font.TextAttribute;
 
 /**
  * Created by scguo on 14/12/25.
@@ -11,6 +15,8 @@ import org.json.JSONObject;
  */
 public class NearbyAssistCoauchSubFragmentBean
 {
+    private static final String TAG = "NearbyAssistCoauchSubFragmentBean";
+
     private String mUserId;
     private String mPhoto;
     private String mName;
@@ -139,5 +145,42 @@ public class NearbyAssistCoauchSubFragmentBean
     public void setUserId(String userId)
     {
         this.mUserId = userId;
+    }
+
+    // TODO: 我们现在的设计当中暂时还没有涉及到关于set的数据结构，我们现在只是用List来
+    // TODO: 存储我们从网络上获取到的数据，如果我们以后采用Set来存储我们的数据，那么我们需要好好设计一下我们的HashCode方法
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        try
+        {
+            int userId = Integer.parseInt(this.getUserId());
+            Log.d(TAG, "the original user id are : " + userId);
+            hash *= userId;
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we parse the userid from the userBean, and the reason goes to : " + e.toString());
+        }
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean result = false;
+        if (object == null || object.getClass() != this.getClass())
+        {
+            result = false;
+        } else
+        {
+            NearbyAssistCoauchSubFragmentBean thatObj = (NearbyAssistCoauchSubFragmentBean) object;
+            if (thatObj.getUserId().equals(this.getUserId()) && thatObj.getName().equals(this.getName())
+                    && thatObj.getPhoto().equals(this.getPhoto()) && thatObj.getDistance().equals(this.getDistance()))
+            {
+                result = true;
+            }
+        }
+        return result;
     }
 }

@@ -11,10 +11,6 @@ import java.util.List;
 public interface NearbyAssistCoauchDao
 {
 
-    public long insertAssistCoauchItem(NearbyAssistCoauchSubFragmentBean assistCoauchItem);
-
-    public long updateAssistCoauchItem(NearbyAssistCoauchSubFragmentBean assistCoauchItem);
-
     public long insertAssistCoauchItemBatch(List<NearbyAssistCoauchSubFragmentBean> assistCoauchList);
 
     public long updateAssistCoauchItemBatch(List<NearbyAssistCoauchSubFragmentBean> assistCoauchList);

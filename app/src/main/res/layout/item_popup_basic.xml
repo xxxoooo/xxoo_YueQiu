@@ -7,6 +7,7 @@
     <TextView
         style="@style/PopupWindowTvStyle"
         android:paddingBottom="14dp"
+        android:layout_height="wrap_content"
         android:paddingTop="13dp"
         android:textColor="@color/md__defaultBackground"
         android:paddingLeft="11dp"
@@ -14,12 +15,3 @@
         />
 </LinearLayout>
 
-    <!-- 这里以前使用的是Button作为每一个ListItem的元素，使用Button确实好看了很多
-         但是却导致了我们不能捕获位于PopupWindow内部的ListView点击事件接收不到-->
-<!--<Button-->
-<!--style="@style/PopupWindowTvStyle"-->
-<!--android:layout_margin="2dp"-->
-<!--android:textColor="@color/md__defaultBackground"-->
-<!--android:paddingLeft="5dp"-->
-<!--android:id="@+id/search_pop_base_button"-->
-    <!--/>-->

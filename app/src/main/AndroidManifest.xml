@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yueqiu" >
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -18,15 +17,23 @@
             android:name=".BilliardGroupActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
-        <activity
-            android:name=".BilliardNearbyActivity"
-            android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
+        <!--程序初始启动时显示的SplashScreen-->
+        <activity
+            android:theme="@android:style/Theme.Wallpaper.NoTitleBar.Fullscreen"
+            android:name=".YueQiuSplashScreen"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".BilliardNearbyActivity"
+            android:screenOrientation="portrait">
+        </activity>
+
         <activity
             android:name=".activity.NearbyResultActivity"
             android:launchMode="singleTop"
@@ -112,16 +119,14 @@
             android:name=".activity.NearbyBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating"
             android:parentActivityName=".BilliardNearbyActivity"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".PlayMainActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.GroupIssueTopic"
             android:label="@string/billiard_group_issue_article"
-            android:screenOrientation="portrait" >
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.GroupSelectTopicTypeActivity"
             android:parentActivityName=".activity.GroupIssueTopic"
@@ -136,13 +141,18 @@
         <activity
             android:name=".activity.Register1Activity"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.ArticleReadActivity" >
+        <activity android:name=".activity.ArticleReadActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <data android:scheme="file" />
+
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activity.Register1Activity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.NearbyBilliardRoomActivity"
             android:screenOrientation="portrait" />
@@ -154,6 +164,7 @@
             android:name=".activity.BilliardGroupDetailActivity"
             android:screenOrientation="portrait">
         </activity>
+
     </application>
 
 </manifest>

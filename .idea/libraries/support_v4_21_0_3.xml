@@ -1,13 +1,29 @@
 <component name="libraryTable">
   <library name="support-v4-21.0.3">
     <CLASSES>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+=======
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar!/" />
+>>>>>>> 3f1558db76bc48c1e27b56f46e2c742c86e09d62
+>>>>>>> 8d51f0ff728b15672b33305ab9df02866f436977
       <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/res" />
       <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar!/" />
       <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
+<<<<<<< HEAD
       <root url="jar://$USER_HOME$/Downloads/android-sdk-macosx/extras/android/m2repository/com/android/support/support-v4/21.0.3/support-v4-21.0.3-sources.jar!/" />
+=======
+<<<<<<< HEAD
+      <root url="jar://$USER_HOME$/android_sdk/sdk/extras/android/m2repository/com/android/support/support-v4/21.0.3/support-v4-21.0.3-sources.jar!/" />
+=======
+      <root url="jar://$USER_HOME$/ddd/sdk/extras/android/m2repository/com/android/support/support-v4/21.0.3/support-v4-21.0.3-sources.jar!/" />
+>>>>>>> 3f1558db76bc48c1e27b56f46e2c742c86e09d62
+>>>>>>> 8d51f0ff728b15672b33305ab9df02866f436977
     </SOURCES>
   </library>
 </component>

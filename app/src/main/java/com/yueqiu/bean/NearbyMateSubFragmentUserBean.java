@@ -16,6 +16,8 @@ import java.awt.font.TextAttribute;
  */
 public class NearbyMateSubFragmentUserBean
 {
+    private static final String TAG = "NearbyMateSubFragmentUserBean";
+
     private String mUserId;
     private String mUserNickName;
     private String mUserGender;
@@ -139,6 +141,43 @@ public class NearbyMateSubFragmentUserBean
     {
         return "the photo url are :" + mUserPhotoUrl + "; name : " + mUserNickName + "; gender: " + mUserGender +
                 "; district : " + mUserDistrict + "; and distance : " + mUserDistance;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 3;
+        try
+        {
+            int idVal = Integer.parseInt(this.getUserId());
+            hash *= idVal;
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we parse the iD value we get : " + e.toString());
+        }
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean result = false;
+
+        if (object == null ||  object.getClass() != this.getClass())
+        {
+            result = false;
+        } else
+        {
+            NearbyMateSubFragmentUserBean thatObj = (NearbyMateSubFragmentUserBean) object;
+            if (thatObj.getUserNickName().equals(this.getUserNickName())
+                    && thatObj.getUserPhotoUrl().equals(this.getUserPhotoUrl())
+                    && thatObj.getUserDistrict().equals(this.getUserDistrict())
+                    && thatObj.getUserId().equals(this.getUserId()))
+            {
+                result = true;
+            }
+        }
+        return result;
     }
 }
 
