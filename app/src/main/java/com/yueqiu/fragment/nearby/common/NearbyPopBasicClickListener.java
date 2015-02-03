@@ -48,7 +48,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
     public NearbyPopBasicClickListener(Context context, Handler handler, NearbyParamsPreference preference)
     {
         this.mContext = context;
-        this.mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.mPopupBaseView = mInflater.inflate(R.layout.popupwindow_basic_layout, null);
         this.mPopupTitleView = (Button) mPopupBaseView.findViewById(R.id.popup_base_button);
         this.mPopupListView = (ListView) mPopupBaseView.findViewById(R.id.popup_base_listview);

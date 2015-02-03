@@ -345,8 +345,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         String errorMsgStr = errorObj.getString("errorMessage");
                         StringBuilder errorInfo = new StringBuilder();
                         errorInfo.append("Error Code : ").append(errorCode).append("; Error Info : ").append(errorMsgStr);
-
-                        mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR, errorInfo.toString()).sendToTarget();
+                        Message errorHandlerMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                        Bundle errorHandlerData = new Bundle();
+                        errorHandlerData.putString(KEY_REQUEST_ERROR_MSG_ROOM, errorInfo.toString());
+                        mUIEventsHandler.sendMessage(errorHandlerMsg);
                         mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                     }
                 } else
@@ -538,14 +540,18 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 // 所以我们不用像其他的四个Fragment当中的UIEventsHandler那样需要处理三种情况，我们仅需要一种就可以了
                 case PublicConstant.REQUEST_ERROR:
                     Bundle errorData = msg.getData();
-                    if (null != errorData) {
-                        Log.d(TAG, " the error data we get are : " + errorData);
-                        Utils.showToast(sContext, errorData.getString(KEY_REQUEST_ERROR_MSG_ROOM));
+                    String errorMsg = errorData.getString(KEY_REQUEST_ERROR_MSG_ROOM);
+                    if (! TextUtils.isEmpty(errorMsg))
+                    {
+                        Log.d(TAG, " the error data we get are : " + errorMsg);
+                        Utils.showToast(sContext, errorMsg);
                     } else {
                         Utils.showToast(sContext, sContext.getString(R.string.http_request_error));
                     }
 
-                    if (mRoomList.isEmpty()) {
+                    if (mRoomList.isEmpty())
+                    {
+                        Log.d(TAG, " the room list we get are : " + mRoomList.size());
                         loadEmptyTv();
                     }
 
@@ -704,7 +710,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
                             retrieveRoomListInfo("北京", regionStr, regionRangeStr, regionSortVal, 20, 1);
                             break;
-
                     }
                 }
             };
@@ -763,7 +768,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
      */
     private PullToRefreshBase.OnRefreshListener2<ListView> onRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>()
     {
-
         /**
          * onPullDownToRefresh will be called only when the user has Pulled from
          * the start, and released.

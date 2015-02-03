@@ -93,8 +93,6 @@ public class BilliardsNearbyDatingFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
 
-        mBackgroundHandler = new BackgroundWorkerHandler();
-
         // TODO: 我们最好将判断网络状况的变量放到onResume()方法当中进行判断，而不是放到onCreate()方法，因为这里调用的次数有限
         // TODO: 但是将她直接放到onResume()方法当中又会使Fragment之间的切换变的卡。稍后在做决定？？？？
         mNetworkAvailable = Utils.networkAvaiable(sContext);
@@ -165,18 +163,23 @@ public class BilliardsNearbyDatingFragment extends Fragment
             }
         });
 
+        mBackgroundHandler = new BackgroundWorkerHandler();
+        Log.d(TAG, " DatingFragment --> inside the onCreateView() method");
         if (Utils.networkAvaiable(sContext))
         {
+            Log.d(TAG, " inside the onCreateView() method, and we have detected the netWork is available, but just cannot get data ");
             mLoadMore = false;
             mRefresh = false;
+            Log.d(TAG, " the state of the current HandlerThread are : " + mBackgroundHandler.getState() + " , " + (mBackgroundHandler == null));
             // 我们仅在网络可行的情况下进行网络请求，减少不必要的网络请求
             if (mBackgroundHandler != null && mBackgroundHandler.getState() == Thread.State.NEW)
             {
-                Log.d(TAG, " start the background handler ");
+                Log.d(TAG, " in the onCreateView --> start the background handler ");
                 mBackgroundHandler.start();
             }
         } else
         {
+            Log.d(TAG, " in the onCreateView --> we have detected network unavailable ");
             mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
         }
 
@@ -193,7 +196,16 @@ public class BilliardsNearbyDatingFragment extends Fragment
     @Override
     public void onPause()
     {
+        Log.d(TAG, " the onPause method has been called ");
         mCallback.closePopupWindow();
+        if (null != mBackgroundHandler)
+        {
+            Log.d(TAG, " we need to stop the Background Handler ");
+            mBackgroundHandler.interrupt();
+            mBackgroundHandler = null;
+        }
+
+
         super.onPause();
     }
 
@@ -247,7 +259,8 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
         String rawResult = HttpUtil.urlClient(HttpConstants.NearbyDating.URL, requestParams, HttpConstants.RequestMethod.GET);
         Log.d(TAG, " the raw result we get for the dating info are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult)) {
+        if (!TextUtils.isEmpty(rawResult))
+        {
             try {
                 JSONObject rawJsonObj = new JSONObject(rawResult);
                 Log.d(TAG, " the rawJson object we get are : " + rawJsonObj);
@@ -315,6 +328,12 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
             }
+        } else
+        {
+            Log.d(TAG, " exception happened on some special devices, and this should occur for the network failure, but the Android does" +
+                    "not detect it as netWork failure, and it sign it as Server(the service provider) error ");
+            mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
         }
     }
 
@@ -365,10 +384,11 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     String infoStr = (String) msg.obj;
                     if (mDatingList.isEmpty())
                     {
+                        Log.d(TAG, " the current list should be empty here ??? ");
                         loadEmptyTv();
                     }
                     Toast.makeText(sContext, infoStr, Toast.LENGTH_SHORT).show();
-
+                    hideProgress();
                     Log.d(TAG, " fail to get data due to the reason as : " + infoStr);
                     break;
                 case FETCH_DATA_SUCCESSED:
@@ -478,12 +498,14 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
     private void showProgress()
     {
+        Log.d(TAG, " inside the showProgress internal method ");
         mPreProgress.setVisibility(View.VISIBLE);
         mPreText.setVisibility(View.VISIBLE);
     }
 
     private void hideProgress()
     {
+        Log.d(TAG, " inside the hideProgress internal method ");
         mPreProgress.setVisibility(View.GONE);
         mPreText.setVisibility(View.GONE);
     }
@@ -568,6 +590,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_DATE_FILTERED, publishDate).sendToTarget();
             }
         }
+
     }
 
     private boolean mRefresh;

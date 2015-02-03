@@ -88,8 +88,6 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         super.onCreate(savedInstanceState);
 
         mNetworkAvailable = Utils.networkAvaiable(sContext);
-        mWorker = new BackgroundWorkerHandler();
-
     }
 
     private View mView;
@@ -148,6 +146,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         mAssistCoauchListAdapter = new NearbyAssistCoauchSubFragmentListAdapter(sContext, (ArrayList<NearbyAssistCoauchSubFragmentBean>) mAssistCoauchList);
         mListView.setAdapter(mAssistCoauchListAdapter);
 
+        mWorker = new BackgroundWorkerHandler();
         if (Utils.networkAvaiable(sContext))
         {
             mLoadMore = false;
@@ -168,12 +167,16 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-
     }
 
     @Override
     public void onPause()
     {
+        if (mWorker != null)
+        {
+            mWorker.interrupt();
+            mWorker = null;
+        }
         mCallback.closePopupWindow();
         super.onPause();
     }
@@ -208,7 +211,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         if (!mNetworkAvailable) {
             mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_FAILED,
                     sContext.getResources().getString(R.string.network_not_available)).sendToTarget();
-
+            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
             return;
         }
 
@@ -397,14 +400,12 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     List<NearbyAssistCoauchSubFragmentBean> asList = (ArrayList<NearbyAssistCoauchSubFragmentBean>) msg.obj;
                     for (NearbyAssistCoauchSubFragmentBean asBean : asList)
                     {
-                        if (mAssistCoauchList.contains(asBean))
+                        if (! mAssistCoauchList.contains(asBean))
                         {
                             mAssistCoauchList.add(asBean);
                         }
                     }
                     mAfterCount = mAssistCoauchList.size();
-
-                    // TODO: 我们已经获取到了更新的数据，现在需要做的就是更新一下本地的我们创建的助教 table
 
                     // 判断一下，当前的List是否是空的，如果是空的，我们就需要加载一下当list为空时，显示的TextView
                     if (mAssistCoauchList.isEmpty())
@@ -449,6 +450,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                 case NETWORK_UNAVAILABLE:
                     if (mAssistCoauchList.isEmpty())
                     {
+                        Log.d(TAG, " inside the UIEvents Handler, and we have loaded the EmptyView here ");
                         loadEmptyTv();
                     }
                     Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
@@ -523,7 +525,6 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     // 用于处理后台任务的处理器
     private class BackgroundWorkerHandler extends HandlerThread
     {
-
         public BackgroundWorkerHandler()
         {
             super(BACKGROUND_HANDLER_NAME, Process.THREAD_PRIORITY_BACKGROUND);
@@ -656,8 +657,6 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             {
                 mBackgroundHandler.obtainMessage(RETREIVE_INFO_WITH_KINDS_FILTERED,clazz).sendToTarget();
             }
-
-
         }
     }
 
@@ -679,7 +678,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
-            if (Utils.networkAvaiable(sContext)) {
+            if (Utils.networkAvaiable(sContext))
+            {
                 mLoadMore = false;
                 mRefresh = true;
                 if (mWorker != null)
@@ -722,7 +722,6 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             {
                 mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
             }
-
         }
     };
 

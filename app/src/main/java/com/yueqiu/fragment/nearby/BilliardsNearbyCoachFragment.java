@@ -90,7 +90,6 @@ public class BilliardsNearbyCoachFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
         mNetworkAvailable = Utils.networkAvaiable(sContext);
-        mWorker = new BackgroundWorkerThread();
 
     }
 
@@ -140,6 +139,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
         mCoauchListView.setAdapter(mCoauchListAdapter);
         mCoauchListAdapter.notifyDataSetChanged();
 
+        mWorker = new BackgroundWorkerThread();
         if (Utils.networkAvaiable(sContext))
         {
             mLoadMore = false;
@@ -167,6 +167,11 @@ public class BilliardsNearbyCoachFragment extends Fragment
     @Override
     public void onPause()
     {
+        if (null != mWorker)
+        {
+            mWorker.interrupt();
+            mWorker = null;
+        }
         mCallback.closePopupWindow();
         super.onPause();
     }
@@ -181,8 +186,6 @@ public class BilliardsNearbyCoachFragment extends Fragment
     @Override
     public void onDestroy()
     {
-        mWorker.quit();
-
         super.onDestroy();
     }
 
