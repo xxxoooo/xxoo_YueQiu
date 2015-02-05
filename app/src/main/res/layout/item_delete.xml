@@ -31,8 +31,7 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:textSize="18sp"
-            style="@style/ListItemTvStyle"
-            android:textColor="@color/black" />
+            style="@style/ListItemTvStyle"/>
 
         <com.rockerhieu.emojicon.EmojiconTextView
             emojicon:emojiconSize="23sp"
@@ -57,7 +56,8 @@
             android:id="@+id/time_tx"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="" />
+            android:text=""
+            style="@style/TimeTextStyle"/>
 
         <TextView
             android:id="@+id/count"

@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,6 +41,7 @@ import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
 import com.yueqiu.R;
+import com.yueqiu.activity.MyProfileActivity;
 import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.ProgressDialogUtil;
 import com.yueqiu.util.SendImageMessageTask;
@@ -116,6 +118,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         currentLoginUser = api.getCurrentLoginUser();
         api.addListerer(this);
         user = (GotyeUser) getIntent().getSerializableExtra("user");
+        Log.e("ddd", "user->initialize = " + user.name);
         room = (GotyeRoom) getIntent().getSerializableExtra("room");
         group = (GotyeGroup) getIntent().getSerializableExtra("group");
         mActionBar = getActionBar();
@@ -395,6 +398,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     //发送文本消息
     private void sendTextMessage(String text) {
         if (!TextUtils.isEmpty(text)) {
+            Log.e("ddd", "currentLoginUser = " + currentLoginUser + " receiver = " + user.name);
             GotyeMessage toSend;
             if (chatType == 0) {
                 toSend = GotyeMessage.createTextMessage(currentLoginUser, user,
@@ -832,8 +836,8 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 */
     @Override
     public void onRequestUserInfo(int code, GotyeUser user) {
-        // TODO Auto-generated method stub
-        this.user = user;
+//        Log.e("ddd", "onRequestUserInfo>>user = " + user.name);
+//        this.user = user;
     }
 
     @Override
@@ -957,7 +961,18 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
+            case R.id.chat_page_friend:
+                //查看好友信息
+                //TODO:
+//                Intent intent = new Intent(this, MyProfileActivity.class);
+                break;
         }
         return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.chat_page_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 }

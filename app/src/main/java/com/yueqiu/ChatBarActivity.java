@@ -254,11 +254,10 @@ public class ChatBarActivity extends FragmentActivity implements LoginListener, 
 
             Intent toService = new Intent(this, GotyeService.class);
             startService(toService);
-            Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show();
-            this.finish();
+            Toast.makeText(this, "已经登录成功。。。", Toast.LENGTH_SHORT).show();
         } else {
             // 失败,可根据code定位失败原因
-            Toast.makeText(this, "登录失败", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "尚未登录或者登录失败。。。", Toast.LENGTH_SHORT).show();
         }
     }
 

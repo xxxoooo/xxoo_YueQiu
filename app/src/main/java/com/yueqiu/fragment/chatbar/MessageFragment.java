@@ -130,8 +130,8 @@ public class MessageFragment extends Fragment implements DownloadListener{
                 GotyeChatTarget target = (GotyeChatTarget) mAdapter.getItem(arg2);
                 //TODO:fixName = "通知列表"
                 if (target.name.equals(fixName)) {
-//                    Intent i = new Intent(getActivity(), NotifyListPage.class);
-//                    startActivity(i);
+                    Intent i = new Intent(getActivity(), FriendsApplicationActivity.class);
+                    startActivity(i);
                 } else {
                     /**
                      * 下面这句是用来标记消息为已读的
@@ -139,8 +139,11 @@ public class MessageFragment extends Fragment implements DownloadListener{
                     GotyeAPI.getInstance().markMeeagesAsread(target);
                     //单人聊天
                     if (target.type == GotyeChatTargetType.GotyeChatTargetTypeUser) {
+                        Log.e("ddd", "------------p2p chat-------------");
                         Intent toChat = new Intent(getActivity(),ChatPage.class);
                         toChat.putExtra("user", (GotyeUser) target);
+                        Log.e("ddd", "target>>" + ((GotyeUser) target).getName() + "  " + ((GotyeUser) target).getInfo() +
+                                "  " + target.name + "  " + ((GotyeUser) target).isFriend());
                         startActivity(toChat);
                         // updateList();
                     }
@@ -157,6 +160,7 @@ public class MessageFragment extends Fragment implements DownloadListener{
                     }
                     refresh();
                 }
+                getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
             }
         });
     }

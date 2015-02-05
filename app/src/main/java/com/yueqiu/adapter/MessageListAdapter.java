@@ -99,7 +99,7 @@ public class MessageListAdapter extends BaseAdapter {
 		final GotyeChatTarget session =  getItem(arg0);
 		Log.d("offLine", "session" + session);
 		if (getItemViewType(arg0)==0) {
-			viewHolder.title.setText(session.name);
+			viewHolder.title.setText("验证消息");//session.name
 			viewHolder.content.setVisibility(View.GONE);
 			viewHolder.icon.setImageResource(R.drawable.message);
 			viewHolder.time.setVisibility(View.GONE);
