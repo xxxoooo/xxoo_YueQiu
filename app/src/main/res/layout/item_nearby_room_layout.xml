@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:padding="3dp">
 
     <!-- 这是用于SearchActivity当中的球厅Fragment下面的ListView当中的
         每一个Item的具体的布局layout文件 -->
@@ -11,15 +11,16 @@
          其他带有本地缓存处理以及网络Http请求的缓存处理的类库来进行处理，
          加快每一个球厅的图片的加载速度 -->
     <!-- 用于显示球厅的photo -->
-    <ImageView
-        android:layout_marginTop="4dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <com.android.volley.toolbox.NetworkImageView
+        android:scaleType="fitCenter"
+        android:layout_marginTop="1dp"
+        android:layout_width="82dp"
+        android:layout_height="82dp"
         android:id="@+id/img_room_subfragment_listitem_photo"
         android:src="@drawable/hall_default"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
-        android:padding="2dp"
+        android:padding="1dp"
         />
 
     <TextView
@@ -28,7 +29,7 @@
         android:text="@string/search_room_sub_fragment_listitem_roomname"
         android:layout_toRightOf="@id/img_room_subfragment_listitem_photo"
         android:layout_marginTop="3dp"
-        android:layout_marginLeft="15dp"
+        android:layout_marginLeft="4dp"
         android:textColor="@color/md__defaultBackground"
         android:textSize="18sp"
 
@@ -69,8 +70,6 @@
         android:layout_alignTop="@+id/rating_room_subfragment_listitem_rating"
         />
 
-
-
     <TextView
         style="@style/TimeTextStyle"
         android:layout_alignTop="@id/tv_price_indi"
@@ -101,9 +100,6 @@
         android:text="@string/search_room_sub_fragment_listitem_roomdistance"
         android:layout_centerVertical="true"
         />
-
-
-
 </RelativeLayout>
 
 

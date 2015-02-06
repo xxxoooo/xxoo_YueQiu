@@ -32,8 +32,6 @@ public class NearbyMateDaoImpl implements NearbyMateDao
     {
         this.mContext = context;
         this.mDBUtils = DBUtils.getInstance(context);
-
-
     }
 
     @Override
@@ -77,7 +75,38 @@ public class NearbyMateDaoImpl implements NearbyMateDao
     @Override
     public synchronized long updateMateInfoBatch(List<NearbyMateSubFragmentUserBean> mateList)
     {
-        return 0;
+        long result = -1;
+        mSQLdatabase = mDBUtils.getWritableDatabase();
+        mSQLdatabase.beginTransaction();
+
+        if (mateList != null)
+        {
+            try
+            {
+                for (NearbyMateSubFragmentUserBean userBean : mateList)
+                {
+                    ContentValues values = new ContentValues();
+                    values.put(DatabaseConstant.SearchMateTable.USER_ID, userBean.getUserId());
+                    values.put(DatabaseConstant.SearchMateTable.NAME, userBean.getUserNickName());
+                    values.put(DatabaseConstant.SearchMateTable.PHOTO_URL, userBean.getUserPhotoUrl());
+                    values.put(DatabaseConstant.SearchMateTable.SEX, userBean.getUserGender());
+                    values.put(DatabaseConstant.SearchMateTable.DISTRICT, userBean.getUserDistrict());
+                    values.put(DatabaseConstant.SearchMateTable.RANGE, userBean.getUserDistance());
+
+                    result = mSQLdatabase.update(DatabaseConstant.SearchMateTable.MATE_TABLE,
+                            values,
+                            DatabaseConstant.SearchMateTable.USER_ID + " =? ",
+                            new String[]{userBean.getUserId()});
+                }
+                mSQLdatabase.setTransactionSuccessful();
+            } catch (final Exception e)
+            {
+                Log.d(TAG, " exception happened while we updating the Search mate table, and the detailed reason are : " + e.toString());
+            } finally {
+                mSQLdatabase.endTransaction();
+            }
+        }
+        return result;
     }
 
     /**
@@ -147,21 +176,54 @@ public class NearbyMateDaoImpl implements NearbyMateDao
                 mateInfoSql,
                 null
         );
-
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast())
+        
+        if (cursor != null && cursor.getCount() != 0)
         {
-            NearbyMateSubFragmentUserBean mateBean = cursorToMateBean(cursor);
-            mateList.add(mateBean);
-            cursor.moveToNext();
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast())
+            {
+                NearbyMateSubFragmentUserBean mateBean = cursorToMateBean(cursor);
+                mateList.add(mateBean);
+                cursor.moveToNext();
+            }
+            cursor.close();
         }
-        cursor.close();
-
-
         return mateList;
     }
 
+    /**
+     * 这个是没有数目限制的，我们可以一次性的将我们在mate table当中保存的所有的数据一次性全部取出来
+     *
+     * @return 返回我们在mateTable当中保存的所有的数据
+     */
+    public List<NearbyMateSubFragmentUserBean> getAllMateList()
+    {
+        this.mSQLdatabase = mDBUtils.getReadableDatabase();
+        List<NearbyMateSubFragmentUserBean> resultMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
 
+        String allMateInfoSql = " SELECT * FROM " + DatabaseConstant.SearchMateTable.MATE_TABLE
+                + " ORDER BY " + DatabaseConstant.SearchMateTable.USER_ID
+                + " DESC ";
+
+        Cursor cursor = mSQLdatabase.rawQuery(
+                allMateInfoSql,
+                null
+        );
+
+        if (null != cursor && cursor.getCount() != 0)
+        {
+            cursor.moveToFirst();
+            while (cursor.isAfterLast())
+            {
+                NearbyMateSubFragmentUserBean userBean = cursorToMateBean(cursor);
+                resultMateList.add(userBean);
+                cursor.moveToNext();
+            }
+            cursor.close();
+        }
+
+        return resultMateList;
+    }
 
 
     /**

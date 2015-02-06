@@ -32,13 +32,47 @@ public class NearbyRoomDaoImpl implements NearbyRoomDao
 
     }
 
+
     /**
-     * 向我们创建的RoomTable当中插入一条RoomBean数据
-     *
-     * @param roomItem
+     * @param roomList
      * @return
      */
     @Override
+    public synchronized long updateRoomItemBatch(List<NearbyRoomSubFragmentRoomBean> roomList)
+    {
+        this.mDatabase = mDBUtils.getWritableDatabase();
+        long updateResult = -1;
+        mDatabase.beginTransaction();
+
+        try {
+            for (NearbyRoomSubFragmentRoomBean roomItem : roomList) {
+                ContentValues values = new ContentValues();
+                values.put(DatabaseConstant.SearchRoomTable.ROOM_ID, roomItem.getRoomId());
+                values.put(DatabaseConstant.SearchRoomTable.NAME, roomItem.getRoomName());
+                values.put(DatabaseConstant.SearchRoomTable.ROOM_URL, roomItem.getRoomPhotoUrl());
+                values.put(DatabaseConstant.SearchRoomTable.DETAILED_ADDRESS, roomItem.getDetailedAddress());
+                values.put(DatabaseConstant.SearchRoomTable.ROOM_LEVEL, roomItem.getLevel());
+                values.put(DatabaseConstant.SearchRoomTable.RANGE, roomItem.getDistance());
+                values.put(DatabaseConstant.SearchRoomTable.PHONE_NUM, roomItem.getRoomPhone());
+                values.put(DatabaseConstant.SearchRoomTable.TAG, roomItem.getRoomTag());
+                values.put(DatabaseConstant.SearchRoomTable.DETAILED_INFO, roomItem.getRoomInfo());
+
+                updateResult = mDatabase.update(DatabaseConstant.SearchRoomTable.ROOM_TABLE_NAME,
+                        values,
+                        DatabaseConstant.SearchRoomTable.ROOM_ID + " =? ",
+                        new String[]{roomItem.getRoomId()});
+            }
+            mDatabase.setTransactionSuccessful();
+
+        } catch (final Exception e) {
+            Log.d(TAG, " exception happened while we updating room table info, and the reason goes to : " + e.toString());
+        } finally {
+            mDatabase.endTransaction();
+        }
+
+        return updateResult;
+    }
+
     public synchronized long insertRoomItem(NearbyRoomSubFragmentRoomBean roomItem)
     {
         this.mDatabase = mDBUtils.getWritableDatabase();
@@ -58,39 +92,28 @@ public class NearbyRoomDaoImpl implements NearbyRoomDao
         return insertId;
     }
 
-    @Override
-    public synchronized long updateRoomItem(NearbyRoomSubFragmentRoomBean roomItem)
-    {
-        return 0;
-    }
-
-    @Override
-    public synchronized long updateRoomItemBatch(List<NearbyRoomSubFragmentRoomBean> roomList)
-    {
-        return 0;
-    }
 
     @Override
     public synchronized long insertRoomItemBatch(List<NearbyRoomSubFragmentRoomBean> roomList)
     {
         this.mDatabase = mDBUtils.getWritableDatabase();
-        long insertResult = 0;
+        long insertResult = -1;
 
-        final int size = roomList.size();
-        int i;
         mDatabase.beginTransaction();
         try
         {
-            for (i = 0; i < size; ++i)
+            for (NearbyRoomSubFragmentRoomBean roomItem : roomList)
             {
                 ContentValues values = new ContentValues();
-                NearbyRoomSubFragmentRoomBean roomItem = new NearbyRoomSubFragmentRoomBean();
                 values.put(DatabaseConstant.SearchRoomTable.ROOM_ID, roomItem.getRoomId());
                 values.put(DatabaseConstant.SearchRoomTable.NAME, roomItem.getRoomName());
                 values.put(DatabaseConstant.SearchRoomTable.ROOM_URL, roomItem.getRoomPhotoUrl());
+                values.put(DatabaseConstant.SearchRoomTable.DETAILED_ADDRESS, roomItem.getDetailedAddress());
                 values.put(DatabaseConstant.SearchRoomTable.ROOM_LEVEL, roomItem.getLevel());
                 values.put(DatabaseConstant.SearchRoomTable.RANGE, roomItem.getDistance());
-                values.put(DatabaseConstant.SearchRoomTable.DETAILED_ADDRESS, roomItem.getDetailedAddress());
+                values.put(DatabaseConstant.SearchRoomTable.PHONE_NUM, roomItem.getRoomPhone());
+                values.put(DatabaseConstant.SearchRoomTable.TAG, roomItem.getRoomTag());
+                values.put(DatabaseConstant.SearchRoomTable.DETAILED_INFO, roomItem.getRoomInfo());
 
                 insertResult = mDatabase.insert(
                         DatabaseConstant.SearchRoomTable.ROOM_TABLE_NAME,
@@ -98,7 +121,6 @@ public class NearbyRoomDaoImpl implements NearbyRoomDao
                         values
                 );
                 mDatabase.setTransactionSuccessful();
-                return insertResult;
             }
         } catch (final Exception e)
         {
@@ -107,7 +129,7 @@ public class NearbyRoomDaoImpl implements NearbyRoomDao
             mDatabase.endTransaction();
         }
 
-        return -1;
+        return insertResult;
     }
 
     /**
@@ -154,22 +176,46 @@ public class NearbyRoomDaoImpl implements NearbyRoomDao
         return roomList;
     }
 
+    /**
+     * 直接返回我们存储的所有的List，没有条数限制，用于判断我们
+     * 是否重复插入了某些数据
+     *
+     * @return
+     */
+    public List<NearbyRoomSubFragmentRoomBean> getAllRoomList()
+    {
+        this.mDatabase = mDBUtils.getReadableDatabase();
+        List<NearbyRoomSubFragmentRoomBean> roomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
+
+        String allRoomInfoSql = " SELECT * FROM " + DatabaseConstant.SearchRoomTable.ROOM_TABLE_NAME
+                + " ORDER BY " + DatabaseConstant.SearchRoomTable.ROOM_ID
+                + " DESC ";
+
+        // TODO: 以下这种检索只是单纯的将所有的数据不加选择的一次性检索出来(这也是我们默认的检索加载方式)
+        // TODO: 现在客户端的实现准则是所有的数据都是先从Server端的Service当中检索
+        // TODO: 出来，然后存到我们建立的本地数据库当中。然后再从数据库当中进行检索
+        // TODO: 这样我们所经过的筛选条件就是完整的SQL语句进行检索了，而不是通过添加请求参数进行检索的
+
+        Cursor cursor = mDatabase.rawQuery(
+                allRoomInfoSql,
+                null);
+
+        cursor.moveToFirst();
+        while (! cursor.isAfterLast())
+        {
+            NearbyRoomSubFragmentRoomBean roomBean = cursorToRoomBean(cursor);
+            roomList.add(roomBean);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        Log.d(TAG, " we have get the room info list we just need, and the content are : " + roomList.size());
+
+        return roomList;
+    }
 
 
     // TODO: 现阶段球厅的table具体字段内容还没有确定，还需要服务器端的进一步确定
     /**
-     * 以下是RoomTable创建时各个Column创建的准确顺序:
-     * 0. public static final String _ID = "_id";
-     * 1. public static final String ROOM_ID = "room_id";
-     * 2. public static final String NAME = "room_name";
-     * 3. public static final String ROOM_URL = "room_url";
-     * 4. public static final String DETAILED_ADDRESS = "detailed_address";
-     * 5. public static final String ROOM_LEVEL = "room_level"; // 球厅的星级
-     * 6. public static final String RANGE = "range";
-     * 7. public static final String PHONE_NUM = "phone_num";
-     * 8. public static final String TAG = "tag";
-     * 9. public static final String DETAILED_INFO = "room_info";
-     *
      * @param cursor
      *
      * @return 将一个Cursor对象转换成我们的bean对象

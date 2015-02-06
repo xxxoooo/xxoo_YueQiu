@@ -111,11 +111,15 @@ public class Utils {
      * @param context
      * @return
      */
-    public static boolean networkAvaiable(Context context) {
-        ConnectivityManager connManager = (ConnectivityManager) context.
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connManager.getActiveNetworkInfo() != null)
-            return connManager.getActiveNetworkInfo().isAvailable();
+    public static boolean networkAvaiable(Context context)
+    {
+        if (null != context)
+        {
+            ConnectivityManager connManager = (ConnectivityManager) context.
+                    getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (connManager.getActiveNetworkInfo() != null)
+                return connManager.getActiveNetworkInfo().isAvailable();
+        }
         return false;
     }
 
@@ -371,13 +375,13 @@ public class Utils {
      * @param context
      * @return
      */
-    public static Dialog showSheet(Context context) {
+    public static Dialog showSheet(Context context)
+    {
         final Dialog dlg = new Dialog(context, R.style.ActionSheet);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.dialog_share, null);
         final int cFullFillWidth = 10000;
         layout.setMinimumWidth(cFullFillWidth);
-
 
         Window window = dlg.getWindow();
         WindowManager.LayoutParams lp = window.getAttributes();

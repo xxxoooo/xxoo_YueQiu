@@ -102,7 +102,7 @@ public class NearbyBilliardRoomActivity extends Activity
             mRoomName.setText(name);
 
             Log.d(TAG, " the room photo url we get are : " + photoUrl);
-            mRoomPhoto.setDefaultImageResId(R.drawable.test_pager_5);
+            mRoomPhoto.setDefaultImageResId(R.drawable.default_reommend_img);
             mRoomPhoto.setImageUrl(photoUrl, mImgLoader);
         }
     }

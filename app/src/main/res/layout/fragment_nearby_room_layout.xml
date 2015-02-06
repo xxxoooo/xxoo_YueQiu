@@ -61,7 +61,7 @@
     <LinearLayout
         android:layout_below="@id/room_gallery_view_pager_zone"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/nearby_subfragment_filter_btn_height"
         android:layout_weight="1"
         android:gravity="center"
         android:orientation="horizontal"
@@ -136,7 +136,8 @@
     <com.yueqiu.view.pullrefresh.PullToRefreshListView
         style="@style/SearchSubActivityListViewStyle"
         android:layout_below="@id/room_filter_group"
-        android:id="@+id/search_room_subfragment_listview">
+        android:id="@+id/search_room_subfragment_listview"
+        android:layout_marginBottom="@dimen/nearby_subfragment_listview_margin_bottom">
 
     </com.yueqiu.view.pullrefresh.PullToRefreshListView>
 

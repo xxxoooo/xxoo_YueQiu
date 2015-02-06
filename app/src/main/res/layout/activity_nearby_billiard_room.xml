@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/img_search_room_detailed_photo"
-                android:src="@drawable/test_pager_5"
+                android:src="@drawable/default_reommend_img"
                 android:scaleType="fitXY"
                 />
 

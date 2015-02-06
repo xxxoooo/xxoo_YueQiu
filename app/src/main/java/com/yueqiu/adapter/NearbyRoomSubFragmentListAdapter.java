@@ -1,6 +1,7 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +10,13 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
+import com.yueqiu.util.VolleySingleton;
 
+import java.awt.font.TextAttribute;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +25,19 @@ import java.util.List;
  */
 public class NearbyRoomSubFragmentListAdapter extends BaseAdapter
 {
+    private static final String TAG = "NearbyRoomSubFragmentListAdapter";
+
     private List<NearbyRoomSubFragmentRoomBean> mRoomList;
     private LayoutInflater mInflater;
+    private ImageLoader mImgLoader;
+
+    private Context mContext;
     public NearbyRoomSubFragmentListAdapter(Context context, ArrayList<NearbyRoomSubFragmentRoomBean> roomList)
     {
+        this.mContext = context;
+
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
+
         this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         this.mRoomList = roomList;
@@ -58,7 +72,7 @@ public class NearbyRoomSubFragmentListAdapter extends BaseAdapter
             viewHolder = new ViewHolder();
             convertView = mInflater.inflate(R.layout.item_nearby_room_layout, parent, false);
 
-            viewHolder.mRoomPhoto = (ImageView) convertView.findViewById(R.id.img_room_subfragment_listitem_photo);
+            viewHolder.mRoomPhoto = (NetworkImageView) convertView.findViewById(R.id.img_room_subfragment_listitem_photo);
             viewHolder.mRoomName = (TextView) convertView.findViewById(R.id.tv_room_subfragment_listitem_roomname);
             viewHolder.mRoomAddress = (TextView) convertView.findViewById(R.id.tv_room_subfragment_listitem_roomaddress);
             viewHolder.mRoomLevel = (RatingBar) convertView.findViewById(R.id.rating_room_subfragment_listitem_rating);
@@ -72,10 +86,12 @@ public class NearbyRoomSubFragmentListAdapter extends BaseAdapter
         }
 
         // then, init the elements in this layout
-        // TODO: for now, we use the default image
-//        viewHolder.mRoomPhoto.setImageResource();
+        viewHolder.mRoomPhoto.setDefaultImageResId(R.drawable.hall_default);
+        Log.d(TAG, " inside the room adapter --> and the url we get for the room thumb photo are : " + item.getRoomPhotoUrl());
+        viewHolder.mRoomPhoto.setImageUrl(item.getRoomPhotoUrl(), mImgLoader);
         viewHolder.mRoomLevel.setRating(item.getLevel());
-        viewHolder.mRoomDistance.setText(item.getDistance());
+
+        viewHolder.mRoomDistance.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, item.getDistance()));
         viewHolder.mRoomAddress.setText(item.getDetailedAddress());
         viewHolder.mRoomPrice.setText(String.valueOf(item.getPrice()));
         viewHolder.mRoomName.setText(item.getRoomName());
@@ -85,7 +101,7 @@ public class NearbyRoomSubFragmentListAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        private ImageView mRoomPhoto;
+        private NetworkImageView mRoomPhoto;
         private TextView mRoomName;
         private RatingBar mRoomLevel;
         private TextView mRoomPrice;

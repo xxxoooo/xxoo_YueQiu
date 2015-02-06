@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Message;
@@ -20,6 +21,8 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
@@ -45,6 +48,8 @@ import com.yueqiu.util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
+
+import java.lang.reflect.Field;
 
 /**
  * Created by doushuqi on 14/12/17.
@@ -136,6 +141,31 @@ public class ChatBarActivity extends FragmentActivity implements LoginListener, 
         getMenuInflater().inflate(R.menu.billiard_search, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+
+        int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
+        EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
+        searchEditText.setTextColor(Color.WHITE);
+        searchEditText.setHintTextColor(Color.LTGRAY);
+
+        searchView.setIconifiedByDefault(false);
+        try {
+            Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
+            searchField.setAccessible(true);
+            ImageView searchHintIcon = (ImageView) searchField.get(searchView);
+            searchHintIcon.setImageResource(R.drawable.search);
+        } catch (NoSuchFieldException e)
+        {
+            Log.d(TAG, " Exception happened while we retrieving the mSearchHintIcon, and the reason goes to : " + e.toString());
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
+        {
+            Log.d(TAG, " Exception happened as we have no right to access this filed, and the reason goes to : " + e.toString());
+            e.printStackTrace();
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we make the search button : " + e.toString());
+        }
+
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
         return true;
     }

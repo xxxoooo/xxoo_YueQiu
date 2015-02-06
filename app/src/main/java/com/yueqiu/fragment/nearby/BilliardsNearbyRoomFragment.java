@@ -41,6 +41,7 @@ import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,16 +96,14 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private WorkerHandlerThread mWorkerThread;
 
     private static NearbyParamsPreference sParamsPreference = NearbyParamsPreference.getInstance();
+
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         mNetworkAvailable = Utils.networkAvaiable(sContext);
         mWorkerThread = new WorkerHandlerThread();
-
     }
-
-    private Button mBtnDistrict, mBtnDistan, mBtnPrice, mBtnApprisal;
 
     private PullToRefreshListView mRoomListView;
     private View mView;
@@ -118,21 +117,29 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
     private NearbyPopBasicClickListener mClickListener;
 
+    private NearbyFragmentsCommonUtils.ControlPopupWindowCallback mCallback;
+
+    // 定义的用于下拉刷新过程当中需要用到的变量
+    private boolean mLoadMore, mRefresh;
+    private int mBeforeCount, mAfterCount;
+    // 以下是我们用于跟踪page的值的请求(用于大众点评的分页请求过程)
+    private int mPage = 1;
+
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-
-
         mView = inflater.inflate(R.layout.fragment_nearby_room_layout, container, false);
 
         NearbyFragmentsCommonUtils.initViewPager(sContext, mView, R.id.room_fragment_gallery_pager, R.id.room_fragment_gallery_pager_indicator_group);
 
-        mClickListener = new NearbyPopBasicClickListener(sContext,mUIEventsHandler,sParamsPreference);
-        (mBtnDistrict = (Button) mView.findViewById(R.id.btn_room_district)).setOnClickListener(mClickListener);
-        (mBtnDistan = (Button) mView.findViewById(R.id.btn_room_distance)).setOnClickListener(mClickListener);
-        (mBtnPrice = (Button) mView.findViewById(R.id.btn_room_price)).setOnClickListener(mClickListener);
-        (mBtnApprisal = (Button) mView.findViewById(R.id.btn_room_apprisal)).setOnClickListener(mClickListener);
+        mClickListener = new NearbyPopBasicClickListener(sContext, mUIEventsHandler, sParamsPreference);
+        (mView.findViewById(R.id.btn_room_district)).setOnClickListener(mClickListener);
+        (mView.findViewById(R.id.btn_room_distance)).setOnClickListener(mClickListener);
+        (mView.findViewById(R.id.btn_room_price)).setOnClickListener(mClickListener);
+        (mView.findViewById(R.id.btn_room_apprisal)).setOnClickListener(mClickListener);
+
+        mCallback = mClickListener;
 
         mRoomListView = (PullToRefreshListView) mView.findViewById(R.id.search_room_subfragment_listview);
         mRoomListView.setMode(PullToRefreshBase.Mode.BOTH);
@@ -155,7 +162,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
         mRoomListView.requestLayout();
         mSearchRoomAdapter.notifyDataSetChanged();
 
-        // TODO: 初始化测试数据
+        // TODO: 初始化测试数据,在正式发布时，将这个过程删掉。现在我们可能还需要看一下具体的
+        // TODO: 效果，所以暂时不删除
 //        initListStaticTestData();
 
         mRoomListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -163,10 +171,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
-                // TODO: 现在的这里似乎是一个XListView引入的自己的内部的一个特性,也就是说XListView当中真正的
-                // TODO: 数据开始是从第1条开始的，而不是从第0条开始的。这样我们就需要手动改动(但是具体的内部细节还
-                // TODO: 是不清楚)，出现同样的问题还有助教Fragment当中的List(其实只要是涉及到List的点击事件都会需要处理这个问题)
-                NearbyRoomSubFragmentRoomBean bean = mRoomList.get(position);
+                NearbyRoomSubFragmentRoomBean bean = mRoomList.get(position - 1);
                 Bundle bundle = new Bundle();
                 bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getRoomPhotoUrl());
                 bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getRoomName());
@@ -186,18 +191,29 @@ public class BilliardsNearbyRoomFragment extends Fragment
         });
 
 
+        if (Utils.networkAvaiable(sContext))
+        {
+            mLoadMore = false;
+            mRefresh = false;
+            if (null != mWorkerThread && mWorkerThread.getState() == Thread.State.NEW)
+            {
+                Log.d(TAG, " the mWorkerThread has been started in the onCreateView ");
+                // 这里的WorkThread必须调用了start()方法之后，位于WorkThread当中的workHandler才可以正常工作
+                mWorkerThread.start();
+            }
+        } else
+        {
+            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
+        }
+
         return mView;
     }
-
 
     @Override
     public void onResume()
     {
         super.onResume();
 
-        if (null != mWorkerThread && mWorkerThread.getState() == Thread.State.NEW) {
-            mWorkerThread.start();
-        }
     }
 
     @Override
@@ -208,7 +224,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
     // TODO: 以下是用于从大众点评的接里面请求的关键字
     private static final String REQUEST_KEYWORD = "台球,桌球室,台球室,桌球";
-    private static ConcurrentHashMap<String, String> sRequestParams = new ConcurrentHashMap<String, String>();
+
 
     /**
      * 对于大众点评提供的接口，我们默认的category是“台球”
@@ -222,43 +238,61 @@ public class BilliardsNearbyRoomFragment extends Fragment
      *               对应于大众点评可以接受的参数则是1. 默认，2. 星级高优先(也就是好评度)，8. 人均价格低优先，9. 人均价格高优先
      *               也就是说区域是通过region指定的，距离是通过radius来指定的(单位为米，最小值为1，最大值为5000，默认是1000)
      *               价格对应于sort的8和9，好评对应于sort的2.
+     *               但是这样就有一个限制，那就是我们一旦设置了价格的筛选策略，那么我们就不能按照好评度来进行筛选了。也就是说
+     *               只能选一个
      *               我们在请求所有参数的时候默认sort为1
      * @param limit  我们在请求所有参数的时候，默认limit的值为40，然后每次用户滑动的时候再进行加载(这个值默认为20，最小为1，最大为40)
      *               注意，这个值指定是每一个page当中所包含的准确的item的数目
      * @param page   在我们向大众点评的Service请求数据时，他是不提供我们请求的开始条数，和结束条数的，提供的仅仅是页数，即我们可以指定
      *               请求的页面的数目
      */
-    private void retrieveRoomListInfo(final String city, final String region, final String range, final int sort, final int limit, final int page)
+    private void retrieveRoomListInfo(final String city, final String region, final String range, final String sort, final int limit, final int page)
     {
-        if (!mNetworkAvailable) {
+        if (!mNetworkAvailable)
+        {
             Log.d(TAG, " the network are really sucked off, and we have to stop fetching any more data from the server any more ");
             mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_FAILED,
-            sContext.getResources().getString(R.string.network_not_available)).sendToTarget();
+                    sContext.getResources().getString(R.string.network_not_available)).sendToTarget();
             // 在请求网络任务的刚开始的时候，我们已经打开了ProgressDialog，现在既然已经确定无法继续请求，所以应该先把已经打开的ProgressDialog关闭
             mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
         }
 
-        sRequestParams.put("keyword", REQUEST_KEYWORD);
-        sRequestParams.put("city", city);
-        sRequestParams.put("region", region);
-        sRequestParams.put("sort", sort + "");
-        sRequestParams.put("limit", limit + "");
+        List<NearbyRoomSubFragmentRoomBean> cacheRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
+        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
+
+        requestParams.put("keyword", REQUEST_KEYWORD);
+        requestParams.put("city", city);
+        // 我们这里采用默认的策略，因为有些参数还是要添加的，如果用户没有设置的话，我们就直接赋予一个默认值就可以了
+        // 比如说用户没有指定region，那么我们就将默认的区域设置为“朝阳区”(当然我们也可以设置成昌平区)
+        String regionVal = TextUtils.isEmpty(region) ? "朝阳区" : region;
+        requestParams.put("region", regionVal);
+
         // TODO: 以下是添加我们所挑选的商店的附近的商店列表的参数值(但是我们传递这个参数的前提是先要将用户当前的经度和纬度信息作为参数传递到Server端)
-//        requestParams.put("range", "");
-        sRequestParams.put("format", "json");
-        sRequestParams.put("has_coupon", 0 + "");
-        sRequestParams.put("page", page + "");
+        String rangeVal = TextUtils.isEmpty(range) ? "1000" : range;
+//        sRequestParams.put("range", range);
+
+        // 这里的sort值很特殊，因为sort的值可以决定两个筛选，一个是价格(当值为8和9时)，还有一个就是好评度(例如值为1和2)
+        // 如果用户没有指定，则我们直接将这个值置为1，即默认排序的情况
+        String sortVal = TextUtils.isEmpty(sort) ? "1" : sort;
+        requestParams.put("sort", sortVal);
+        requestParams.put("limit", limit + "");
+
+        requestParams.put("format", "json");
+        requestParams.put("has_coupon", 0 + "");
+        requestParams.put("page", page + "");
 
         // TODO: 得到当前用户的经纬度信息,因为我们需要这两个值才能获得以当前用户为中心，附近指定范围内的球店信息
 
 
-        String rawResult = HttpUtil.dpUrlClient(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, sRequestParams);
+        String rawResult = HttpUtil.dpUrlClient(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams);
         Log.d(TAG, " the raw result we get are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult)) {
-            try {
+        if (!TextUtils.isEmpty(rawResult))
+        {
+            try
+            {
                 JSONObject resultJsonObj = new JSONObject(rawResult);
                 Log.d(TAG, " the initial json data of the room fragment we get are : " + resultJsonObj.toString());
-                if (! resultJsonObj.isNull("status"))
+                if (!resultJsonObj.isNull("status"))
                 {
                     String status = resultJsonObj.getString("status");
                     if (status.equals("OK"))
@@ -280,8 +314,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             double price = businessObj.getDouble("avg_price");
                             String address = businessObj.getString("address");
                             String distance = String.valueOf(businessObj.getInt("distance"));
-                            String roomPhoto = businessObj.getString("photo_list_url");
-
+                            String roomPhoto = businessObj.getString("s_photo_url");
+                            Log.d(TAG, " inside the room info retrieved part --> the room url we get for the room list are : " + roomPhoto);
                             // TODO: 我们以下解析的数据全部都是为下一个即RoomDetailedActivity当中的数据(这些数据都是需要传动到球厅详情Activity当中的)
                             String roomPhoneNum = businessObj.getString("telephone");
 
@@ -298,10 +332,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             // String roomPhoto, String roomName, float level, double price, String address, String distance
                             NearbyRoomSubFragmentRoomBean roomBean = new NearbyRoomSubFragmentRoomBean(String.valueOf(businessId), roomPhoto, roomName, level, price, address, distance, roomPhoneNum, roomTag, detailedRoomInfo);
                             // TODO: 将这条数据加入到roomList当中(现在由于数据不完整，所以暂时不添加，等数据完整性已经比较好的时候再进行添加)
-                            mRoomList.add(roomBean);
-
+                            cacheRoomList.add(roomBean);
                         }
-                        mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, mRoomList).sendToTarget();
+                        mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheRoomList).sendToTarget();
                         // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
                         mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
 
@@ -312,17 +345,24 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         String errorMsgStr = errorObj.getString("errorMessage");
                         StringBuilder errorInfo = new StringBuilder();
                         errorInfo.append("Error Code : ").append(errorCode).append("; Error Info : ").append(errorMsgStr);
-
-                        mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR,errorInfo.toString()).sendToTarget();
+                        Message errorHandlerMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                        Bundle errorHandlerData = new Bundle();
+                        errorHandlerData.putString(KEY_REQUEST_ERROR_MSG_ROOM, errorInfo.toString());
+                        mUIEventsHandler.sendMessage(errorHandlerMsg);
+                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                     }
                 } else
                 {
                     // 什么错误信息都没有获取到，甚至连error都没有
                     mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                    mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 }
 
-            } catch (JSONException e) {
+            } catch (JSONException e)
+            {
                 e.printStackTrace();
+                mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 Log.d(TAG, " Exception happened in parsing the resulted json object we get, and the detailed reason are : " + e.toString());
             }
         }
@@ -368,9 +408,18 @@ public class BilliardsNearbyRoomFragment extends Fragment
     @Override
     public void onPause()
     {
+        mCallback.closePopupWindow();
         super.onPause();
     }
 
+    @Override
+    public void onStop()
+    {
+        mCallback.closePopupWindow();
+        super.onStop();
+    }
+
+    private static final String KEY_REQUEST_PAGE_NUM = "keyRequestPageNum";
     private static final String KEY_FETCH_DATA_FAILED = "keyFetchDataFailed";
     private static final String WORKER_HANDLER_THREAD_NAME = "workerHandlerThread";
 
@@ -381,11 +430,13 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private static final int STATE_FETCH_DATA_SUCCESS = 1 << 9;
 
     private static final int REQUEST_ALL_ROOM_INFO = 1 << 1;
-    // 以下是按FIlterButton当中当中弹出的List进行筛选时的List的点击的事件的处理
-    public static final int REQUEST_ROOM_INFO_REGION_FILTERED = 1 << 2;
-    public static final int REQUEST_ROOM_INFO_RANGE_FILTERED = 1 << 3;
-    public static final int REQUEST_ROOM_INFO_PRICE_FILTERED = 1 << 4;
-    public static final int REQUEST_ROOM_INFO_APPRISAL_FILTERED = 1 << 5;
+
+    // 以下是按FIlterButton当中当中弹出的List进行筛选时的List的点击的事件的处理,
+    // 由于这些常量值被定义到同一个地方进行使用，所以我们将球厅Fragment当中的常量值定义为从50开始
+    public static final int REQUEST_ROOM_INFO_REGION_FILTERED = 50 << 2;
+    public static final int REQUEST_ROOM_INFO_RANGE_FILTERED = 50 << 3;
+    public static final int REQUEST_ROOM_INFO_PRICE_FILTERED = 50 << 4;
+    public static final int REQUEST_ROOM_INFO_APPRISAL_FILTERED = 50 << 5;
 
     // TODO: 因为我们总是需要在主线程当中进行关于Adapter的更新操作，因此我们将所有的涉及到Adapter的更新就
     // TODO: 发送到mUIEventsHandler当中执行
@@ -407,6 +458,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     // 此时数据已经加载完毕，我们需要通知List的Adpter数据源已经发生改变
                     mSearchRoomAdapter.notifyDataSetChanged();
                     hideProgress();
+                    if (mRoomListView.isRefreshing())
+                    {
+                        mRoomListView.onRefreshComplete();
+                    }
                     break;
 
                 case STATE_FETCH_DATA_FAILED:
@@ -415,24 +470,36 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     Log.d(TAG, " we have fail to fetch the data for the room fragment, and the reason are : " + failStr);
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
-
+                    mBeforeCount = mRoomList.size();
                     List<NearbyRoomSubFragmentRoomBean> roomList = (ArrayList<NearbyRoomSubFragmentRoomBean>) msg.obj;
-                    final int size = roomList.size();
-                    int i;
-                    for (i = 0; i < size; ++i)
+                    mBeforeCount = mRoomList.size();
+                    for (NearbyRoomSubFragmentRoomBean roomBean : roomList)
                     {
-                        if (! mRoomList.contains(roomList.get(i)))
+                        if (! mRoomList.contains(roomBean))
                         {
-                            mRoomList.add(roomList.get(i));
+                            mRoomList.add(roomBean);
+                        }
+                    }
+                    mAfterCount = mRoomList.size();
+                    if (mRoomList.isEmpty())
+                    {
+                        Log.d(TAG, " inside the room fragment UIEventsHandler --> have send the message to load the Empty TextView ");
+                        loadEmptyTv();
+                    } else
+                    {
+                        if (mRefresh)
+                        {
+                            if (mAfterCount == mBeforeCount)
+                            {
+                                Utils.showToast(sContext, sContext.getString(R.string.no_newer_info));
+                            } else
+                            {
+                                Utils.showToast(sContext, sContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                            }
                         }
                     }
 
-                    // TODO: 更新数据库
-
-                    if (mRoomList.isEmpty())
-                    {
-                        loadEmptyTv();
-                    }
+                    mSearchRoomAdapter.notifyDataSetChanged();
 
                     break;
 
@@ -466,37 +533,47 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     break;
 
                 case DATA_HAS_BEEN_UPDATED:
-                    // TODO: 考虑移除这个标签，因为这会使Adapter的更新发生异常
+                    mSearchRoomAdapter.notifyDataSetChanged();
                     break;
-
                 // 对于大众点评的服务牛逼的一点在于所有的请求错误，会有详细的错误信息供我们向用户展示
                 // 所以我们不需要单独的额外的判断errorCode来判断具体的错误信息，我们只需要定义一条信息就可以了
+                // 所以我们不用像其他的四个Fragment当中的UIEventsHandler那样需要处理三种情况，我们仅需要一种就可以了
                 case PublicConstant.REQUEST_ERROR:
                     Bundle errorData = msg.getData();
-                    if (null != errorData)
+                    String errorMsg = errorData.getString(KEY_REQUEST_ERROR_MSG_ROOM);
+                    if (! TextUtils.isEmpty(errorMsg))
                     {
-                        Log.d(TAG , " the error data we get are : " + errorData);
-                        Utils.showToast(sContext, errorData.getString(KEY_REQUEST_ERROR_MSG_ROOM));
+                        Log.d(TAG, " the error data we get are : " + errorMsg);
+                        Utils.showToast(sContext, errorMsg);
                     } else {
                         Utils.showToast(sContext, sContext.getString(R.string.http_request_error));
                     }
 
-                    if (mRoomList.isEmpty()) {
+                    if (mRoomList.isEmpty())
+                    {
+                        Log.d(TAG, " the room list we get are : " + mRoomList.size());
                         loadEmptyTv();
                     }
 
                     break;
+                case PublicConstant.NO_NETWORK:
+                    hideProgress();
+                    Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
+                    if (mRoomList.isEmpty())
+                        loadEmptyTv();
+                    break;
             }
-
-            mSearchRoomAdapter = new NearbyRoomSubFragmentListAdapter(sContext, (ArrayList<NearbyRoomSubFragmentRoomBean>) mRoomList);
-            mRoomListView.setAdapter(mSearchRoomAdapter);
             mSearchRoomAdapter.notifyDataSetChanged();
-
         }
     };
 
-    private  void loadEmptyTv()
+    private void loadEmptyTv()
     {
+        if (mRoomListView.isRefreshing())
+        {
+            mRoomListView.onRefreshComplete();
+        }
+        Log.d(TAG, "inside the roomFragment --> we have load the EmptyView ");
         NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mRoomListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str));
     }
 
@@ -514,13 +591,13 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
     private class WorkerHandlerThread extends HandlerThread
     {
-
         public WorkerHandlerThread()
         {
             super(WORKER_HANDLER_THREAD_NAME, Process.THREAD_PRIORITY_BACKGROUND);
         }
 
-        private Handler mWorkerHandler;
+        // 参照MateFragment当中的理解
+        private Handler mWorkerHandler = new Handler();
 
         @Override
         protected void onLooperPrepared()
@@ -533,92 +610,156 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 public void handleMessage(Message msg)
                 {
                     super.handleMessage(msg);
-                    switch (msg.what) {
+                    switch (msg.what)
+                    {
                         case REQUEST_ALL_ROOM_INFO:
                             // 通知UI线程开始显示dialog
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
+                            Bundle pageData = msg.getData();
+                            final int pageNum = pageData.getInt(KEY_REQUEST_PAGE_NUM);
+                            Log.d(TAG, " inside the WorkThreadHandler, and the pageNum we get are : " + pageNum);
                             // 然后开始正式的加载数据
-                            retrieveRoomListInfo("北京", "海淀区", "1000", 2, 20, 1);
+                            String cachedRegion = sParamsPreference.getRoomRegion(sContext);
+                            String cachedRange = sParamsPreference.getRoomRange(sContext);
+                            // 因为按照好评度排序和按照价格排序这两种排序规则只能存在一种，
+                            // 因为请求函数一次只能接受一个参数，要么星级要么价格排序，所以我们选择不为空的那一个
+                            // 当然如果两个都为空的话，那么我们就都传空的参数，然后由具体的请求函数做判断
+                            // 因为我们这里只要保证只传递一个参数就可以了
+                            String cachedApprisal = sParamsPreference.getRoomApprisal(sContext);
+                            String cachedPrice = sParamsPreference.getRoomPrice(sContext);
+                            String sortFilterVal = TextUtils.isEmpty(cachedApprisal) ? cachedPrice : cachedApprisal;
+                            retrieveRoomListInfo("北京", cachedRegion, cachedRange, sortFilterVal, 20, pageNum);
                             break;
                         case REQUEST_ROOM_INFO_APPRISAL_FILTERED:
-                            // TODO: 按商家的好评度来进行筛选
-                            // TODO: 我们可以避免再次进行网络请求来进行筛选，因为这样太耗费时间了，而且用户体验也特别差，我们应该是
-                            // TODO: 将所有的数据获取之后保存到本地，也就是SQLite当中，然后在进行筛选才可以
-                            // TODO: 这也是SearchActivity当中所有的数据请求所遵循的设计原则
+                            if (!mRoomList.isEmpty())
+                            {
+                                mRoomList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+                            // 得到好评度
                             String apprisalStr = (String) msg.obj;
                             Log.d(TAG, " in the internal mWorkThread --> the data we received to fetch the data based on the apprisal rule are : " + apprisalStr);
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            // TODO: 具体的请求方法
+                            // 由于大众点评的所有的参数都是可选的，所以我们将所有的判断参数的可行性的过程都放到具体的请求方法当中
+                            // 由于价格和好评度只能选一个，所以这里由于我们是按好评度来选择的话，就把价格的筛选因素干脆不予考虑
+                            // 同时，一旦到了我们筛选距离和区域的时候，我们可能会碰到价格和好评度同时存在的情况，
+                            // 所以我们这里决定一旦筛选了价格，那么就把ParamsPreference当中的好评度的值清零，同样的对于好评度筛选
+                            // 时，我们也需要将价格在ParamsPreference当中存储的值情况
+                            // 这样，当我们进行距离和区域的筛选时，就会发现价格和好评度只有一个存在，而不是两个，方便筛选(当然如果大众点评同时提供两个接口就不用这么麻烦了)
+                            sParamsPreference.setRoomPrice(sContext, "");
+                            String apprisalRangeStr = sParamsPreference.getRoomRange(sContext);
+                            String apprisalRegionStr = sParamsPreference.getRoomRegion(sContext);
 
-                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                            // 每次都是重新请求，所以我们将页码的数目设置为1
+                            retrieveRoomListInfo("北京", apprisalRegionStr, apprisalRangeStr, apprisalStr, 20, 1);
 
                             break;
                         case REQUEST_ROOM_INFO_PRICE_FILTERED:
+                            if (!mRoomList.isEmpty())
+                            {
+                                mRoomList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
                             String priceStr = (String) msg.obj;
                             Log.d(TAG, "in the internal mWorkThread --> the price data we get are : " + priceStr);
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-
-                            // TODO:
-
-                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                            // 由于价格和好评度每次只能选择一个，这里按用户的要求是进行价格的筛选，所以我们干脆就把好评度不管了
+                            // 首先将好评度在ParamsPreference当中的值清空
+                            sParamsPreference.setRoomApprisal(sContext, "");
+                            String priceRangeStr = sParamsPreference.getRoomRange(sContext);
+                            String priceRegionStr = sParamsPreference.getRoomRegion(sContext);
+                            // 每次筛选都是重新进行筛选的，所以我们将页码的数目设置为1
+                            retrieveRoomListInfo("北京", priceRegionStr, priceRangeStr, priceStr, 20, 1);
 
                             break;
                         case REQUEST_ROOM_INFO_RANGE_FILTERED:
+                            if (!mRoomList.isEmpty())
+                            {
+                                mRoomList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
                             String rangeStr = (String) msg.obj;
                             Log.d(TAG, " in the internal mWorkThread --> the range string we get are : " + rangeStr);
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            // TODO:
+                            String rangePriceStr = sParamsPreference.getRoomPrice(sContext);
+                            String rangeApprisalStr = sParamsPreference.getRoomApprisal(sContext);
+                            String rangeRegionStr = sParamsPreference.getRoomRegion(sContext);
+                            String rangeSortStr = TextUtils.isEmpty(rangePriceStr) ? rangeApprisalStr : rangePriceStr;
+                            Log.d(TAG, " the sort value we get are " + rangeSortStr);
 
-                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                            retrieveRoomListInfo("北京", rangeRegionStr, rangeStr, rangeSortStr, 20, 1);
+
                             break;
-
                         case REQUEST_ROOM_INFO_REGION_FILTERED:
+                            // 在筛选之前，我们需要首先将我们已经获得到的roomList清空
+                            if (!mRoomList.isEmpty())
+                            {
+                                mRoomList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
                             Log.d(TAG, " In the mWorkerHandler : we have received the message to handle the task of region filtering ");
                             String regionStr = (String) msg.obj;
                             Log.d(TAG, " we have received the string to send the message, and the string are : " + regionStr);
                             // 我们在这里开始真正的请求过程(即进行网络请求，请求参数即为我们这里获取到的region字符串)
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            // TODO: 但是我们这里需要先将ListView之前当中的数据清空，否则我们似乎无法直接
-                            // TODO: 将listView当中的数据进行替换
-                            retrieveRoomListInfo("北京", regionStr, "1000", 2, 20, 1);
-                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
-                            break;
+                            String regionPriceStr = sParamsPreference.getRoomPrice(sContext);
+                            String regionApprisalStr = sParamsPreference.getRoomApprisal(sContext);
+                            String regionRangeStr = sParamsPreference.getRoomRange(sContext);
 
+                            String regionSortVal = TextUtils.isEmpty(regionPriceStr) ? regionApprisalStr : regionPriceStr;
+
+                            retrieveRoomListInfo("北京", regionStr, regionRangeStr, regionSortVal, 20, 1);
+                            break;
                     }
                 }
             };
-            fetchRoomData();
+            // 我们初始情况下的数据请求都是请求最新的数据
+            fetchRoomData(1);
         }
 
-        public void fetchRoomData()
+        public void fetchRoomData(final int pageNum)
         {
-            mWorkerHandler.sendEmptyMessage(REQUEST_ALL_ROOM_INFO);
+            Log.d(TAG, " the room data we need to retrieve are from page : " + pageNum);
+            Message pageMsg = mWorkerHandler.obtainMessage(REQUEST_ALL_ROOM_INFO);
+            Bundle pageData = new Bundle();
+            pageData.putInt(KEY_REQUEST_PAGE_NUM, pageNum);
+            pageMsg.setData(pageData);
+            mWorkerHandler.sendMessage(pageMsg);
         }
 
         public void fetchRoomDataRegionFiltered(String regionStr)
         {
             Log.d(TAG, " in the BackgroundWorkerThread : the region str we get are : " + regionStr);
-            mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_REGION_FILTERED,regionStr);
+            if (! TextUtils.isEmpty(regionStr))
+            {
+                mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_REGION_FILTERED, regionStr).sendToTarget();
+            }
         }
 
         public void fetchRoomDataPriceFiltered(String priceStr)
         {
-            mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_PRICE_FILTERED,priceStr);
+            if (! TextUtils.isEmpty(priceStr))
+            {
+                mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_PRICE_FILTERED, priceStr).sendToTarget();
+            }
         }
 
         public void fetchRoomDataRangeFiltered(String rangeStr)
         {
-            mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_RANGE_FILTERED,rangeStr).sendToTarget();
+            if (! TextUtils.isEmpty(rangeStr))
+            {
+                mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_RANGE_FILTERED, rangeStr).sendToTarget();
+            }
         }
 
         public void fetchRoomDataApprisalFiltered(String apprisalStr)
         {
-            mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_APPRISAL_FILTERED,apprisalStr).sendToTarget();
+            if (! TextUtils.isEmpty(apprisalStr))
+            {
+                mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_APPRISAL_FILTERED, apprisalStr).sendToTarget();
+            }
         }
     }
-
-    // 定义的用于下拉刷新过程当中需要用到的变量
-    private static boolean sLoadMore, sRefresh;
 
     // TODO: 尝试将下面的这个过程抽象出来，单独形成一个Module放大SearchFragmentCommonUtils里面
     /**
@@ -627,7 +768,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
      */
     private PullToRefreshBase.OnRefreshListener2<ListView> onRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>()
     {
-
         /**
          * onPullDownToRefresh will be called only when the user has Pulled from
          * the start, and released.
@@ -638,27 +778,23 @@ public class BilliardsNearbyRoomFragment extends Fragment
         public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView)
         {
             String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
-
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
-            new Thread(new Runnable()
+            mRefresh = true;
+            mLoadMore = false;
+            if (Utils.networkAvaiable(sContext))
             {
-                @Override
-                public void run()
+                // 我们将我们的page数增加
+                // 因为我们向下拉的时候，加载的总是最新的数据，所以我们将这里的page的数目置成1，
+                // 因为第一页当中的数据总是最新的
+                if (mWorkerThread != null)
                 {
-                    if (Utils.networkAvaiable(sContext)) {
-                        sRefresh = true;
-                        sLoadMore = false;
-                        // 我们将我们的page数增加
-                        // 因为我们向下拉的时候，加载的总是最新的数据，所以我们将这里的page的数目置成1，
-                        // 因为第一页当中的数据总是最新的
-                        sRequestParams.put("page", 1 + "");
-                        retrieveRoomListInfo("北京", "海淀区", "1000", 2, 20, 1);
-                    } else {
-                        Toast.makeText(sContext, sContext.getString(R.string.network_not_available), Toast.LENGTH_LONG).show();
-                    }
+                    mWorkerThread.fetchRoomData(1);
                 }
-            }).start();
+            } else
+            {
+                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
+            }
         }
 
         /**
@@ -671,12 +807,29 @@ public class BilliardsNearbyRoomFragment extends Fragment
         public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView)
         {
             String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
-
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+            mLoadMore = true;
+            mRefresh = false;
 
+            if (mBeforeCount != mAfterCount)
+                mPage += 1;
+
+            if (Utils.networkAvaiable(sContext))
+            {
+                // TODO: 我们在这里进行网络更新的请求
+                // TODO: 只是大众点评并没有提供完整的开始请求条数和结束请求条数，而是直接的按分页
+                // TODO: 来进行提供的，也就是说我们不能传递startNum和endNum，而是直接传入page值
+                if (null != mWorkerThread)
+                {
+                    Log.d(TAG, "PullToRefresh --> have touched the end of the list, and the pageNum we need to request are : " + mPage);
+                    mWorkerThread.fetchRoomData(mPage);
+                }
+            }
         }
     };
 
+
+    // TODO: ------------------------- DELETE THE FOLLOWING CODE ON RELEASE -----------------------------------------
     // TODO: 以下仅仅是测试数据，在项目最终通过测试之后再删除下面的静态数据部分
     // use the static data to init the BilliardsNearbyRoomFragment
     private void initListStaticTestData()
@@ -692,7 +845,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
         String roomTag = "西城区 五道口 清华大学旁边厕所附近";
         String roomDetailedInfo = "办会员卡，容声VIP会员。我是屌丝，我为屌丝代言";
         int i;
-        for (i = 0; i < 100; ++i) {
+        for (i = 0; i < 100; ++i)
+        {
             mRoomList.add(new NearbyRoomSubFragmentRoomBean("", "", roomName, level, price, address, distance, roomPhoneNum, roomTag, roomDetailedInfo));
         }
     }

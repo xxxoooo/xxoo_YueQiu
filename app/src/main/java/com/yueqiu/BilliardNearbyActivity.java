@@ -22,7 +22,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -49,6 +51,7 @@ import com.yueqiu.fragment.nearby.BilliardsNearbyCoachFragment;
 import com.yueqiu.fragment.nearby.BilliardsNearbyDatingFragment;
 import com.yueqiu.fragment.nearby.BilliardsNearbyMateFragment;
 import com.yueqiu.fragment.nearby.BilliardsNearbyRoomFragment;
+import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.nearby.common.NearbySubFragmentConstants;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
@@ -58,6 +61,7 @@ import com.yueqiu.view.menudrawer.Position;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -217,7 +221,6 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                     .setTabListener(this);
             mActionBar.addTab(tab);
         }
-
     }
 
     @Override
@@ -340,6 +343,34 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
         searchEditText.setTextColor(Color.WHITE);
         searchEditText.setHintTextColor(Color.LTGRAY);
+
+        // TODO: 以下的设置是为了改变SearchView底部的bottom line的颜色的
+        // TODO: 按StackOverflow上面的教程时可以实现我们的需求的，但是需要美工提供的EditText的bottom Line的
+        // TODO: 图片才可以完成，现在还是不可以完成的,仅仅是测试
+        // 得到'search_plate'的background
+//        View searchPlate = searchView.findViewById(searchSrcTextId);
+//        searchPlate.setBackgroundResource(R.drawable.edit_test);
+
+        searchView.setIconifiedByDefault(false);
+        try {
+            Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
+            searchField.setAccessible(true);
+            ImageView searchHintIcon = (ImageView) searchField.get(searchView);
+            searchHintIcon.setImageResource(R.drawable.search);
+        } catch (NoSuchFieldException e)
+        {
+            Log.d(TAG, " Exception happened while we retrieving the mSearchHintIcon, and the reason goes to : " + e.toString());
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
+        {
+            Log.d(TAG, " Exception happened as we have no right to access this filed, and the reason goes to : " + e.toString());
+            e.printStackTrace();
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we make the search button : " + e.toString());
+        }
+
+
 //
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
 

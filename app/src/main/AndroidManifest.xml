@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
 
-
     <application
         android:name=".YueQiuApp"
         android:allowBackup="true"
@@ -22,24 +21,34 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"/>
 
+        <!--程序初始启动时显示的SplashScreen-->
         <activity
-            android:name=".BilliardNearbyActivity"
+            android:name=".YueQiuSplashScreen"
+            android:label="@string/title_activity_yue_qiu_splash_screen"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
-
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".BilliardNearbyActivity"
+            android:screenOrientation="portrait"
+            >
+
+        </activity>
+
         <activity
             android:name=".activity.NearbyResultActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
+
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
@@ -91,7 +100,6 @@
         <activity
             android:name=".activity.PublishedInfoActivity"
             android:screenOrientation="portrait"/>
-
         <activity
             android:name=".activity.PlayDetailActivity"
             android:label="@string/activities_detail"
@@ -121,7 +129,6 @@
         <activity
             android:name=".PlayMainActivity"
             android:screenOrientation="portrait"/>
-
         <activity
             android:name=".activity.GroupIssueTopic"
             android:label="@string/billiard_group_issue_article"
@@ -131,24 +138,20 @@
             android:name=".activity.GroupSelectTopicTypeActivity"
             android:parentActivityName=".activity.GroupIssueTopic"
             android:screenOrientation="portrait"/>
-
         <activity
             android:name=".activity.ChatActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden"/>
         <activity
             android:name=".activity.CheckNumActivity"
-
             android:screenOrientation="portrait"/>
-
         <activity
             android:name=".activity.Register1Activity"
             android:screenOrientation="portrait"/>
-        <activity
-            android:name=".activity.ArticleReadActivity"
-            >
+        <activity android:name=".activity.ArticleReadActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
+
                 <data android:scheme="file"/>
             </intent-filter>
         </activity>
@@ -163,8 +166,9 @@
             android:name=".chatbar.ShowBigImage"
             android:screenOrientation="portrait"/>
 
-        <!--服务组件-->
+        <!-- 服务组件 -->
         <service android:name=".util.LocationUtil"/>
+
     </application>
 
 </manifest>

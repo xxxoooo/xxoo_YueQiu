@@ -110,7 +110,36 @@ public class NearbyCoauchDaoImpl implements NearbyCoauchDao
     @Override
     public synchronized long updateCoauchItemBatch(List<NearbyCoauchSubFragmentCoauchBean> coauchList)
     {
-        return 0;
+        long result = -1;
+        mDatabase = mDBUtils.getWritableDatabase();
+        mDatabase.beginTransaction();
+        try
+        {
+            for (NearbyCoauchSubFragmentCoauchBean coauchItem : coauchList)
+            {
+                ContentValues values = new ContentValues();
+                values.put(DatabaseConstant.SearchCoauchTable.NAME, coauchItem.getUserName());
+                values.put(DatabaseConstant.SearchCoauchTable.PHOTO_URL, coauchItem.getUserPhoto());
+                values.put(DatabaseConstant.SearchCoauchTable.SEX, coauchItem.getUserGender());
+                values.put(DatabaseConstant.SearchCoauchTable.CLASS, coauchItem.getmBilliardKind());
+                values.put(DatabaseConstant.SearchCoauchTable.LEVEL, coauchItem.getUserLevel());
+                values.put(DatabaseConstant.SearchCoauchTable.RANGE, coauchItem.getUserDistance());
+
+                result = mDatabase.update(DatabaseConstant.SearchCoauchTable.COAUCH_TABLE_NAME,
+                        values,
+                        DatabaseConstant.SearchCoauchTable.USER_ID + " =? ",
+                        new String[]{coauchItem.getId()});
+            }
+            mDatabase.setTransactionSuccessful();
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we updating the coauch table, and the reason goes to : " + e.toString());
+        } finally
+        {
+            mDatabase.endTransaction();
+        }
+
+        return result;
     }
 
     @Override
@@ -142,33 +171,50 @@ public class NearbyCoauchDaoImpl implements NearbyCoauchDao
         return coauchList;
     }
 
+    public List<NearbyCoauchSubFragmentCoauchBean> getAllCoauchList()
+    {
+        this.mDatabase = mDBUtils.getReadableDatabase();
+        List<NearbyCoauchSubFragmentCoauchBean> coauchList = new ArrayList<NearbyCoauchSubFragmentCoauchBean>();
 
+        String coauchInfoSql = " SELECT * FROM " + DatabaseConstant.SearchCoauchTable.COAUCH_TABLE_NAME
+                + " ORDER BY " + DatabaseConstant.SearchCoauchTable.USER_ID
+                + " DESC ";
 
+        Cursor cursor = mDatabase.rawQuery(
+                coauchInfoSql,
+                null
+        );
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast())
+        {
+            NearbyCoauchSubFragmentCoauchBean coauchBean = cursorToCoauchBean(cursor);
+            coauchList.add(coauchBean);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        Log.d(TAG, " the finally coauch list we get from the coauch table are : " + coauchList.size());
+        return coauchList;
+
+    }
 
     /**
-     *
-     * 以下是我们创建Coauch表的时候，创建Columns的顺序
-     * 0. public static final String _ID = "_id";
-     * 1. public static final String USER_ID = "user_id";
-     * 2. public static final String NAME = "username";
-     * 3. public static final String PHOTO_URL = "photo_url";
-     * 4. public static final String CLASS = "class"; // 球种(例如九球，斯诺克等)
-     * 5. public static final String LEVEL = "level"; // 教练的资质(例如国家队还是北京队)
-     * 6. public static final String RANGE = "range";
-     * 7. public static final String SEX = "sex";
      *
      * @param cursor
      * @return
      */
     private NearbyCoauchSubFragmentCoauchBean cursorToCoauchBean(Cursor cursor)
     {
+
         NearbyCoauchSubFragmentCoauchBean coauchBean = new NearbyCoauchSubFragmentCoauchBean();
+        coauchBean.setId(cursor.getString(1));
         coauchBean.setUserName(cursor.getString(2));
         coauchBean.setUserPhoto(cursor.getString(3));
-        coauchBean.setBilliardKind(cursor.getString(4));
-        coauchBean.setUserLevel(cursor.getString(5));
-        coauchBean.setUserDistance(cursor.getString(6));
-        coauchBean.setUserGender(cursor.getString(7));
+        coauchBean.setUserGender(cursor.getString(4));
+        coauchBean.setBilliardKind(cursor.getString(5));
+        coauchBean.setUserLevel(cursor.getString(6));
+        coauchBean.setUserDistance(cursor.getString(7));
 
         return coauchBean;
     }
