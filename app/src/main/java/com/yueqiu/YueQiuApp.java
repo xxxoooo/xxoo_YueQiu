@@ -3,9 +3,9 @@ package com.yueqiu;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.gotye.api.GotyeAPI;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.bean.Identity;
@@ -13,29 +13,17 @@ import com.yueqiu.bean.PlayIdentity;
 import com.yueqiu.bean.PlayInfo;
 import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.bean.UserInfo;
+import com.yueqiu.chatbar.CrashApplication;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.dao.DaoFactory;
-import com.yueqiu.dao.PublishedDao;
-import com.yueqiu.db.DBUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
 /**
  * Created by wangyun on 15/1/4.
  */
-public class YueQiuApp extends Application
-{
+public class YueQiuApp extends Application {
 
     public static UserInfo sUserInfo = new UserInfo();
     private SharedPreferences mSharedPreferences;
@@ -46,26 +34,35 @@ public class YueQiuApp extends Application
     /**
      * 用于存放从数据库中查询到的全部Group信息
      */
-    public static Map<Integer,GroupNoteInfo> sGroupDbMap = new LinkedHashMap<Integer, GroupNoteInfo>();
+    public static Map<Integer, GroupNoteInfo> sGroupDbMap = new LinkedHashMap<Integer, GroupNoteInfo>();
     /**
      * 用于存放从数据库中查询到的全部Publish信息
      */
-    public static Map<Identity,PublishedInfo> sPublishMap = new LinkedHashMap<Identity, PublishedInfo>();
+    public static Map<Identity, PublishedInfo> sPublishMap = new LinkedHashMap<Identity, PublishedInfo>();
 
     /**
      * 用于存放从数据库中查询得到的全部Favor信息
      */
-    public static Map<Identity,FavorInfo> sFavorMap = new LinkedHashMap<Identity, FavorInfo>();
+    public static Map<Identity, FavorInfo> sFavorMap = new LinkedHashMap<Identity, FavorInfo>();
 
     /**
      * 用于存放数据库中查询得到的全部Activitie信息
      */
-    public static Map<PlayIdentity,PlayInfo> sPlayMap = new LinkedHashMap<PlayIdentity, PlayInfo>();
+    public static Map<PlayIdentity, PlayInfo> sPlayMap = new LinkedHashMap<PlayIdentity, PlayInfo>();
+
+
+    public static final String APPKEY = "007b7931-bd77-4aec-876f-47f6f9b58db2";
+    public static final String PACKAGENAME = "com.yueqiu";
+
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
+
+        //异常拦截记录
+        CrashApplication.getInstance(this).onCreate();
+        //初始化
+        GotyeAPI.getInstance().init(getApplicationContext(), APPKEY, PACKAGENAME);
 
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
 
@@ -79,8 +76,7 @@ public class YueQiuApp extends Application
 
     }
 
-    public static Context getAppContext()
-    {
+    public static Context getAppContext() {
         return sAppContext;
     }
 

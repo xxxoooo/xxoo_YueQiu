@@ -92,43 +92,41 @@
             android:visibility="gone"
             android:background="@color/devide_line">
 
-            <TableLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
 
-                <TableRow>
+            <LinearLayout
+                android:id="@+id/to_gallery"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical">
+                <TextView
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:drawableTop="@drawable/picture"
+                    android:gravity="center"
+                    android:text="图片"/>
+            </LinearLayout>
 
-                        <TextView
-                            android:layout_width="75dp"
-                            android:layout_height="75dp"
-                            android:drawableTop="@drawable/picture"
-                            android:gravity="center"
-                            android:text="图片"/>
-                    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/to_camera"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
 
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:gravity="center_vertical"
-                        android:orientation="vertical">
+                <TextView
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:gravity="center"
+                    android:drawableTop="@drawable/camera"
+                    android:text="拍照"/>
+            </LinearLayout>
 
-                        <TextView
-                            android:layout_width="75dp"
-                            android:layout_height="75dp"
-                            android:gravity="center"
-                            android:drawableTop="@drawable/camera"
-                            android:text="拍照"/>
-                    </LinearLayout>
-                </TableRow>
-            </TableLayout>
         </LinearLayout>
 
         <FrameLayout
@@ -158,6 +156,7 @@
     </LinearLayout>
 
     <com.yueqiu.view.CustomListView
+        android:layout_margin="3dp"
         android:id="@+id/chat_container_list_item"
         android:layout_above="@id/chat_container_extension_toggle"
         android:layout_below="@id/chat_container_message_more"
