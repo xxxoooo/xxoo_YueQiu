@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -108,6 +109,8 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     private ImageView mEmotion, mAssistToggle;
     private View mExtension, mEmotionToggle, mSendFromePic, mSendfromCamera;
     private InputMethodManager mInputMethodManager;
+
+    private Fragment emojiconFragment = EmojiconsFragment.newInstance(false);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -399,6 +402,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     private void sendTextMessage(String text) {
         if (!TextUtils.isEmpty(text)) {
             Log.e("ddd", "currentLoginUser = " + currentLoginUser + " receiver = " + user.name);
+            Log.e("ddd", "text = " + text);
             GotyeMessage toSend;
             if (chatType == 0) {
                 toSend = GotyeMessage.createTextMessage(currentLoginUser, user,
@@ -545,6 +549,8 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             // 停止语音播放
             GotyeVoicePlayClickListener.currentPlayListener.stopPlayVoice();
         }*/
+        Log.e("ddd", ">>>>>>>>onPause<<<<<<<<<");
+//        getSupportFragmentManager().findFragmentById(R.id.chat_container_emotion).onDetach();
         super.onPause();
     }
 
@@ -907,7 +913,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     @Override
     public void onDecodeMessage(int code, GotyeMessage message) {
         // TODO Auto-generated method stub
-        Log.d("", "");
         super.onDecodeMessage(code, message);
     }
 
@@ -946,11 +951,14 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onStart() {
         super.onStart();
+        Log.e("ddd", "加载emojicons。。。。。");
         //加载表情Fragment
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.chat_container_emotion, EmojiconsFragment.newInstance(false))
-                .commit();
+        if (getSupportFragmentManager().findFragmentById(R.id.chat_container_emotion) == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.chat_container_emotion, emojiconFragment)
+                    .commit();
+        }
     }
 
     @Override

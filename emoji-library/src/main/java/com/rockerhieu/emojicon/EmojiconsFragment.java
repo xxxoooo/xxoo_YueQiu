@@ -26,6 +26,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.*;
 import android.widget.EditText;
 import com.rockerhieu.emojicon.emoji.*;
@@ -198,6 +199,7 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
 
         @Override
         public Fragment getItem(int i) {
+            Log.e("ddd", "current position = " + i);
             return fragments.get(i);
         }
 

@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -87,6 +88,8 @@ public class MessageFragment extends Fragment implements DownloadListener{
 //                getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
 //            }
 //        });
+        registerForContextMenu(mListView);
+
         return view;
     }
 
@@ -142,8 +145,6 @@ public class MessageFragment extends Fragment implements DownloadListener{
                         Log.e("ddd", "------------p2p chat-------------");
                         Intent toChat = new Intent(getActivity(),ChatPage.class);
                         toChat.putExtra("user", (GotyeUser) target);
-                        Log.e("ddd", "target>>" + ((GotyeUser) target).getName() + "  " + ((GotyeUser) target).getInfo() +
-                                "  " + target.name + "  " + ((GotyeUser) target).isFriend());
                         startActivity(toChat);
                         // updateList();
                     }
@@ -183,4 +184,29 @@ public class MessageFragment extends Fragment implements DownloadListener{
                 getResources().getDisplayMetrics());
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getActivity().getMenuInflater().inflate(R.menu.chat_message_item_context, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int position = info.position;
+        switch (item.getItemId()) {
+            case R.id.menu_item_delete_message:
+                GotyeChatTarget target = mAdapter.getItem(position);
+                api.deleteSession(target);
+                updateList();
+                return true;
+            default:
+                break;
+        }
+        return super.onContextItemSelected(item);
+    }
 }
