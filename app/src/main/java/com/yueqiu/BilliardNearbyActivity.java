@@ -370,8 +370,6 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
             Log.d(TAG, " exception happened while we make the search button : " + e.toString());
         }
 
-
-//
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
 
         return true;
