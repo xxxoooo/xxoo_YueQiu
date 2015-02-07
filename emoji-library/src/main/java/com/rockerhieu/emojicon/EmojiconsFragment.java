@@ -192,19 +192,22 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
     private static class EmojisPagerAdapter extends FragmentStatePagerAdapter {
         private List<EmojiconGridFragment> fragments;
 
-        public EmojisPagerAdapter(FragmentManager fm, List<EmojiconGridFragment> fragments) {
+        public EmojisPagerAdapter(FragmentManager fm, List<EmojiconGridFragment> fragments)
+        {
             super(fm);
             this.fragments = fragments;
         }
 
         @Override
-        public Fragment getItem(int i) {
+        public Fragment getItem(int i)
+        {
             Log.e("ddd", "current position = " + i);
             return fragments.get(i);
         }
 
         @Override
-        public int getCount() {
+        public int getCount()
+        {
             return fragments.size();
         }
     }
