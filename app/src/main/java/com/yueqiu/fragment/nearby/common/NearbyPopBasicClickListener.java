@@ -370,6 +370,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     {
                         String regionStr = regionStrList[position];
                         mParamsPreference.setRoomRegion(mContext, regionStr);
+                        Log.d(TAG, " inside the popupBase click listener, and the params we transfer are : " + regionStr);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_REGION_FILTERED, regionStr).sendToTarget();
                         // 当我们选择了一个条目之后，就需要将popupWindow dismiss掉
                         mPopupWindow.dismiss();

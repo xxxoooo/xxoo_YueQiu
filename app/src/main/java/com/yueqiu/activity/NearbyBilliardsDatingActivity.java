@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -372,6 +373,10 @@ public class NearbyBilliardsDatingActivity extends Activity
                 Dialog dlg = Utils.showSheet(this);
                 dlg.show();
                 return true;
+            case android.R.id.home:
+                finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);;
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -396,6 +401,17 @@ public class NearbyBilliardsDatingActivity extends Activity
         {
             mFollowList.add(new NearbyDatingDetailedAlreadyBean("", "温柔的语"));
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

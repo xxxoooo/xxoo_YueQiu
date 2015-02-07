@@ -3,6 +3,7 @@ package com.yueqiu.activity;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -30,6 +31,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
@@ -59,7 +61,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
     private Drawable mProgressDrawable;
     private GroupNoteInfo mGroupInfo;
 
-    private Map<String,String> mParamsMap = new HashMap<String, String>();
+    private Map<String,Integer> mParamsMap = new HashMap<String,Integer>();
     private Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +112,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
 
     private void requestDetail(){
         //TODO:id值要根据intent传进来的id设置，这里先设为
-        mParamsMap.put(HttpConstants.GroupDetail.ID,String.valueOf(mNoteId));
+        mParamsMap.put(HttpConstants.GroupDetail.ID,mNoteId);
 
         mUrlAndMethodMap.put(PublicConstant.URL, HttpConstants.GroupDetail.URL);
         mUrlAndMethodMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.GET);
@@ -138,9 +140,9 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
         return info;
     }
 
-    private class DetailRequestTask extends AsyncTaskUtil<String>{
+    private class DetailRequestTask extends AsyncTaskUtil<Integer>{
 
-        public DetailRequestTask(Map<String, String> map) {
+        public DetailRequestTask(Map<String, Integer> map) {
             super(map);
         }
 
@@ -214,8 +216,10 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
                     //TODO:如果用缓存的话，这里是有逻辑上的问题，但是目前不需要缓存，所以暂时没问题
                     Utils.showToast(BilliardGroupDetailActivity.this, getString(R.string.network_not_available));
                     break;
-                case PublicConstant.SHARE_SUCCESS:
+                case PublicConstant.FAVOR_SUCCESS:
                     //TODO:如果有缓存功能的话，这里还得插入收藏的数据库
+                    Intent shareIntent = new Intent(PublicConstant.SLIDE_FAVOR_ACTION);
+                    sendBroadcast(shareIntent);
                     Utils.showToast(BilliardGroupDetailActivity.this, getString(R.string.store_success));
                     break;
                 case PublicConstant.NO_RESULT:
@@ -243,6 +247,17 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
             mShareDlg = Utils.showSheet(this);
             mShareDlg.show();
 
+        }else if(id == R.id.billiard_detail_action_collect){
+            int user_id = YueQiuApp.sUserInfo.getUser_id();
+            if(user_id < 1 ){
+                Utils.showToast(this,getString(R.string.please_login_first));
+            }else{
+                if(Utils.networkAvaiable(this)){
+                    store();
+                }else{
+                    mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
+                }
+            }
         }
 
         return true;
@@ -269,9 +284,54 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
         return super.onKeyDown(keyCode, event);
     }
 
+    private void store(){
+        mParamsMap.put(HttpConstants.Play.TYPE,PublicConstant.GROUP);
+        mParamsMap.put(HttpConstants.Play.ID,mNoteId);
+        mParamsMap.put(HttpConstants.Play.USER_ID,YueQiuApp.sUserInfo.getUser_id());
 
+        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Favor.STORE_URL);
+        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
+        //mStroe = true;
 
+        new StoreTask(mParamsMap).execute(mUrlAndMethodMap);
+    }
 
+    private class StoreTask extends AsyncTaskUtil<Integer>{
+
+        public StoreTask(Map<String, Integer> map) {
+            super(map);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mPreProgress.setVisibility(View.VISIBLE);
+            mPreTextView.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
+            super.onPostExecute(jsonObject);
+            mPreProgress.setVisibility(View.GONE);
+            mPreTextView.setVisibility(View.GONE);
+
+            try{
+                if(!jsonObject.isNull("code")){
+                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                        mHandler.sendEmptyMessage(PublicConstant.FAVOR_SUCCESS);
+                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                        mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                    }else{
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonObject.getString("msg")).sendToTarget();
+                    }
+                }else{
+                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                }
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+        }
+    }
 
 
 }

@@ -21,7 +21,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
 
-import com.yueqiu.activity.NearbyResultActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.chatbar.ContactFragment;
 import com.yueqiu.fragment.chatbar.MessageFragment;
@@ -142,7 +142,7 @@ public class ChatBarActivity extends FragmentActivity {
             Log.d(TAG, " exception happened while we make the search button : " + e.toString());
         }
 
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
 

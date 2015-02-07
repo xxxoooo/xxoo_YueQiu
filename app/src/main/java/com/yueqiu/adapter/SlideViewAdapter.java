@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +20,9 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.activity.LoginActivity;
-import com.yueqiu.bean.IListItem;
-import com.yueqiu.bean.SlideAccountItemI;
-import com.yueqiu.bean.SlideOtherItemI;
+import com.yueqiu.bean.ISlideListItem;
+import com.yueqiu.bean.SlideAccountItemISlide;
+import com.yueqiu.bean.SlideOtherItemISlide;
 
 import java.util.List;
 
@@ -30,10 +31,10 @@ import java.util.List;
  */
 public class SlideViewAdapter extends BaseAdapter {
     private Context mContext;
-    private List<IListItem> mList;
+    private List<ISlideListItem> mList;
     private LayoutInflater mInflater;
 
-    public SlideViewAdapter(Context context,List<IListItem> list){
+    public SlideViewAdapter(Context context,List<ISlideListItem> list){
         this.mContext = context;
         this.mList = list;
         this.mInflater = LayoutInflater.from(context);
@@ -74,7 +75,7 @@ public class SlideViewAdapter extends BaseAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        IListItem item = (IListItem) getItem(position);
+        ISlideListItem item = (ISlideListItem) getItem(position);
         int type = item.getType();
         return type;
     }
@@ -105,12 +106,12 @@ public class SlideViewAdapter extends BaseAdapter {
      */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        IListItem item = (IListItem) getItem(position);
+        ISlideListItem item = (ISlideListItem) getItem(position);
         int type = item.getType();
         ViewAccountHolder accountHolder;
         ViewHolder holder;
         switch (type) {
-           case IListItem.ITEM_ACCOUNT:
+           case ISlideListItem.ITEM_ACCOUNT:
                if(convertView == null) {
                    convertView = mInflater.inflate(R.layout.item_more_account_layout, null);
                    accountHolder = new ViewAccountHolder();
@@ -121,7 +122,7 @@ public class SlideViewAdapter extends BaseAdapter {
                }else{
                    accountHolder = (ViewAccountHolder) convertView.getTag();
                }
-               SlideAccountItemI accountItem = (SlideAccountItemI) item;
+               SlideAccountItemISlide accountItem = (SlideAccountItemISlide) item;
                int embedResId = R.drawable.lable_friend;
                if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_assist_coauch_str))){
                    embedResId = R.drawable.lable_assistant;
@@ -166,22 +167,23 @@ public class SlideViewAdapter extends BaseAdapter {
 
                //accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accountItem.getGolden());
                break;
-            case IListItem.ITEM_BASIC:
+            case ISlideListItem.ITEM_BASIC:
                 if(convertView == null){
                     convertView = mInflater.inflate(R.layout.item_more_other_layout,null);
                     holder = new ViewHolder();
                     holder.image = (ImageView) convertView.findViewById(R.id.other_image);
                     holder.name = (TextView) convertView.findViewById(R.id.other_name);
-                    holder.hasMsg = convertView.findViewById(R.id.other_has_msg);
+                    holder.hasMsg = (ImageView) convertView.findViewById(R.id.other_has_msg);
                     holder.bottom = convertView.findViewById(R.id.other_bottom);
                     convertView.setTag(holder);
                 }else{
                     holder = (ViewHolder) convertView.getTag();
                 }
 
-                SlideOtherItemI otherItem = (SlideOtherItemI) item;
+                SlideOtherItemISlide otherItem = (SlideOtherItemISlide) item;
                 holder.image.setImageResource(otherItem.getImgId());
                 holder.name.setText(otherItem.getName());
+                ///holder.hasMsg.setBackgroundColor(mContext.getResources().getColor(R.color.slide_drawer_more_other_has_msg));
                 if(otherItem.hasMsg()){
                     holder.hasMsg.setVisibility(View.VISIBLE);
                 }else{
@@ -190,7 +192,7 @@ public class SlideViewAdapter extends BaseAdapter {
                 if(position == mList.size()-1){
                     holder.bottom.setVisibility(View.INVISIBLE);
                 }
-            break;
+                break;
         }
         return convertView;
     }
@@ -205,7 +207,7 @@ public class SlideViewAdapter extends BaseAdapter {
     private class ViewHolder{
         ImageView image;
         TextView  name;
-        View hasMsg;
+        ImageView hasMsg;
         View bottom;
     }
 

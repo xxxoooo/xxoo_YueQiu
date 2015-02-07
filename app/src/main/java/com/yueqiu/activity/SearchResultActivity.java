@@ -3,19 +3,24 @@ package com.yueqiu.activity;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import com.yueqiu.R;
 import android.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
+
+import java.lang.reflect.Field;
 
 /**
  * Created by wangyun on 14/12/30.
  */
-public class NearbyResultActivity extends Activity implements SearchView.OnQueryTextListener {
+public class SearchResultActivity extends Activity implements SearchView.OnQueryTextListener {
     private SearchView mSearchView;
     private ActionBar mActionBar;
     private String mQueryResult;
@@ -57,6 +62,25 @@ public class NearbyResultActivity extends Activity implements SearchView.OnQuery
         ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(searchViewWidth, ActionBar.LayoutParams.WRAP_CONTENT);
         mSearchView = (SearchView) customSearchView.findViewById(R.id.search_view);
         mSearchView.setIconified(true);
+        int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
+        EditText searchEditText = (EditText) mSearchView.findViewById(searchSrcTextId);
+        searchEditText.setTextColor(Color.WHITE);
+        searchEditText.setHintTextColor(Color.LTGRAY);
+
+        // 用于改变SearchView当中的icon
+        mSearchView.setIconifiedByDefault(false);
+        try {
+            Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
+            searchField.setAccessible(true);
+            ImageView searchHintIcon = (ImageView) searchField.get(mSearchView);
+            searchHintIcon.setImageResource(R.drawable.search);
+        } catch (NoSuchFieldException e){
+            e.printStackTrace();
+        } catch (IllegalAccessException e){
+            e.printStackTrace();
+        }
+
+
         View backView =  customSearchView.findViewById(R.id.back_menu_item);
         backView.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -36,6 +36,9 @@ import java.util.List;
  */
 public class FavorBasicFragment extends SlideMenuBasicFragment implements AdapterView.OnItemClickListener{
     private static final String SAVE_FAVOR_KEY = "save_favor";
+    private static final String SAVE_FAVOR_REFRESH = "save_refresh";
+    private static final String SAVE_FAVOR_LOAD_MORE = "save_load_more";
+    private static final String SAVE_FAVOR_INSTANCE = "saved_instance";
     private FavorBasicAdapter mAdapter;
     private FavorDao mFavorDao;
     //跟数据库相关的list
@@ -48,6 +51,9 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
         //TODO:是否需要在这里保存数据？如果在滑动过程中断网了，那么在滑回来的时候
         //TODO:按照现在不用缓存的逻辑页面就是空的
         outState.putParcelableArrayList(SAVE_FAVOR_KEY, mList);
+        outState.putBoolean(SAVE_FAVOR_REFRESH,mRefresh);
+        outState.putBoolean(SAVE_FAVOR_LOAD_MORE,mLoadMore);
+        outState.putBoolean(SAVE_FAVOR_INSTANCE,true);
     }
     
     @Override
@@ -77,6 +83,9 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
         ///////////////////////////////////////////////////////////////////////////////////////////
 
         if(savedInstanceState != null){
+            mRefresh = savedInstanceState.getBoolean(SAVE_FAVOR_REFRESH);
+            mLoadMore = savedInstanceState.getBoolean(SAVE_FAVOR_LOAD_MORE);
+            mIsSavedInstance = savedInstanceState.getBoolean(SAVE_FAVOR_INSTANCE);
             mCacheList = savedInstanceState.getParcelableArrayList(SAVE_FAVOR_KEY);
             mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
         }
@@ -232,8 +241,17 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                     mBeforeCount = mList.size();
                     List<FavorInfo> list = (List<FavorInfo>) msg.obj;
                     for(FavorInfo info : list){
-                        if(!mList.contains(info)){
-                            mList.add(info);
+                        if (!mList.contains(info)) {
+
+                            if(mRefresh) {
+                                mList.add(0,info);
+                            }else{
+                                if(mIsSavedInstance){
+                                    mList.add(0,info);
+                                }else{
+                                    mList.add(info);
+                                }
+                            }
                         }
                         //////////////////////////////////////////////////////
                         //TODO:下面的逻辑是用来更新缓存的，不过目前先不需要缓存

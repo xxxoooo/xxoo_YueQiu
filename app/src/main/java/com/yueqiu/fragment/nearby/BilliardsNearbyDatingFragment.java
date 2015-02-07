@@ -164,6 +164,22 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 sContext.startActivity(intent);
             }
         });
+
+        if (Utils.networkAvaiable(sContext))
+        {
+            mLoadMore = false;
+            mRefresh = false;
+            // 我们仅在网络可行的情况下进行网络请求，减少不必要的网络请求
+            if (mBackgroundHandler != null && mBackgroundHandler.getState() == Thread.State.NEW)
+            {
+                Log.d(TAG, " start the background handler ");
+                mBackgroundHandler.start();
+            }
+        } else
+        {
+            mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
+        }
+
         return mView;
     }
 
@@ -171,10 +187,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-        if (mBackgroundHandler != null && mBackgroundHandler.getState() == Thread.State.NEW) {
-            Log.d(TAG, " start the background handler ");
-            mBackgroundHandler.start();
-        }
+
     }
 
     @Override
@@ -265,15 +278,16 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
                             // TODO: 我们应该在这里通知UI主线程数据请求工作已经全部完成了，停止显示ProgressBar或者显示一个Toast全部数据已经加载完的提示
                             mUIEventsHandler.obtainMessage(FETCH_DATA_SUCCESSED, cacheDatingList).sendToTarget();
-
                             mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+
                         } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
                         {
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-
+                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                         } else if (statusCode == HttpConstants.ResponseCode.NO_RESULT)
                         {
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                         } else
                         {
                             Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
@@ -285,10 +299,12 @@ public class BilliardsNearbyDatingFragment extends Fragment
                             }
                             errorMsg.setData(errorData);
                             mUIEventsHandler.sendMessage(errorMsg);
+                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                         }
                     } else
                     {
                         mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                     }
                 }
             } catch (JSONException e)
@@ -296,6 +312,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 e.printStackTrace();
                 // 发生异常了之后，我们应该准确的通知UIHandler没有获取到任何的数据
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
             }
         }
@@ -332,6 +349,10 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 case UI_HIDE_DIALOG:
                     mDatingListAdapter.notifyDataSetChanged();
                     hideProgress();
+                    if (mDatingListView.isRefreshing())
+                    {
+                        mDatingListView.onRefreshComplete();
+                    }
                     Log.d(TAG, " hiding the dialog ");
 
                     break;
@@ -351,6 +372,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     Log.d(TAG, " fail to get data due to the reason as : " + infoStr);
                     break;
                 case FETCH_DATA_SUCCESSED:
+                    mBeforeCount = mDatingList.size();
                     List<NearbyDatingSubFragmentDatingBean> datingList = (ArrayList<NearbyDatingSubFragmentDatingBean>) msg.obj;
                     for (NearbyDatingSubFragmentDatingBean datingBean : datingList)
                     {
@@ -359,11 +381,24 @@ public class BilliardsNearbyDatingFragment extends Fragment
                             mDatingList.add(datingBean);
                         }
                     }
-
+                    mAfterCount = mDatingList.size();
                     if (mDatingList.isEmpty())
                     {
                         loadEmptyTv();
+                    } else
+                    {
+                        if (mRefresh)
+                        {
+                            if (mAfterCount == mBeforeCount)
+                            {
+                                Utils.showToast(sContext, sContext.getString(R.string.no_newer_info));
+                            } else
+                            {
+                                Utils.showToast(sContext, sContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                            }
+                        }
                     }
+                    mDatingListAdapter.notifyDataSetChanged();
                     break;
                 case RETRIEVE_DATA_WITH_RANGE_FILTERED:
                     String range = (String) msg.obj;
@@ -462,7 +497,8 @@ public class BilliardsNearbyDatingFragment extends Fragment
             super(BACKGROUDN_WORKER_NAME, Process.THREAD_PRIORITY_BACKGROUND);
         }
 
-        private Handler mWorkerHandler;
+        // 参照MateFragment当中的理解
+        private Handler mWorkerHandler = new Handler();
 
         @Override
         protected void onLooperPrepared()
@@ -518,13 +554,19 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
         public void fetchDatingWithRangeFilter(String range)
         {
-            mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_RANGE_FILTERED, range).sendToTarget();
+            if (! TextUtils.isEmpty(range))
+            {
+                mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_RANGE_FILTERED, range).sendToTarget();
+            }
         }
 
         public void fetchDatingWithPublishDateFilter(String publishDate)
         {
             Log.d(TAG, " inside the method of BackgroundHandler --> the published date we get are : " + publishDate);
-            mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_DATE_FILTERED, publishDate).sendToTarget();
+            if (! TextUtils.isEmpty(publishDate))
+            {
+                mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_DATE_FILTERED, publishDate).sendToTarget();
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -161,6 +162,10 @@ public class NearbyBilliardRoomActivity extends Activity
                 dlg.show();
 
                 break;
+            case android.R.id.home:
+                finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);;
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -252,6 +257,16 @@ public class NearbyBilliardRoomActivity extends Activity
                     break;
             }
         }
+    }
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 

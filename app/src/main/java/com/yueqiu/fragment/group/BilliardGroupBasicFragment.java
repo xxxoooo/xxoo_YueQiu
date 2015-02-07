@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -58,6 +59,9 @@ import java.util.Map;
  */
 public class BilliardGroupBasicFragment extends Fragment implements AdapterView.OnItemClickListener{
     private static final String SAVE_GROUP_KEY = "save_group";
+    private static final String SAVE_REFRESH_KEY = "save_refresh";
+    private static final String SAVE_LOAD_MORE_KEY = "save_load_more";
+    private static final String SAVED_INSTANCE = "saved_instance";
     private View mView;
     private Activity mActivity;
     private RadioGroup mGroup;
@@ -73,7 +77,7 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
     private int mStart_no = 0,mEnd_no = 9;
     private int mBeforeCount,mAfterCount;
     private int mCurrPosition;
-    private boolean mRefresh,mLoadMore;
+    private boolean mRefresh,mLoadMore,mIsSavedInstance;
 
     private Map<String,Integer> mParamMap = new HashMap<String, Integer>();
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
@@ -92,6 +96,9 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(SAVE_GROUP_KEY,mList);
+        outState.putBoolean(SAVE_REFRESH_KEY,mRefresh);
+        outState.putBoolean(SAVE_LOAD_MORE_KEY,mLoadMore);
+        outState.putBoolean(SAVED_INSTANCE,true);
     }
 
     @Override
@@ -124,6 +131,10 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
         /////////////////////////////////////////////////////////////////////////////////////
 
         if(savedInstanceState != null){
+            mRefresh = savedInstanceState.getBoolean(SAVE_REFRESH_KEY);
+            mLoadMore = savedInstanceState.getBoolean(SAVE_LOAD_MORE_KEY);
+            mIsSavedInstance = savedInstanceState.getBoolean(SAVED_INSTANCE);
+
             mCacheList = savedInstanceState.getParcelableArrayList(SAVE_GROUP_KEY);
             mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
         }
@@ -346,6 +357,7 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
                     mBeforeCount = mList.size();
 
                     List<GroupNoteInfo> list = (List<GroupNoteInfo>) msg.obj;
+                    Log.d("wy","mRefresh - >" + mRefresh);
                     for(GroupNoteInfo info : list){
                         /**
                          * UI list与数据库无关
@@ -353,7 +365,16 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
                         //TODO:有可能存在服务器那边删了数据，但数据库中还会存在这条数据
                         //TODO:需要再加一定的逻辑判断，如果发生这样的情况，该如何处理
                          if (!mList.contains(info)) {
-                             mList.add(info);
+
+                             if(mRefresh) {
+                                mList.add(0,info);
+                             }else{
+                                 if(mIsSavedInstance){
+                                     mList.add(0,info);
+                                 }else{
+                                     mList.add(info);
+                                 }
+                             }
                          }
                         //TODO:目前不需要缓存，所以这块先不需要操作数据库
                         /**
@@ -491,7 +512,6 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
 
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
             mLoadMore = true;
-            mRefresh = false;
             mCurrPosition = mList.size() ;
             mInsertList.clear();
             mUpdateList.clear();
@@ -499,13 +519,14 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
              * 如果要加载前先进行过下拉刷新，同时数据有更新，则此时再加载时分页的
              * start，end应该相应的增加
              */
-            if(mBeforeCount != mAfterCount){
+            if(mBeforeCount != mAfterCount && !mRefresh){
                 mStart_no = mEnd_no + (mAfterCount - mBeforeCount);
                 mEnd_no += 10 + (mAfterCount - mBeforeCount);
             }else{
                 mStart_no = mEnd_no + 1;
                 mEnd_no += 10;
             }
+            mRefresh = false;
             if(Utils.networkAvaiable(mActivity)){
                 mParamMap.put(HttpConstants.GroupList.STAR_NO,mStart_no);
                 mParamMap.put(HttpConstants.GroupList.END_NO,mEnd_no);

@@ -190,6 +190,22 @@ public class BilliardsNearbyRoomFragment extends Fragment
             }
         });
 
+
+        if (Utils.networkAvaiable(sContext))
+        {
+            mLoadMore = false;
+            mRefresh = false;
+            if (null != mWorkerThread && mWorkerThread.getState() == Thread.State.NEW)
+            {
+                Log.d(TAG, " the mWorkerThread has been started in the onCreateView ");
+                // 这里的WorkThread必须调用了start()方法之后，位于WorkThread当中的workHandler才可以正常工作
+                mWorkerThread.start();
+            }
+        } else
+        {
+            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
+        }
+
         return mView;
     }
 
@@ -198,9 +214,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
     {
         super.onResume();
 
-        if (null != mWorkerThread && mWorkerThread.getState() == Thread.State.NEW) {
-            mWorkerThread.start();
-        }
     }
 
     @Override
@@ -334,17 +347,20 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         errorInfo.append("Error Code : ").append(errorCode).append("; Error Info : ").append(errorMsgStr);
 
                         mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR, errorInfo.toString()).sendToTarget();
+                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                     }
                 } else
                 {
                     // 什么错误信息都没有获取到，甚至连error都没有
                     mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                    mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 }
 
             } catch (JSONException e)
             {
                 e.printStackTrace();
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 Log.d(TAG, " Exception happened in parsing the resulted json object we get, and the detailed reason are : " + e.toString());
             }
         }
@@ -440,6 +456,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     // 此时数据已经加载完毕，我们需要通知List的Adpter数据源已经发生改变
                     mSearchRoomAdapter.notifyDataSetChanged();
                     hideProgress();
+                    if (mRoomListView.isRefreshing())
+                    {
+                        mRoomListView.onRefreshComplete();
+                    }
                     break;
 
                 case STATE_FETCH_DATA_FAILED:
@@ -448,6 +468,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     Log.d(TAG, " we have fail to fetch the data for the room fragment, and the reason are : " + failStr);
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
+                    mBeforeCount = mRoomList.size();
                     List<NearbyRoomSubFragmentRoomBean> roomList = (ArrayList<NearbyRoomSubFragmentRoomBean>) msg.obj;
                     mBeforeCount = mRoomList.size();
                     for (NearbyRoomSubFragmentRoomBean roomBean : roomList)
@@ -529,8 +550,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     }
 
                     break;
-
                 case PublicConstant.NO_NETWORK:
+                    hideProgress();
                     Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
                     if (mRoomList.isEmpty())
                         loadEmptyTv();
@@ -569,7 +590,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
             super(WORKER_HANDLER_THREAD_NAME, Process.THREAD_PRIORITY_BACKGROUND);
         }
 
-        private Handler mWorkerHandler;
+        // 参照MateFragment当中的理解
+        private Handler mWorkerHandler = new Handler();
 
         @Override
         protected void onLooperPrepared()
@@ -681,7 +703,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             String regionSortVal = TextUtils.isEmpty(regionPriceStr) ? regionApprisalStr : regionPriceStr;
 
                             retrieveRoomListInfo("北京", regionStr, regionRangeStr, regionSortVal, 20, 1);
-                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                             break;
 
                     }
@@ -704,22 +725,34 @@ public class BilliardsNearbyRoomFragment extends Fragment
         public void fetchRoomDataRegionFiltered(String regionStr)
         {
             Log.d(TAG, " in the BackgroundWorkerThread : the region str we get are : " + regionStr);
-            mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_REGION_FILTERED, regionStr);
+            if (! TextUtils.isEmpty(regionStr))
+            {
+                mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_REGION_FILTERED, regionStr).sendToTarget();
+            }
         }
 
         public void fetchRoomDataPriceFiltered(String priceStr)
         {
-            mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_PRICE_FILTERED, priceStr);
+            if (! TextUtils.isEmpty(priceStr))
+            {
+                mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_PRICE_FILTERED, priceStr).sendToTarget();
+            }
         }
 
         public void fetchRoomDataRangeFiltered(String rangeStr)
         {
-            mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_RANGE_FILTERED, rangeStr).sendToTarget();
+            if (! TextUtils.isEmpty(rangeStr))
+            {
+                mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_RANGE_FILTERED, rangeStr).sendToTarget();
+            }
         }
 
         public void fetchRoomDataApprisalFiltered(String apprisalStr)
         {
-            mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_APPRISAL_FILTERED, apprisalStr).sendToTarget();
+            if (! TextUtils.isEmpty(apprisalStr))
+            {
+                mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_APPRISAL_FILTERED, apprisalStr).sendToTarget();
+            }
         }
     }
 

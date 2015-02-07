@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CAMERA"/>
 
     <application
         android:name=".YueQiuApp"
@@ -20,7 +21,6 @@
 
         <!--程序初始启动时显示的SplashScreen-->
         <activity
-            android:theme="@android:style/Theme.Wallpaper.NoTitleBar.Fullscreen"
             android:name=".YueQiuSplashScreen"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -32,10 +32,11 @@
         <activity
             android:name=".BilliardNearbyActivity"
             android:screenOrientation="portrait">
+
         </activity>
 
         <activity
-            android:name=".activity.NearbyResultActivity"
+            android:name=".activity.SearchResultActivity"
             android:launchMode="singleTop"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -73,7 +74,7 @@
         <activity
             android:name=".activity.PlayIssueActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".activity.FeedbackActivity"
             android:windowSoftInputMode="adjustUnspecified|stateHidden" />
@@ -126,7 +127,8 @@
         <activity
             android:name=".activity.GroupIssueTopic"
             android:label="@string/billiard_group_issue_article"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateHidden"/>
         <activity
             android:name=".activity.GroupSelectTopicTypeActivity"
             android:parentActivityName=".activity.GroupIssueTopic"
@@ -150,9 +152,6 @@
 
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activity.Register1Activity"
-            android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.NearbyBilliardRoomActivity"
             android:screenOrientation="portrait" />

@@ -183,10 +183,29 @@ public class BilliardsNearbyMateFragment extends Fragment
 //        }).start();
         // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 
+        // 我们将所有的数据请求的工作放到onCreateView()当中，而不是放到onResume()方法当中。
+        // 因为在onResume()当中请求太频繁了
+
+
         mMateListAdapter = new NearbyMateSubFragmentListAdapter(sContext, (ArrayList<NearbyMateSubFragmentUserBean>) mUserList);
         mSubFragmentListView.setAdapter(mMateListAdapter);
 
         mMateListAdapter.notifyDataSetChanged();
+
+        if (Utils.networkAvaiable(sContext))
+        {
+            mLoadMore = false;
+            mRefresh = false;
+            // 我们的数据请求只是发生于网络可行的情况下
+            if (mWorker != null && mWorker.getState() == Thread.State.NEW)
+            {
+                Log.d(TAG, " the mWorker has started ");
+                mWorker.start();
+            }
+        } else
+        {
+            mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
+        }
         return mView;
     }
 
@@ -200,13 +219,6 @@ public class BilliardsNearbyMateFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-        mView.postInvalidate();
-
-        if (mWorker != null && mWorker.getState() == Thread.State.NEW)
-        {
-            Log.d(TAG, " the mWorker has started ");
-            mWorker.start();
-        }
     }
 
     @Override
@@ -306,12 +318,15 @@ public class BilliardsNearbyMateFragment extends Fragment
                         // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
                         mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
                         mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+
                     } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
                     {
                         mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                        mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                     } else if (statusCode == HttpConstants.ResponseCode.NO_RESULT)
                     {
                         mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                        mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                     } else
                     {
                         String errorStr = initialObj.getString("msg");
@@ -328,6 +343,7 @@ public class BilliardsNearbyMateFragment extends Fragment
                 } else
                 {
                     mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                    mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                 }
             } catch (JSONException e)
             {
@@ -335,6 +351,7 @@ public class BilliardsNearbyMateFragment extends Fragment
                 e.printStackTrace();
                 Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
             }
         }
     }
@@ -454,6 +471,15 @@ public class BilliardsNearbyMateFragment extends Fragment
                 case HIDE_PROGRESSBAR:
                     mMateListAdapter.notifyDataSetChanged();
                     hideProgress();
+                    // 当我们将数据获取完之后，就需要经Refresh的标记去掉，否则会一直在那里转
+                    if (mSubFragmentListView.isRefreshing())
+                    {
+                        mSubFragmentListView.onRefreshComplete();
+                    }
+                    if (mUserList.isEmpty())
+                    {
+                        loadEmptyTv();
+                    }
                     Log.d(TAG, " hiding the progress bar ");
 
                     break;
@@ -549,7 +575,11 @@ public class BilliardsNearbyMateFragment extends Fragment
     // 这个Handler是真正在后台当中控制所有繁重任务的Handler，包括基本的网络请求和从数据库当中检索数据
     private class BackgroundWorker extends HandlerThread
     {
-        private Handler mBackgroundHandler;
+        // 注意这里我们必须先要将Handler初始化一下，否则在没有网络的情况下，mHandler就是一个空的
+        // 因为我们对Handler的初始化是在网络可行的情况下才调用HandlerThread的start()方法，而
+        // new HandlerThread().start()的方法的调用才会调用onLooperPrepared()方法，只有这样才可以
+        // 初始化我们内部的Handler
+        private Handler mBackgroundHandler = new Handler();
 
         public BackgroundWorker()
         {
@@ -664,7 +694,10 @@ public class BilliardsNearbyMateFragment extends Fragment
         {
             // 当用户添加了筛选之后，我们现在就是一个重新请求的过程了，因此我们需要先将我们之前获得的数据清除才可以
             Log.d(TAG, " inside the mWorker --> fetchDataWithRangeFiltered --> the range data we get are : " + range);
-            mBackgroundHandler.obtainMessage(START_RETRIEVE_DATA_WITH_RANGE_FILTER, range).sendToTarget();
+            if (! TextUtils.isEmpty(range))
+            {
+                mBackgroundHandler.obtainMessage(START_RETRIEVE_DATA_WITH_RANGE_FILTER, range).sendToTarget();
+            }
         }
 
         public void fetchDataWithGenderFiltered(String gender)
@@ -672,7 +705,10 @@ public class BilliardsNearbyMateFragment extends Fragment
             // 同筛选距离的过程一样，我们也是需要先将我们之前的List清除掉，然后开始重新请求(因为我们不清楚我们之前
             // 的请求过程是否时成功的)
             Log.d(TAG, " inside the mWorker --> fetchDataWithGenderFiltered --> the gender data we get are : " + gender);
-            mBackgroundHandler.obtainMessage(START_RETRIEVE_DATA_WITH_GENDER_FILTER, gender).sendToTarget();
+            if (! TextUtils.isEmpty(gender))
+            {
+                mBackgroundHandler.obtainMessage(START_RETRIEVE_DATA_WITH_GENDER_FILTER, gender).sendToTarget();
+            }
         }
 
         // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
@@ -688,7 +724,10 @@ public class BilliardsNearbyMateFragment extends Fragment
 
         public void exit()
         {
-            mBackgroundHandler.getLooper().quit();
+            if (null != mBackgroundHandler)
+            {
+                mBackgroundHandler.getLooper().quit();
+            }
         }
     }
 

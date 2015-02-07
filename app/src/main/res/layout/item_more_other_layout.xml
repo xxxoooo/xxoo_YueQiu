@@ -10,7 +10,6 @@
         android:id="@+id/other_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/logo"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/button_tool"
         android:layout_marginRight="20dp"
@@ -27,16 +26,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="我的资料"
-        android:textColor="@android:color/white"/>
-    <View
+        android:textColor="@android:color/white"
+        />
+    <ImageView
         android:id="@+id/other_has_msg"
-        android:layout_width="16dp"
-        android:layout_height="16dp"
+        android:layout_width="7dp"
+        android:layout_height="7dp"
         android:layout_toRightOf="@+id/other_name"
-        android:layout_above="@+id/other_name"
-        android:background="@color/slide_drawer_more_other_has_msg"
-        android:visibility="invisible"/>
+        android:layout_alignTop="@+id/button_tool"
+        android:src="@drawable/has_msg"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="10dp"
+
+        />
     <View
         android:id="@+id/other_bottom"
         android:layout_width="400dp"

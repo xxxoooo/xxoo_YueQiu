@@ -1,48 +1,93 @@
 package com.yueqiu.activity;
 
-import android.app.Activity;
+
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.app.ActionBar;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 
+import com.rockerhieu.emojicon.EmojiconEditText;
+import com.rockerhieu.emojicon.EmojiconGridFragment;
+import com.rockerhieu.emojicon.EmojiconsFragment;
+import com.rockerhieu.emojicon.emoji.Emojicon;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.bean.BitmapBean;
+import com.yueqiu.bean.OnKeyboardHideListener;
+import com.yueqiu.bean.SlideOtherItemISlide;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.fragment.group.ImageFragment;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.FileUtil;
+import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.CustomDialogBuilder;
+import com.yueqiu.view.GroupTopicScrollView;
 import com.yueqiu.view.dlgeffect.EffectsType;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-public class GroupIssueTopic extends Activity implements View.OnClickListener{
+public class GroupIssueTopic extends FragmentActivity implements View.OnClickListener,AdapterView.OnItemClickListener,
+        EmojiconsFragment.OnEmojiconBackspaceClickedListener,EmojiconGridFragment.OnEmojiconClickedListener
+{
+    private static final String TAG = "IssueTopic";
+    private static final String DIALOG_IMAGE = "image";
+    private static final int CAMERA_REQUEST = 1;
+    private static final int ALBUM_REQUEST = 2;
 
-    private EditText    mTitleEdit,mContentEdit;
+    private EditText    mTitleEdit;
+    private EmojiconEditText mContentEdit;
     private TextView    mTopicTypeTv,mTakePhoto,mSelectPhoto;
-    private ImageView   mIvExpression,mIvAddImg;
+    private ImageView   mIvExpression,mBackExpression,mIvAddImg;//TODO:图片按下的效果
     private View        mLinearType;
+    private GridView    mGridView;
+    private RelativeLayout mRootView,mExpressRelative;
+    private GroupTopicScrollView mRootScrollView;
+    private FrameLayout mEmotionContainer;
+    private LinearLayout mAddImgContainer;
 
     private ProgressBar mPreProgress;
     private TextView mPreText;
@@ -51,11 +96,23 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
     private String mTitle;
     private String mContent;
     private int mTopicType;
+    private String mImgFilePath;
+    private int mAddViewWidth,mAddViewHeight;
+    private int mKeyboardHeight,mExpressionNewTop,mExpressionOldTop;
+
+    private boolean mIsKeyboardShow;
+    private boolean mIsEmotionShow;
 
     private CustomDialogBuilder mDlgBuilder;
+    private TopicImgAdapter mImgAdapter;
+    private FragmentManager mFragmentManager;
+    private FragmentTransaction mFragmentTransaction;
+    private EmojiconsFragment mEmojiFragment;
 
     private Map<String,String> mParamsMap = new HashMap<String, String>();
     private Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
+    private List<ImageView> mAddViewList = new ArrayList<ImageView>();
+    private List<BitmapBean> mBitmapBeanList = new ArrayList<BitmapBean>();
 
 
     @Override
@@ -67,16 +124,95 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         initView();
+        mFragmentManager = getSupportFragmentManager();
+
+        //TODO:这个viewTreeObserver是addImageView的treeObserver
+        ViewTreeObserver addImgObserver = mIvAddImg.getViewTreeObserver();
+        addImgObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mAddViewWidth = mIvAddImg.getWidth();
+                mAddViewHeight = mIvAddImg.getHeight();
+            }
+        });
+        ViewTreeObserver rootViewObserver = mRootView.getViewTreeObserver();
+        rootViewObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect rect = new Rect();
+                mRootView.getRootView().getWindowVisibleDisplayFrame(rect);
+                int screenHeight = mRootView.getRootView().getHeight();
+                mKeyboardHeight = screenHeight - (rect.bottom - rect.top);
+                Log.d(TAG,"keyboard height is ->" + mKeyboardHeight);
+                //TODO:有问题，oldTop最后也有可能大于keyheight
+                if(mExpressionNewTop > mKeyboardHeight && mKeyboardHeight > rect.top){
+                    mBackExpression.setVisibility(View.VISIBLE);
+                    mIvExpression.setVisibility(View.INVISIBLE);
+                }else{
+                    mBackExpression.setVisibility(View.INVISIBLE);
+                    mIvExpression.setVisibility(View.VISIBLE);
+                }
+
+                if(mIsKeyboardShow){
+                    mEmotionContainer.setVisibility(View.GONE);
+                    mAddImgContainer.setVisibility(View.VISIBLE);
+                    if(!mBitmapBeanList.isEmpty()){
+                        mGridView.setVisibility(View.GONE);
+                    }else{
+                        mGridView.setVisibility(View.VISIBLE);
+                    }
+                    mIsEmotionShow = false;
+                }else{
+                    mOnKeyboardHideListener.onKeyBoardHide();
+                }
+            }
+        });
+
+        mExpressRelative.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                Log.d(TAG,"expression new top is ->" + top);
+
+                mExpressionNewTop = top;
+                mExpressionOldTop = oldTop;
+
+            }
+        });
+        mRootScrollView.setOnSizeChangeListener(new GroupTopicScrollView.OnSizeChangedListener() {
+            @Override
+            public void onSizeChanged(int w, int h, int oldw, int oldh) {
+                if(oldh > h){
+                    mIsKeyboardShow = true;
+                }else{
+                    mIsKeyboardShow = false;
+                }
+                Log.d(TAG,"isKeyBoardShow->" + mIsKeyboardShow);
+//                if(mIsKeyboardShow){
+//                    mEmotionContainer.setVisibility(View.GONE);
+//                    mIsEmotionShow = false;
+//                }else{
+//                    mOnKeyboardHideListener.onKeyBoardHide();
+//                }
+            }
+        });
     }
 
     private void initView(){
         mTitleEdit = (EditText) findViewById(R.id.group_issue_title);
-        mContentEdit = (EditText) findViewById(R.id.group_issue_content);
+        mContentEdit = (EmojiconEditText) findViewById(R.id.group_issue_content);
         mTopicTypeTv = (TextView) findViewById(R.id.group_issue_type);
         mLinearType = findViewById(R.id.group_issue_type_linear);
+        mGridView = (GridView) findViewById(R.id.topic_grid_view);
+        mGridView.setVisibility(View.GONE);
+        mRootView = (RelativeLayout) findViewById(R.id.topic_root_relative_view);
+        mExpressRelative = (RelativeLayout) findViewById(R.id.topic_expression_relative);
+        mRootScrollView = (GroupTopicScrollView) findViewById(R.id.topic_scroll_view);
+        mEmotionContainer = (FrameLayout) findViewById(R.id.topic_emotion_container);
+        mAddImgContainer = (LinearLayout) findViewById(R.id.topic_img_container);
 
         mIvExpression = (ImageView) findViewById(R.id.group_issue_express);
         mIvAddImg = (ImageView) findViewById(R.id.group_issue_add_img);
+        mBackExpression = (ImageView) findViewById(R.id.topic_backup_expression);
 
         mPreText = (TextView) findViewById(R.id.pre_text);
         mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
@@ -87,8 +223,15 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
         mPreProgress.getIndeterminateDrawable().setBounds(bounds);
         mPreText.setText(getString(R.string.activity_issuing));
 
+        mImgAdapter = new TopicImgAdapter();
+        mGridView.setAdapter(mImgAdapter);
+        mGridView.setOnItemClickListener(this);
+
         mLinearType.setOnClickListener(this);
         mIvAddImg.setOnClickListener(this);
+        mIvExpression.setOnClickListener(this);
+        mBackExpression.setOnClickListener(this);
+
     }
     private void requestPublish(){
 
@@ -175,6 +318,8 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
             switch(msg.what){
                 case PublicConstant.GET_SUCCESS:
                     //TODO:如果后期需要缓存的话，这里还需要多做几步操作，向group表插入缓存数据同时还得向publish表插入数据
+                    Intent broadCastIntent = new Intent(PublicConstant.SLIDE_PUBLISH_ACTION);
+                    sendBroadcast(broadCastIntent);
                     Utils.showToast(GroupIssueTopic.this,getString(R.string.activity_submit_success));
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
@@ -192,10 +337,20 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
             }
         }
     };
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mEmojiFragment = EmojiconsFragment.newInstance(false);
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+        mFragmentTransaction.replace(R.id.topic_emotion_container, mEmojiFragment).commit();
+
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        Utils.setActivityMenuColor(this);
+        Utils.setFragmentActivityMenuColor(this);;
         getMenuInflater().inflate(R.menu.menu_group_issue_topic, menu);
 
         return true;
@@ -209,6 +364,7 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
             this.finish();
             overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
         }else if(id == R.id.action_group_issue_topic){
+            //TODO:如果是表情的话，给服务器传过去了，但是服务器返回来的是空值
             requestPublish();
         }
 
@@ -220,11 +376,22 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                finish();
-                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                if(mIsEmotionShow){
+                    mEmotionContainer.setVisibility(View.GONE);
+                    mAddImgContainer.setVisibility(View.VISIBLE);
+                    if(!mBitmapBeanList.isEmpty()){
+                        mGridView.setVisibility(View.VISIBLE);
+                    }else{
+                        mGridView.setVisibility(View.GONE);
+                    }
+                    mIsEmotionShow = false;
+                }else {
+                    finish();
+                    overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                }
                 break;
         }
-        return super.onKeyDown(keyCode, event);
+        return true;
     }
 
 
@@ -253,6 +420,31 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
                 startActivityForResult(intent,0);
                 overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
                 break;
+            case R.id.topic_backup_expression:
+            case R.id.group_issue_express:
+                //TODO:maybe has problem
+                if(mIsEmotionShow){
+                    mEmotionContainer.setVisibility(View.GONE);
+                    mAddImgContainer.setVisibility(View.VISIBLE);
+                    if(!mBitmapBeanList.isEmpty()){
+                        mGridView.setVisibility(View.VISIBLE);
+                    }else{
+                        mGridView.setVisibility(View.GONE);
+                    }
+                    mIsEmotionShow = false;
+                }
+                //表情没有弹起
+                else{
+                    //设置表情弹起标志为true
+                    mIsEmotionShow = true;
+                    if(mIsKeyboardShow){
+                        Utils.dismissInputMethod(this,mContentEdit);
+                    }else{
+                        mOnKeyboardHideListener.onKeyBoardHide();
+                    }
+
+                }
+                break;
             case R.id.group_issue_add_img:
                 mDlgBuilder = CustomDialogBuilder.getsInstance(this);
                 mDlgBuilder.withTitle(getString(R.string.select_photo))
@@ -263,7 +455,7 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
                         .isCancelable(true)
                         .withDialogColor(R.color.actionbar_color)
                         .withDuration(700)
-                        .withEffect(EffectsType.NewsPaper)
+                        .withEffect(EffectsType.SlideLeft)
                         .setSureButtonVisible(false)
                         .withCancelButtonText(getString(R.string.btn_message_cancel))
                         .setCustomView(R.layout.dialog_select_photo, v.getContext())
@@ -279,17 +471,40 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
                 mSelectPhoto = (TextView) mDlgBuilder.findViewById(R.id.select_photo_from_album);
                 mTakePhoto.setOnClickListener(this);
                 mSelectPhoto.setOnClickListener(this);
+
                 break;
             case R.id.take_photo_now:
+                Uri imageFileUri = null;
+                if(FileUtil.isSDCardReady()){
+                    mImgFilePath = FileUtil.getSDCardPath() + "/yueqiu/" + UUID.randomUUID().toString() + ".jpg";
+                    Log.d(TAG,"imgFilePath->" + mImgFilePath);
+                    File imageFile = new File(mImgFilePath);
+                    if(!imageFile.exists()){
+                        imageFile.getParentFile().mkdirs();
+                    }
+                    imageFileUri = Uri.fromFile(imageFile);
+                }
+                Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                captureIntent.putExtra(MediaStore.EXTRA_OUTPUT,imageFileUri);
+                startActivityForResult(captureIntent, CAMERA_REQUEST);
+                if(mDlgBuilder != null)
+                    mDlgBuilder.dismiss();
                 break;
             case R.id.select_photo_from_album:
+                Intent albumIntent = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(albumIntent,ALBUM_REQUEST);
+                if(mDlgBuilder != null)
+                    mDlgBuilder.dismiss();
                 break;
         }
 
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG,"resultCode is ->" + resultCode);
+        //select topic type
         if (requestCode == 0 && resultCode == RESULT_OK) {
             mTopicType = data.getIntExtra(GroupSelectTopicTypeActivity.TOPIC_TYPE_KEY,GroupSelectTopicTypeActivity.GET_MASTER);
             if(mTopicType == GroupSelectTopicTypeActivity.GET_MASTER){
@@ -304,5 +519,142 @@ public class GroupIssueTopic extends Activity implements View.OnClickListener{
                 mTopicTypeTv.setText(getString(R.string.billiard_other));
             }
         }
+        //capture photo from camera
+        else if(requestCode == CAMERA_REQUEST && resultCode == RESULT_OK){
+            Log.d(TAG,"camera request and result is ok");
+//            ImageView photoView = new ImageView(this);
+//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth, mAddViewHeight);
+//            params.gravity = Gravity.CENTER_VERTICAL;
+//            int leftMargin = Utils.dip2px(this,10);
+//            params.setMargins(leftMargin,0,0,0);
+//            photoView.setLayoutParams(params);
+            Log.d(TAG,"addViewWidth->" + mAddViewWidth );
+            Log.d(TAG,"addViewHeight->" + mAddViewHeight );
+            BitmapDrawable bitmap = ImgUtil.getThumbnailScaledBitmap(this, mImgFilePath, mAddViewWidth, mAddViewHeight);
+            BitmapBean bmpBean = new BitmapBean();
+            bmpBean.bitmapDrawable = bitmap;
+            bmpBean.imgFilePath = mImgFilePath;
+            bmpBean.imgUri = null;
+            mBitmapBeanList.add(bmpBean);
+            mImgAdapter.notifyDataSetChanged();
+            mGridView.setVisibility(View.VISIBLE);
+//            photoView.setImageDrawable(bitmap);
+//            photoView.setScaleType(ImageView.ScaleType.FIT_XY);
+//            mPhotoContainer.addView(photoView);
+//            mAddViewList.add(photoView);
+        }
+        else if(requestCode == ALBUM_REQUEST && resultCode == RESULT_OK){
+            Uri imageFileUri = data.getData();
+            BitmapDrawable drawable = ImgUtil.getThumbnailScaleBitmapByUri(this,imageFileUri,mAddViewWidth,mAddViewHeight);
+            BitmapBean bmpBean = new BitmapBean();
+            bmpBean.bitmapDrawable = drawable;
+            bmpBean.imgFilePath = null;
+            bmpBean.imgUri = imageFileUri;
+            mBitmapBeanList.add(bmpBean);
+            mImgAdapter.notifyDataSetChanged();
+            mGridView.setVisibility(View.VISIBLE);
+        }
     }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        BitmapBean bean = mBitmapBeanList.get(position);
+        if(bean == null)
+            return ;
+
+        FragmentManager fm = getSupportFragmentManager();
+        String imgPath = bean.imgFilePath;
+        Uri imgUri = bean.imgUri;
+        ImageFragment.newInstance(imgPath,imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
+    }
+
+
+    @Override
+    public void onEmojiconBackspaceClicked(View v) {
+        EmojiconsFragment.backspace(mContentEdit);
+    }
+
+    @Override
+    public void onEmojiconClicked(Emojicon emojicon) {
+        EmojiconsFragment.input(mContentEdit,emojicon);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG,"onDestroy");
+        ImgUtil.clearImageView(mAddViewList);
+        File dir = new File(FileUtil.getSdDirectory() + "/yueqiu/");
+        if(dir.exists()){
+            File[] files = dir.listFiles(new FileUtil.FileNameFilter("jpg"));
+            Log.d(TAG,"files.size->" + files.length);
+            for(File file : files){
+                file.delete();
+            }
+        }
+    }
+
+    private class TopicImgAdapter extends BaseAdapter{
+
+
+        @Override
+        public int getCount() {
+            return mBitmapBeanList.size();
+        }
+
+
+        @Override
+        public Object getItem(int position) {
+            return mBitmapBeanList.get(position);
+        }
+
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder holder;
+            if(convertView == null){
+                convertView = LayoutInflater.from(GroupIssueTopic.this).inflate(R.layout.item_topic_grid_view,null);
+                holder = new ViewHolder();
+                holder.imageView = (ImageView) convertView.findViewById(R.id.item_topic_imageview);
+                convertView.setTag(holder);
+            }else{
+                holder = (ViewHolder) convertView.getTag();
+            }
+            holder.imageView.setLayoutParams(new GridView.LayoutParams(mAddViewWidth,mAddViewHeight));
+            holder.imageView.getRootView().setBackgroundColor(getResources().getColor(android.R.color.black));
+            holder.imageView.setImageDrawable(mBitmapBeanList.get(position).bitmapDrawable);
+            mAddViewList.add(holder.imageView);
+            return convertView;
+        }
+
+        private class ViewHolder{
+            ImageView imageView;
+        }
+    }
+
+    private OnKeyboardHideListener mOnKeyboardHideListener = new OnKeyboardHideListener() {
+        @Override
+        public void onKeyBoardHide() {
+            if(mIsEmotionShow){
+                mEmotionContainer.setVisibility(View.VISIBLE);
+                mAddImgContainer.setVisibility(View.INVISIBLE);
+                mGridView.setVisibility(View.GONE);
+            }else{
+                mEmotionContainer.setVisibility(View.GONE);
+                mAddImgContainer.setVisibility(View.VISIBLE);
+                if(mBitmapBeanList.isEmpty()){
+                    mGridView.setVisibility(View.GONE);
+                }else{
+                    mGridView.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+    };
+
+
 }

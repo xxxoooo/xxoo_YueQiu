@@ -301,8 +301,10 @@ public class PlayDetailActivity extends Activity {
 //                        if(TextUtils.isEmpty(mCachePlayInfo.getUsername()))
                             Utils.showToast(PlayDetailActivity.this, getString(R.string.network_not_available));
                         break;
-                    case PublicConstant.SHARE_SUCCESS:
+                    case PublicConstant.FAVOR_SUCCESS:
                         //TODO:如果有缓存功能的话，这里还得插入收藏的数据库
+                        Intent shareIntent = new Intent(PublicConstant.SLIDE_FAVOR_ACTION);
+                        sendBroadcast(shareIntent);
                         Utils.showToast(PlayDetailActivity.this, getString(R.string.store_success));
                         break;
                 }
@@ -397,8 +399,8 @@ public class PlayDetailActivity extends Activity {
         mParamMap.put(HttpConstants.Play.ID,mTableId);
         mParamMap.put(HttpConstants.Play.USER_ID,YueQiuApp.sUserInfo.getUser_id());
 
-        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Play.GETDETAIL);
-        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.GET);
+        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Favor.STORE_URL);
+        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
         mStroe = true;
 
         new StoreTask(mParamMap).execute(mUrlAndMethodMap);
@@ -426,7 +428,7 @@ public class PlayDetailActivity extends Activity {
             try{
                 if(!jsonObject.isNull("code")){
                     if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                        mHandler.sendEmptyMessage(PublicConstant.SHARE_SUCCESS);
+                        mHandler.sendEmptyMessage(PublicConstant.FAVOR_SUCCESS);
                     }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
                         mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
                     }else{

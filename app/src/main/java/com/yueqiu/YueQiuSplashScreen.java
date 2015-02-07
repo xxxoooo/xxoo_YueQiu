@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 
 
 public class YueQiuSplashScreen extends Activity
@@ -15,6 +16,7 @@ public class YueQiuSplashScreen extends Activity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_yue_qiu_splash_screen);
 
         // TODO: 我们可以在这里加入更多的初始化事件，比如加入数据库的初始化过程，
@@ -31,7 +33,7 @@ public class YueQiuSplashScreen extends Activity
                 overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
                 YueQiuSplashScreen.this.finish();
             }
-        }, 1000);
+        }, 850);
     }
 
     @Override

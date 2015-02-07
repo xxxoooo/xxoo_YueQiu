@@ -3,14 +3,15 @@ package com.yueqiu.util;
 import android.os.Environment;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 public class FileUtil {
 	private static String path="";
 	static{
 		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-			path= Environment.getExternalStorageDirectory()+"/demo";
+			path= Environment.getExternalStorageDirectory()+"/yueqiu";
 		}else{
-			path= Environment.getDataDirectory().getAbsolutePath()+"/demo";
+			path= Environment.getDataDirectory().getAbsolutePath()+"/yueqiu";
 		}
 	}
 	
@@ -50,7 +51,28 @@ public class FileUtil {
     public static String getSdDirectory() {
         return Environment.getExternalStorageDirectory().getPath();
     }
-	
+
+    public static class FileNameFilter implements FilenameFilter{
+
+        private String mExtension = ".";
+
+        public FileNameFilter(String fileExtName){
+            mExtension += fileExtName;
+        }
+        /**
+         * Indicates if a specific filename matches this filter.
+         *
+         * @param dir      the directory in which the {@code filename} was found.
+         * @param filename the name of the file in {@code dir} to test.
+         * @return {@code true} if the filename matches the filter
+         * and can be included in the list, {@code false}
+         * otherwise.
+         */
+        @Override
+        public boolean accept(File dir, String filename) {
+            return filename.endsWith(mExtension);
+        }
+    }
 	
 //	////////////////////////////////////////////////////////////
 //	private static String ANDROID_SECURE = "/mnt/sdcard/.android_secure";

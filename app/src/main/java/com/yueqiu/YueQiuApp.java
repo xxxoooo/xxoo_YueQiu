@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.GroupNoteInfo;
+import com.yueqiu.bean.ISlideListItem;
 import com.yueqiu.bean.Identity;
 import com.yueqiu.bean.PlayIdentity;
 import com.yueqiu.bean.PlayInfo;
@@ -61,6 +62,7 @@ public class YueQiuApp extends Application
      * 用于存放数据库中查询得到的全部Activitie信息
      */
     public static Map<PlayIdentity,PlayInfo> sPlayMap = new LinkedHashMap<PlayIdentity, PlayInfo>();
+
 
     @Override
     public void onCreate()
