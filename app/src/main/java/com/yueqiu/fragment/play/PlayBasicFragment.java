@@ -49,6 +49,9 @@ import java.util.Map;
 
 public class PlayBasicFragment extends Fragment implements AdapterView.OnItemClickListener{
     private static final String SAVED_KEY = "saved_play";
+    private static final String SAVE_PLAY_REFRESH = "save_play_refresh";
+    private static final String SAVE_PLAY_LOAD_MORE = "save_play_load_more";
+    private static final String SAVE_PLAY_INSTANCE = "saved_instance";
     private Activity mActivity;
     private View mView;
     private PullToRefreshListView mPullToRefreshListView;
@@ -57,7 +60,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     private PlayDao mPlayDao;
     private ProgressBar mPreProgressBar;
     private TextView mEmptyView,mPreTextView;
-    private boolean mRefresh,mLoadMore;
+    private boolean mRefresh,mLoadMore,mIsSavedInstance;
     private int mPlayType;
     private Drawable mProgressDrawable;
     private String mEmptyTypeStr;
@@ -82,6 +85,9 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         //TODO:是否需要在这里保存数据？如果在滑动过程中断网了，那么在滑回来的时候
         //TODO:按照现在不用缓存的逻辑页面就是空的
         outState.putParcelableArrayList(SAVED_KEY, mList);
+        outState.putBoolean(SAVE_PLAY_REFRESH,mRefresh);
+        outState.putBoolean(SAVE_PLAY_LOAD_MORE,mLoadMore);
+        outState.putBoolean(SAVE_PLAY_INSTANCE,true);
     }
 
     @Override
@@ -111,6 +117,9 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
 //        }).start();
         //////////////////////////////////////////////////////////////////////////////////
         if(savedInstanceState != null){
+            mRefresh = savedInstanceState.getBoolean(SAVE_PLAY_REFRESH);
+            mLoadMore = savedInstanceState.getBoolean(SAVE_PLAY_LOAD_MORE);
+            mIsSavedInstance = savedInstanceState.getBoolean(SAVE_PLAY_INSTANCE);
             mCacheList = savedInstanceState.getParcelableArrayList(SAVED_KEY);
             mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
         }
@@ -311,8 +320,17 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                     mBeforeCount = mList.size();
                     List<PlayInfo> list = (List<PlayInfo>) msg.obj;
                     for(PlayInfo info : list){
-                        if(!mList.contains(info)){
-                            mList.add(info);
+                        if (!mList.contains(info)) {
+
+                            if(mRefresh) {
+                                mList.add(0,info);
+                            }else{
+                                if(mIsSavedInstance){
+                                    mList.add(0,info);
+                                }else{
+                                    mList.add(info);
+                                }
+                            }
                         }
 
                         //TODO:下面的逻辑是用来更新缓存的，不过目前先不需要缓存
@@ -456,7 +474,6 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
             mLoadMore = true;
-            mRefresh = false;
             mCurrPosition = mList.size() ;
             /**
              * 将用来插入和更新数据库的两个list清空，以免之前的数据重复插入
@@ -467,13 +484,14 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
              * 如果要加载前先进行过下拉刷新，同时数据有更新，则此时再加载时分页的
              * start，end应该相应的增加
              */
-            if(mBeforeCount != mAfterCount){
+            if(mBeforeCount != mAfterCount && !mRefresh){
                 mStart = mEnd + (mAfterCount - mBeforeCount);
                 mEnd += 10 + (mAfterCount - mBeforeCount);
             }else{
                 mStart = mEnd + 1;
                 mEnd += 10;
             }
+            mRefresh = false;
             if(Utils.networkAvaiable(mActivity)){
                 mParamMap.put(HttpConstants.GroupList.STAR_NO,mStart);
                 mParamMap.put(HttpConstants.GroupList.END_NO,mEnd);

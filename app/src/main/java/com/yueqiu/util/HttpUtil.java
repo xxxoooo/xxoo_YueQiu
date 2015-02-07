@@ -82,7 +82,7 @@ public class HttpUtil
             HttpURLConnection conn = (HttpURLConnection)urls.openConnection();
             String requestMethod = (null == method || "".equals(method)) ? "GET" : method;
             conn.setRequestMethod(requestMethod);
-            conn.setConnectTimeout(2000);
+            conn.setConnectTimeout(3000);
             conn.setDoInput(true);
             conn.setDoOutput(true);
             conn.connect();

@@ -80,6 +80,8 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
             switch (msg.what)
             {
                 case PublicConstant.GET_SUCCESS:
+                    Intent broadCastIntent = new Intent(PublicConstant.SLIDE_PUBLISH_ACTION);
+                    sendBroadcast(broadCastIntent);
                     Toast.makeText(PlayIssueActivity.this,
                             getString(R.string.activity_submit_success),Toast.LENGTH_SHORT).show();
                     mPreProgress.setVisibility(View.GONE);
@@ -95,6 +97,7 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
 //                    }).start();
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+
                     break;
                 case PublicConstant.REQUEST_ERROR:
                     Toast.makeText(PlayIssueActivity.this,

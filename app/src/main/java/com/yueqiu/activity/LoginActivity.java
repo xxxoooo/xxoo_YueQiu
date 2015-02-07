@@ -44,13 +44,6 @@ import java.util.HashMap;
 
 import java.util.Map;
 
-
-
-
-/**
- * 登录Activity
- * Created by yinfeng on 14/12/17.
- */
 public class LoginActivity extends Activity implements View.OnClickListener, LoginListener{
     private static final String TAG = "LoginActivity";
 
@@ -85,6 +78,8 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
                     Toast.makeText(LoginActivity.this, getString(R.string.login_success),Toast.LENGTH_SHORT).show();
                     Map<String,String> map = (Map<String, String>) msg.obj;
                     Utils.getOrUpdateUserBaseInfo(LoginActivity.this,map);
+                    Intent intent = new Intent(PublicConstant.SLIDE_ACCOUNT_ACTION);
+                    sendBroadcast(intent);
                     if(!mUserDao.queryUserId(map)){
                         mUserDao.insertUserInfo(map);
                     }

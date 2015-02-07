@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.rockerhieu.emojicon.EmojiconTextView;
 import com.yueqiu.R;
 import com.yueqiu.bean.GroupNoteInfo;
 
@@ -50,7 +51,7 @@ public class GroupBasicAdapter extends BaseAdapter{
             holder = new ViewHolder();
             holder.image = (ImageView) convertView.findViewById(R.id.group_item_image);
             holder.title = (TextView) convertView.findViewById(R.id.billiard_group_title);
-            holder.content = (TextView) convertView.findViewById(R.id.group_content);
+            holder.content = (EmojiconTextView) convertView.findViewById(R.id.group_content);
             holder.browseCount = (TextView) convertView.findViewById(R.id.billiard_group_browse_count_text);
             holder.commentCount = (TextView) convertView.findViewById(R.id.group_comment_count_text);
             holder.issueTime = (TextView) convertView.findViewById(R.id.group_issue_time);
@@ -69,7 +70,7 @@ public class GroupBasicAdapter extends BaseAdapter{
     class ViewHolder{
         ImageView image;
         TextView  title;
-        TextView  content;
+        EmojiconTextView content;
         TextView  browseCount;
         TextView  commentCount;
         TextView  issueTime;

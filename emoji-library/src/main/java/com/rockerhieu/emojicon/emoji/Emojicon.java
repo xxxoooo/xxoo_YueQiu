@@ -16,7 +16,10 @@
 
 package com.rockerhieu.emojicon.emoji;
 
+import android.util.Log;
+
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 
 /**
  * @author Hieu Rocker (rockerhieu@gmail.com)

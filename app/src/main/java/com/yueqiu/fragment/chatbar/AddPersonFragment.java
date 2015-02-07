@@ -235,7 +235,7 @@ public class AddPersonFragment extends Fragment {
                     break;
                 case PublicConstant.NO_RESULT:
                     showProgressBar(false);
-                    Toast.makeText(getActivity(), "未查询到球友！", Toast.LENGTH_LONG).show();
+                    Utils.showToast(getActivity(),getActivity().getString(R.string.not_found_friend));
                     break;
                 case PublicConstant.TIME_OUT:
                     Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
@@ -402,7 +402,7 @@ public class AddPersonFragment extends Fragment {
             viewHolder.mNickName.setText(mList.get(position).getUsername());
             viewHolder.mGender.setText(mList.get(position).getSex() == 1 ? getString(R.string.man) : getString(R.string.woman));
             String district = mList.get(position).getDistrict();
-            viewHolder.mDistrict.setText("".equals(district) ? "未知" : district);
+            viewHolder.mDistrict.setText("".equals(district) ? getActivity().getString(R.string.unknown): district);
             return convertView;
         }
 

@@ -25,9 +25,7 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.yueqiu.R;
-import com.yueqiu.YueQiuApp;
 import com.yueqiu.adapter.PlayListViewAdapter;
-import com.yueqiu.bean.PlayIdentity;
 import com.yueqiu.bean.PlayInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
@@ -376,7 +374,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
 

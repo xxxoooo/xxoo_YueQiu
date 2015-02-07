@@ -3,12 +3,14 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,9 +21,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
 import com.yueqiu.adapter.NearbyDatingDetailedGridAdapter;
 import com.yueqiu.bean.NearbyDatingDetailedAlreadyBean;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 
@@ -54,11 +59,18 @@ public class NearbyBilliardsDatingActivity extends Activity
 
     private NearbyDatingDetailedGridAdapter mAlreadyInUserGridAdapter;
 
+    private static int sNodeId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_dating_detail);
+
+        Intent datingIntent = getIntent();
+        Bundle receivedData = datingIntent.getBundleExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_DATING_FRAGMENT);
+        sNodeId = receivedData.getInt(NearbyFragmentsCommonUtils.KEY_DATING_TABLE_ID, -1);
+        Log.d(TAG, " the node id we get are : " + sNodeId);
 
         mGridAlreadyFlow = (GridView) findViewById(R.id.gridview_search_dating_detailed_already_flow);
         mUserPhoto = (ImageView) findViewById(R.id.img_search_dating_detail_photo);
@@ -115,6 +127,12 @@ public class NearbyBilliardsDatingActivity extends Activity
     private static final int RETRIEVE_DATING_DETAILED_INFO = 1 << 2;
     private static final int SET_DATING_DETAILED_INFO = 1 << 3;
     private static final int SHOW_TOAST = 1 << 4;
+    private static final int JOIN_SUCCESS = 1 << 5;
+    private static final int ADD_TO_FAVOR_SUCCESS = 1 << 6;
+    private static final int ADD_TO_FAVOR_FAILURE = 1 << 8;
+    private static final int ADD_TO_FAVOR = 1 << 7;
+    private static final int USER_HAS_NOT_LOGIN = 1 << 9;
+
     private Handler mHandler = new Handler()
     {
         @Override
@@ -129,16 +147,48 @@ public class NearbyBilliardsDatingActivity extends Activity
                         @Override
                         public void run()
                         {
-                            // TODO: 这里应该添加另一层逻辑，就是当用户在没有登录的情况下是没有办法直接
-                            // TODO: 是没有办法直接参加约球活动的，仍然还是需要先登录的情况下才可以
-                            // TODO: 所以我们应该先判断一下用户是否已经登录，如果已经登录了，我们就可以获取当前用户的ID值，
-                            // TODO: 然后直接处理登录的请求，但是如果用户没有登录的话，我们应该弹出一个对话框，提示用户
-                            // TODO: 登录之后才可以参加，或者干脆直接跳转到用户登录的那个界面就可以了，让用户直接
-                            // TODO: 处理登录过程就可以了
-                            joinActivity(1, 1, 2);
+                            Log.d(TAG, " the sNodeId we get from the previous dating list are : " + sNodeId);
+                            if (sNodeId != -1)
+                            {
+                                joinActivity(
+                                        YueQiuApp.sUserInfo.getUser_id(), // userId
+                                        2, // current type
+                                        sNodeId // pid we get from the previous dating item list
+                                );
+                            }
                         }
                     }).start();
 
+                    break;
+
+                case ADD_TO_FAVOR:
+                    Log.d(TAG, " the current dating id we get are : sNodeId --> " + sNodeId);
+                    new Thread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            if (sNodeId != -1)
+                            {
+                                // 开始向服务器发送请求将当前的约球信息加入到个人收藏当中
+                                addDatingToFavor(
+                                        YueQiuApp.sUserInfo.getUser_id(), // 用户ID，从YueQiuApp当中获取
+                                        1, // type Dating信息的type为1
+                                        sNodeId // noteId 当前的Dating所在的具体的table
+                                );
+                            }
+                        }
+                    }).start();
+                    break;
+
+                case ADD_TO_FAVOR_SUCCESS:
+                    Utils.showToast(NearbyBilliardsDatingActivity.this, getString(R.string.store_success));
+                    // 发送广播用于通知已经成功的加入收藏当中
+                    Intent favorIntent = new Intent(PublicConstant.SLIDE_FAVOR_ACTION);
+                    sendBroadcast(favorIntent);
+                    break;
+                case ADD_TO_FAVOR_FAILURE:
+                    Utils.showToast(NearbyBilliardsDatingActivity.this, getString(R.string.store_failure));
                     break;
                 case RETRIEVE_DATING_DETAILED_INFO:
                     Log.d(TAG, " start retrieving all the information of the dating detailed info activity ");
@@ -178,6 +228,14 @@ public class NearbyBilliardsDatingActivity extends Activity
                     String toastStr = toastInfo.getString(KEY_TOAST_MSG);
                     Log.d(TAG, " the toast string are : " + toastStr);
                     showToast(toastStr);
+                    break;
+
+                case JOIN_SUCCESS:
+                    Intent joinIntent = new Intent(PublicConstant.SLIDE_PART_IN_ACTION);
+                    sendBroadcast(joinIntent);
+                    break;
+                case USER_HAS_NOT_LOGIN:
+                    Utils.showToast(NearbyBilliardsDatingActivity.this, getString(R.string.please_login_first));
                     break;
             }
         }
@@ -294,17 +352,23 @@ public class NearbyBilliardsDatingActivity extends Activity
     }
 
 
-    // TODO: 用于处理“我要参加”的处理事件
-    // TODO: 是POST请求
     /**
      *
      * @param userId 用户id
      * @param type 类型, 1对应于活动;2对应于约球
-     * @param pId 分为两种类型 活动/约球
+     * @param pId 即约球Id
      */
     private void joinActivity(int userId, int type, int pId)
     {
+        Log.d(TAG, " jointActiivty --> the current userId : " + userId + " , and the type are : " + type + " , and the pId are : " + pId);
+
         boolean resultStatus = false;
+
+        if (userId < 1)
+        {
+            mHandler.sendEmptyMessage(USER_HAS_NOT_LOGIN);
+            return;
+        }
 
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
         requestParams.put("user_id", userId + "");
@@ -322,6 +386,11 @@ public class NearbyBilliardsDatingActivity extends Activity
             e.printStackTrace();
         }
 
+        if (resultStatus)
+        {
+            mHandler.sendEmptyMessage(JOIN_SUCCESS);
+        }
+
         String resultStr = resultStatus ? getResources().getString(R.string.search_dating_detailed_btn_i_want_in_success)
                 : getResources().getString(R.string.search_dating_detailed_btn_i_want_in_failed);
 
@@ -336,15 +405,58 @@ public class NearbyBilliardsDatingActivity extends Activity
         mHandler.sendMessage(toastMeg);
     }
 
+    /**
+     * 将当前的约球详情加入到"我的收藏"当中
+     *
+     * @param userId 当前的用户Id
+     * @param type 指定收藏的类型,对于约球来说，type值为1
+     * @param nodeId 这个值指的是我们之前在获取约球列表时所获得的表Id,我们通过前一个List的item当中值传递过来直接获取就可以了
+     *
+     */
+    private void addDatingToFavor(int userId, int type, int nodeId)
+    {
+        Log.d(TAG, " the current user id are : " + userId + " , and the type are : " + type + " , and the table ID are : " + nodeId);
+        if (userId < 1)
+        {
+            mHandler.sendEmptyMessage(USER_HAS_NOT_LOGIN);
+            // 直接返回，不执行之后的操作，节省资源
+            return;
+        }
+        boolean resultStatus = false;
+
+        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
+        requestParams.put("user_id", userId + "");
+        requestParams.put("type", type + "");
+        requestParams.put("id", nodeId + "");
+
+        String rawResult = HttpUtil.urlClient(HttpConstants.NearbyDating.URL_JOIN_ACTIVITY, requestParams, HttpConstants.RequestMethod.POST);
+
+        Log.d(TAG, " the raw result we get for adding the current dating item to favor collection are  : " + rawResult);
+        try {
+            JSONObject resultJson = new JSONObject(rawResult);
+            final int code = resultJson.getInt("code");
+            resultStatus = code == 1001 ? true : false;
+        } catch (JSONException e)
+        {
+            Log.d(TAG, " exception happened while we add the current dating info into the server collection, cause to : " + e.toString());
+            e.printStackTrace();
+        }
+
+        if (resultStatus)
+        {
+            mHandler.sendEmptyMessage(ADD_TO_FAVOR_SUCCESS);
+        } else
+        {
+            mHandler.sendEmptyMessage(ADD_TO_FAVOR_FAILURE);
+        }
+    }
+
     // 因为Toast是涉及到UI的操作，所以必须在MainUIThread当中执行，我们不可知直接在一个第三方Thread当中
     // 调用Toast。所以我们单独封装到另一个方法当中
     private void showToast(final String content)
     {
         Toast.makeText(NearbyBilliardsDatingActivity.this, content, Toast.LENGTH_LONG).show();
     }
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -367,11 +479,16 @@ public class NearbyBilliardsDatingActivity extends Activity
         switch (id)
         {
             case R.id.search_room_action_collect:
+                mHandler.sendEmptyMessage(ADD_TO_FAVOR);
                 return true;
             case R.id.search_room_action_share:
                 Dialog dlg = Utils.showSheet(this);
                 dlg.show();
                 return true;
+            case android.R.id.home:
+                finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);;
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -396,6 +513,17 @@ public class NearbyBilliardsDatingActivity extends Activity
         {
             mFollowList.add(new NearbyDatingDetailedAlreadyBean("", "温柔的语"));
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.top_in,R.anim.top_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

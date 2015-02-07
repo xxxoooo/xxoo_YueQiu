@@ -28,6 +28,12 @@
     <string name="no_newer_info">当前已经是最新的信息了</string>
     <string name="have_already_update_info">共更新<xliff:g id="number">%1$s</xliff:g>条信息</string>
     <string name="no_more_group_info">没有更多的台球圈信息了</string>
+    <string name="no_group_detail_info">未获取详情信息</string>
+    <string name="praise">赞 <xliff:g id="count">%1$s</xliff:g></string>
+    <string name="reply">回复 <xliff:g id="reply">%1$s</xliff:g></string>
+    <string name="select_photo">选择照片</string>
+    <string name="take_photo_now">现在拍摄</string>
+    <string name="select_photo_from_album">选择相册图片</string>
 
     <!-- 登录注册 -->
     <string name="login_without_phone_or_account">请输入手机号或账号</string>
@@ -308,6 +314,8 @@
     <string name="ignore">忽略</string>
     <string name="agree">通过</string>
     <string name="search_nearby">正在努力查找附近的球友....</string>
+    <string name="not_found_friend">未查询到球友</string>
+    <string name="unknown">未知</string>
     <string name="text_ack_msg">已读</string>
     <string name="text_delivered_msg">送达</string>
 
@@ -381,7 +389,7 @@
     <string name="activity_no_result">抱歉，未获取到<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
     <string name="sorry_no_info">抱歉，没有获取到详情信息</string>
     <string name="store_success">收藏成功，可以进入我的收藏查看</string>
-
+    <string name="store_failure">抱歉，收藏失败</string>
     <!-- 我的资料 -->
     <string name="photo">头像</string>
     <string name="account">账户</string>
@@ -453,7 +461,7 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_article_read">ArticleReadActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_yue_qiu_splash_screen">YueQiuSplashScreen</string>
+
 
     <!--IM-->
     <string name="im_login_other_device">您的账号在另外一台设备上登录了！</string>
