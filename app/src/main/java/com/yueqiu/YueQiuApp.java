@@ -51,6 +51,7 @@ public class YueQiuApp extends Application {
     public static Map<PlayIdentity, PlayInfo> sPlayMap = new LinkedHashMap<PlayIdentity, PlayInfo>();
 
 
+    //IM APPKEY
     public static final String APPKEY = "007b7931-bd77-4aec-876f-47f6f9b58db2";
     public static final String PACKAGENAME = "com.yueqiu";
 
@@ -59,6 +60,7 @@ public class YueQiuApp extends Application {
     public void onCreate() {
         super.onCreate();
 
+        //以下两句用于IM
         //异常拦截记录
         CrashApplication.getInstance(this).onCreate();
         //初始化

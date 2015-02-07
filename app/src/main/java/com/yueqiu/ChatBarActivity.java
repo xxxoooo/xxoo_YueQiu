@@ -1,6 +1,7 @@
 package com.yueqiu;
 
 import android.app.ActionBar;
+import android.app.NotificationManager;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -55,7 +56,7 @@ import java.lang.reflect.Field;
  * Created by doushuqi on 14/12/17.
  * 聊吧Activity
  */
-public class ChatBarActivity extends FragmentActivity implements LoginListener, NotifyListener {
+public class ChatBarActivity extends FragmentActivity implements NotifyListener {
     private static final String TAG = "ChatBarActivity";
     private ActionBar mActionBar;
     private FragmentManager fragmentManager;
@@ -77,25 +78,13 @@ public class ChatBarActivity extends FragmentActivity implements LoginListener, 
         super.onCreate(savedInstanceState);
         api = GotyeAPI.getInstance();
         api.addListerer(this);
-        login();
         setContentView(R.layout.activity_chatbar_main);
         beep = new BeepManager(this);
         beep.updatePrefs();
 
         fragmentManager = getSupportFragmentManager();
         initView();
-    }
 
-    private void login() {
-        Log.e(TAG, "isOnline --> " + api.isOnline());
-        if (!GotyeAPI.getInstance().isOnline()) {
-            int i = GotyeAPI.getInstance().login(mUserName, null);
-            // 根据返回的code判断
-            if (i == GotyeStatusCode.CODE_OK) {
-                // 已经登陆
-                onLogin(i, null);
-            }
-        }
     }
 
     private void switchFragment(Fragment fragment) {
@@ -153,16 +142,13 @@ public class ChatBarActivity extends FragmentActivity implements LoginListener, 
             searchField.setAccessible(true);
             ImageView searchHintIcon = (ImageView) searchField.get(searchView);
             searchHintIcon.setImageResource(R.drawable.search);
-        } catch (NoSuchFieldException e)
-        {
+        } catch (NoSuchFieldException e) {
             Log.d(TAG, " Exception happened while we retrieving the mSearchHintIcon, and the reason goes to : " + e.toString());
             e.printStackTrace();
-        } catch (IllegalAccessException e)
-        {
+        } catch (IllegalAccessException e) {
             Log.d(TAG, " Exception happened as we have no right to access this filed, and the reason goes to : " + e.toString());
             e.printStackTrace();
-        } catch (final Exception e)
-        {
+        } catch (final Exception e) {
             Log.d(TAG, " exception happened while we make the search button : " + e.toString());
         }
 
@@ -235,8 +221,6 @@ public class ChatBarActivity extends FragmentActivity implements LoginListener, 
     }
 
 
-
-
     @Override
     protected void onPause() {
         returnNotify = true;
@@ -254,42 +238,6 @@ public class ChatBarActivity extends FragmentActivity implements LoginListener, 
         super.onDestroy();
     }
 
-    // 此处处理账号在另外设备登陆造成的被动下线
-    @Override
-    public void onLogout(int code) {
-        /*if (code == GotyeStatusCode.CODE_FORCELOGOUT) {
-            Toast.makeText(this, "您的账号在另外一台设备上登录了！", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getBaseContext(), LoginPage.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        } else if (code == GotyeStatusCode.CODE_NETWORD_DISCONNECTED) {
-            Toast.makeText(this, "您的账号掉线了！", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(getBaseContext(), LoginPage.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-        }else{
-            Intent i = new Intent(this, LoginPage.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            Toast.makeText(this, "退出登陆！", Toast.LENGTH_SHORT).show();
-            startActivity(i);
-        }
-        finish();*/
-    }
-
-    @Override
-    public void onLogin(int code, GotyeUser currentLoginUser) {
-        // 判断登陆是否成功
-        if (code == GotyeStatusCode.CODE_OK) {
-            saveUser(mUserName, mPassword);
-
-            Intent toService = new Intent(this, GotyeService.class);
-            startService(toService);
-            Toast.makeText(this, "已经登录成功。。。", Toast.LENGTH_SHORT).show();
-        } else {
-            // 失败,可根据code定位失败原因
-            Toast.makeText(this, "尚未登录或者登录失败。。。", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     private static final String CONFIG = "chatbar_login_config";
 
@@ -315,9 +263,10 @@ public class ChatBarActivity extends FragmentActivity implements LoginListener, 
 
     /**
      * 收到消息时的回调方法，这里该方法是主要是用来更新MessageFragment的界面
-     * @param code 状态码 参见 {@link GotyeStatusCode}
-     * @param message  消息对象
-     * @param unRead 是否已读
+     *
+     * @param code    状态码 参见 {@link GotyeStatusCode}
+     * @param message 消息对象
+     * @param unRead  是否已读
      */
     @Override
     public void onReceiveMessage(int code, GotyeMessage message, boolean unRead) {
@@ -325,7 +274,7 @@ public class ChatBarActivity extends FragmentActivity implements LoginListener, 
             return;
         }
         mMessageFragment.refresh();
-        Log.d("wy","onReceiveMessage");
+        Log.d("wy", "onReceiveMessage");
         if (unRead) {
             updateUnReadTip();
 

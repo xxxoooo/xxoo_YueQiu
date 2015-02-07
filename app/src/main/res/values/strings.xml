@@ -455,4 +455,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_yue_qiu_splash_screen">YueQiuSplashScreen</string>
 
+    <!--IM-->
+    <string name="im_login_other_device">您的账号在另外一台设备上登录了！</string>
+    <string name="im_user_offline">您的账号掉线了！</string>
 </resources>

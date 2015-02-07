@@ -195,16 +195,14 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
         // 判断登陆是否成功
         if (code == GotyeStatusCode.CODE_OK) {
             saveUser(mUserName, mPwd);
-//            Intent i = new Intent(LoginActivity.this, MainActivity.class);
-//            startActivity(i);
 
             Intent toService = new Intent(this, GotyeService.class);
             startService(toService);
-            Toast.makeText(this, "登录成功....", Toast.LENGTH_SHORT).show();
-//            this.finish();
+            Log.d(TAG, "登录时。。IM服务启动");
         } else {
+            Log.d(TAG, "登录时。。IM服务启动失败，code = " + code);
             // 失败,可根据code定位失败原因
-            Toast.makeText(this, "登录失败....", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "IM系统登录失败....", Toast.LENGTH_SHORT).show();
         }
     }
 

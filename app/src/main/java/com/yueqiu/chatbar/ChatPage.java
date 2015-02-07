@@ -2,6 +2,8 @@ package com.yueqiu.chatbar;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.Drawable;
@@ -549,9 +551,14 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             // 停止语音播放
             GotyeVoicePlayClickListener.currentPlayListener.stopPlayVoice();
         }*/
-        Log.e("ddd", ">>>>>>>>onPause<<<<<<<<<");
-//        getSupportFragmentManager().findFragmentById(R.id.chat_container_emotion).onDetach();
         super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        manager.cancel(0);
     }
 
     @Override
