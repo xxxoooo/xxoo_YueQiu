@@ -70,9 +70,9 @@ public class PartInAdapter extends BaseAdapter{
         }else{
             holder.whole_bg.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.published_item_bg));
         }
-        holder.title.setText(((PartInInfo)mList.get(position)).getTitle());
-        holder.content.setText(((PartInInfo)mList.get(position)).getContent());
-        holder.dateTime.setText(((PartInInfo)mList.get(position)).getDateTime());
+        holder.title.setText(((PartInInfo) mList.get(position)).getTitle());
+        holder.content.setText(((PartInInfo) mList.get(position)).getContent());
+        holder.dateTime.setText(((PartInInfo) mList.get(position)).getDateTime());
         return convertView;
     }
 
@@ -85,7 +85,7 @@ public class PartInAdapter extends BaseAdapter{
     }
     public void unCheckAll(){
         for(int i=0;i<getCount();i++){
-            PublishedInfo item = (PublishedInfo) getItem(i);
+            PartInInfo item = (PartInInfo) getItem(i);
             item.setChecked(false);
         }
     }

@@ -281,6 +281,7 @@
     <string name="no_store_info">网络请求错误，未获取收藏信息</string>
     <string name="your_favor_is_empty">你还没有收藏任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
     <string name="no_more_info">没有更多<xliff:g id="number" example="15">%1$s</xliff:g>信息了</string>
+    <string name="your_partin_is_null">你还没有参与任何活动<xliff:g>%1$s</xliff:g></string>
 
     <!-- 聊吧 -->
     <string name="btn_liaoba_message">消息</string>
@@ -439,7 +440,7 @@
     <string name="activities_detail">活动详情</string>
     <string name="activities_collect">收藏</string>
     <string name="activities_share">分享</string>
-    <string name="activities_type">活动类型:</string>
+    <string name="activities_type">活动类型</string>
     <string name="groupactivity">群活动</string>
     <string name="meetstar">球星见面会</string>
     <string name="taiqiuzhan">台球展</string>

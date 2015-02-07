@@ -488,7 +488,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                             intent.setClass(BilliardNearbyActivity.this, MyParticipationActivity.class);
                             startActivity(intent);
                             overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
-                            SlideOtherItemISlide partinItem = (SlideOtherItemISlide) mItemList.get(1);
+                            SlideOtherItemISlide partinItem = (SlideOtherItemISlide) mItemList.get(2);
                             if(partinItem.hasMsg()){
                                 partinItem.setHasMsg(false);
                                 mAdapter.notifyDataSetChanged();

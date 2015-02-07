@@ -194,6 +194,13 @@ public class PartInFragment extends SlideMenuBasicFragment{
     }
 
     @Override
+    protected void setEmptyViewVisible() {
+        super.setEmptyViewVisible();
+        mEmptyView.setText(mActivity.getString(R.string.your_partin_is_null,mEmptyTypeStr));
+        mPullToRefreshListView.setEmptyView(mEmptyView);
+    }
+
+    @Override
     protected void onItemStateChanged(int position, boolean checked) {
         PartInInfo itemInfo = (PartInInfo) mListView.getItemAtPosition(position);
         itemInfo.setChecked(checked);

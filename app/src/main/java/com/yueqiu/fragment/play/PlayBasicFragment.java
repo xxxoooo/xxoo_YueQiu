@@ -484,7 +484,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
              * 如果要加载前先进行过下拉刷新，同时数据有更新，则此时再加载时分页的
              * start，end应该相应的增加
              */
-            if(mBeforeCount != mAfterCount && !mRefresh){
+            if(mBeforeCount != mAfterCount && mRefresh){
                 mStart = mEnd + (mAfterCount - mBeforeCount);
                 mEnd += 10 + (mAfterCount - mBeforeCount);
             }else{

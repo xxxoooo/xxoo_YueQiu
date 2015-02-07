@@ -365,7 +365,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
             mFavorInsertList.clear();
             mFavorUpdateList.clear();
             mCurrPosition = mList.size() ;
-            if(mBeforeCount != mAfterCount && !mRefresh){
+            if(mBeforeCount != mAfterCount && mRefresh){
                   mStart_no = mEnd_no + (mAfterCount-mBeforeCount);
                   mEnd_no += 10 + (mAfterCount-mBeforeCount);
              }else{

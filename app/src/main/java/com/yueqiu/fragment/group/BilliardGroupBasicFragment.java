@@ -299,6 +299,7 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
         @Override
         protected void onPostExecute(JSONObject jsonObject) {
             super.onPostExecute(jsonObject);
+            Log.d("wy","jsonObject->" + jsonObject);
             mPreProgress.setVisibility(View.GONE);
             mPreText.setVisibility(View.GONE);
 
@@ -519,13 +520,15 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
              * 如果要加载前先进行过下拉刷新，同时数据有更新，则此时再加载时分页的
              * start，end应该相应的增加
              */
-            if(mBeforeCount != mAfterCount && !mRefresh){
+            if(mBeforeCount != mAfterCount && mRefresh){
                 mStart_no = mEnd_no + (mAfterCount - mBeforeCount);
                 mEnd_no += 10 + (mAfterCount - mBeforeCount);
             }else{
                 mStart_no = mEnd_no + 1;
                 mEnd_no += 10;
             }
+            Log.d("wy","start_no is ->" + mStart_no);
+            Log.d("wy","end_no is ->" + mEnd_no);
             mRefresh = false;
             if(Utils.networkAvaiable(mActivity)){
                 mParamMap.put(HttpConstants.GroupList.STAR_NO,mStart_no);
