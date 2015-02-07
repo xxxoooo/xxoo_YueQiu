@@ -179,6 +179,16 @@ public class NearbyFragmentsCommonUtils
      */
     public static void initViewPager(final Context context, View parentView, final int viewPagerId, final int galleryIndiGroupId)
     {
+        // 我们现在需要增加这个判断条件，因为我们现在的Fragment的创建方式不是符合创建Fragment的最佳实践，即我们
+        // 在子Fragment当中获取Context实例不是通过onAttachedToActivity()这个生命周期方法来获得的，而是通过
+        // 最原始的Fragment的构造方法来获得的。
+        // 通过构造方法来获取就会产生一个Bug，那就是Fragment所依附的Activity已经被回收了，但是Fragment还没有被回收,
+        // 然后我们进入程序时导致Fragment使用的还是旧的Context(在这里就是我们的Activity实例)，由于Activity已经被回收了，
+        // 所以导致传过来的context参数就是空的，所以程序会崩溃。
+        // 但是我们现在不能直接修改，主要是我前期设计上的缺陷导致的，应该从一开始就遵循Fragment的最佳实现模式.放到下一个项目当中再改吧
+        if (null == context)
+            return;
+
         mImgLoader = VolleySingleton.getInstance().getImgLoader();
 
         final ImageView[] sPagerIndicatorImgList;
@@ -212,7 +222,8 @@ public class NearbyFragmentsCommonUtils
         Log.d(TAG, " the size we get are : " + size);
         ImageView indicatorView;
         int i;
-        for (i = 0; i < size; ++i) {
+        for (i = 0; i < size; ++i)
+        {
             indicatorView = new ImageView(context);
             indicatorView.setLayoutParams(new ViewGroup.LayoutParams(10, 10));
 

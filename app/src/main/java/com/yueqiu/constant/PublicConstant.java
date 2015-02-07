@@ -12,6 +12,7 @@ public class PublicConstant {
     public static final String SLIDE_PART_IN_ACTION = "com.yueqiu.slide.part_in.update";
     public static final String SLIDE_FAVOR_ACTION = "com.yueqiu.slide.favor.update";
     public static final String SLIDE_PUBLISH_ACTION = "com.yueqiu.slide.publish.update";
+    public static final String SLIDE_ACCOUNT_ACTION = "com.yueqiu.slide.account.update";
 
 
     public static final int GET_SUCCESS   = 0;

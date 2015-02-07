@@ -169,6 +169,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         filter.addAction(PublicConstant.SLIDE_PART_IN_ACTION);
         filter.addAction(PublicConstant.SLIDE_FAVOR_ACTION);
         filter.addAction(PublicConstant.SLIDE_PUBLISH_ACTION);
+        filter.addAction(PublicConstant.SLIDE_ACCOUNT_ACTION);
         registerReceiver(mReceiver,filter);
 
 
@@ -694,6 +695,13 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                 mAdapter.notifyDataSetChanged();
                 mEditor.putBoolean("publish",true);
                 mEditor.apply();
+            }else if(action.equals(PublicConstant.SLIDE_ACCOUNT_ACTION)){
+                SlideAccountItemISlide accountItemISlide = (SlideAccountItemISlide) mItemList.get(0);
+                accountItemISlide.setName(YueQiuApp.sUserInfo.getUsername());
+                accountItemISlide.setUserId(YueQiuApp.sUserInfo.getUser_id());
+                accountItemISlide.setTitle(YueQiuApp.sUserInfo.getTitle());
+                accountItemISlide.setImg(YueQiuApp.sUserInfo.getImg_url());
+                mAdapter.notifyDataSetChanged();
             }
         }
     };

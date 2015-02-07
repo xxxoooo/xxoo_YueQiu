@@ -14,11 +14,13 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.gotye.api.GotyeUser;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.ChatActivity;
 import com.yueqiu.adapter.ExpAdapter;
 import com.yueqiu.bean.ContactsList;
+import com.yueqiu.chatbar.ChatPage;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -97,6 +99,8 @@ public class ContactFragment extends Fragment {
                 ContactsList.Contacts contacts = (ContactsList.Contacts) mExpAdapter.getChild(groupPosition, childPosition);
                 //TODO:传入待聊天好友的userid
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
+//                intent.putExtra("user", userProxy.gotyeUser);
+//                intent.putExtra("from", 200);
                 intent.putExtra(MessageFragment.FRIEND_USER_ID, contacts.getUser_id());//fake date
                 intent.putExtra(MessageFragment.FRIEND_USER_NAME, contacts.getUsername());
                 startActivity(intent);

@@ -99,7 +99,6 @@ public class BilliardsNearbyMateFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mWorker = new BackgroundWorker();
 
         // 得到用于保存请求参数的SharedPreference实例
         mRequestParms = NearbyParamsPreference.getInstance();
@@ -192,6 +191,7 @@ public class BilliardsNearbyMateFragment extends Fragment
 
         mMateListAdapter.notifyDataSetChanged();
 
+        mWorker = new BackgroundWorker();
         if (Utils.networkAvaiable(sContext))
         {
             mLoadMore = false;
@@ -224,9 +224,11 @@ public class BilliardsNearbyMateFragment extends Fragment
     @Override
     public void onPause()
     {
-        // TODO: 如果此时我们请求到新的数据或者服务器端提供了消息推送的服务，我们这个时候需要
-        // TODO: 以Notification的方式来通知用户消息的接收
-
+        if (mWorker != null)
+        {
+            mWorker.interrupt();
+            mWorker = null;
+        }
         Log.d("mate_onpause", " inside mate fragment --> the current mate fragment is onPause ... ");
         mPopupwindowCallback.closePopupWindow();
         super.onPause();
@@ -722,6 +724,7 @@ public class BilliardsNearbyMateFragment extends Fragment
 //        }
         // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 
+        // 这个方法暂时不使用，因为这个方法会导致我们的任务处理终止
         public void exit()
         {
             if (null != mBackgroundHandler)
@@ -734,10 +737,6 @@ public class BilliardsNearbyMateFragment extends Fragment
     @Override
     public void onDestroy()
     {
-        if (null != mWorker)
-        {
-            mWorker.exit();
-        }
         super.onDestroy();
     }
 

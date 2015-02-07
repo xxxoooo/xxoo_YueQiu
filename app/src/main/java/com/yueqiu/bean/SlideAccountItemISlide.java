@@ -26,7 +26,9 @@ public class SlideAccountItemISlide implements ISlideListItem {
         return mImg;
 
     }
-
+    public void setImg(String img){
+        this.mImg = img;
+    }
     @Override
     public String getName() {
         return mName;
@@ -46,6 +48,10 @@ public class SlideAccountItemISlide implements ISlideListItem {
 
     public int getUserId() {
         return mUserId;
+    }
+
+    public void setUserId(int userId){
+        this.mUserId = userId;
     }
 
 
