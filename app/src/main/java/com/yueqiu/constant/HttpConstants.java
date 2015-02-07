@@ -97,6 +97,8 @@ public class HttpConstants
 
         public static final String URL = "/store/getStore";
 
+        public static final String STORE_URL = "/store/storeSave";
+
         public static final String TYPE = "type";
 
         public static final String START_NO = "start_no";

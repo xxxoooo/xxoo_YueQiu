@@ -4,13 +4,13 @@ package com.yueqiu.bean;
 /**
  * Created by wangyun on 14/12/29.
  */
-public class SlideAccountItemI implements IListItem {
+public class SlideAccountItemISlide implements ISlideListItem {
     private String mName;
     private int mGolden;
     private String mTitle;
     private String mImg;
     private int mUserId;
-    public SlideAccountItemI(String img, String name, int golden, String title, int userId){
+    public SlideAccountItemISlide(String img, String name, int golden, String title, int userId){
         this.mImg = img;
         this.mName = name;
         this.mGolden = golden;
@@ -26,7 +26,9 @@ public class SlideAccountItemI implements IListItem {
         return mImg;
 
     }
-
+    public void setImg(String img){
+        this.mImg = img;
+    }
     @Override
     public String getName() {
         return mName;
@@ -46,6 +48,10 @@ public class SlideAccountItemI implements IListItem {
 
     public int getUserId() {
         return mUserId;
+    }
+
+    public void setUserId(int userId){
+        this.mUserId = userId;
     }
 
 

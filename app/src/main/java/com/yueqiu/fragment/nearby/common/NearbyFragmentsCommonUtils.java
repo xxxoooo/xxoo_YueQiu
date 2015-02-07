@@ -67,6 +67,7 @@ public class NearbyFragmentsCommonUtils
     public static final String KEY_DATING_FRAGMENT_GENDER = "datingGender";
     public static final String KEY_DATING_FRAGMENT_FOLLOWNUM = "datingFollowNum";
     public static final String KEY_DATING_PUBLISH_TIME = "datingTime";
+    public static final String KEY_DATING_TABLE_ID = "datingTableId";
 
     // 以下是用于教练Fragment当中需要传输的数据的详细的key值
     public static final String KEY_BUNDLE_SEARCH_COAUCH_FRAGMENT = "searchCoauchFragment";

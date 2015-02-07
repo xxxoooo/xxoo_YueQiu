@@ -60,7 +60,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
     protected PullToRefreshListView mPullToRefreshListView;
     protected ListView mListView;
     protected int mType;
-    protected boolean mLoadMore,mRefresh;
+    protected boolean mLoadMore,mRefresh,mIsSavedInstance;
     private BasicHandler mHandler;
     protected int mStart_no = 0,mEnd_no = 9;
     protected int mCurrPosition;
@@ -356,19 +356,19 @@ public abstract class SlideMenuBasicFragment extends Fragment {
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
             mLoadMore = true;
-            mRefresh = false;
             mPublishInsertList.clear();
             mPublishUpdateList.clear();
             mFavorInsertList.clear();
             mFavorUpdateList.clear();
             mCurrPosition = mList.size() ;
-            if(mBeforeCount != mAfterCount){
+            if(mBeforeCount != mAfterCount && !mRefresh){
                   mStart_no = mEnd_no + (mAfterCount-mBeforeCount);
                   mEnd_no += 10 + (mAfterCount-mBeforeCount);
              }else{
                   mStart_no = mEnd_no + 1;
                   mEnd_no += 10;
              }
+            mRefresh = false;
              if(Utils.networkAvaiable(mActivity)) {
                   mParamsMap.put(HttpConstants.Published.START_NO,mStart_no);
                   mParamsMap.put(HttpConstants.Published.END_NO, mEnd_no);

@@ -30,6 +30,9 @@ import java.util.List;
  */
 public class PublishedFragment extends SlideMenuBasicFragment {
     private static final String SAVE_PUBLISH_KEY = "save_publish";
+    private static final String SAVE_PUBLISH_REFRESH = "save_refresh";
+    private static final String SAVE_PUBLISH_LOAD_MORE = "save_load_more";
+    private static final String SAVE_PUBLISH_INSTANCE = "saved_instance";
     private PublishedBasicAdapter mPublishedAdapter;
     private PublishedDao mPublishedDao;
     //跟数据库相关的list
@@ -41,6 +44,9 @@ public class PublishedFragment extends SlideMenuBasicFragment {
         //TODO:是否需要在这里保存数据？如果在滑动过程中断网了，那么在滑回来的时候
         //TODO:按照现在不用缓存的逻辑页面就是空的
         outState.putParcelableArrayList(SAVE_PUBLISH_KEY, mList);
+        outState.putBoolean(SAVE_PUBLISH_REFRESH,mRefresh);
+        outState.putBoolean(SAVE_PUBLISH_LOAD_MORE,mLoadMore);
+        outState.putBoolean(SAVE_PUBLISH_INSTANCE,true);
     }
 
     @Override
@@ -68,6 +74,9 @@ public class PublishedFragment extends SlideMenuBasicFragment {
         //////////////////////////////////////////////////////////////////////////////////////////////////
 
         if(savedInstanceState != null){
+            mRefresh = savedInstanceState.getBoolean(SAVE_PUBLISH_REFRESH);
+            mLoadMore = savedInstanceState.getBoolean(SAVE_PUBLISH_LOAD_MORE);
+            mIsSavedInstance = savedInstanceState.getBoolean(SAVE_PUBLISH_INSTANCE);
             mCacheList = savedInstanceState.getParcelableArrayList(SAVE_PUBLISH_KEY);
             mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
         }
@@ -218,8 +227,17 @@ public class PublishedFragment extends SlideMenuBasicFragment {
                     mBeforeCount = mList.size();
                     List<PublishedInfo> list = (List<PublishedInfo>) msg.obj;
                     for(PublishedInfo info : list){
-                        if(!mList.contains(info)){
-                            mList.add(info);
+                        if (!mList.contains(info)) {
+
+                            if(mRefresh) {
+                                mList.add(0,info);
+                            }else{
+                                if(mIsSavedInstance){
+                                    mList.add(0,info);
+                                }else{
+                                    mList.add(info);
+                                }
+                            }
                         }
                         //////////////////////////////////////////////////
                         //TODO:下面的逻辑是用来更新缓存的，不过目前先不需要缓存

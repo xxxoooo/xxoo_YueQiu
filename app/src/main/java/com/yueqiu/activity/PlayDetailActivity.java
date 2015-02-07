@@ -80,15 +80,15 @@ public class PlayDetailActivity extends Activity {
         //TODO:先去掉缓存功能，后期再根据需求加回来，目前逻辑没问题
         //TODO:同样是可以考虑用更有效率的loader或其他异步方法，而不是
         //TODO:简单地用线程，线程的生命周期不可控
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mCachePlayInfo = mPlayDao.getPlayInfoById(mTableId,mInfoType);
-                if(!TextUtils.isEmpty(mCachePlayInfo.getUsername())){
-                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mCachePlayInfo).sendToTarget();
-                }
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                mCachePlayInfo = mPlayDao.getPlayInfoById(mTableId,mInfoType);
+//                if(!TextUtils.isEmpty(mCachePlayInfo.getUsername())){
+//                    mHandler.obtainMessage(PublicConstant.USE_CACHE,mCachePlayInfo).sendToTarget();
+//                }
+//            }
+//        }).start();
         //////////////////////////////////////////////////////////////////////
 
         if(Utils.networkAvaiable(this)){
@@ -298,11 +298,14 @@ public class PlayDetailActivity extends Activity {
                         break;
                     case PublicConstant.NO_NETWORK:
                         //TODO:如果用缓存的话，这里是有逻辑上的问题，但是目前不需要缓存，所以暂时没问题
-                        if(TextUtils.isEmpty(mCachePlayInfo.getUsername()))
+//                        if(TextUtils.isEmpty(mCachePlayInfo.getUsername()))
                             Utils.showToast(PlayDetailActivity.this, getString(R.string.network_not_available));
                         break;
-                    case PublicConstant.SHARE_SUCCESS:
-                            Utils.showToast(PlayDetailActivity.this, getString(R.string.store_success));
+                    case PublicConstant.FAVOR_SUCCESS:
+                        //TODO:如果有缓存功能的话，这里还得插入收藏的数据库
+                        Intent shareIntent = new Intent(PublicConstant.SLIDE_FAVOR_ACTION);
+                        sendBroadcast(shareIntent);
+                        Utils.showToast(PlayDetailActivity.this, getString(R.string.store_success));
                         break;
                 }
             }
@@ -396,8 +399,8 @@ public class PlayDetailActivity extends Activity {
         mParamMap.put(HttpConstants.Play.ID,mTableId);
         mParamMap.put(HttpConstants.Play.USER_ID,YueQiuApp.sUserInfo.getUser_id());
 
-        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Play.GETDETAIL);
-        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.GET);
+        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Favor.STORE_URL);
+        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
         mStroe = true;
 
         new StoreTask(mParamMap).execute(mUrlAndMethodMap);
@@ -425,7 +428,7 @@ public class PlayDetailActivity extends Activity {
             try{
                 if(!jsonObject.isNull("code")){
                     if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                        mHandler.sendEmptyMessage(PublicConstant.SHARE_SUCCESS);
+                        mHandler.sendEmptyMessage(PublicConstant.FAVOR_SUCCESS);
                     }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
                         mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
                     }else{

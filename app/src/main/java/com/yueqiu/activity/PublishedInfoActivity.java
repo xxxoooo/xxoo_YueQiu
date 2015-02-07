@@ -154,7 +154,7 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
 

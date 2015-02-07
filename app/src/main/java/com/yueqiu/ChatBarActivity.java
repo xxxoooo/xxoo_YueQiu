@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -20,7 +19,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
@@ -28,6 +26,8 @@ import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+
+import com.yueqiu.activity.SearchResultActivity;
 import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeGroup;
 import com.gotye.api.GotyeMessage;
@@ -37,7 +37,6 @@ import com.gotye.api.GotyeUser;
 import com.gotye.api.PathUtil;
 import com.gotye.api.listener.LoginListener;
 import com.gotye.api.listener.NotifyListener;
-import com.yueqiu.activity.NearbyResultActivity;
 import com.yueqiu.chatbar.GotyeService;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.chatbar.ContactFragment;
@@ -166,7 +165,7 @@ public class ChatBarActivity extends FragmentActivity implements LoginListener, 
             Log.d(TAG, " exception happened while we make the search button : " + e.toString());
         }
 
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
 

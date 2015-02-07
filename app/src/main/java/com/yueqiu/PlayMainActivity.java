@@ -6,7 +6,6 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,7 +13,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,13 +20,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SearchView;
 
-import com.yueqiu.activity.NearbyResultActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.activity.PlayBusinessActivity;
 import com.yueqiu.activity.PlayIssueActivity;
-import com.yueqiu.bean.PlayIdentity;
 import com.yueqiu.bean.PlayInfo;
-import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.PlayDao;
 import com.yueqiu.fragment.play.PlayBasicFragment;
 import com.yueqiu.util.Utils;
@@ -62,19 +57,19 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
          * 的每条play信息的tableId肯定是唯一的，所以这里用tableId和type生成一个对象作为
          * 唯一标识的key，该对象一定要覆盖equals和hashCode方法
          */
-        mPlayDao = DaoFactory.getPlay(this);
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mCacheAllList = mPlayDao.getAllPlayInfo();
-                for(PlayInfo info : mCacheAllList){
-                    PlayIdentity identity = new PlayIdentity();
-                    identity.table_id = info.getTable_id();
-                    identity.type = info.getType();
-                    YueQiuApp.sPlayMap.put(identity,info);
-                }
-            }
-        }).start();
+//        mPlayDao = DaoFactory.getPlay(this);
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                mCacheAllList = mPlayDao.getAllPlayInfo();
+//                for(PlayInfo info : mCacheAllList){
+//                    PlayIdentity identity = new PlayIdentity();
+//                    identity.table_id = info.getTable_id();
+//                    identity.type = info.getType();
+//                    YueQiuApp.sPlayMap.put(identity,info);
+//                }
+//            }
+//        }).start();
         //////////////////////////////////////////////////
 
 
@@ -208,7 +203,7 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
             e.printStackTrace();
         }
 
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
 

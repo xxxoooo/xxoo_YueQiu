@@ -24,7 +24,6 @@
             android:id="@+id/billiard_group_detail_owner"
             style="@style/ListItemTvStyle"
             android:textColor="@color/md__defaultBackground"
-            android:text="温柔的雨"
             android:layout_alignTop="@+id/billiard_group_detail_img"
             android:layout_toRightOf="@+id/billiard_group_detail_img"
             android:layout_marginLeft="10dp"
@@ -34,7 +33,6 @@
             style="@style/TimeTextStyle"
             android:background="@drawable/textview_withdrawable_bg"
             android:layout_below="@+id/billiard_group_detail_owner"
-            android:text="男"
             android:padding="4dp"
             android:layout_alignLeft="@+id/billiard_group_detail_owner"
             android:drawableRight="@drawable/male"
@@ -53,17 +51,16 @@
         <TextView
             android:id="@+id/billiard_group_detail_read_count_tv"
             style="@style/TimeTextStyle"
-            android:text="213"
             android:textColor="@color/search_distance_color"
             android:layout_toRightOf="@+id/billiard_group_derail_read_iv"
             android:layout_alignTop="@+id/billiard_group_derail_read_iv"
             android:gravity="center_vertical"
+            android:paddingLeft="3dp"
             />
         <TextView
             android:id="@+id/billiard_group_detail_publish_time"
             style="@style/TimeTextStyle"
             android:layout_alignParentRight="true"
-            android:text="12-20 21:20"
             android:layout_centerVertical="true"/>
     </RelativeLayout>
     <View
@@ -95,7 +92,6 @@
                 android:id="@+id/billiard_group_detail_praise_count_tv"
                 style="@style/ListItemTvStyle"
                 android:gravity="center"
-                android:text="赞 29"
                 android:textSize="16sp"
                 android:layout_centerInParent="true"
                 />
@@ -118,7 +114,6 @@
                 android:id="@+id/billiard_group_detail_reply_count_tv"
                 style="@style/ListItemTvStyle"
                 android:gravity="center"
-                android:text="回复 2"
                 android:textSize="16sp"
                 android:layout_centerInParent="true"
                 />

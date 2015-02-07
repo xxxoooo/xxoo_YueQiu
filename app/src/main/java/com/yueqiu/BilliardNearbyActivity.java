@@ -2,9 +2,11 @@ package com.yueqiu;
 
 import android.app.ActionBar;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -22,7 +24,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -32,7 +33,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.yueqiu.activity.FavorActivity;
-import com.yueqiu.activity.NearbyResultActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.activity.PlayIssueActivity;
 import com.yueqiu.activity.FeedbackActivity;
 import com.yueqiu.activity.LoginActivity;
@@ -40,9 +41,9 @@ import com.yueqiu.activity.MyParticipationActivity;
 import com.yueqiu.activity.MyProfileActivity;
 import com.yueqiu.activity.PublishedInfoActivity;
 import com.yueqiu.adapter.SlideViewAdapter;
-import com.yueqiu.bean.IListItem;
-import com.yueqiu.bean.SlideAccountItemI;
-import com.yueqiu.bean.SlideOtherItemI;
+import com.yueqiu.bean.ISlideListItem;
+import com.yueqiu.bean.SlideAccountItemISlide;
+import com.yueqiu.bean.SlideOtherItemISlide;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -51,7 +52,6 @@ import com.yueqiu.fragment.nearby.BilliardsNearbyCoachFragment;
 import com.yueqiu.fragment.nearby.BilliardsNearbyDatingFragment;
 import com.yueqiu.fragment.nearby.BilliardsNearbyMateFragment;
 import com.yueqiu.fragment.nearby.BilliardsNearbyRoomFragment;
-import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.nearby.common.NearbySubFragmentConstants;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
@@ -97,7 +97,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private ListView mMenuList;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
-    private List<IListItem> mItemList = new ArrayList<IListItem>();
+    private List<ISlideListItem> mItemList = new ArrayList<ISlideListItem>();
 
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
@@ -163,6 +163,15 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
             }
         });
         setupTabs();
+        initDrawer();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PublicConstant.SLIDE_PART_IN_ACTION);
+        filter.addAction(PublicConstant.SLIDE_FAVOR_ACTION);
+        filter.addAction(PublicConstant.SLIDE_PUBLISH_ACTION);
+        filter.addAction(PublicConstant.SLIDE_ACCOUNT_ACTION);
+        registerReceiver(mReceiver,filter);
+
 
     }
 
@@ -171,7 +180,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     {
         super.onResume();
 //        setupTabs();
-        initDrawer();
+//        initDrawer();
         mNearbyRadio.setChecked(true);
         mViewPager.setCurrentItem(sPagerPos);
     }
@@ -191,6 +200,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         super.onDestroy();
         mContext = null;
         sPagerPos = mViewPager.getCurrentItem();
+        unregisterReceiver(mReceiver);
     }
 
     private void setupTabs()
@@ -370,7 +380,9 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
             Log.d(TAG, " exception happened while we make the search button : " + e.toString());
         }
 
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
+
+
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
 
         return true;
     }
@@ -400,8 +412,8 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private void initDrawer()
     {
 
-        mItemList.clear();
-        SlideAccountItemI accountItem = new SlideAccountItemI(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
+        //mItemList.clear();
+        SlideAccountItemISlide accountItem = new SlideAccountItemISlide(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
                 100, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(accountItem);
 
@@ -414,6 +426,15 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                 getString(R.string.search_feed_back_str),
                 getString(R.string.search_logout_str)
         };
+        final String[] spf_values = new String[]{
+                "profile",
+                "part_in",
+                "favor",
+                "publish",
+                "play",
+                "feedback",
+                "logout"
+        };
         int[] resIds = new int[]{
                 R.drawable.more_my_information,
                 R.drawable.more_my_part_in,
@@ -424,9 +445,10 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                 R.drawable.more_exit
         };
 
-        SlideOtherItemI otherItem;
+        SlideOtherItemISlide otherItem;
         for (int i = 0; i < values.length; i++) {
-            otherItem = new SlideOtherItemI(resIds[i], values[i], false);
+            boolean hasMsg = mSharedPreferences.getBoolean(spf_values[i],false);
+            otherItem = new SlideOtherItemISlide(resIds[i], values[i], hasMsg);
             mItemList.add(otherItem);
         }
 
@@ -466,6 +488,13 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                             intent.setClass(BilliardNearbyActivity.this, MyParticipationActivity.class);
                             startActivity(intent);
                             overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
+                            SlideOtherItemISlide partinItem = (SlideOtherItemISlide) mItemList.get(1);
+                            if(partinItem.hasMsg()){
+                                partinItem.setHasMsg(false);
+                                mAdapter.notifyDataSetChanged();
+                                mEditor.putBoolean(spf_values[1],false);
+                                mEditor.apply();
+                            }
                         }else{
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
@@ -475,6 +504,13 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                             intent.setClass(BilliardNearbyActivity.this, FavorActivity.class);
                             startActivity(intent);
                             overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
+                            SlideOtherItemISlide favorItem = (SlideOtherItemISlide) mItemList.get(3);
+                            if(favorItem.hasMsg()){
+                                favorItem.setHasMsg(false);
+                                mAdapter.notifyDataSetChanged();
+                                mEditor.putBoolean(spf_values[2],false);
+                                mEditor.apply();
+                            }
                         }else{
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
@@ -484,6 +520,13 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                             intent.setClass(BilliardNearbyActivity.this, PublishedInfoActivity.class);
                             startActivity(intent);
                             overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
+                            SlideOtherItemISlide publishedItem = (SlideOtherItemISlide) mItemList.get(4);
+                            if(publishedItem.hasMsg()) {
+                                publishedItem.setHasMsg(false);
+                                mAdapter.notifyDataSetChanged();
+                                mEditor.putBoolean(spf_values[3],false);
+                                mEditor.apply();
+                            }
                         }else{
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
@@ -583,7 +626,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
 
         mItemList.remove(0);
-        SlideAccountItemI accountItem = new SlideAccountItemI(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
+        SlideAccountItemISlide accountItem = new SlideAccountItemISlide(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
                 0, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(0, accountItem);
         mAdapter.notifyDataSetChanged();
@@ -630,6 +673,38 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
     }
 
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(PublicConstant.SLIDE_PART_IN_ACTION)){
+                SlideOtherItemISlide partInItem = (SlideOtherItemISlide) mItemList.get(2);
+                partInItem.setHasMsg(true);
+                mAdapter.notifyDataSetChanged();
+                mEditor.putBoolean("part_in",true);
+                mEditor.apply();
+            }else if(action.equals(PublicConstant.SLIDE_FAVOR_ACTION)){
+                SlideOtherItemISlide favorItem = (SlideOtherItemISlide) mItemList.get(3);
+                favorItem.setHasMsg(true);
+                mAdapter.notifyDataSetChanged();
+                mEditor.putBoolean("favor",true);
+                mEditor.apply();
+            }else if(action.equals(PublicConstant.SLIDE_PUBLISH_ACTION)){
+                SlideOtherItemISlide publishItem = (SlideOtherItemISlide) mItemList.get(4);
+                publishItem.setHasMsg(true);
+                mAdapter.notifyDataSetChanged();
+                mEditor.putBoolean("publish",true);
+                mEditor.apply();
+            }else if(action.equals(PublicConstant.SLIDE_ACCOUNT_ACTION)){
+                SlideAccountItemISlide accountItemISlide = (SlideAccountItemISlide) mItemList.get(0);
+                accountItemISlide.setName(YueQiuApp.sUserInfo.getUsername());
+                accountItemISlide.setUserId(YueQiuApp.sUserInfo.getUser_id());
+                accountItemISlide.setTitle(YueQiuApp.sUserInfo.getTitle());
+                accountItemISlide.setImg(YueQiuApp.sUserInfo.getImg_url());
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+    };
 
 }
 

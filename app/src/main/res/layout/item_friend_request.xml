@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:src="@drawable/ic_launcher"/>
+        android:src="@drawable/logo"/>
 
     <TextView
         android:id="@+id/mention_me_item_nickname_tv"

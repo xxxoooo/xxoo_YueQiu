@@ -7,7 +7,6 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,7 +14,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,10 +22,8 @@ import android.widget.ImageView;
 import android.widget.SearchView;
 
 import com.yueqiu.activity.GroupIssueTopic;
-import com.yueqiu.activity.NearbyResultActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.bean.GroupNoteInfo;
-import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.GroupInfoDao;
 import com.yueqiu.fragment.group.BilliardGroupBasicFragment;
 import com.yueqiu.util.Utils;
@@ -177,7 +173,7 @@ public class BilliardGroupActivity extends FragmentActivity implements ActionBar
             e.printStackTrace();
         }
 
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, NearbyResultActivity.class)));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
 

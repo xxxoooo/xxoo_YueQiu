@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:background="@drawable/ic_launcher"
+            android:background="@drawable/default_head"
             android:focusable="false"/>
 
         <com.rockerhieu.emojicon.EmojiconTextView
