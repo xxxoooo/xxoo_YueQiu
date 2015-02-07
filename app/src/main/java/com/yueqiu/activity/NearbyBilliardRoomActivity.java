@@ -6,6 +6,8 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -22,9 +24,19 @@ import android.widget.Toast;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
+import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.security.AlgorithmParameterGenerator;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author scguo
@@ -47,7 +59,6 @@ public class NearbyBilliardRoomActivity extends Activity
     private ActionBar mActionBar;
 
 //    private FrameLayout mWindowRootElem;
-
 
     private ImageLoader mImgLoader;
 
@@ -155,7 +166,7 @@ public class NearbyBilliardRoomActivity extends Activity
 
         switch (id) {
             case R.id.search_room_detail_action_collect:
-                Toast.makeText(NearbyBilliardRoomActivity.this, NearbyBilliardRoomActivity.this.getResources().getString(R.string.search_room_collect_success_indicator), Toast.LENGTH_LONG).show();
+                mUIEventsHandler.sendEmptyMessage(ADD_TO_FAVOR);
                 break;
             case R.id.search_room_detail_action_share:
                 Dialog dlg = Utils.showSheet(this);
@@ -258,9 +269,75 @@ public class NearbyBilliardRoomActivity extends Activity
             }
         }
     }
+
+    // 将当前的球厅加入我们收藏当中
+    private void addRoomToFavor()
+    {
+        boolean resultStatus = false;
+        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
+        requestParams.put("user_id", YueQiuApp.sUserInfo.getUser_id() + "");
+        requestParams.put("type", "2");
+        requestParams.put("id", "");
+
+        String rawResult = HttpUtil.urlClient(HttpConstants.Favor.STORE_URL, requestParams, HttpConstants.RequestMethod.POST);
+        Log.d(TAG, " the raw result we get for the add the room to favor are : " + rawResult);
+        try
+        {
+            JSONObject resultJson = new JSONObject(rawResult);
+            final int code = resultJson.getInt("code");
+            resultStatus = code == 1001 ? true : false;
+        } catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+
+        if (resultStatus)
+        {
+            mUIEventsHandler.sendEmptyMessage(FAVOR_SUCCESS);
+        } else
+        {
+            mUIEventsHandler.sendEmptyMessage(FAVOR_FAILURE);
+        }
+    }
+
+    private static final int FAVOR_SUCCESS = 1 << 1;
+    private static final int FAVOR_FAILURE = 1 << 2;
+    private static final int ADD_TO_FAVOR = 1 << 3;
+
+    private Handler mUIEventsHandler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg)
+        {
+            switch (msg.what)
+            {
+                case FAVOR_SUCCESS:
+                    Intent favorSuccessIntent = new Intent(PublicConstant.SLIDE_FAVOR_ACTION);
+                    NearbyBilliardRoomActivity.this.sendBroadcast(favorSuccessIntent);
+                    Utils.showToast(NearbyBilliardRoomActivity.this, getString(R.string.store_success));
+                    break;
+                case FAVOR_FAILURE:
+                    Utils.showToast(NearbyBilliardRoomActivity.this, getString(R.string.store_failure));
+                    break;
+                case ADD_TO_FAVOR:
+                    new Thread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            addRoomToFavor();
+                        }
+                    }).start();
+                    break;
+            }
+        }
+    };
+
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        switch (keyCode)
+        {
             case KeyEvent.KEYCODE_BACK:
                 finish();
                 overridePendingTransition(R.anim.top_in,R.anim.top_out);

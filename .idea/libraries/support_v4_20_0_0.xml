@@ -7,7 +7,11 @@
     </CLASSES>
     <JAVADOC />
     <SOURCES>
+<<<<<<< HEAD
+      <root url="jar://$USER_HOME$/android_sdk/sdk/extras/android/m2repository/com/android/support/support-v4/20.0.0/support-v4-20.0.0-sources.jar!/" />
+=======
       <root url="jar://$USER_HOME$/Downloads/android-sdk-macosx/extras/android/m2repository/com/android/support/support-v4/20.0.0/support-v4-20.0.0-sources.jar!/" />
+>>>>>>> 990fc436032f052e3e8d874e0adf56fa5bab0aec
     </SOURCES>
   </library>
 </component>

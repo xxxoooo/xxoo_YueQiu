@@ -102,7 +102,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
         mNetworkAvailable = Utils.networkAvaiable(sContext);
-        mWorkerThread = new WorkerHandlerThread();
+
     }
 
     private PullToRefreshListView mRoomListView;
@@ -190,7 +190,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
             }
         });
 
-
+        mWorkerThread = new WorkerHandlerThread();
         if (Utils.networkAvaiable(sContext))
         {
             mLoadMore = false;
@@ -408,6 +408,11 @@ public class BilliardsNearbyRoomFragment extends Fragment
     @Override
     public void onPause()
     {
+        if (mWorkerThread != null)
+        {
+            mWorkerThread.interrupt();
+            mWorkerThread = null;
+        }
         mCallback.closePopupWindow();
         super.onPause();
     }

@@ -381,7 +381,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         }
 
 
-//
+
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
 
         return true;
