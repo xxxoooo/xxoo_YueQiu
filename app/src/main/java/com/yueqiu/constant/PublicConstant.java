@@ -27,6 +27,9 @@ public class PublicConstant {
     public static final int PUBLISHED_ACTIVITY_TYPE = 2;
     public static final int PUBLISHED_GROUP_TYPE    = 3;
 
+    public static final int PART_IN_DATE_TYPE       = 1;
+    public static final int PART_IN_PLAY_TYPE       = 2;
+
     public static final int FAVOR_DATE_TYPE         = 1;
     public static final int FAVPR_ROOM_TYPE         = 2;
     public static final int FAVOR_PLAY_TYPE         = 3;

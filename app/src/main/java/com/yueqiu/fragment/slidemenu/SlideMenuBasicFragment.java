@@ -12,6 +12,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Gravity;
@@ -51,6 +52,7 @@ import java.util.Map;
  * Created by wangyun on 15/1/20.
  */
 public abstract class SlideMenuBasicFragment extends Fragment {
+    private static final String TAG = "SlideMenu";
     protected Activity mActivity;
     protected View mView;
     protected ProgressBar mPreProgress;
@@ -151,6 +153,8 @@ public abstract class SlideMenuBasicFragment extends Fragment {
         @Override
         protected void onPostExecute(JSONObject jsonResult) {
             super.onPostExecute(jsonResult);
+
+            Log.d(TAG,"jsonResult is ->" + jsonResult);
             mPreProgress.setVisibility(View.GONE);
             mPreText.setVisibility(View.GONE);
 

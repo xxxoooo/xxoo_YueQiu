@@ -12,7 +12,7 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 
 import com.yueqiu.R;
-import com.yueqiu.fragment.participation.MyPlayFragment;
+import com.yueqiu.fragment.slidemenu.PartInFragment;
 
 /**
  * created by doushuqi on 14/12/19.
@@ -99,15 +99,10 @@ public class MyParticipationActivity extends FragmentActivity implements ActionB
 
         @Override
         public Fragment getItem(int i) {
-            switch (i) {
-                case 0:
-//                    mFragment = new BilliardDatingFragment();
-                    mFragment = new MyPlayFragment();//should to be replaced!
-                    break;
-                case 1:
-                    mFragment = new MyPlayFragment();
-                    break;
-            }
+            mFragment = new PartInFragment();
+            Bundle args = new Bundle();
+            args.putInt("type",i+1);
+            mFragment.setArguments(args);
             return mFragment;
         }
 

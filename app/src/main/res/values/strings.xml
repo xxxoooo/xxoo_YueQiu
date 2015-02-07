@@ -267,8 +267,9 @@
     <string name="slide_account_golden">金币:</string>
     <string name="md__drawerOpenIndicatorDesc">Close drawer</string>
     <string name="md__drawerClosedIndicatorDesc">Open drawer</string>
-    <string name="published_action_mode_title">选择活动</string>
-    <string name="my_colloec_action_mode_title">选择收藏</string>
+    <string name="published_action_mode_title">选择发布信息</string>
+    <string name="my_colloec_action_mode_title">选择收藏信息</string>
+    <string name="part_in_action_mode_title">选择参与信息</string>
     <string name="published_confirm_str">确认</string>
     <string name="published_cancel_str">取消</string>
     <string name="published_delete_content">确定要删除所选的<xliff:g id="number" example="15">%1$s</xliff:g>条记录吗？</string>

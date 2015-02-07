@@ -90,6 +90,11 @@ public class HttpConstants
         public static final String URL = "/user/logout";
     }
 
+    public static final class PartIn{
+
+        public static final String URL = "/center/getJoin";
+    }
+
     /**
      * 我的收藏
      */

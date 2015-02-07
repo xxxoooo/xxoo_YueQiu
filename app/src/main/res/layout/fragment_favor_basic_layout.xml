@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="@color/devide_line"
-        android:dividerHeight="1.5dp"/>
+        android:dividerHeight="0.8dp"/>
 
     <include
         layout="@layout/pre_load"
