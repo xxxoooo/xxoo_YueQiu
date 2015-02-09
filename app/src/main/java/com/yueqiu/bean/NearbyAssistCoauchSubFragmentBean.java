@@ -1,5 +1,7 @@
 package com.yueqiu.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -13,7 +15,7 @@ import java.awt.font.TextAttribute;
  * 这是用于创建SearchActivity当中的助教Fragment当中的助教的Bean
  * 主要是用于创建ListView当中的item
  */
-public class NearbyAssistCoauchSubFragmentBean
+public class NearbyAssistCoauchSubFragmentBean implements Parcelable
 {
     private static final String TAG = "NearbyAssistCoauchSubFragmentBean";
 
@@ -183,4 +185,65 @@ public class NearbyAssistCoauchSubFragmentBean
         }
         return result;
     }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return a bitmask indicating the set of special object types marshalled
+     * by the Parcelable.
+     */
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(mUserId);
+        dest.writeString(mPhoto);
+        dest.writeString(mName);
+        dest.writeString(mGender);
+        dest.writeString(mKinds);
+        dest.writeString(mDistance);
+        dest.writeString(mPrice);
+    }
+
+    public static final Creator<NearbyAssistCoauchSubFragmentBean> CREATOR = new Creator<NearbyAssistCoauchSubFragmentBean>()
+    {
+        @Override
+        public NearbyAssistCoauchSubFragmentBean createFromParcel(Parcel source)
+        {
+            return new NearbyAssistCoauchSubFragmentBean(source);
+        }
+
+        @Override
+        public NearbyAssistCoauchSubFragmentBean[] newArray(int size)
+        {
+            return new NearbyAssistCoauchSubFragmentBean[size];
+        }
+    };
+
+    public NearbyAssistCoauchSubFragmentBean(Parcel source)
+    {
+        this.mUserId = source.readString();
+        this.mPhoto = source.readString();
+        this.mName = source.readString();
+        this.mGender = source.readString();
+        this.mKinds = source.readString();
+        this.mDistance = source.readString();
+        this.mPrice = source.readString();
+    }
+
+
+
 }

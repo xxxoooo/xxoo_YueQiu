@@ -56,6 +56,12 @@ public class NearbyFragmentsCommonUtils
         public void closePopupWindow();
     }
 
+    // 定义用于保存NearbyActivity当中的Fragment的List以及一些ListView的position的值
+    public static final String KEY_SAVED_LISTVIEW = "savedListView";
+    public static final String KEY_SAVED_REFRESH = "savedRefresh";
+    public static final String KEY_SAVED_LOAD_MORE = "savedLoadMore";
+    public static final String KEY_SAVED_INSTANCE = "savedInstance";
+
     // 定义用于处理从Fragment的ListView点击之后切换到具体的Activity时的切换过程
     // 以下是用于球厅Fragment当中需要传输的数据的详细的key值
     public static final String KEY_BUNDLE_SEARCH_ROOM_FRAGMENT = "searchRoomFragment";
@@ -101,14 +107,21 @@ public class NearbyFragmentsCommonUtils
                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
     }
 
-    public static void setFragmentEmptyTextView(Context context, final PullToRefreshListView listView, final String emptyText)
+    public static void setFragmentEmptyTextView(Context context, final PullToRefreshListView listView, final String emptyText, boolean disable)
     {
         TextView emptyView = new TextView(context);
         emptyView.setGravity(Gravity.CENTER);
-        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
+        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         emptyView.setTextColor(context.getResources().getColor(R.color.md__defaultBackground));
         emptyView.setText(emptyText);
-        listView.setEmptyView(emptyView);
+        if (! disable)
+        {
+            listView.setEmptyView(emptyView);
+        } else
+        {
+            listView.setEmptyView(null);
+        }
+
     }
 
     public static PopupWindow getFilterPopupWindow(Context context, View anchorView, View popupLayoutView)
@@ -226,6 +239,8 @@ public class NearbyFragmentsCommonUtils
 
     private static class WorkerThread extends Thread
     {
+        // 这个Handler所关联的Looper是MainLooper，所以在这里我们可以直接进行所有同
+        // UI相关的更新操作
         public Handler mInternalHandler;
         @Override
         public void run()
@@ -247,7 +262,6 @@ public class NearbyFragmentsCommonUtils
                             Log.d(TAG, " the data has retrieved success, and the list size are : " + sGlobalRoomList.size());
                             if (sGalleryImgAdapter != null)
                             {
-
                                 sGalleryImgAdapter.notifyDataSetChanged();
                             }
                             break;
@@ -256,6 +270,10 @@ public class NearbyFragmentsCommonUtils
                             {
                                 String failureReason = (String) msg.obj;
                                 // TODO: 显示Toast，提醒用户数据获取失败
+                                // TODO: 但是由于我们目前无法获得有效的Toast，所以暂时无法弹出Toast
+                                // TODO: 我们在下一步的优化过程当中，第一步工程就是优化CommonUtils这里，这里设计的
+                                // TODO: 乱的就是一坨屎(scguo)
+                                // TODO: 我们需要根据全都是Fragment的设计方式来重新实现这个部分
 
                             }
                             break;
@@ -312,7 +330,6 @@ public class NearbyFragmentsCommonUtils
                 retrieveRecommdedRoomInfo();
             }
         }).start();
-
 
         mImgLoader = VolleySingleton.getInstance().getImgLoader();
 
@@ -438,7 +455,8 @@ public class NearbyFragmentsCommonUtils
 
     public static final int parseGenderDrawable(String sexVal)
     {
-        if (!TextUtils.isEmpty(sexVal)) {
+        if (!TextUtils.isEmpty(sexVal))
+        {
             Log.d(TAG, " the sex val we get are :" + sexVal);
             return sexVal.equals("男") ? R.drawable.male : R.drawable.female;
         }

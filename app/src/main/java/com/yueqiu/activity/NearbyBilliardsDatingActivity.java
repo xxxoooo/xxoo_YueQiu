@@ -223,7 +223,7 @@ public class NearbyBilliardsDatingActivity extends Activity
                         @Override
                         public void run()
                         {
-                            retrieveDatingDetailedInfo(1);
+                            retrieveDatingDetailedInfo(sNodeId);
                         }
                     }).start();
                     break;
@@ -317,7 +317,7 @@ public class NearbyBilliardsDatingActivity extends Activity
 
     // TODO: 获取约球详情信息
     /**
-     *
+     * 这里需要传递的是约球Id，而不是用户Id
      * @param datingId 约球id
      * @return
      */
@@ -486,7 +486,7 @@ public class NearbyBilliardsDatingActivity extends Activity
         requestParams.put("type", type + "");
         requestParams.put("id", nodeId + "");
 
-        String rawResult = HttpUtil.urlClient(HttpConstants.NearbyDating.URL_JOIN_ACTIVITY, requestParams, HttpConstants.RequestMethod.POST);
+        String rawResult = HttpUtil.urlClient(HttpConstants.Favor.STORE_URL, requestParams, HttpConstants.RequestMethod.POST);
 
         Log.d(TAG, " the raw result we get for adding the current dating item to favor collection are  : " + rawResult);
         try {

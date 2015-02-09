@@ -100,6 +100,8 @@ public class BilliardsNearbyCoachFragment extends Fragment
     private Drawable mProgressDrawable;
 
     private List<NearbyCoauchSubFragmentCoauchBean> mCoauchList = new ArrayList<NearbyCoauchSubFragmentCoauchBean>();
+    private List<NearbyCoauchSubFragmentCoauchBean> mCachedList = new ArrayList<NearbyCoauchSubFragmentCoauchBean>();
+
     private NearbyCoauchSubFragmentListAdapter mCoauchListAdapter;
     private NearbyPopBasicClickListener mClickListener;
 
@@ -139,6 +141,17 @@ public class BilliardsNearbyCoachFragment extends Fragment
         mCoauchListView.setAdapter(mCoauchListAdapter);
         mCoauchListAdapter.notifyDataSetChanged();
 
+        if (null != savedInstanceState)
+        {
+            mRefresh = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_REFRESH);
+            mLoadMore = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_LOAD_MORE);
+            mIsSavedInstance = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_INSTANCE);
+
+            mCachedList = savedInstanceState.getParcelableArrayList(NearbyFragmentsCommonUtils.KEY_SAVED_LISTVIEW);
+            mUIEventsHandler.obtainMessage(PublicConstant.USE_CACHE, mCachedList);
+
+        }
+
         mWorker = new BackgroundWorkerThread();
         if (Utils.networkAvaiable(sContext))
         {
@@ -155,6 +168,16 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
 
         return mView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(NearbyFragmentsCommonUtils.KEY_SAVED_LISTVIEW, (ArrayList<? extends android.os.Parcelable>) mCoauchList);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_LOAD_MORE, mLoadMore);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_REFRESH, mRefresh);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_INSTANCE, true);
     }
 
     @Override
@@ -352,14 +375,39 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     Log.d(TAG, " fail to get the data we need, and the detailed reason for that are : " + reasonDesc);
                     Toast.makeText(sContext, reasonDesc, Toast.LENGTH_SHORT).show();
                     break;
+                case PublicConstant.USE_CACHE:
+                    ArrayList<NearbyCoauchSubFragmentCoauchBean> cachedList = (ArrayList<NearbyCoauchSubFragmentCoauchBean>) msg.obj;
+                    if (cachedList.size() > 0)
+                    {
+                        // 首先将我们的EmptyView隐藏掉
+                        loadEmptyTv(true);
+                    }
+                    mCoauchList.addAll(cachedList);
+                    mCoauchListAdapter.notifyDataSetChanged();
+                    break;
                 case STATE_FETCH_DATA_SUCCESS:
+                    // 首先将我们的Empty隐藏掉，每次重新获得数据之后都需要先将EmptyView隐藏掉，然后需要重新判断
+                    loadEmptyTv(true);
+
                     mBeforeCount = mCoauchList.size();
                     List<NearbyCoauchSubFragmentCoauchBean> coauchList = (ArrayList<NearbyCoauchSubFragmentCoauchBean>) msg.obj;
                     for (NearbyCoauchSubFragmentCoauchBean bean : coauchList)
                     {
                         if (! mCoauchList.contains(bean))
                         {
-                            mCoauchList.add(bean);
+                            if (mRefresh)
+                            {
+                                mCoauchList.add(0, bean);
+                            } else
+                            {
+                                if (mIsSavedInstance)
+                                {
+                                    mCoauchList.add(0, bean);
+                                } else
+                                {
+                                    mCoauchList.add(bean);
+                                }
+                            }
                         }
                     }
                     mAfterCount = mCoauchList.size();
@@ -367,7 +415,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     if (mCoauchList.isEmpty())
                     {
                         Log.d(TAG, " inside the coauchFragment mUIEventsHandler --> we start to load the emptyView");
-                        loadEmptyTv();
+                        loadEmptyTv(false);
                     } else
                     {
                         if (mRefresh)
@@ -405,7 +453,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     hideProgress();
                     if (mCoauchList.isEmpty())
                     {
-                        loadEmptyTv();
+                        loadEmptyTv(false);
                     }
                     Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
                     break;
@@ -414,7 +462,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     Utils.showToast(sContext, sContext.getString(R.string.http_request_time_out));
                     if (mCoauchList.isEmpty())
                     {
-                        loadEmptyTv();
+                        loadEmptyTv(false);
                     }
                     hideProgress();
                     break;
@@ -422,7 +470,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 case PublicConstant.NO_RESULT:
                     if (mCoauchList.isEmpty())
                     {
-                        loadEmptyTv();
+                        loadEmptyTv(false);
                     } else
                     {
                         if (mLoadMore)
@@ -446,7 +494,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
                     if (mCoauchList.isEmpty())
                     {
-                        loadEmptyTv();
+                        loadEmptyTv(false);
                     }
                     hideProgress();
                     break;
@@ -455,14 +503,14 @@ public class BilliardsNearbyCoachFragment extends Fragment
         }
     };
 
-    private void loadEmptyTv()
+    private void loadEmptyTv(boolean disabled)
     {
         Log.d(TAG, " inside the loadEmptyTV method --> we are start loading the empty view from here ");
         if (mCoauchListView.isRefreshing())
         {
             mCoauchListView.onRefreshComplete();
         }
-        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mCoauchListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mCoauchListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str), disabled);
     }
 
     private void showProgress()
@@ -559,6 +607,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
     private boolean mLoadMore;
     private boolean mRefresh;
+    private boolean mIsSavedInstance;
 
     private int mCurrentPos;
     private int mBeforeCount;
@@ -598,7 +647,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
             mLoadMore = true;
             mCurrentPos = mCoauchList.size();
-            if (mBeforeCount != mAfterCount)
+            if (mBeforeCount != mAfterCount && !mRefresh)
             {
                 mStartNum = mEndNum + (mAfterCount - mBeforeCount);
                 mEndNum += 10 + (mAfterCount - mBeforeCount);
@@ -607,7 +656,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 mStartNum = mEndNum + 1;
                 mEndNum += 10;
             }
-
+            mRefresh = false;
             if (Utils.networkAvaiable(sContext))
             {
                 if (null != mWorker)

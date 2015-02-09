@@ -1,5 +1,7 @@
 package com.yueqiu.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -10,7 +12,7 @@ import org.json.JSONObject;
  *
  * 用于SearchActivity当中的教练的Bean文件
  */
-public class NearbyCoauchSubFragmentCoauchBean
+public class NearbyCoauchSubFragmentCoauchBean implements Parcelable
 {
     private static final String TAG = "NearbyCoauchSubFragmentCoauchBean";
 
@@ -181,4 +183,63 @@ public class NearbyCoauchSubFragmentCoauchBean
         }
         return result;
     }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return a bitmask indicating the set of special object types marshalled
+     * by the Parcelable.
+     */
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(mId);
+        dest.writeString(mUserPhoto);
+        dest.writeString(mUserName);
+        dest.writeString(mUserGender);
+        dest.writeString(mUserDistance);
+        dest.writeString(mUserLevel);
+        dest.writeString(mBilliardKind);
+    }
+
+    public static final Creator<NearbyDatingSubFragmentDatingBean> CREATOR = new Creator<NearbyDatingSubFragmentDatingBean>()
+    {
+        @Override
+        public NearbyDatingSubFragmentDatingBean createFromParcel(Parcel source)
+        {
+            return new NearbyDatingSubFragmentDatingBean(source);
+        }
+
+        @Override
+        public NearbyDatingSubFragmentDatingBean[] newArray(int size)
+        {
+            return new NearbyDatingSubFragmentDatingBean[size];
+        }
+    };
+
+    public NearbyCoauchSubFragmentCoauchBean(Parcel source)
+    {
+        this.mId = source.readString();
+        this.mUserPhoto = source.readString();
+        this.mUserName = source.readString();
+        this.mUserGender = source.readString();
+        this.mUserDistance = source.readString();
+        this.mUserLevel = source.readString();
+        this.mBilliardKind = source.readString();
+    }
+
 }

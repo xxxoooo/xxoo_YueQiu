@@ -47,6 +47,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.sql.CommonDataSource;
+
 /**
  * @author scguo
  *         <p/>
@@ -107,7 +109,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
     private PullToRefreshListView mRoomListView;
     private View mView;
-    private List<NearbyRoomSubFragmentRoomBean> mRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
+    private ArrayList<NearbyRoomSubFragmentRoomBean> mRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
+    private ArrayList<NearbyRoomSubFragmentRoomBean> mCachedList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
     private NearbyRoomSubFragmentListAdapter mSearchRoomAdapter;
 
     // 加载王赟开发的ProgressBar
@@ -120,7 +123,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private NearbyFragmentsCommonUtils.ControlPopupWindowCallback mCallback;
 
     // 定义的用于下拉刷新过程当中需要用到的变量
-    private boolean mLoadMore, mRefresh;
+    private boolean mLoadMore, mRefresh, mIsSavedInstance;
     private int mBeforeCount, mAfterCount;
     // 以下是我们用于跟踪page的值的请求(用于大众点评的分页请求过程)
     private int mPage = 1;
@@ -190,6 +193,17 @@ public class BilliardsNearbyRoomFragment extends Fragment
             }
         });
 
+        if (null != savedInstanceState)
+        {
+            mRefresh = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_REFRESH);
+            mLoadMore = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_LOAD_MORE);
+            mIsSavedInstance = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_INSTANCE);
+
+            mCachedList = savedInstanceState.getParcelableArrayList(NearbyFragmentsCommonUtils.KEY_SAVED_LISTVIEW);
+            mUIEventsHandler.obtainMessage(PublicConstant.USE_CACHE, mCachedList).sendToTarget();
+        }
+
+
         mWorkerThread = new WorkerHandlerThread();
         if (Utils.networkAvaiable(sContext))
         {
@@ -220,6 +234,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
     public void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(NearbyFragmentsCommonUtils.KEY_SAVED_LISTVIEW, mRoomList);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_LOAD_MORE, mLoadMore);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_REFRESH, mRefresh);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_INSTANCE, true);
     }
 
     // TODO: 以下是用于从大众点评的接里面请求的关键字
@@ -475,7 +493,17 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     String failStr = failData.getString(KEY_FETCH_DATA_FAILED);
                     Log.d(TAG, " we have fail to fetch the data for the room fragment, and the reason are : " + failStr);
                     break;
+                case PublicConstant.USE_CACHE:
+                    // 首先将我们的EmptyView隐藏掉
+                    loadEmptyTv(true);
+                    ArrayList<NearbyRoomSubFragmentRoomBean> cachedList = (ArrayList<NearbyRoomSubFragmentRoomBean>) msg.obj;
+                    mRoomList.addAll(cachedList);
+                    mSearchRoomAdapter.notifyDataSetChanged();
+                    break;
                 case STATE_FETCH_DATA_SUCCESS:
+                    // 依然是首先将我们的EmpttyView隐藏掉
+                    loadEmptyTv(true);
+
                     mBeforeCount = mRoomList.size();
                     List<NearbyRoomSubFragmentRoomBean> roomList = (ArrayList<NearbyRoomSubFragmentRoomBean>) msg.obj;
                     mBeforeCount = mRoomList.size();
@@ -483,14 +511,26 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     {
                         if (! mRoomList.contains(roomBean))
                         {
-                            mRoomList.add(roomBean);
+                            if (mRefresh)
+                            {
+                                mRoomList.add(0, roomBean);
+                            } else
+                            {
+                                if (mIsSavedInstance)
+                                {
+                                    mRoomList.add(0, roomBean);
+                                } else
+                                {
+                                    mRoomList.add(roomBean);
+                                }
+                            }
                         }
                     }
                     mAfterCount = mRoomList.size();
                     if (mRoomList.isEmpty())
                     {
                         Log.d(TAG, " inside the room fragment UIEventsHandler --> have send the message to load the Empty TextView ");
-                        loadEmptyTv();
+                        loadEmptyTv(false);
                     } else
                     {
                         if (mRefresh)
@@ -558,7 +598,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     if (mRoomList.isEmpty())
                     {
                         Log.d(TAG, " the room list we get are : " + mRoomList.size());
-                        loadEmptyTv();
+                        loadEmptyTv(false);
                     }
 
                     break;
@@ -566,21 +606,21 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     hideProgress();
                     Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
                     if (mRoomList.isEmpty())
-                        loadEmptyTv();
+                        loadEmptyTv(false);
                     break;
             }
             mSearchRoomAdapter.notifyDataSetChanged();
         }
     };
 
-    private void loadEmptyTv()
+    private void loadEmptyTv(boolean disabled)
     {
         if (mRoomListView.isRefreshing())
         {
             mRoomListView.onRefreshComplete();
         }
         Log.d(TAG, "inside the roomFragment --> we have load the EmptyView ");
-        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mRoomListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mRoomListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str), disabled);
     }
 
     private void showProgress()
@@ -815,11 +855,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
             String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
             mLoadMore = true;
-            mRefresh = false;
 
-            if (mBeforeCount != mAfterCount)
+            if (mBeforeCount != mAfterCount && !mRefresh)
                 mPage += 1;
-
+            mRefresh = false;
             if (Utils.networkAvaiable(sContext))
             {
                 // TODO: 我们在这里进行网络更新的请求
