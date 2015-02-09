@@ -15,6 +15,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -59,6 +60,7 @@ import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.CustomDialogBuilder;
 import com.yueqiu.view.GroupTopicScrollView;
+import com.yueqiu.view.IssueImageView;
 import com.yueqiu.view.dlgeffect.EffectsType;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
@@ -75,7 +77,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class PlayIssueActivity extends FragmentActivity implements View.OnClickListener,
-        DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener,AdapterView.OnItemClickListener,
+        DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener,
         EmojiconsFragment.OnEmojiconBackspaceClickedListener,EmojiconGridFragment.OnEmojiconClickedListener
 {
 
@@ -97,8 +99,9 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
     private String mImgFilePath;
     private int mTimeFlag;
     private TextView mEtActivityType;
-    private ImageView mIvAddImg, mIvExpression;
-    private GridView mGridView;
+    private ImageView  mIvExpression;
+    private IssueImageView mIvAddImg;
+//    private GridView mGridView;
     private LinearLayout mAddImgContainer;
     private GroupTopicScrollView mScrollView;
     private RelativeLayout mRootView;
@@ -113,7 +116,6 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
 
     private ProgressBar mPreProgress;
     private Drawable mProgressDrawable;
-    private PublishedDao mPublishedDao;
     //TODO:发布成功后他应该把发布成功的table_id返回来
     private PlayInfo mInfo;
 
@@ -121,10 +123,10 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
     private EmojiconsFragment mEmojiFragment;
-    private TopicImgAdapter mImgAdapter;
+//    private TopicImgAdapter mImgAdapter;
 
-    private List<ImageView> mAddViewList = new ArrayList<ImageView>();
-    private List<BitmapBean> mBitmapBeanList = new ArrayList<BitmapBean>();
+    private List<IssueImageView> mAddViewList = new ArrayList<IssueImageView>();
+//    private List<BitmapBean> mBitmapBeanList = new ArrayList<BitmapBean>();
 
 
     private Handler mHandler = new Handler()
@@ -181,7 +183,6 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         setContentView(R.layout.activity_play_issues);
         initActionBar();
         initView();
-        mPublishedDao = DaoFactory.getPublished(this);
         mFragmentManager = getSupportFragmentManager();
 
         ViewTreeObserver addImgObserver = mIvAddImg.getViewTreeObserver();
@@ -203,11 +204,11 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
                 if(mIsKeyboardShow){
                     mEmotionContainer.setVisibility(View.GONE);
                     mAddImgContainer.setVisibility(View.VISIBLE);
-                    if(!mBitmapBeanList.isEmpty()){
-                        mGridView.setVisibility(View.GONE);
-                    }else{
-                        mGridView.setVisibility(View.VISIBLE);
-                    }
+//                    if(!mBitmapBeanList.isEmpty()){
+//                        mGridView.setVisibility(View.GONE);
+//                    }else{
+//                        mGridView.setVisibility(View.VISIBLE);
+//                    }
                     mIsEmotionShow = false;
                 }else{
                     mOnKeyboardHideListener.onKeyBoardHide();
@@ -231,16 +232,16 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         public void onKeyBoardHide() {
             if(mIsEmotionShow){
                 mEmotionContainer.setVisibility(View.VISIBLE);
-                mAddImgContainer.setVisibility(View.INVISIBLE);
-                mGridView.setVisibility(View.GONE);
+                mAddImgContainer.setVisibility(View.GONE);
+//                mGridView.setVisibility(View.GONE);
             }else{
                 mEmotionContainer.setVisibility(View.GONE);
                 mAddImgContainer.setVisibility(View.VISIBLE);
-                if(mBitmapBeanList.isEmpty()){
-                    mGridView.setVisibility(View.GONE);
-                }else{
-                    mGridView.setVisibility(View.VISIBLE);
-                }
+//                if(mBitmapBeanList.isEmpty()){
+//                    mGridView.setVisibility(View.GONE);
+//                }else{
+//                    mGridView.setVisibility(View.VISIBLE);
+//                }
             }
         }
     };
@@ -261,15 +262,15 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         mChargeModuleTv   = (TextView) findViewById(R.id.activity_charge_module_text);
         mLocationTv       = (TextView) findViewById(R.id.activity_location_text);
 
-        mGridView = (GridView) findViewById(R.id.play_topic_grid_view);
-        mGridView.setVisibility(View.GONE);
+//        mGridView = (GridView) findViewById(R.id.play_topic_grid_view);
+//        mGridView.setVisibility(View.GONE);
         mAddImgContainer = (LinearLayout) findViewById(R.id.play_add_img_container);
         mScrollView = (GroupTopicScrollView) findViewById(R.id.play_topic_scroll_view);
         mRootView = (RelativeLayout) findViewById(R.id.play_topic_root_relative_view);
         mEmotionContainer = (FrameLayout) findViewById(R.id.play_topic_emotion_container);
 
         mEtActivityType = (TextView) findViewById(R.id.activitie_title_edit_type);
-        mIvAddImg = (ImageView) findViewById(R.id.activitiy_issues_iv_add_img);
+        mIvAddImg = (IssueImageView) findViewById(R.id.activitiy_issues_iv_add_img);
         mIvExpression = (ImageView) findViewById(R.id.activity_issues_expression);
 
         mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
@@ -300,9 +301,9 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         mIvAddImg.setOnClickListener(this);
 
 
-        mImgAdapter = new TopicImgAdapter();
-        mGridView.setAdapter(mImgAdapter);
-        mGridView.setOnItemClickListener(this);
+//        mImgAdapter = new TopicImgAdapter();
+//        mGridView.setAdapter(mImgAdapter);
+//        mGridView.setOnItemClickListener(this);
 
 
     }
@@ -372,11 +373,11 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
                 if(mIsEmotionShow){
                     mEmotionContainer.setVisibility(View.GONE);
                     mAddImgContainer.setVisibility(View.VISIBLE);
-                    if(!mBitmapBeanList.isEmpty()){
-                        mGridView.setVisibility(View.VISIBLE);
-                    }else{
-                        mGridView.setVisibility(View.GONE);
-                    }
+//                    if(!mBitmapBeanList.isEmpty()){
+//                        mGridView.setVisibility(View.VISIBLE);
+//                    }else{
+//                        mGridView.setVisibility(View.GONE);
+//                    }
                     mIsEmotionShow = false;
                 }
                 //表情没有弹起
@@ -392,32 +393,43 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
                 }
                 break;
             case R.id.activitiy_issues_iv_add_img:
-                mDlgBuilder = CustomDialogBuilder.getsInstance(this);
-                mDlgBuilder.withTitle(getString(R.string.select_photo))
-                        .withTitleColor(Color.WHITE)
-                        .withDividerColor(getResources().getColor(R.color.search_distance_color))
-                        .withMessage(null)
-                        .isCancelableOnTouchOutside(true)
-                        .isCancelable(true)
-                        .withDialogColor(R.color.actionbar_color)
-                        .withDuration(700)
-                        .withEffect(EffectsType.SlideLeft)
-                        .setSureButtonVisible(false)
-                        .withCancelButtonText(getString(R.string.btn_message_cancel))
-                        .setCustomView(R.layout.dialog_select_photo, v.getContext())
-                        .setCancelButtonClick(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                mDlgBuilder.dismiss();
-                            }
-                        })
-                        .show();
 
-                mTakePhoto = (TextView) mDlgBuilder.findViewById(R.id.take_photo_now);
-                mSelectPhoto = (TextView) mDlgBuilder.findViewById(R.id.select_photo_from_album);
-                mTakePhoto.setOnClickListener(this);
-                mSelectPhoto.setOnClickListener(this);
 
+                if(mIvAddImg.getBitmapBean() != null){
+                    BitmapBean bean = mIvAddImg.getBitmapBean();
+                    if(bean == null)
+                        return ;
+                    FragmentManager fm = getSupportFragmentManager();
+                    String imgPath = bean.imgFilePath;
+                    Uri imgUri = bean.imgUri;
+                    ImageFragment.newInstance(imgPath,imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
+                }else {
+                    mDlgBuilder = CustomDialogBuilder.getsInstance(this);
+                    mDlgBuilder.withTitle(getString(R.string.select_photo))
+                            .withTitleColor(Color.WHITE)
+                            .withDividerColor(getResources().getColor(R.color.search_distance_color))
+                            .withMessage(null)
+                            .isCancelableOnTouchOutside(true)
+                            .isCancelable(true)
+                            .withDialogColor(R.color.actionbar_color)
+                            .withDuration(700)
+                            .withEffect(EffectsType.SlideLeft)
+                            .setSureButtonVisible(false)
+                            .withCancelButtonText(getString(R.string.btn_message_cancel))
+                            .setCustomView(R.layout.dialog_select_photo, v.getContext())
+                            .setCancelButtonClick(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mDlgBuilder.dismiss();
+                                }
+                            })
+                            .show();
+
+                    mTakePhoto = (TextView) mDlgBuilder.findViewById(R.id.take_photo_now);
+                    mSelectPhoto = (TextView) mDlgBuilder.findViewById(R.id.select_photo_from_album);
+                    mTakePhoto.setOnClickListener(this);
+                    mSelectPhoto.setOnClickListener(this);
+                }
                 break;
             case R.id.take_photo_now:
                 Uri imageFileUri = null;
@@ -604,9 +616,16 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
             bmpBean.bitmapDrawable = bitmap;
             bmpBean.imgFilePath = mImgFilePath;
             bmpBean.imgUri = null;
-            mBitmapBeanList.add(bmpBean);
-            mImgAdapter.notifyDataSetChanged();
-            mGridView.setVisibility(View.VISIBLE);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth,mAddViewHeight);
+            params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
+            params.gravity = Gravity.CENTER_VERTICAL;
+            mIvAddImg.setLayoutParams(params);
+            mIvAddImg.setBitmapBean(bmpBean);
+            mIvAddImg.setImageDrawable(bmpBean.bitmapDrawable);
+            mAddViewList.add(mIvAddImg);
+//            mBitmapBeanList.add(bmpBean);
+//            mImgAdapter.notifyDataSetChanged();
+//            mGridView.setVisibility(View.VISIBLE);
         }
 
         else if(requestCode == ALBUM_REQUEST && resultCode == RESULT_OK){
@@ -616,9 +635,17 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
             bmpBean.bitmapDrawable = drawable;
             bmpBean.imgFilePath = null;
             bmpBean.imgUri = imageFileUri;
-            mBitmapBeanList.add(bmpBean);
-            mImgAdapter.notifyDataSetChanged();
-            mGridView.setVisibility(View.VISIBLE);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth,mAddViewHeight);
+            params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
+            params.gravity = Gravity.CENTER_VERTICAL;
+            mIvAddImg.setLayoutParams(params);
+            mIvAddImg.setBitmapBean(bmpBean);
+            mIvAddImg.setImageDrawable(bmpBean.bitmapDrawable);
+            mIvAddImg.setBackgroundColor(getResources().getColor(android.R.color.black));
+            mAddViewList.add(mIvAddImg);
+//            mBitmapBeanList.add(bmpBean);
+//            mImgAdapter.notifyDataSetChanged();
+//            mGridView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -643,17 +670,17 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         }
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        BitmapBean bean = mBitmapBeanList.get(position);
-        if(bean == null)
-            return ;
-
-        FragmentManager fm = getSupportFragmentManager();
-        String imgPath = bean.imgFilePath;
-        Uri imgUri = bean.imgUri;
-        ImageFragment.newInstance(imgPath,imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
-    }
+//    @Override
+//    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//        BitmapBean bean = mBitmapBeanList.get(position);
+//        if(bean == null)
+//            return ;
+//
+//        FragmentManager fm = getSupportFragmentManager();
+//        String imgPath = bean.imgFilePath;
+//        Uri imgUri = bean.imgUri;
+//        ImageFragment.newInstance(imgPath,imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
+//    }
 
     @Override
     public void onEmojiconBackspaceClicked(View v) {
@@ -665,49 +692,49 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         EmojiconsFragment.input(mIllustrationEdit,emojicon);
     }
 
-    private class TopicImgAdapter extends BaseAdapter {
-
-
-        @Override
-        public int getCount() {
-            return mBitmapBeanList.size();
-        }
-
-
-        @Override
-        public Object getItem(int position) {
-            return mBitmapBeanList.get(position);
-        }
-
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-            if(convertView == null){
-                convertView = LayoutInflater.from(PlayIssueActivity.this).inflate(R.layout.item_topic_grid_view,null);
-                holder = new ViewHolder();
-                holder.imageView = (ImageView) convertView.findViewById(R.id.item_topic_imageview);
-                convertView.setTag(holder);
-            }else{
-                holder = (ViewHolder) convertView.getTag();
-            }
-            holder.imageView.setLayoutParams(new GridView.LayoutParams(mAddViewWidth,mAddViewHeight));
-            holder.imageView.getRootView().setBackgroundColor(getResources().getColor(android.R.color.black));
-            holder.imageView.setImageDrawable(mBitmapBeanList.get(position).bitmapDrawable);
-            mAddViewList.add(holder.imageView);
-            return convertView;
-        }
-
-        private class ViewHolder{
-            ImageView imageView;
-        }
-    }
+//    private class TopicImgAdapter extends BaseAdapter {
+//
+//
+//        @Override
+//        public int getCount() {
+//            return mBitmapBeanList.size();
+//        }
+//
+//
+//        @Override
+//        public Object getItem(int position) {
+//            return mBitmapBeanList.get(position);
+//        }
+//
+//
+//        @Override
+//        public long getItemId(int position) {
+//            return position;
+//        }
+//
+//
+//        @Override
+//        public View getView(int position, View convertView, ViewGroup parent) {
+//            ViewHolder holder;
+//            if(convertView == null){
+//                convertView = LayoutInflater.from(PlayIssueActivity.this).inflate(R.layout.item_topic_grid_view,null);
+//                holder = new ViewHolder();
+//                holder.imageView = (ImageView) convertView.findViewById(R.id.item_topic_imageview);
+//                convertView.setTag(holder);
+//            }else{
+//                holder = (ViewHolder) convertView.getTag();
+//            }
+//            holder.imageView.setLayoutParams(new GridView.LayoutParams(mAddViewWidth,mAddViewHeight));
+//            holder.imageView.getRootView().setBackgroundColor(getResources().getColor(android.R.color.black));
+//            holder.imageView.setImageDrawable(mBitmapBeanList.get(position).bitmapDrawable);
+//            mAddViewList.add(holder.imageView);
+//            return convertView;
+//        }
+//
+//        private class ViewHolder{
+//            ImageView imageView;
+//        }
+//    }
 
     private String getType(String type)
     {
@@ -759,11 +786,17 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                finish();
-                overridePendingTransition(R.anim.top_in,R.anim.top_out);
+                if(mIsEmotionShow){
+                    mEmotionContainer.setVisibility(View.GONE);
+                    mAddImgContainer.setVisibility(View.VISIBLE);
+                    mIsEmotionShow = false;
+                }else {
+                    finish();
+                    overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                }
                 break;
         }
-        return super.onKeyDown(keyCode, event);
+        return true;
     }
 
     //TODO:由于目前不需要缓存，所以暂时先不调用该方法

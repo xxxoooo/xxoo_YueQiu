@@ -282,6 +282,8 @@
     <string name="your_favor_is_empty">你还没有收藏任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
     <string name="no_more_info">没有更多<xliff:g id="number" example="15">%1$s</xliff:g>信息了</string>
     <string name="your_partin_is_null">你还没有参与任何活动<xliff:g>%1$s</xliff:g></string>
+    <string name="feed_backing">正在提交中...</string>
+    <string name="feed_back_success">反馈成功</string>
 
     <!-- 聊吧 -->
     <string name="btn_liaoba_message">消息</string>

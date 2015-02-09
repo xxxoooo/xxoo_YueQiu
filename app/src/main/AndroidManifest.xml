@@ -8,8 +8,6 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA"/>
 
-
-
     <application
         android:name=".YueQiuApp"
         android:allowBackup="true"
@@ -79,7 +77,8 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".activity.FeedbackActivity"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.UpgradeAssistantActivity"
             android:screenOrientation="portrait" />

@@ -416,6 +416,7 @@ public class HttpConstants
         public static final String URL      = "/store/storeSave";
     }
 
+
     /**
      * 台球圈详情
      */
@@ -485,6 +486,16 @@ public class HttpConstants
          * 请求超时
          */
         public static final int TIME_OUT = 1011;
+    }
+
+    public static class FeedBack{
+        public static final String URL = "/center/suggest";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String TITLE = "title";
+
+        public static final String CONTENT = "content";
     }
 
 

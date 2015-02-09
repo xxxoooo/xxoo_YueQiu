@@ -370,7 +370,7 @@
                         android:id="@+id/activity_issues_expression"
                         android:layout_alignParentRight="true"
                         android:layout_width="wrap_content"
-                        android:src="@drawable/expression"
+                        android:src="@drawable/emotion_bg"
                         android:layout_marginRight="5dp"
                         android:layout_marginBottom="5dp"
                         android:layout_height="wrap_content" />
@@ -391,35 +391,38 @@
             <LinearLayout
                 android:id="@+id/play_add_img_container"
                 android:layout_width="match_parent"
-                android:background="@drawable/login_shape"
-                android:gravity="center_vertical"
                 android:layout_height="0dp"
-                android:layout_weight="0.9"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp">
-                <ImageView
-                    android:id="@+id/activitiy_issues_iv_add_img"
-                    android:src="@drawable/add_img"
-                    android:layout_marginLeft="10dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-            <GridView
-                android:id="@+id/play_topic_grid_view"
-                android:background="@android:color/white"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="2"
-                android:layout_marginTop="10dp"
-                android:numColumns="4"
-                android:horizontalSpacing="10dp"
+                android:layout_weight="1"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:verticalSpacing="3dp"
-                android:paddingLeft="10dp"
-                android:paddingBottom="5dp"
-                android:paddingTop="5dp"
-                />
+                android:background="@drawable/login_shape"
+                android:orientation="horizontal"
+                android:padding="2dp"
+                >
+                <com.yueqiu.view.IssueImageView
+                    android:id="@+id/activitiy_issues_iv_add_img"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/add_img_bg"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"/>
+            </LinearLayout>
+            <!--<GridView-->
+                <!--android:id="@+id/play_topic_grid_view"-->
+                <!--android:background="@android:color/white"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="0dp"-->
+                <!--android:layout_weight="2"-->
+                <!--android:layout_marginTop="10dp"-->
+                <!--android:numColumns="4"-->
+                <!--android:horizontalSpacing="10dp"-->
+                <!--android:layout_marginLeft="10dp"-->
+                <!--android:layout_marginRight="10dp"-->
+                <!--android:verticalSpacing="3dp"-->
+                <!--android:paddingLeft="10dp"-->
+                <!--android:paddingBottom="5dp"-->
+                <!--android:paddingTop="5dp"-->
+                <!--/>-->
 
         </LinearLayout>
 
