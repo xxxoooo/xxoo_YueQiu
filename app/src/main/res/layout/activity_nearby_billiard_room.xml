@@ -57,7 +57,8 @@
                     android:textSize="18sp"
                     android:textColor="@color/login_btn_normal"
                     android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"/>
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="4dp"/>
 
                 <RatingBar
                     android:id="@+id/ratingbar_search_room_detailed_ratingbar"
@@ -69,6 +70,7 @@
                     android:layout_marginLeft="5dp"
                     android:layout_toLeftOf="@id/tv_search_room_level_num"
                     android:layout_centerVertical="true"
+                    android:layout_marginRight="4dp"
                     />
             </RelativeLayout>
         </RelativeLayout>

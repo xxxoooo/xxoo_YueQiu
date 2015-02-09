@@ -71,6 +71,7 @@ public class NearbyBilliardRoomActivity extends Activity
         mRoomPhoto = (NetworkImageView) findViewById(R.id.img_search_room_detailed_photo);
         mRoomName = (TextView) findViewById(R.id.tv_search_room_detailed_name);
         mRoomRatingBar = (RatingBar) findViewById(R.id.ratingbar_search_room_detailed_ratingbar);
+        mRoomRatingBar.setStepSize(0.02f); // 我们接受到的rating的值的总数为100，但是我们只有5个星星，所以我们每次移动的步骤就是5/100=0.02
         mRoomRatingNum = (TextView) findViewById(R.id.tv_search_room_level_num);
 
         // the tag textView collection here
@@ -92,15 +93,15 @@ public class NearbyBilliardRoomActivity extends Activity
         Intent receivedIntent = getIntent();
         Bundle receivedData = receivedIntent.getBundleExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT);
         if (null != receivedData) {
-            double price = receivedData.getDouble(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE);
-            float level = receivedData.getFloat(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL);
-            String tag = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_TAG);
-            String info = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO);
-            String address = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS);
-            String phone = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE);
-            String photoUrl = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO);
-            String name = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME);
-
+            double price = receivedData.getDouble(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, 0.0);
+            float level = receivedData.getFloat(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, 1.0f);
+            String tag = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_TAG, "");
+            String info = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO, "");
+            String address = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, "");
+            String phone = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, "");
+            String photoUrl = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, "");
+            String name = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, "");
+            String shopHours = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_SHOP_HOURS, "");
 
             // 把我们得到的数据全部渲染到Activity当中
             mRoomPrice.setText(String.valueOf(price));

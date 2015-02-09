@@ -330,7 +330,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
                             Log.d(TAG, " after totally parsed this json obj : " + businessId + " , " + roomName + " , " + level + " , " + price + " , " + distance + " , " + roomPhoto + " , " + address);
                             // String roomPhoto, String roomName, float level, double price, String address, String distance
-                            NearbyRoomSubFragmentRoomBean roomBean = new NearbyRoomSubFragmentRoomBean(String.valueOf(businessId), roomPhoto, roomName, level, price, address, distance, roomPhoneNum, roomTag, detailedRoomInfo);
+                            // TODO: 我们在这里最新增加了一个字段就是shop hours(在我们自己提供的接口当中我们已经添加了，但是大众点评的接口当中没有看到这个field的提供信息，先空着，到以后优化时再修改)
+                            NearbyRoomSubFragmentRoomBean roomBean = new NearbyRoomSubFragmentRoomBean(String.valueOf(businessId), roomPhoto, roomName, level, price, address, distance, roomPhoneNum, roomTag, detailedRoomInfo, "");
                             // TODO: 将这条数据加入到roomList当中(现在由于数据不完整，所以暂时不添加，等数据完整性已经比较好的时候再进行添加)
                             cacheRoomList.add(roomBean);
                         }
@@ -852,7 +853,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
         int i;
         for (i = 0; i < 100; ++i)
         {
-            mRoomList.add(new NearbyRoomSubFragmentRoomBean("", "", roomName, level, price, address, distance, roomPhoneNum, roomTag, roomDetailedInfo));
+            mRoomList.add(new NearbyRoomSubFragmentRoomBean("", "", roomName, level, price, address, distance, roomPhoneNum, roomTag, roomDetailedInfo, ""));
         }
     }
 }

@@ -90,6 +90,7 @@
     <string name="search_dating_detailed_btn_i_want_in_success">您已成功提交请求</string>
     <string name="search_dating_detailed_btn_i_want_in_failed">抱歉，您的请求失败了</string>
     <string name="search_dating_detailed_tv_already_in">已参加人员</string>
+    <string name="search_dating_login_first">请您先登录，登录之后查看专属您个人的约球信息</string>
 
     <!-- 约球当中的popupWindow中的string资源 -->
     <string name="search_dating_popupwindow_no_filter">约球时间(智能排序)</string>
@@ -151,8 +152,8 @@
         这个是用于显示助教的价格，这里我们将用到<=这个符号，为了将这个符号完整的拼接到TextView当中，我们最好使用
         Xliff，而不是通过复杂的StringBuilder来实现，因为我们的TextView是有背景图片的，所以我们只能使用这个技巧
     -->
-    <string name="search_assistcaouch_subfragment_listitem_price">大约<xliff:g id="price" /> 元/时</string>
-    <string name="nearby_room_subfragment_listitem_range"><xliff:g id="number" /> 米以内</string>
+    <string name="search_assistcaouch_subfragment_listitem_price">大约<xliff:g id="number" example="38">%1$s</xliff:g> 元/时</string>
+    <string name="nearby_room_subfragment_listitem_range"><xliff:g id="number" example="2500">%1$s</xliff:g> 米以内</string>
 
     <!-- 4.教练子Fragment的title -->
     <string name="search_caouch_subfragment_title_ability">资质</string>
@@ -173,7 +174,7 @@
     <string name="search_room_popupwindow_do_notfilter">区域(不限)</string>
     <!-- 球厅当中的popupWindow的用于筛选的各个区域的名字 -->
     <string name="search_room_popupwindow_region_chaoyang">朝阳区</string>
-    <string name="search_room_popupwindow_region_haidian">海地区</string>
+    <string name="search_room_popupwindow_region_haidian">海淀区</string>
     <string name="search_room_popupwindow_region_dongcheng">通州区</string>
     <string name="search_room_popupwindow_region_xicheng">西城区</string>
     <string name="search_room_popupwindow_region_feitaiqu">丰台区</string>

@@ -90,10 +90,13 @@ public class NearbyRoomSubFragmentListAdapter extends BaseAdapter
         Log.d(TAG, " inside the room adapter --> and the url we get for the room thumb photo are : " + item.getRoomPhotoUrl());
         viewHolder.mRoomPhoto.setImageUrl(item.getRoomPhotoUrl(), mImgLoader);
         viewHolder.mRoomLevel.setRating(item.getLevel());
+        viewHolder.mRoomLevel.setStepSize(0.02f); // 我们接受到的rating的值的总数为100，但是我们只有5个星星，所以我们每次移动的步骤就是5/100=0.02
 
         viewHolder.mRoomDistance.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, item.getDistance()));
         viewHolder.mRoomAddress.setText(item.getDetailedAddress());
         viewHolder.mRoomPrice.setText(String.valueOf(item.getPrice()));
+        Log.d(TAG, " the rating level for the room item are : " + item.getLevel() + ", and the distance we get are : " + item.getDistance()
+                        + ", and the roomPrice are : " + item.getPrice());
         viewHolder.mRoomName.setText(item.getRoomName());
 
         return convertView;

@@ -26,4 +26,10 @@
     <dimen name="nearby_subfragment_listview_margin_bottom">48dp</dimen>
     <dimen name="nearby_subfragment_filter_btn_height">39dp</dimen>
     <dimen name="dialog_padding">25dp</dimen>
+
+    <!--用于定义每一个ListView的item当中的用户头像userPhoto的大小的dimen值，因为服务器
+        端传送过来的图片有一些大，不符合客户端的设计的目标 -->
+    <dimen name="listview_item_user_photo_width">62dp</dimen>
+    <dimen name="listview_item_user_photo_height">62dp</dimen>
+
 </resources>

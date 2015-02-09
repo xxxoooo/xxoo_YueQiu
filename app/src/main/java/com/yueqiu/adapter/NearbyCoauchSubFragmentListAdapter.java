@@ -86,11 +86,8 @@ public class NearbyCoauchSubFragmentListAdapter extends BaseAdapter
         viewHolder.mGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, NearbyFragmentsCommonUtils.parseGenderDrawable(bean.getUserGender()), 0);
         viewHolder.mGender.setCompoundDrawablePadding(6);
         viewHolder.mName.setText(bean.getUserName());
-        // TODO: this is the static data, and we should change it to the dynamic data by using the VolleyImageView
-        // TODO: or something else that has the same functionality
         viewHolder.mPhoto.setDefaultImageResId(R.drawable.default_head);
         viewHolder.mPhoto.setImageUrl(bean.getUserPhoto(), mImgLoader);
-
 
         return convertView;
     }
@@ -100,8 +97,6 @@ public class NearbyCoauchSubFragmentListAdapter extends BaseAdapter
         public NetworkImageView mPhoto;
         private TextView mName, mGender, mLevel, mKinds, mDistance;
     }
-
-
 }
 
 
