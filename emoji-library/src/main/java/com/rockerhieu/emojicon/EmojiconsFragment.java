@@ -165,24 +165,31 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
 
     @Override
     public void onPageSelected(int i) {
+        Log.e("ddd", "onPageSelected>>>i = " + i);
         if (mEmojiTabLastSelectedIndex == i) {
             return;
         }
-        switch (i) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                if (mEmojiTabLastSelectedIndex >= 0 && mEmojiTabLastSelectedIndex < mEmojiTabs.length) {
-                    mEmojiTabs[mEmojiTabLastSelectedIndex].setSelected(false);
-                }
-                mEmojiTabs[i].setSelected(true);
-                mEmojiTabLastSelectedIndex = i;
-                mRecentsManager.setRecentPage(i);
-                break;
+//        switch (i) {
+//            case 0:
+//            case 1:
+//            case 2:
+//            case 3:
+//            case 4:
+//            case 5:
+//                if (mEmojiTabLastSelectedIndex >= 0 && mEmojiTabLastSelectedIndex < mEmojiTabs.length) {
+//                    mEmojiTabs[mEmojiTabLastSelectedIndex].setSelected(false);
+//                }
+//                mEmojiTabs[i].setSelected(true);
+//                mEmojiTabLastSelectedIndex = i;
+//                mRecentsManager.setRecentPage(i);
+//                break;
+//        }
+        if (mEmojiTabLastSelectedIndex >= 0 && mEmojiTabLastSelectedIndex < mEmojiTabs.length) {
+            mEmojiTabs[mEmojiTabLastSelectedIndex].setSelected(false);
         }
+        mEmojiTabs[i].setSelected(true);
+        mEmojiTabLastSelectedIndex = i;
+        mRecentsManager.setRecentPage(i);
     }
 
     @Override

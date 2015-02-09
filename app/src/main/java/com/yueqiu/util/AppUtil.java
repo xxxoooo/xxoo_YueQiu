@@ -13,7 +13,7 @@ import java.util.List;
 public class AppUtil {
 	public static String  getTopAppPackage(Context context) {
 		ActivityManager activityManager = (ActivityManager) context.getApplicationContext()
-				.getSystemService("activity");
+				.getSystemService(Context.ACTIVITY_SERVICE);
 		RunningTaskInfo currentRun = activityManager.getRunningTasks(1).get(0);
 		ComponentName nowApp = currentRun.topActivity;
 		String packname = nowApp.getPackageName();
@@ -37,5 +37,12 @@ public class AppUtil {
 		}
 		 return sb.toString();
 	}
+
+    public static String getCurrentActivityName(Context context) {
+        ActivityManager activityManager = (ActivityManager) context.getApplicationContext()
+                .getSystemService(Context.ACTIVITY_SERVICE);
+        RunningTaskInfo currentRun = activityManager.getRunningTasks(1).get(0);
+        return currentRun.topActivity.getClassName();
+    }
 
 }

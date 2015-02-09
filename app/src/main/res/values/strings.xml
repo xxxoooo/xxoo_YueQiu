@@ -464,4 +464,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
+    <!--IM-->
+    <string name="im_login_other_device">您的账号在另外一台设备上登录了！</string>
+    <string name="im_user_offline">您的账号掉线了！</string>
 </resources>

@@ -32,6 +32,10 @@ import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.gotye.api.GotyeAPI;
+import com.gotye.api.GotyeStatusCode;
+import com.gotye.api.GotyeUser;
+import com.gotye.api.listener.LoginListener;
 import com.yueqiu.activity.FavorActivity;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.activity.PlayIssueActivity;
@@ -41,6 +45,7 @@ import com.yueqiu.activity.MyParticipationActivity;
 import com.yueqiu.activity.MyProfileActivity;
 import com.yueqiu.activity.PublishedInfoActivity;
 import com.yueqiu.adapter.SlideViewAdapter;
+import com.yueqiu.chatbar.GotyeService;
 import com.yueqiu.bean.ISlideListItem;
 import com.yueqiu.bean.SlideAccountItemISlide;
 import com.yueqiu.bean.SlideOtherItemISlide;
@@ -71,7 +76,7 @@ import java.util.Map;
 /**
  * 首页的SearchActivity
  */
-public class BilliardNearbyActivity extends FragmentActivity implements ActionBar.TabListener
+public class BilliardNearbyActivity extends FragmentActivity implements ActionBar.TabListener, LoginListener
 {
     private static final String TAG = "BilliardNearbyActivity";
 
@@ -144,7 +149,13 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                     case R.id.first_title_nearby:
                         break;
                     case R.id.first_title_chatbar:
-                        mIntent.setClass(BilliardNearbyActivity.this, ChatBarActivity.class);
+                        if (checkUserId()){
+                            mIntent.setClass(BilliardNearbyActivity.this, ChatBarActivity.class);
+                        }
+                        else {
+                            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                            mIntent.setClass(BilliardNearbyActivity.this, LoginActivity.class);
+                        }
                         startActivity(mIntent);
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
@@ -172,6 +183,11 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         filter.addAction(PublicConstant.SLIDE_ACCOUNT_ACTION);
         registerReceiver(mReceiver,filter);
 
+
+        //登录IM
+        GotyeAPI.getInstance().addListerer(this);
+        if(checkUserId())
+            login();
 
     }
 
@@ -256,6 +272,66 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private static final String TAG_ASSISTCOAUCH_FRAGMENT = "searchAssistCoauchFragment";
     private static final String TAG_COAUCH_FRAGMENT = "searchCoauchFragment";
     private static final String TAG_ROOM_FRAGMENT = "searchRoomFragment";
+
+    /**
+     * 登录IM
+     */
+    private void login() {
+        Log.e(TAG, "isOnline --> " + GotyeAPI.getInstance().isOnline());
+        if (!GotyeAPI.getInstance().isOnline()) {
+            int i = GotyeAPI.getInstance().login(YueQiuApp.sUserInfo.getUsername(), null);
+            // 根据返回的code判断
+            if (i == GotyeStatusCode.CODE_OK) {
+                // 已经登陆
+                onLogin(i, null);
+            }
+        }
+    }
+
+    /**
+     * IM 登出
+     * @param code 状态码 参见 {@link com.gotye.api.GotyeStatusCode}
+     */
+    @Override
+    public void onLogout(int code) {
+        if (code == GotyeStatusCode.CODE_FORCELOGOUT) {
+            Toast.makeText(this, getString(R.string.im_login_other_device), Toast.LENGTH_SHORT).show();
+        } else if (code == GotyeStatusCode.CODE_NETWORD_DISCONNECTED) {
+            Toast.makeText(this, getString(R.string.im_user_offline), Toast.LENGTH_SHORT).show();
+
+        }
+        if (Utils.networkAvaiable(BilliardNearbyActivity.this)) {
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    logout();
+                }
+            }).start();
+        } else {
+            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * IM 登录
+     * @param code 状态码 参见 {@link com.gotye.api.GotyeStatusCode}
+     * @param currentLoginUser 当前登录用户
+     */
+    @Override
+    public void onLogin(int code, GotyeUser currentLoginUser) {
+        // 判断登陆是否成功
+        if (code == GotyeStatusCode.CODE_OK) {
+            Intent toService = new Intent(this, GotyeService.class);
+            startService(toService);
+//            Toast.makeText(this, "IM登录callback....", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "IM登录成功");
+        } else {
+            // 失败,可根据code定位失败原因
+            Toast.makeText(this, "IM系统登录失败....", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
     private class SectionPagerAdapter extends FragmentPagerAdapter
@@ -550,18 +626,19 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                         }
                         break;
                     case 7:
-                        if (Utils.networkAvaiable(BilliardNearbyActivity.this)) {
-                            new Thread(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    logout();
-                                }
-                            }).start();
-                        } else {
-                            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
-                        }
+//                        if (Utils.networkAvaiable(BilliardNearbyActivity.this)) {
+//                            new Thread(new Runnable()
+//                            {
+//                                @Override
+//                                public void run()
+//                                {
+//                                    logout();
+//                                }
+//                            }).start();
+//                        } else {
+//                            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
+//                        }
+                        onLogout(-100);
                         break;
                 }
 
