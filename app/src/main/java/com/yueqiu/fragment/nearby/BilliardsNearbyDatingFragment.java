@@ -266,24 +266,28 @@ public class BilliardsNearbyDatingFragment extends Fragment
             return;
         }
 
-        try
-        {
-            final int userIdInt = Integer.parseInt(userId);
-            Log.d(TAG, " the finally user id we get for requesting the user info are : " + userId);
-            if (userIdInt < 1)
-            {
-                // 当前用户并没有登录，是不可能得到相关的约球信息的，所以必须要先登录才可以
-                mUIEventsHandler.sendEmptyMessage(USER_HAS_NOT_LOGIN);
-                return;
-            }
-        } catch (final Exception e)
-        {
-            Log.d(TAG, " exception happened while we parse the user id value from the YueQiuApp, and cause to : " + e.toString());
-        }
+        // TODO: 以下的部分是用于判断当前的用户是否登录的逻辑，但是现在不需要了，所以我们注掉了
+        // TODO: 但是不知道会不会变策略，所以暂时还是不要直接删掉了
+//        try
+//        {
+//            final int userIdInt = Integer.parseInt(userId);
+//            Log.d(TAG, " the finally user id we get for requesting the user info are : " + userId);
+//            if (userIdInt < 1)
+//            {
+//                // 当前用户并没有登录，是不可能得到相关的约球信息的，所以必须要先登录才可以
+//                mUIEventsHandler.sendEmptyMessage(USER_HAS_NOT_LOGIN);
+//                return;
+//            }
+//        } catch (final Exception e)
+//        {
+//            Log.d(TAG, " exception happened while we parse the user id value from the YueQiuApp, and cause to : " + e.toString());
+//        }
 
 
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
-        requestParams.put("user_id", userId);
+        // TODO: 现在约球的设计是不需要传递UserId的
+//        requestParams.put("user_id", userId);
+
         // 我们将range的默认值置为1000
         String rangeVal = TextUtils.isEmpty(range) ? "1000" : range;
         requestParams.put("range", rangeVal);

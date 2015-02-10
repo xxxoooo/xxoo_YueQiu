@@ -1,4 +1,3 @@
-
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -108,126 +107,128 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3.9"
+        android:layout_weight="3.4"
         android:fillViewport="true">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/search_dating_separator"
-        >
-        <TextView
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_info_title"
-            android:layout_marginTop="2dp"
-            />
 
-        <TextView
-            android:layout_below="@id/tv_search_dating_info_title"
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_address_indi"
-            android:text="@string/search_dating_detailed_address_indi"
-            />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/search_dating_separator"
+            >
 
-        <TextView
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_address"
-            android:layout_toRightOf="@id/tv_search_dating_detailed_address_indi"
-            android:layout_alignTop="@id/tv_search_dating_detailed_address_indi"
-            />
+            <TextView
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_info_title"
+                android:layout_marginTop="2dp"
+                />
 
-        <TextView
-            android:layout_below="@id/tv_search_dating_detailed_address_indi"
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_starttime_indi"
-            android:text="@string/search_dating_detailed_starttime_indi"
-            />
+            <TextView
+                android:layout_below="@id/tv_search_dating_info_title"
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_address_indi"
+                android:text="@string/search_dating_detailed_address_indi"
+                />
 
-        <TextView
-            android:layout_toRightOf="@id/tv_search_dating_detailed_starttime_indi"
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_starttime"
-            android:layout_alignTop="@id/tv_search_dating_detailed_starttime_indi"
-            />
+            <TextView
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_address"
+                android:layout_toRightOf="@id/tv_search_dating_detailed_address_indi"
+                android:layout_alignTop="@id/tv_search_dating_detailed_address_indi"
+                />
 
-        <TextView
-            android:layout_below="@id/tv_search_dating_detailed_starttime_indi"
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_endtime_indi"
-            android:text="@string/search_dating_detailed_endtime_indi"
-            />
+            <TextView
+                android:layout_below="@id/tv_search_dating_detailed_address_indi"
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_starttime_indi"
+                android:text="@string/search_dating_detailed_starttime_indi"
+                />
 
-        <TextView
-            android:layout_toRightOf="@id/tv_search_dating_detailed_endtime_indi"
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_endtime"
-            android:layout_alignTop="@id/tv_search_dating_detailed_endtime_indi"
-            />
+            <TextView
+                android:layout_toRightOf="@id/tv_search_dating_detailed_starttime_indi"
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_starttime"
+                android:layout_alignTop="@id/tv_search_dating_detailed_starttime_indi"
+                />
 
-        <TextView
-            android:layout_below="@id/tv_search_dating_detailed_endtime_indi"
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_model_indi"
-            android:text="@string/search_dating_detailed_model_indi"
-            />
+            <TextView
+                android:layout_below="@id/tv_search_dating_detailed_starttime_indi"
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_endtime_indi"
+                android:text="@string/search_dating_detailed_endtime_indi"
+                />
 
-        <TextView
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_model"
-            android:text="@string/search_dating_detailed_model_indi_test"
-            android:layout_toRightOf="@id/tv_search_dating_detailed_model_indi"
-            android:layout_alignTop="@id/tv_search_dating_detailed_model_indi"
-            />
+            <TextView
+                android:layout_toRightOf="@id/tv_search_dating_detailed_endtime_indi"
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_endtime"
+                android:layout_alignTop="@id/tv_search_dating_detailed_endtime_indi"
+                />
 
-        <TextView
-            android:layout_below="@id/tv_search_dating_detailed_model_indi"
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_contact_indi"
-            android:text="@string/search_dating_detailed_contact_indi"
-            />
+            <TextView
+                android:layout_below="@id/tv_search_dating_detailed_endtime_indi"
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_model_indi"
+                android:text="@string/search_dating_detailed_model_indi"
+                />
 
-        <TextView
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_contact"
-            android:layout_toRightOf="@id/tv_search_dating_detailed_contact_indi"
-            android:layout_alignTop="@id/tv_search_dating_detailed_contact_indi"
-            android:layout_alignLeft="@id/tv_search_dating_detailed_model"
-            />
+            <TextView
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_model"
+                android:text="@string/search_dating_detailed_model_indi_test"
+                android:layout_toRightOf="@id/tv_search_dating_detailed_model_indi"
+                android:layout_alignTop="@id/tv_search_dating_detailed_model_indi"
+                />
 
-        <TextView
-            android:layout_below="@id/tv_search_dating_detailed_contact_indi"
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_phonenum_indi"
-            android:text="@string/search_dating_detailed_phone_indi"
-            />
+            <TextView
+                android:layout_below="@id/tv_search_dating_detailed_model_indi"
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_contact_indi"
+                android:text="@string/search_dating_detailed_contact_indi"
+                />
 
-        <TextView
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_phonenum"
-            android:autoLink="phone"
-            android:layout_toRightOf="@id/tv_search_dating_detailed_phonenum_indi"
-            android:layout_alignTop="@id/tv_search_dating_detailed_phonenum_indi"
-            />
+            <TextView
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_contact"
+                android:layout_toRightOf="@id/tv_search_dating_detailed_contact_indi"
+                android:layout_alignTop="@id/tv_search_dating_detailed_contact_indi"
+                android:layout_alignLeft="@id/tv_search_dating_detailed_model"
+                />
 
-        <TextView
-            android:layout_below="@id/tv_search_dating_detailed_phonenum_indi"
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_activity_intro_indi"
-            android:text="@string/search_dating_detailed_activity_intro_indi"
-            />
+            <TextView
+                android:layout_below="@id/tv_search_dating_detailed_contact_indi"
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_phonenum_indi"
+                android:text="@string/search_dating_detailed_phone_indi"
+                />
 
-        <TextView
-            style="@style/SearchRoomActivityTvStyle"
-            android:id="@+id/tv_search_dating_detailed_activity_intro"
-            android:layout_toRightOf="@id/tv_search_dating_detailed_activity_intro_indi"
-            android:layout_alignTop="@id/tv_search_dating_detailed_activity_intro_indi"
-            />
-    </RelativeLayout>
+            <TextView
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_phonenum"
+                android:autoLink="phone"
+                android:layout_toRightOf="@id/tv_search_dating_detailed_phonenum_indi"
+                android:layout_alignTop="@id/tv_search_dating_detailed_phonenum_indi"
+                />
+
+            <TextView
+                android:layout_below="@id/tv_search_dating_detailed_phonenum_indi"
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_activity_intro_indi"
+                android:text="@string/search_dating_detailed_activity_intro_indi"
+                />
+
+            <TextView
+                style="@style/SearchRoomActivityTvStyle"
+                android:id="@+id/tv_search_dating_detailed_activity_intro"
+                android:layout_toRightOf="@id/tv_search_dating_detailed_activity_intro_indi"
+                android:layout_alignTop="@id/tv_search_dating_detailed_activity_intro_indi"
+                />
+        </RelativeLayout>
     </ScrollView>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
+        android:layout_weight="2.4"
         >
 
         <TextView

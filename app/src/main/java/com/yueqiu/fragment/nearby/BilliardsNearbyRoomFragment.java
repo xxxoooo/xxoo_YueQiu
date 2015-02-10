@@ -1,16 +1,21 @@
 package com.yueqiu.fragment.nearby;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.os.Process;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,6 +38,7 @@ import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
@@ -220,14 +226,45 @@ public class BilliardsNearbyRoomFragment extends Fragment
             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
         }
 
+        // 开启用于获取地理位置的服务
+        getActivity().startService(new Intent(getActivity(), LocationUtil.class));
+
         return mView;
     }
 
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            Bundle bundle = intent.getExtras();
+            boolean isTimeout = bundle.getBoolean(LocationUtil.ISTIMEOUT_KEY);
+            if (isTimeout)
+            {
+                hideProgress();
+            } else
+            {
+                Location location = bundle.getParcelable(LocationUtil.LOCATION_KEY);
+                Log.d(TAG_1, " the locationInfo we get are --> latitude : " + location.getLatitude() + ", longitude : " + location.getLongitude());
+                double latitude = location.getLatitude();
+                double longitude = location.getLongitude();
+                // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
+                sParamsPreference.ensurePreference(sContext);
+                sParamsPreference.setRoomLati(sContext, (float) latitude);
+                sParamsPreference.setRoomLongi(sContext, (float) longitude);
+
+                mUIEventsHandler.sendEmptyMessage(LOCATION_HAS_GOT);
+                Log.d(TAG_1, " inside the mLocationBroadcastReceiver, and we have get the location that the user needs ");
+            }
+        }
+    };
+
+    private static final String TAG_1 = "roomFragment";
     @Override
     public void onResume()
     {
         super.onResume();
-
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, new IntentFilter(LocationUtil.BROADCAST_FILTER));
     }
 
     @Override
@@ -251,6 +288,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
      * @param region 区域范围，例如朝阳，昌平(这些区域都是依靠我们之前选定的city做为基准的)
      * @param range  范围(例如1000米以内),这个值默认为1000，对应到具体的参数名就是radius
      *               但是这里有一个问题，就是如果我们需要传入radius作为请求参数的话，我们必须还要同时提供当前用户的经纬度
+     *               同时还要知道range的最大值为5000，超过5000就默认作为错误参数处理
      *               因为大众点评是需要通过用户当前的经纬度来确定用户的大致范围的(我们需要单独提供用户的经纬度信息)
      * @param sort   我们本地的客户端提供了四种排序选择1. 区域；2. 距离；3. 价格；4. 好评
      *               对应于大众点评可以接受的参数则是1. 默认，2. 星级高优先(也就是好评度)，8. 人均价格低优先，9. 人均价格高优先
@@ -285,9 +323,18 @@ public class BilliardsNearbyRoomFragment extends Fragment
         String regionVal = TextUtils.isEmpty(region) ? "朝阳区" : region;
         requestParams.put("region", regionVal);
 
-        // TODO: 以下是添加我们所挑选的商店的附近的商店列表的参数值(但是我们传递这个参数的前提是先要将用户当前的经度和纬度信息作为参数传递到Server端)
-        String rangeVal = TextUtils.isEmpty(range) ? "1000" : range;
-//        sRequestParams.put("range", range);
+        // 将我们的经纬度信息参数传递到服务器端
+        float longi = sParamsPreference.getRoomLongi(sContext);
+        float lati = sParamsPreference.getRoomLati(sContext);
+        if (longi != -1 && lati != -1)
+        {
+            Log.d(TAG_1, " the latitude and the longitude has get ");
+            requestParams.put("latitude", lati + "");
+            requestParams.put("longitude", longi + "");
+            String rangeVal = TextUtils.isEmpty(range) ? "1000" : range;
+            Log.d(TAG_1, " the range we get are : " + rangeVal);
+            requestParams.put("radius", rangeVal);
+        }
 
         // 这里的sort值很特殊，因为sort的值可以决定两个筛选，一个是价格(当值为8和9时)，还有一个就是好评度(例如值为1和2)
         // 如果用户没有指定，则我们直接将这个值置为1，即默认排序的情况
@@ -433,6 +480,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
             mWorkerThread = null;
         }
         mCallback.closePopupWindow();
+
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
         super.onPause();
     }
 
@@ -454,6 +503,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private static final int STATE_FETCH_DATA_SUCCESS = 1 << 9;
 
     private static final int REQUEST_ALL_ROOM_INFO = 1 << 1;
+
+    private static final int LOCATION_HAS_GOT = 1 << 11;
 
     // 以下是按FIlterButton当中当中弹出的List进行筛选时的List的点击的事件的处理,
     // 由于这些常量值被定义到同一个地方进行使用，所以我们将球厅Fragment当中的常量值定义为从50开始
@@ -550,11 +601,28 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     break;
 
                 case REQUEST_ROOM_INFO_RANGE_FILTERED:
-                    Log.d(TAG, "inside the mUIEventsHandler --> the REQUEST_ROOM_INFO_RANGE_FILTERED ");
-                    String rangeStr = (String) msg.obj;
-                    mWorkerThread.fetchRoomDataRangeFiltered(rangeStr);
-                    Log.d(TAG, " the range string we get in the mUIEventsHandler are : " + rangeStr);
+                    Log.d(TAG_1, "inside the mUIEventsHandler --> the REQUEST_ROOM_INFO_RANGE_FILTERED ");
+                    // 我们不需要在这里直接获取当前用户请求的范围了，而是从SharedPreference当中进行获取
+//                    String rangeStr = (String) msg.obj;
+                    // 开启获取当前用户位置的服务
+//                    mWorkerThread.fetchRoomDataRangeFiltered(rangeStr);
+//                    Log.d(TAG, " the range string we get in the mUIEventsHandler are : " + rangeStr);
 
+                    // 我们现在的策略是当用户点击了popupWindow上的选项之后，我们并不是直接开始进行数据请求，
+                    // 而是首先开始打开位置获取服务，然后直到位置获取成功之后通过广播通知到我们，然后我们再在
+                    // 收到通知的广播内通过Handler发送Event通知我们现在才是可以真正的进行数据请求工作了
+                    getActivity().startService(new Intent(getActivity(), LocationUtil.class));
+                    showProgress();
+
+                    break;
+                case LOCATION_HAS_GOT:
+                    Log.d(TAG_1, " the location get event has been received ... ");
+                    sParamsPreference.ensurePreference(sContext);
+                    String rangeStr = sParamsPreference.getRoomRange(sContext);
+                    if (!TextUtils.isEmpty(rangeStr))
+                    {
+                        mWorkerThread.fetchRoomDataRangeFiltered(rangeStr);
+                    }
                     break;
 
                 case REQUEST_ROOM_INFO_PRICE_FILTERED:
@@ -792,6 +860,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
         public void fetchRoomDataRangeFiltered(String rangeStr)
         {
+            Log.d(TAG_1, " and we start to retrieve the range filtered information ");
             if (! TextUtils.isEmpty(rangeStr))
             {
                 mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_RANGE_FILTERED, rangeStr).sendToTarget();

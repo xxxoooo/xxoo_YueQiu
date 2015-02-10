@@ -396,9 +396,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        String rangeStr = room_distance[position];
-                        mParamsPreference.setRoomRange(mContext, rangeStr);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_RANGE_FILTERED, rangeStr).sendToTarget();
+                        String rawRangeStr = room_distance[position];
+                        int len = rawRangeStr.length();
+                        String range = rawRangeStr.substring(0, len - 3);
+                        mParamsPreference.setRoomRange(mContext, range);
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_RANGE_FILTERED, range).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });

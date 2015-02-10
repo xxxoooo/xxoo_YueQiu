@@ -38,6 +38,8 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
     private static final String KEY_ROOM_PRICE = "keyRoomPrice";
     private static final String KEY_ROOM_APPRISAL = "keyRoomApprisal";
 
+    private static final String KEY_ROOM_LATI = "keyRoomLati";
+    private static final String KEY_ROOM_LONGI = "keyRoomLongi";
 
     private SharedPreferences mSharedPreference = null;
 
@@ -56,6 +58,34 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
             mSharedPreference = PreferenceManager.getDefaultSharedPreferences(context);
 
         return this;
+    }
+
+    public float getRoomLongi(Context context)
+    {
+        ensurePreference(context);
+        return mSharedPreference.getFloat(KEY_ROOM_LONGI, -1);
+    }
+
+    public float getRoomLati(Context context)
+    {
+        ensurePreference(context);
+        return mSharedPreference.getFloat(KEY_ROOM_LATI, -1);
+    }
+
+    public void setRoomLati(Context context, float lati)
+    {
+        ensurePreference(context);
+        SharedPreferences.Editor editor = mSharedPreference.edit();
+        editor.putFloat(KEY_ROOM_LATI, lati);
+        editor.commit();
+    }
+
+    public void setRoomLongi(Context context, float longi)
+    {
+        ensurePreference(context);
+        SharedPreferences.Editor editor = mSharedPreference.edit();
+        editor.putFloat(KEY_ROOM_LONGI, longi);
+        editor.commit();
     }
 
     public String getMateRange(Context context)

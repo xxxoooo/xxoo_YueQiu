@@ -92,7 +92,9 @@ public class LocationUtil extends Service {
         Location retLocation = null;
         if ((flagGetGPSDone || flagNetworkDone)) {
             culocationGPS = myLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Log.d("roomFragment", " inside the Locationuril : " + culocationGPS);
             culocationNetwork = myLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Log.d("roomFragment", " inside the Locationuril : " + culocationNetwork);
             if (culocationGPS == null && culocationNetwork == null) {
                 retLocation = myLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
                 if (retLocation == null) {
