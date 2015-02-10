@@ -81,7 +81,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
         return instance;
     }
 
-    private boolean mNetworkAvailable;
+    private boolean mNetworkAvailable,mIsListEmpty;
 
     private BackgroundWorkerHandler mBackgroundHandler;
 
@@ -106,8 +106,10 @@ public class BilliardsNearbyDatingFragment extends Fragment
     private View mView;
     private Button mBtnDistan, mBtnPublishDate;
     private PullToRefreshListView mDatingListView;
-    private List<NearbyDatingSubFragmentDatingBean> mDatingList = new ArrayList<NearbyDatingSubFragmentDatingBean>();
+    private ArrayList<NearbyDatingSubFragmentDatingBean> mDatingList = new ArrayList<NearbyDatingSubFragmentDatingBean>();
 
+    // 用于保存在我们的状态当中的cacheList
+    private ArrayList<NearbyDatingSubFragmentDatingBean> mCachedDatingList = new ArrayList<NearbyDatingSubFragmentDatingBean>();
     private NearbyDatingSubFragmentListAdapter mDatingListAdapter;
     // TODO: mArgs是我们在初始化Fragment时需要接受来自初始化这个Fragment所传递的参数的容器，
     // TODO: 只不过我们现在没有用到，但是这个参数是我们更好的封装Fragment的基础，不要忽略
@@ -168,6 +170,17 @@ public class BilliardsNearbyDatingFragment extends Fragment
             }
         });
 
+        if (null != savedInstanceState)
+        {
+            mRefresh = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_REFRESH);
+            mLoadMore = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_LOAD_MORE);
+            mIsSavedInstance = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_INSTANCE);
+
+            mCachedDatingList = savedInstanceState.getParcelableArrayList(NearbyFragmentsCommonUtils.KEY_SAVED_LISTVIEW);
+            mUIEventsHandler.obtainMessage(PublicConstant.USE_CACHE, mCachedDatingList).sendToTarget();
+        }
+
+
         mBackgroundHandler = new BackgroundWorkerHandler();
         Log.d(TAG, " DatingFragment --> inside the onCreateView() method");
         if (Utils.networkAvaiable(sContext))
@@ -189,6 +202,16 @@ public class BilliardsNearbyDatingFragment extends Fragment
         }
 
         return mView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(NearbyFragmentsCommonUtils.KEY_SAVED_LISTVIEW, mDatingList);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_LOAD_MORE, mLoadMore);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_REFRESH, mRefresh);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_INSTANCE, true);
     }
 
     @Override
@@ -407,26 +430,49 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     if (mDatingList.isEmpty())
                     {
                         Log.d(TAG, " the current list should be empty here ??? ");
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
                     }
                     Toast.makeText(sContext, infoStr, Toast.LENGTH_SHORT).show();
                     hideProgress();
                     Log.d(TAG, " fail to get data due to the reason as : " + infoStr);
                     break;
+                case PublicConstant.USE_CACHE:
+                    // 首先将我们的EmptyView隐藏掉
+                    loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, true);
+                    ArrayList<NearbyDatingSubFragmentDatingBean> cachedList = (ArrayList<NearbyDatingSubFragmentDatingBean>) msg.obj;
+                    mDatingList.addAll(cachedList);
+                    mDatingListAdapter.notifyDataSetChanged();
+                    break;
+
                 case FETCH_DATA_SUCCESSED:
+                    loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, true);
                     mBeforeCount = mDatingList.size();
+                    mIsListEmpty = mDatingList.isEmpty();
                     List<NearbyDatingSubFragmentDatingBean> datingList = (ArrayList<NearbyDatingSubFragmentDatingBean>) msg.obj;
                     for (NearbyDatingSubFragmentDatingBean datingBean : datingList)
                     {
                         if (! mDatingList.contains(datingBean))
                         {
+                            if (mRefresh && !mIsListEmpty)
+                            {
+                                mDatingList.add(0, datingBean);
+                            } else
+                            {
+                                if (mIsSavedInstance)
+                                {
+                                    mDatingList.add(0, datingBean);
+                                } else
+                                {
+                                    mDatingList.add(datingBean);
+                                }
+                            }
                             mDatingList.add(datingBean);
                         }
                     }
                     mAfterCount = mDatingList.size();
                     if (mDatingList.isEmpty())
                     {
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
                     } else
                     {
                         if (mRefresh)
@@ -461,7 +507,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     hideProgress();
                     if (mDatingList.isEmpty())
                     {
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
                     }
                     Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
 
@@ -470,13 +516,13 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     // 超时之后的处理策略
                     Utils.showToast(sContext, sContext.getString(R.string.http_request_time_out));
                     if (mDatingList.isEmpty()) {
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
                     }
                     hideProgress();
                     break;
                 case PublicConstant.NO_RESULT:
                     if (mDatingList.isEmpty()) {
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
                     } else {
                         if (mLoadMore) {
                             Utils.showToast(sContext, sContext.getString(R.string.no_more_info));
@@ -498,7 +544,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
                     if (mDatingList.isEmpty())
                     {
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
                     }
 
                     hideProgress();
@@ -510,7 +556,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     mDatingListAdapter.notifyDataSetChanged();
                     if (mDatingList.isEmpty())
                     {
-                        loadEmptyTv(R.string.search_dating_login_first);
+                        loadEmptyTv(R.string.search_dating_login_first, false);
                     }
                     break;
             }
@@ -518,14 +564,14 @@ public class BilliardsNearbyDatingFragment extends Fragment
         }
     };
 
-    private void loadEmptyTv(final int contentStrId)
+    private void loadEmptyTv(final int contentStrId, boolean disabled)
     {
         if (mDatingListView.isRefreshing())
         {
             mDatingListView.onRefreshComplete();
         }
 
-        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mDatingListView, sContext.getString(contentStrId));
+        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mDatingListView, sContext.getString(contentStrId), disabled);
     }
 
     private void showProgress()
@@ -627,6 +673,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
     private boolean mRefresh;
     private boolean mLoadMore;
+    private boolean mIsSavedInstance;
 
     // 用于请求更多数据时的开始条目和结束条目
     private int mStarNum = 0;
@@ -643,7 +690,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
         {
             String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-
+            loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str,true);
             if (Utils.networkAvaiable(sContext))
             {
                 mRefresh = true;
@@ -667,7 +714,10 @@ public class BilliardsNearbyDatingFragment extends Fragment
             mLoadMore = true;
 
             mCurrentPos = mDatingList.size();
+
             if (mBeforeCount != mAfterCount && mRefresh)
+
+            if (mBeforeCount != mAfterCount && !mRefresh)
             {
                 mStarNum = mEndNum + (mAfterCount - mBeforeCount);
                 mEndNum += 10 + (mAfterCount - mBeforeCount);
@@ -677,6 +727,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 mEndNum += 10;
             }
             mRefresh = false;
+            loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str,true);
             if (Utils.networkAvaiable(sContext))
             {
                 if (null != mBackgroundHandler)

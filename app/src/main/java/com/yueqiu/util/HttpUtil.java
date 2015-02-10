@@ -87,7 +87,6 @@ public class HttpUtil
             conn.setDoInput(true);
             conn.setDoOutput(true);
             conn.connect();
-            Log.d("wy","caocao");
             StringBuilder result = new StringBuilder();
             if(conn.getResponseCode() == 200)
             {
@@ -229,6 +228,6 @@ public class HttpUtil
 
     private static void log(String msg)
     {
-        Log.i("wy", "msg is ->"+ msg);
+        Log.i(TAG, "msg is ->"+ msg);
     }
 }

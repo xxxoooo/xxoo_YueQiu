@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -14,6 +15,8 @@ import android.support.v4.view.ViewPager;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.SearchView;
 
 import com.yueqiu.R;
@@ -24,6 +27,7 @@ import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.PublishedDao;
 import com.yueqiu.fragment.slidemenu.PublishedFragment;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
 
@@ -154,6 +158,25 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
+        EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
+        searchEditText.setTextColor(Color.WHITE);
+        searchEditText.setHintTextColor(Color.LTGRAY);
+
+        // 用于改变SearchView当中的icon
+        searchView.setIconifiedByDefault(false);
+        try {
+            Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
+            searchField.setAccessible(true);
+            ImageView searchHintIcon = (ImageView) searchField.get(searchView);
+            searchHintIcon.setImageResource(R.drawable.search);
+        } catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }

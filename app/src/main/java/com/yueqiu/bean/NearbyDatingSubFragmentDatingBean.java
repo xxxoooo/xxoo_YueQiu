@@ -1,5 +1,7 @@
 package com.yueqiu.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -12,7 +14,7 @@ import org.json.JSONObject;
  * 主要是用于创建ListView当中的item
  *
  */
-public class NearbyDatingSubFragmentDatingBean
+public class NearbyDatingSubFragmentDatingBean implements Parcelable
 {
     private final static String TAG = "NearbyDatingSubFragmentDatingBean";
 
@@ -148,4 +150,60 @@ public class NearbyDatingSubFragmentDatingBean
         }
         return result;
     }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return a bitmask indicating the set of special object types marshalled
+     * by the Parcelable.
+     */
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(mId);
+        dest.writeString(mUserDeclare);
+        dest.writeString(mUserPhoto);
+        dest.writeString(mUserDistance);
+        dest.writeString(mUserName);
+
+    }
+
+    public static final Creator<NearbyDatingSubFragmentDatingBean> CREATOR = new Creator<NearbyDatingSubFragmentDatingBean>()
+    {
+        @Override
+        public NearbyDatingSubFragmentDatingBean createFromParcel(Parcel source)
+        {
+            return new NearbyDatingSubFragmentDatingBean(source);
+        }
+
+        @Override
+        public NearbyDatingSubFragmentDatingBean[] newArray(int size)
+        {
+            return new NearbyDatingSubFragmentDatingBean[size];
+        }
+    };
+
+    public NearbyDatingSubFragmentDatingBean(Parcel source)
+    {
+        this.mId = source.readString();
+        this.mUserDeclare = source.readString();
+        this.mUserPhoto = source.readString();
+        this.mUserDistance = source.readString();
+        this.mUserName = source.readString();
+    }
+
 }

@@ -276,15 +276,18 @@
     <string name="published_confirm_str">确认</string>
     <string name="published_cancel_str">取消</string>
     <string name="published_delete_content">确定要删除所选的<xliff:g id="number" example="15">%1$s</xliff:g>条记录吗？</string>
-    <string name="your_published_info_is_empty">你还没有发布任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
+    <string name="your_published_info_is_empty">未获取任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
+    <string name="no_your_published_info">你还没有发布任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
     <string name="http_request_error">网络请求错误</string>
     <string name="http_request_time_out">网络请求超时，请稍后再试</string>
     <string name="location_request_time_out">请求超时！请检查GPS或者网络是否可用！</string>
     <string name="no_published_info">网络请求发生错误，未获取发布信息</string>
     <string name="no_store_info">网络请求错误，未获取收藏信息</string>
-    <string name="your_favor_is_empty">你还没有收藏任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
+    <string name="your_favor_is_empty">未获取任何<xliff:g id="number" example="15">%1$s</xliff:g>收藏信息</string>
+    <string name="no_favor_info">你还有收藏任何<xliff:g id="number" example="15">%1$s</xliff:g></string>
     <string name="no_more_info">没有更多<xliff:g id="number" example="15">%1$s</xliff:g>信息了</string>
-    <string name="your_partin_is_null">你还没有参与任何活动<xliff:g>%1$s</xliff:g></string>
+    <string name="your_partin_is_null">未获取任何<xliff:g>%1$s</xliff:g>参与信息</string>
+    <string name="no_part_in_info">你还没有参与任何<xliff:g>%1$s</xliff:g></string>
     <string name="feed_backing">正在提交中...</string>
     <string name="feed_back_success">反馈成功</string>
 

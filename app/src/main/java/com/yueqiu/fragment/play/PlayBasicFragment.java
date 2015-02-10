@@ -60,7 +60,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     private PlayDao mPlayDao;
     private ProgressBar mPreProgressBar;
     private TextView mEmptyView,mPreTextView;
-    private boolean mRefresh,mLoadMore,mIsSavedInstance;
+    private boolean mRefresh,mLoadMore,mIsSavedInstance,mIsListEmpty;
     private int mPlayType;
     private Drawable mProgressDrawable;
     private String mEmptyTypeStr;
@@ -318,11 +318,12 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                      * 这两个值是用来判断更新了多少条
                      */
                     mBeforeCount = mList.size();
+                    mIsListEmpty = mList.isEmpty();
                     List<PlayInfo> list = (List<PlayInfo>) msg.obj;
                     for(PlayInfo info : list){
                         if (!mList.contains(info)) {
 
-                            if(mRefresh) {
+                            if(mRefresh && !mIsListEmpty) {
                                 mList.add(0,info);
                             }else{
                                 if(mIsSavedInstance){
@@ -452,6 +453,9 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
             mLoadMore = false;
             mInsertList.clear();
             mUpdateList.clear();
+            if(mEmptyView.getVisibility() == View.VISIBLE){
+                mEmptyView.setVisibility(View.GONE);
+            }
             /**
              * 下拉刷新始终都是请求最新的数据,无网络时无法使用缓存
              */
@@ -475,11 +479,15 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
 
             mLoadMore = true;
             mCurrPosition = mList.size() ;
+
             /**
              * 将用来插入和更新数据库的两个list清空，以免之前的数据重复插入
              */
             mInsertList.clear();
             mUpdateList.clear();
+            if(mEmptyView.getVisibility() == View.VISIBLE){
+                mEmptyView.setVisibility(View.GONE);
+            }
             /**
              * 如果要加载前先进行过下拉刷新，同时数据有更新，则此时再加载时分页的
              * start，end应该相应的增加

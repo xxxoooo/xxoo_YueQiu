@@ -47,6 +47,12 @@ public class NearbyFragmentsCommonUtils{
         public void closePopupWindow();
     }
 
+    // 定义用于保存NearbyActivity当中的Fragment的List以及一些ListView的position的值
+    public static final String KEY_SAVED_LISTVIEW = "savedListView";
+    public static final String KEY_SAVED_REFRESH = "savedRefresh";
+    public static final String KEY_SAVED_LOAD_MORE = "savedLoadMore";
+    public static final String KEY_SAVED_INSTANCE = "savedInstance";
+
     // 定义用于处理从Fragment的ListView点击之后切换到具体的Activity时的切换过程
     // 以下是用于球厅Fragment当中需要传输的数据的详细的key值
     public static final String KEY_BUNDLE_SEARCH_ROOM_FRAGMENT = "searchRoomFragment";
@@ -91,14 +97,22 @@ public class NearbyFragmentsCommonUtils{
                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
     }
 
-    public static void setFragmentEmptyTextView(Context context, final PullToRefreshListView listView, final String emptyText)
+    public static void setFragmentEmptyTextView(Context context, final PullToRefreshListView listView, final String emptyText, boolean disable)
     {
         TextView emptyView = new TextView(context);
         emptyView.setGravity(Gravity.CENTER);
-        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
+        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         emptyView.setTextColor(context.getResources().getColor(R.color.md__defaultBackground));
         emptyView.setText(emptyText);
-        listView.setEmptyView(emptyView);
+        if (! disable)
+        {
+            listView.setEmptyView(emptyView);
+        } else
+        {
+            //listView.setEmptyView(null);
+            emptyView.setVisibility(View.GONE);
+        }
+
     }
 
     public static PopupWindow getFilterPopupWindow(Context context, View anchorView, View popupLayoutView)
@@ -218,7 +232,6 @@ public class NearbyFragmentsCommonUtils{
 
 
     private Handler mInternalHandler = new Handler(){
-        @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch(msg.what){
@@ -291,7 +304,6 @@ public class NearbyFragmentsCommonUtils{
                             mPagerImgArr[i] = imgView;
                         }
                     }
-
                     mGalleryImgAdapter = new NearbyMateFragmentViewPagerImgAdapter(mPagerImgArr);
                     mImgGalleryViewPager.setAdapter(mGalleryImgAdapter);
                     mImgGalleryViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
@@ -397,7 +409,8 @@ public class NearbyFragmentsCommonUtils{
 
     public static final int parseGenderDrawable(String sexVal)
     {
-        if (!TextUtils.isEmpty(sexVal)) {
+        if (!TextUtils.isEmpty(sexVal))
+        {
             Log.d(TAG, " the sex val we get are :" + sexVal);
             return sexVal.equals("男") ? R.drawable.male : R.drawable.female;
         }

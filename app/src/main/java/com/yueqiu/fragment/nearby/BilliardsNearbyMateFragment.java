@@ -47,6 +47,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils.KEY_SAVED_LISTVIEW;
+
 /**
  * Created by scguo on 14/12/17.
  * <p/>
@@ -113,7 +115,7 @@ public class BilliardsNearbyMateFragment extends Fragment
     private ProgressBar mPreProgress;
     private TextView mPreTextView;
     private Drawable mProgressDrawable;
-    private List<NearbyMateSubFragmentUserBean> mUserList = new ArrayList<NearbyMateSubFragmentUserBean>();
+    private ArrayList<NearbyMateSubFragmentUserBean> mUserList = new ArrayList<NearbyMateSubFragmentUserBean>();
 
     // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 //    private List<NearbyMateSubFragmentUserBean> mUpdateList = new ArrayList<NearbyMateSubFragmentUserBean>();
@@ -127,12 +129,16 @@ public class BilliardsNearbyMateFragment extends Fragment
 
     private boolean mRefresh;
     private boolean mLoadMore;
+    private boolean mIsSavedInstance;
+    private boolean mIsListEmpty;
 
     private int mStartNum = 0;
     private int mEndNum = 9;
     // 用于定义当前MateList当中的list的position，帮助我们确定从第几条开始请求数据
     private int mCurrentPos;
     private int mBeforeCount, mAfterCount;
+
+    private ArrayList<NearbyMateSubFragmentUserBean> mCachedMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
 
     public NearbyFragmentsCommonUtils.ControlPopupWindowCallback mPopupwindowCallback;
 
@@ -186,29 +192,45 @@ public class BilliardsNearbyMateFragment extends Fragment
         // 我们将所有的数据请求的工作放到onCreateView()当中，而不是放到onResume()方法当中。
         // 因为在onResume()当中请求太频繁了
 
+        if (null != savedInstanceState)
+        {
+            mRefresh = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_REFRESH);
+            mLoadMore = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_LOAD_MORE);
+            mIsSavedInstance = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_INSTANCE);
 
-        mMateListAdapter = new NearbyMateSubFragmentListAdapter(sContext, (ArrayList<NearbyMateSubFragmentUserBean>) mUserList);
+            mCachedMateList = savedInstanceState.getParcelableArrayList(KEY_SAVED_LISTVIEW);
+
+            mUIEventsHandler.obtainMessage(PublicConstant.USE_CACHE, mCachedMateList).sendToTarget();
+        }
+
+
+        mMateListAdapter = new NearbyMateSubFragmentListAdapter(sContext,  mUserList);
         mSubFragmentListView.setAdapter(mMateListAdapter);
 
-        mMateListAdapter.notifyDataSetChanged();
+//        mMateListAdapter.notifyDataSetChanged();
 
         mWorker = new BackgroundWorker();
+        mWorker.start();
+        mWorker.getLooper();
         if (Utils.networkAvaiable(sContext))
         {
             mLoadMore = false;
             mRefresh = false;
             // 我们的数据请求只是发生于网络可行的情况下
-            if (mWorker != null && mWorker.getState() == Thread.State.NEW)
-            {
-                Log.d(TAG, " the mWorker has started ");
-                mWorker.start();
-            }
+//            if (mWorker != null && mWorker.getState() == Thread.State.NEW)
+//            {
+//                Log.d(TAG, " the mWorker has started ");
+//                mWorker.start();
+//            }
+            mWorker.fetchAllData(mStartNum,mEndNum);
         } else
         {
             mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
         }
         return mView;
     }
+
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState)
@@ -247,7 +269,6 @@ public class BilliardsNearbyMateFragment extends Fragment
         super.onStop();
     }
 
-
     /**
      * 用于请求首页当中的球友的信息列表
      *
@@ -278,9 +299,7 @@ public class BilliardsNearbyMateFragment extends Fragment
             requestParams.put("gender", gender);
         }
         List<NearbyMateSubFragmentUserBean> cacheMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
-        Log.d("wy","aaa");
         String rawResult = HttpUtil.urlClient(HttpConstants.NearbyMate.URL, requestParams, HttpConstants.RequestMethod.GET);
-        Log.d("wy","bbb");
         Log.d(TAG, " the raw result we get for the mate fragment are : " + rawResult);
         if (!TextUtils.isEmpty(rawResult))
         {
@@ -297,27 +316,31 @@ public class BilliardsNearbyMateFragment extends Fragment
                     Log.d(TAG, " the initial json object we get are : " + initialObj + " ; and the result are : " + resultJson);
                     if (statusCode == HttpConstants.ResponseCode.NORMAL)
                     {
-                        Log.d(TAG, " all are ok in for now ");
-                        final int dataCount = resultJson.getInt("count");
-                        Log.d(TAG, " the dataCount we get are : " + dataCount);
-                        JSONArray dataList = resultJson.getJSONArray("list_data");
-                        int i;
-                        for (i = 0; i < dataList.length(); ++i)
-                        {
-                            JSONObject dataObj = (JSONObject) dataList.get(i);
-                            String imgUrl = dataObj.getString("img_url");
-                            String sex = dataObj.getString("sex");
-                            String userName = dataObj.getString("username");
-                            String userId = dataObj.getString("user_id");
-                            int range = dataObj.getInt("range");
-                            String district = dataObj.getString("district");
-                            NearbyMateSubFragmentUserBean mateUserBean = new NearbyMateSubFragmentUserBean(userId, imgUrl, userName, NearbyFragmentsCommonUtils.parseGenderStr(sContext, sex), district, String.valueOf(range));
+                        if(resultJson != null) {
+                            Log.d(TAG, " all are ok in for now ");
+                            final int dataCount = resultJson.getInt("count");
+                            Log.d(TAG, " the dataCount we get are : " + dataCount);
+                            JSONArray dataList = resultJson.getJSONArray("list_data");
+                            int i;
+                            for (i = 0; i < dataList.length(); ++i) {
+                                JSONObject dataObj = (JSONObject) dataList.get(i);
+                                String imgUrl = dataObj.getString("img_url");
+                                String sex = dataObj.getString("sex");
+                                String userName = dataObj.getString("username");
+                                String userId = dataObj.getString("user_id");
+                                int range = dataObj.getInt("range");
+                                String district = dataObj.getString("district");
+                                NearbyMateSubFragmentUserBean mateUserBean = new NearbyMateSubFragmentUserBean(userId, imgUrl, userName, NearbyFragmentsCommonUtils.parseGenderStr(sContext, sex), district, String.valueOf(range));
 
-                            cacheMateList.add(mateUserBean);
+                                cacheMateList.add(mateUserBean);
+                            }
+                            // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
+                            mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
+                            mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                        }else{
+                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                         }
-                        // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
-                        mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
-                        mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                     } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
                     {
                         mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
@@ -392,21 +415,44 @@ public class BilliardsNearbyMateFragment extends Fragment
                 case DATA_RETRIEVE_FAILED:
                     if (mUserList.isEmpty())
                     {
-                        loadEmptyTv();
+                        Log.d("scguo_tag", "load emptyView 1");
+                        loadEmptyTv(false);
                     }
                     Toast.makeText(sContext, sContext.getResources().getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
                     hideProgress();
                     break;
+                case PublicConstant.USE_CACHE:
+                    // 我们需要首先将我们之前加载的EmptyView不再显示
+                    loadEmptyTv(true);
+                    List<NearbyMateSubFragmentUserBean> cacheList = (ArrayList<NearbyMateSubFragmentUserBean>) msg.obj;
+                    mUserList.addAll(cacheList);
+                    mMateListAdapter.notifyDataSetChanged();
+                    break;
+
                 case DATA_RETRIEVE_SUCCESS:
-                    // TODO: 我们会将我们从网络上以及从本地数据库当中检索到的数据
-                    // TODO: 都会通过消息通知的形式发送到这里，因为这样就可以保证我们所有的涉及到UI工作都是在UI线程当中完成的
+                    // 首先我们需要将我们的EmptyView隐藏掉
+                    loadEmptyTv(true);
+
                     mBeforeCount = mUserList.size();
+                    mIsListEmpty = mUserList.isEmpty();
                     List<NearbyMateSubFragmentUserBean> mateList = (ArrayList<NearbyMateSubFragmentUserBean>) msg.obj;
                     for (NearbyMateSubFragmentUserBean mateBean : mateList)
                     {
                         if (!mUserList.contains(mateBean))
                         {
-                            mUserList.add(mateBean);
+                            if (mRefresh && !mIsListEmpty)
+                            {
+                                mUserList.add(0, mateBean);
+                            } else
+                            {
+                                if (mIsSavedInstance)
+                                {
+                                    mUserList.add(0, mateBean);
+                                } else
+                                {
+                                    mUserList.add(mateBean);
+                                }
+                            }
                         }
                         // TODO: ------------------------UNCOMMENT LATER------------------------------------------
 //                        if (!mDBList.isEmpty())
@@ -427,12 +473,12 @@ public class BilliardsNearbyMateFragment extends Fragment
 
                     if (mUserList.isEmpty())
                     {
-                        loadEmptyTv();
+                        Log.d("scguo_tag", "load emptyView 2");
+                        loadEmptyTv(false);
                     } else
                     {
                         // 如果触发DATA_RETRIEVE_SUCCESS的事件是来自用户的下拉刷新
                         // 事件，那么我们需要根据我们得到更新后的List来判断数据的加载是否是成功的(上拉刷新是不需要判断的，
-                        // TODO: 上拉刷新理论上所有的数据都应该保存到本地的数据库当中,如果没有保存的话，那么就是我们程序的问题了)
                         if (mRefresh)
                         {
                             if (mAfterCount == mBeforeCount)
@@ -446,6 +492,7 @@ public class BilliardsNearbyMateFragment extends Fragment
                     }
                     break;
                 // TODO: ------------------------UNCOMMENT LATER------------------------------------------
+                // TODO: 以下的代码是用于数据库的缓存处理过程
 //                case USE_CACHE:
 //                    List<NearbyMateSubFragmentUserBean> dbCacheList = (ArrayList<NearbyMateSubFragmentUserBean>) msg.obj;
 //                    mUserList.addAll(dbCacheList);
@@ -458,7 +505,8 @@ public class BilliardsNearbyMateFragment extends Fragment
 
                     if (mUserList.isEmpty())
                     {
-                        loadEmptyTv();
+                        Log.d("scguo_tag", "load emptyView 3");
+                        loadEmptyTv(false);
                     }
 
                     break;
@@ -477,7 +525,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                     }
                     if (mUserList.isEmpty())
                     {
-                        loadEmptyTv();
+                        Log.d("scguo_tag", "load emptyView 4");
+                        loadEmptyTv(false);
                     }
                     Log.d(TAG, " hiding the progress bar ");
 
@@ -507,16 +556,21 @@ public class BilliardsNearbyMateFragment extends Fragment
                     Utils.showToast(sContext, sContext.getString(R.string.http_request_time_out));
                     if (mUserList.isEmpty())
                     {
-                        loadEmptyTv();
+                        Log.d("scguo_tag", "load emptyView 5");
+                        loadEmptyTv(false);
                     }
                     hideProgress();
                     break;
 
                 case PublicConstant.NO_RESULT:
-                    if (mUserList.isEmpty()) {
-                        loadEmptyTv();
-                    } else {
-                        if (mLoadMore) {
+                    if (mUserList.isEmpty())
+                    {
+                        Log.d("scguo_tag", "load emptyView 6");
+                        loadEmptyTv(false);
+                    } else
+                    {
+                        if (mLoadMore)
+                        {
                             Utils.showToast(sContext, sContext.getString(R.string.no_more_info));
                         }
                     }
@@ -536,7 +590,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                     }
                     if (mUserList.isEmpty())
                     {
-                        loadEmptyTv();
+                        Log.d("scguo_tag", "load emptyView 6");
+                        loadEmptyTv(false);
                     }
                     hideProgress();
                     break;
@@ -545,13 +600,15 @@ public class BilliardsNearbyMateFragment extends Fragment
         }
     };
 
-    private void loadEmptyTv()
+    // 我们通过将disable的值设置为false来进行加载EmptyView
+    // 通过将disable的值设置为true来隐藏emptyView
+    private void loadEmptyTv(final boolean whetherHide)
     {
         // 先把正在显示的ProgressBar隐藏掉
         if (mSubFragmentListView.isRefreshing())
             mSubFragmentListView.onRefreshComplete();
 
-        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mSubFragmentListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mSubFragmentListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str), whetherHide);
     }
 
     private void showProgress()
@@ -624,7 +681,7 @@ public class BilliardsNearbyMateFragment extends Fragment
                             // 每次筛选，都是从第0条开始请求最新的数据
                             // 因为这相当于完全的重新开始了，所以我们需要将我们已经获得的UserList清空才可以
                             if (!TextUtils.isEmpty(sParamsPreference.getMateGender(sContext))) {
-                                    retrieveInitialMateInfoList(0, 9, range, sParamsPreference.getMateGender(sContext));
+                                retrieveInitialMateInfoList(0, 9, range, sParamsPreference.getMateGender(sContext));
                             }
 
                             break;
@@ -675,7 +732,7 @@ public class BilliardsNearbyMateFragment extends Fragment
             // 这里，我们需要理清一个基本前提的逻辑，那就是我们现在
             // 是没有保持任何缓存的，所以我们在任何时候进入到这个应用的时候，也就是onResume()方法当中的时候，
             // 我们仅仅只是单纯的加载我们所需要的最新的10条数据就可以了
-            fetchAllData(0, 9);
+//            fetchAllData(0, 9);
         }
 
         public void fetchAllData(final int startNum, final int endNum)
@@ -737,11 +794,15 @@ public class BilliardsNearbyMateFragment extends Fragment
         super.onDestroy();
     }
 
+
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
         super.onSaveInstanceState(outState);
-
+        outState.putParcelableArrayList(KEY_SAVED_LISTVIEW, mUserList);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_LOAD_MORE, mLoadMore);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_REFRESH, mRefresh);
+        outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_INSTANCE, true);
     }
 
     private PullToRefreshBase.OnRefreshListener2<ListView> mOnRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>()
@@ -751,7 +812,7 @@ public class BilliardsNearbyMateFragment extends Fragment
         {
             String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-
+            loadEmptyTv(true);
             if (Utils.networkAvaiable(sContext))
             {
                 mRefresh = true;
@@ -777,7 +838,7 @@ public class BilliardsNearbyMateFragment extends Fragment
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
             mLoadMore = true;
-            mRefresh = false;
+
             mCurrentPos = mUserList.size();
 
             // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
@@ -785,7 +846,7 @@ public class BilliardsNearbyMateFragment extends Fragment
 //            mUpdateList.clear();
             // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 
-            if (mBeforeCount != mAfterCount)
+            if (mBeforeCount != mAfterCount && mRefresh)
             {
                 mStartNum = mEndNum + (mAfterCount - mBeforeCount);
                 mEndNum += 10 + (mAfterCount - mBeforeCount);
@@ -795,6 +856,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                 mEndNum += 10;
             }
 
+            mRefresh = false;
+            loadEmptyTv(true);
             if (Utils.networkAvaiable(sContext))
             {
                 // 网络可行的情况,我们直接在我们已经得到的startNum和endNum基础之上进行数据的请求
@@ -828,7 +891,7 @@ public class BilliardsNearbyMateFragment extends Fragment
 //                {
 //                    mUIEventsHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
 //                }
-                // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
+            // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 //            }
         }
     };

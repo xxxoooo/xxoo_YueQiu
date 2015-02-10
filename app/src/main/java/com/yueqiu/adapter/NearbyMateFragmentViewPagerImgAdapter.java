@@ -32,14 +32,14 @@ public class NearbyMateFragmentViewPagerImgAdapter extends PagerAdapter
     @Override
     public Object instantiateItem(ViewGroup container, int position)
     {
-        Log.d(TAG, " the current init item are : " + position);
-        if (mImgList.length > 0)
-        {
 
-            if(mImgList.length == 1){
+        Log.d(TAG, " the current init item are : " + position);
+        if (mImgList.length > 0) {
+
+            if (mImgList.length == 1) {
                 container.addView(mImgList[position]);
                 return mImgList[position];
-            }else {
+            } else {
                 ViewGroup parent = (ViewGroup) mImgList[position % mImgList.length].getParent();
                 if (parent != null) {
                     parent.removeView(mImgList[position % mImgList.length]);

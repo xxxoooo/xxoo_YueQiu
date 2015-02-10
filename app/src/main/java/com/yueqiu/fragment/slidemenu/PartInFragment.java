@@ -83,13 +83,14 @@ public class PartInFragment extends SlideMenuBasicFragment{
                 case PublicConstant.GET_SUCCESS:
                     setEmptyViewGone();
                     mBeforeCount = mList.size();
+                    mIsListEmpty = mList.isEmpty();
                     List<PartInInfo> list = (List<PartInInfo>) msg.obj;
                     for(PartInInfo info : list){
                         if(!mList.contains(info)){
-                            if(mRefresh){
+                            if(mRefresh && !mIsListEmpty){
                                 mList.add(0,info);
                             }else{
-                                if(mIsSavedInstance){
+                                if(mIsSavedInstance ){
                                     mList.add(0,info);
                                 }else{
                                     mList.add(info);
@@ -100,7 +101,7 @@ public class PartInFragment extends SlideMenuBasicFragment{
 
                     mAfterCount = mList.size();
                     if(mList.isEmpty()){
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(mActivity.getString(R.string.no_part_in_info,mEmptyTypeStr));
                     }else{
                         if(mRefresh){
                             if (mAfterCount == mBeforeCount) {
@@ -193,12 +194,6 @@ public class PartInFragment extends SlideMenuBasicFragment{
         return mHandler;
     }
 
-    @Override
-    protected void setEmptyViewVisible() {
-        super.setEmptyViewVisible();
-        mEmptyView.setText(mActivity.getString(R.string.your_partin_is_null,mEmptyTypeStr));
-        mPullToRefreshListView.setEmptyView(mEmptyView);
-    }
 
     @Override
     protected void onItemStateChanged(int position, boolean checked) {

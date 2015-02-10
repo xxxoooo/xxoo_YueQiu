@@ -223,7 +223,7 @@ public class NearbyBilliardsDatingActivity extends Activity
                         @Override
                         public void run()
                         {
-                            retrieveDatingDetailedInfo(1);
+                            retrieveDatingDetailedInfo(sNodeId);
                         }
                     }).start();
                     break;
@@ -317,7 +317,7 @@ public class NearbyBilliardsDatingActivity extends Activity
 
     // TODO: 获取约球详情信息
     /**
-     *
+     * 这里需要传递的是约球Id，而不是用户Id
      * @param datingId 约球id
      * @return
      */

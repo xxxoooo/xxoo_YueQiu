@@ -205,13 +205,6 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
         mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
     }
 
-    @Override
-    protected void setEmptyViewVisible(){
-        super.setEmptyViewVisible();
-        mEmptyView.setText(mActivity.getString(R.string.your_favor_is_empty,mEmptyTypeStr));
-        mPullToRefreshListView.setEmptyView(mEmptyView);
-
-    }
     //TODO:目前不需要缓存，所以这个方法先不调用
     private void updateDB(){
         if(!mFavorUpdateList.isEmpty()){
@@ -242,11 +235,12 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                 case PublicConstant.GET_SUCCESS:
                     setEmptyViewGone();
                     mBeforeCount = mList.size();
+                    mIsListEmpty = mList.isEmpty();
                     List<FavorInfo> list = (List<FavorInfo>) msg.obj;
                     for(FavorInfo info : list){
                         if (!mList.contains(info)) {
 
-                            if(mRefresh) {
+                            if(mRefresh && !mIsListEmpty) {
                                 mList.add(0,info);
                             }else{
                                 if(mIsSavedInstance){
@@ -284,7 +278,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                     }
                     mAfterCount = mList.size();
                     if(mList.isEmpty()){
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(mActivity.getString(R.string.no_favor_info,mEmptyTypeStr));
                     }else{
                         if(mRefresh){
                             if (mAfterCount == mBeforeCount) {

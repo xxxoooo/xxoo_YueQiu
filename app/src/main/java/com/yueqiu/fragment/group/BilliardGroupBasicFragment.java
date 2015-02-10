@@ -77,7 +77,7 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
     private int mStart_no = 0,mEnd_no = 9;
     private int mBeforeCount,mAfterCount;
     private int mCurrPosition;
-    private boolean mRefresh,mLoadMore,mIsSavedInstance;
+    private boolean mRefresh,mLoadMore,mIsSavedInstance,mIsListEmpty;
 
     private Map<String,Integer> mParamMap = new HashMap<String, Integer>();
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
@@ -356,7 +356,7 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
                      * 保存还未更新的list的size
                      */
                     mBeforeCount = mList.size();
-
+                    mIsListEmpty = mList.isEmpty();
                     List<GroupNoteInfo> list = (List<GroupNoteInfo>) msg.obj;
                     Log.d("wy","mRefresh - >" + mRefresh);
                     for(GroupNoteInfo info : list){
@@ -367,7 +367,7 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
                         //TODO:需要再加一定的逻辑判断，如果发生这样的情况，该如何处理
                          if (!mList.contains(info)) {
 
-                             if(mRefresh) {
+                             if(mRefresh && !mIsListEmpty) {
                                 mList.add(0,info);
                              }else{
                                  if(mIsSavedInstance){
@@ -496,6 +496,9 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
             mLoadMore = false;
             mInsertList.clear();
             mUpdateList.clear();
+            if(mEmptyView.getVisibility() == View.VISIBLE){
+                mEmptyView.setVisibility(View.GONE);
+            }
             if(Utils.networkAvaiable(mActivity)){
 
                 mParamMap.put(HttpConstants.GroupList.STAR_NO,0);
@@ -516,6 +519,9 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
             mCurrPosition = mList.size() ;
             mInsertList.clear();
             mUpdateList.clear();
+            if(mEmptyView.getVisibility() == View.VISIBLE){
+                mEmptyView.setVisibility(View.GONE);
+            }
             /**
              * 如果要加载前先进行过下拉刷新，同时数据有更新，则此时再加载时分页的
              * start，end应该相应的增加

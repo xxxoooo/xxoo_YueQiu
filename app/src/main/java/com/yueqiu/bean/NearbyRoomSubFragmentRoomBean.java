@@ -1,5 +1,7 @@
 package com.yueqiu.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -14,7 +16,7 @@ import java.io.StringReader;
  * 用于控制每一个球厅显示的属性的Bean文件
  * 用于在球厅的ListView item当中的bean文件
  */
-public class NearbyRoomSubFragmentRoomBean
+public class NearbyRoomSubFragmentRoomBean implements Parcelable
 {
     private String mRoomId;
     private String mRoomPhotoUrl;
@@ -215,4 +217,71 @@ public class NearbyRoomSubFragmentRoomBean
     {
         this.mShopHours = shopHours;
     }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return a bitmask indicating the set of special object types marshalled
+     * by the Parcelable.
+     */
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(mRoomId);
+        dest.writeString(mDetailedAddress);
+        dest.writeString(mDistance);
+        dest.writeFloat(mLevel);
+        dest.writeString(mRoomPhotoUrl);
+        dest.writeDouble(mPrice);
+        dest.writeString(mRoomName);
+        dest.writeString(mRoomPhone);
+        dest.writeString(mRoomTag);
+        dest.writeString(mRoomInfo);
+        dest.writeString(mShopHours);
+    }
+
+    public static final Creator<NearbyRoomSubFragmentRoomBean> CREATOR = new Creator<NearbyRoomSubFragmentRoomBean>()
+    {
+        @Override
+        public NearbyRoomSubFragmentRoomBean createFromParcel(Parcel source)
+        {
+            return new NearbyRoomSubFragmentRoomBean(source);
+        }
+
+        @Override
+        public NearbyRoomSubFragmentRoomBean[] newArray(int size)
+        {
+            return new NearbyRoomSubFragmentRoomBean[size];
+        }
+    };
+
+    public NearbyRoomSubFragmentRoomBean(Parcel source)
+    {
+        this.mRoomId = source.readString();
+        this.mDetailedAddress = source.readString();
+        this.mDistance = source.readString();
+        this.mLevel = source.readFloat();
+        this.mRoomPhotoUrl = source.readString();
+        this.mPrice = source.readDouble();
+        this.mRoomName = source.readString();
+        this.mRoomPhone = source.readString();
+        this.mRoomTag = source.readString();
+        this.mRoomInfo = source.readString();
+        this.mShopHours = source.readString();
+    }
+
 }

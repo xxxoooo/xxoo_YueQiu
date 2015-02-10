@@ -73,7 +73,7 @@ public class GotyeService extends Service implements NotifyListener {
         notificationManager.cancel(0);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        builder.setSmallIcon(R.drawable.logo);
+        builder.setSmallIcon(R.drawable.ic_launcher);
         builder.setAutoCancel(true);
         builder.setContentTitle(getString(R.string.app_name));
         builder.setContentText(msg);

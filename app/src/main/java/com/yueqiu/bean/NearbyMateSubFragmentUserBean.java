@@ -1,5 +1,7 @@
 package com.yueqiu.bean;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -14,7 +16,7 @@ import java.awt.font.TextAttribute;
  * 这是用于创建SearchActivity当中的球友Fragment当中的用户的Bean
  * 主要是用于创建ListView当中的item
  */
-public class NearbyMateSubFragmentUserBean
+public class NearbyMateSubFragmentUserBean implements Parcelable
 {
     private static final String TAG = "NearbyMateSubFragmentUserBean";
 
@@ -179,6 +181,66 @@ public class NearbyMateSubFragmentUserBean
         }
         return result;
     }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return a bitmask indicating the set of special object types marshalled
+     * by the Parcelable.
+     */
+    @Override
+    public int describeContents()
+    {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags)
+    {
+        dest.writeString(mUserId);
+        dest.writeString(mUserDistance);
+        dest.writeString(mUserPhotoUrl);
+        dest.writeString(mUserDistrict);
+        dest.writeString(mUserGender);
+        dest.writeString(mUserNickName);
+    }
+
+    public static final Creator<NearbyMateSubFragmentUserBean> CREATOR = new Creator<NearbyMateSubFragmentUserBean>()
+    {
+        @Override
+        public NearbyMateSubFragmentUserBean createFromParcel(Parcel source)
+        {
+            return new NearbyMateSubFragmentUserBean(source);
+        }
+
+        @Override
+        public NearbyMateSubFragmentUserBean[] newArray(int size)
+        {
+            return new NearbyMateSubFragmentUserBean[size];
+        }
+    };
+
+    public NearbyMateSubFragmentUserBean(Parcel savedData)
+    {
+        // 我们读取的顺序需要同我们写入Parcel的顺序保持一致，否则我们读到的值就会是乱的
+        // 之所以要保持顺序一致是因为我们写入Parcel时并没有根据相应的KEY值来进行插入，所以获取时要按照
+        // 最原始的顺序来确定我们读到的值是正确的
+        mUserId = savedData.readString();
+        mUserDistance = savedData.readString();
+        mUserPhotoUrl = savedData.readString();
+        mUserDistrict = savedData.readString();
+        mUserGender = savedData.readString();
+        mUserNickName = savedData.readString();
+    }
+
 }
 
 
