@@ -291,14 +291,17 @@ public class BilliardsNearbyDatingFragment extends Fragment
         // 我们将range的默认值置为1000
         String rangeVal = TextUtils.isEmpty(range) ? "1000" : range;
         requestParams.put("range", rangeVal);
-        // 我们将date的默认值设置为当前的请求时间，日期格式设置为2015-01-31
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-        calendar.setTime(new Date());
-        String currentDateStr = dateFormatter.format(calendar.getTime());
-        Log.d(TAG, " the detailed date we get for today are : " + currentDateStr);
-        String dateStr = TextUtils.isEmpty(date) ? currentDateStr : date;
-        requestParams.put("date", dateStr);
+        // 现在的策略是如果没有需要的话，默认的date参数直接置为空就可以了，即不传递这个参数
+//        // 我们将date的默认值设置为当前的请求时间，日期格式设置为2015-01-31
+//        Calendar calendar = Calendar.getInstance();
+//        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+//        calendar.setTime(new Date());
+//        String currentDateStr = dateFormatter.format(calendar.getTime());
+//        Log.d(TAG, " the detailed date we get for today are : " + currentDateStr);
+        if (! TextUtils.isEmpty(date))
+        {
+            requestParams.put("date", date);
+        }
         requestParams.put("start_no", startNum + "");
         requestParams.put("end_no", endNum + "");
 
