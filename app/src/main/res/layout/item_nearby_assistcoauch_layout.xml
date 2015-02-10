@@ -7,8 +7,8 @@
 
 
     <com.android.volley.toolbox.NetworkImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/listview_item_user_photo_width"
+        android:layout_height="@dimen/listview_item_user_photo_height"
         android:layout_centerVertical="true"
         android:src="@drawable/default_head"
         android:layout_alignParentLeft="true"

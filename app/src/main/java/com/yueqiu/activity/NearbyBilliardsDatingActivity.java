@@ -20,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.adapter.NearbyDatingDetailedGridAdapter;
@@ -29,6 +31,7 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +40,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils.parseGenderDrawable;
 
 /**
  * @author scguo
@@ -49,7 +54,11 @@ public class NearbyBilliardsDatingActivity extends Activity
 {
     private static final String TAG = "NearbyBilliardsDatingActivity";
     private GridView mGridAlreadyFlow;
-    private ImageView mUserPhoto;
+
+    // 用于加载用户头像的ImageLoader
+    private ImageLoader mImgLoader;
+    // 以下的字段都是用于显示在约球详情Activity顶部的Column上面的内容
+    private NetworkImageView mUserPhoto;
     private TextView mUserName, mUserGender, mTvFollowNum, mTvTime1, mTvTime2;
 
     private TextView mTvTitle, mTvActivityAddress, mTvStartTime, mTvEndTime, mTvModel, mTvContact, mTvPhoneNum, mTvActivityIntro;
@@ -67,14 +76,25 @@ public class NearbyBilliardsDatingActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_dating_detail);
 
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
+
         Intent datingIntent = getIntent();
         Bundle receivedData = datingIntent.getBundleExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_DATING_FRAGMENT);
         sNodeId = receivedData.getInt(NearbyFragmentsCommonUtils.KEY_DATING_TABLE_ID, -1);
-        Log.d(TAG, " the node id we get are : " + sNodeId);
+        String userPhotoUrl = receivedData.getString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO, "");
+        String userName = receivedData.getString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME, "");
+        Log.d(TAG, " the node id we get are : " + sNodeId + ", and the dating photo we get are : " + userPhotoUrl);
 
         mGridAlreadyFlow = (GridView) findViewById(R.id.gridview_search_dating_detailed_already_flow);
-        mUserPhoto = (ImageView) findViewById(R.id.img_search_dating_detail_photo);
+        mUserPhoto = (NetworkImageView) findViewById(R.id.img_search_dating_detail_photo);
+        mUserPhoto.setDefaultImageResId(R.drawable.default_head);
+        if (! TextUtils.isEmpty(userPhotoUrl))
+        {
+            mUserPhoto.setImageUrl(userPhotoUrl, mImgLoader);
+        }
+
         mUserName = (TextView) findViewById(R.id.tv_search_dating_detail_nickname);
+        mUserName.setText(userName);
         mUserGender = (TextView) findViewById(R.id.tv_search_dating_detail_gender);
         mTvFollowNum = (TextView) findViewById(R.id.tv_search_dating_detail_follow_num);
 
@@ -104,11 +124,15 @@ public class NearbyBilliardsDatingActivity extends Activity
 
         // the parameter we need to set are all retrieved from the previous activity
 
-        // TODO: 以下加载的是测试数据
-        initGridList();
-        mAlreadyInUserGridAdapter = new NearbyDatingDetailedGridAdapter(this, (ArrayList<NearbyDatingDetailedAlreadyBean>) mFollowList);
 
+        // TODO: 以下加载的是测试数据，加载的是用于显示当前已经报名参加该活动的人员的姓名列表
+        // TODO: 但是我们现在还没有找到关于提供的已经参加人员的列表，所以我们现在仅仅是加载测试数据，但是这个
+        // TODO: 加载的过程现在最好不要删除，因为我们最后还是想看一下最终的加载的效果完成图
+//        initGridList();
+        mAlreadyInUserGridAdapter = new NearbyDatingDetailedGridAdapter(this, (ArrayList<NearbyDatingDetailedAlreadyBean>) mFollowList);
         mGridAlreadyFlow.setAdapter(mAlreadyInUserGridAdapter);
+        mAlreadyInUserGridAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -132,6 +156,8 @@ public class NearbyBilliardsDatingActivity extends Activity
     private static final int ADD_TO_FAVOR_FAILURE = 1 << 8;
     private static final int ADD_TO_FAVOR = 1 << 7;
     private static final int USER_HAS_NOT_LOGIN = 1 << 9;
+    private static final int RETRIEVE_FOLLOWER_LIST = 1 << 10;
+
 
     private Handler mHandler = new Handler()
     {
@@ -197,7 +223,7 @@ public class NearbyBilliardsDatingActivity extends Activity
                         @Override
                         public void run()
                         {
-                            retrieveDatingDetailedInfo(1);
+                            retrieveDatingDetailedInfo(sNodeId);
                         }
                     }).start();
                     break;
@@ -207,14 +233,24 @@ public class NearbyBilliardsDatingActivity extends Activity
                     Message detailedInfoMsg = msg;
                     Log.d(TAG, " the message we get for the TextView are : " + (detailedInfoMsg.what == SET_DATING_DETAILED_INFO));
                     Bundle infoBundle = detailedInfoMsg.getData();
+                    String appointId = infoBundle.getString(KEY_APPOINT_ID);
+                    String sex = infoBundle.getString(KEY_SEX);
+                    String lookNum = infoBundle.getString(KEY_LOOK_NUM);
                     String titleInfo = infoBundle.getString(KEY_TITLE_INFO);
                     String address = infoBundle.getString(KEY_ADDRESS);
                     String startTime = infoBundle.getString(KEY_START_TIME);
                     String endTime = infoBundle.getString(KEY_END_TIME);
                     String model = infoBundle.getString(KEY_MODEL);
+                    String createTime = infoBundle.getString(KEY_CREATE_TIME); // 活动的发布日期
 
-                    Log.d(TAG, " the data we get are : " + titleInfo + " , address : " + address + " , startTime :" + startTime
+                    Log.d(TAG, " the data we get are : " + " titleInfo : " + titleInfo + " , address : " + address + " , startTime :" + startTime
                             + " , endTime : " + endTime + " , model " + model);
+
+                    mUserGender.setText(NearbyFragmentsCommonUtils.parseGenderStr(NearbyBilliardsDatingActivity.this, sex));
+                    mUserGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, parseGenderDrawable(sex), 0);
+                    mUserGender.setCompoundDrawablePadding(6);
+                    mTvTime1.setText(createTime);
+                    mTvFollowNum.setText(lookNum);
                     mTvTitle.setText(titleInfo);
                     mTvActivityAddress.setText(address);
                     mTvStartTime.setText(startTime);
@@ -237,6 +273,12 @@ public class NearbyBilliardsDatingActivity extends Activity
                 case USER_HAS_NOT_LOGIN:
                     Utils.showToast(NearbyBilliardsDatingActivity.this, getString(R.string.please_login_first));
                     break;
+
+                case RETRIEVE_FOLLOWER_LIST:
+                    ArrayList<NearbyDatingDetailedAlreadyBean> followerList = (ArrayList<NearbyDatingDetailedAlreadyBean>) msg.obj;
+                    mFollowList.addAll(followerList);
+                    mAlreadyInUserGridAdapter.notifyDataSetChanged();
+                    break;
             }
         }
     };
@@ -251,11 +293,13 @@ public class NearbyBilliardsDatingActivity extends Activity
 
     // TODO: 服务器端有很多的interface仍然没有实现，需要后期提醒.
     // TODO: 以下定义的字段都是我们确定至少需要的
+    private static final String KEY_APPOINT_ID = "appointId"; // 活动的ID
     private static final String KEY_SEX = "sex";
     private static final String KEY_LOOK_NUM = "lookNum";
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_TIME_1 = "time1";
     private static final String KEY_TIME_2 = "time2";
+    private static final String KEY_CREATE_TIME = "createTime";
     private static final String KEY_TITLE_INFO = "titleInfo";
     private static final String KEY_ADDRESS = "address";
     private static final String KEY_START_TIME = "startTime";
@@ -273,7 +317,7 @@ public class NearbyBilliardsDatingActivity extends Activity
 
     // TODO: 获取约球详情信息
     /**
-     *
+     * 这里需要传递的是约球Id，而不是用户Id
      * @param datingId 约球id
      * @return
      */
@@ -287,64 +331,77 @@ public class NearbyBilliardsDatingActivity extends Activity
         try {
             // TODO: 以下有一些字段暂时服务器端还没有完全定义好，并返回，所有效果有一点差
             Log.d(TAG, " start parsing the json we get ");
-            JSONObject resultJson = new JSONObject(rawResult);
-            JSONObject wholeResult = resultJson.getJSONObject("result"); // 得到的总的json object
-            String appointId = wholeResult.getString("appoint_id"); // 约球id
-            String userId = wholeResult.getString("user_id"); // 用户id
-            String account = wholeResult.getString("account"); // 用户昵称
-
-            // TODO: 以下的两个字段服务器端还没有提供，我们需要联系服务器端的人员提供
-//            String sex = wholeResult.getString("sex"); // 用户性别
-//            String lookNumber = wholeResult.getString("look_number"); // 浏览数目，即眼睛图标对应的那个数字
-            String createTime = wholeResult.getString("create_time"); // 活动发布的日期
-            String title = wholeResult.getString("title"); // 活动主题
-            String address = wholeResult.getString("address"); // 活动地点
-            String beginTime = wholeResult.getString("begin_time"); // 活动开始时间
-            String endTime = wholeResult.getString("end_time"); // 活动结束时间
-            String model = wholeResult.getString("model"); // 收费模式 1.免费;2.收费;3.AA制
-
-            String modelStr = "";
-            if (model.equals("1") || TextUtils.isEmpty(model))
+            if (! TextUtils.isEmpty(rawResult))
             {
-                modelStr = getResources().getString(R.string.search_dating_detailed_model_1);
-            } else if (model.equals("2"))
-            {
-                modelStr = getResources().getString(R.string.search_dating_detailed_model_2);
-            } else if (model.equals("3"))
-            {
-                modelStr = getResources().getString(R.string.search_dating_detailed_model_3);
-            }
+                JSONObject resultJson = new JSONObject(rawResult);
+                JSONObject wholeResult = resultJson.getJSONObject("result"); // 得到的总的json object
+                String appointId = wholeResult.getString("appoint_id"); // 约球id
+                String sex = wholeResult.getString("sex"); // 用户性别
+                String lookNumber = wholeResult.getString("look_number"); // 浏览数目，即眼睛图标对应的那个数字
+                String createTime = wholeResult.getString("create_time"); // 活动发布的日期
+                String title = wholeResult.getString("title"); // 活动主题
+                String address = wholeResult.getString("address"); // 活动地点
+                String beginTime = wholeResult.getString("begin_time"); // 活动开始时间
+                String endTime = wholeResult.getString("end_time"); // 活动结束时间
+                String model = wholeResult.getString("model"); // 收费模式 1.免费;2.收费;3.AA制
 
-            Message msg = mHandler.obtainMessage(SET_DATING_DETAILED_INFO);
-            Bundle detailedInfoBundle = new Bundle();
-            detailedInfoBundle.putString(KEY_TITLE_INFO, title);
-            detailedInfoBundle.putString(KEY_ADDRESS, address);
-            detailedInfoBundle.putString(KEY_START_TIME, beginTime);
-            detailedInfoBundle.putString(KEY_END_TIME, endTime);
-            detailedInfoBundle.putString(KEY_MODEL, modelStr);
-            msg.setData(detailedInfoBundle);
-            msg.what = SET_DATING_DETAILED_INFO;
-            mHandler.sendMessage(msg);
+                String modelStr = "";
+                if (model.equals("1") || TextUtils.isEmpty(model))
+                {
+                    modelStr = getResources().getString(R.string.search_dating_detailed_model_1);
+                } else if (model.equals("2"))
+                {
+                    modelStr = getResources().getString(R.string.search_dating_detailed_model_2);
+                } else if (model.equals("3"))
+                {
+                    modelStr = getResources().getString(R.string.search_dating_detailed_model_3);
+                }
 
-            Log.d(TAG, " the parsed result we get are : " + appointId + " ; " +
-                        userId + " ; " + account + " ; " + "sex" + " ; " + "lookNumber" + " ; " + createTime + " ; " +
+                Message msg = mHandler.obtainMessage(SET_DATING_DETAILED_INFO);
+                Bundle detailedInfoBundle = new Bundle();
+                detailedInfoBundle.putString(KEY_APPOINT_ID, appointId); // 活动Id
+                detailedInfoBundle.putString(KEY_SEX, sex); // 发布活动的用户的性别
+                detailedInfoBundle.putString(KEY_LOOK_NUM, lookNumber); // 当期活动的关注数目
+                detailedInfoBundle.putString(KEY_CREATE_TIME, createTime); // 活动发布日期
+                detailedInfoBundle.putString(KEY_TITLE_INFO, title); // 活动主题
+                detailedInfoBundle.putString(KEY_ADDRESS, address); // 活动地址
+                detailedInfoBundle.putString(KEY_START_TIME, beginTime); // 开始时间
+                detailedInfoBundle.putString(KEY_END_TIME, endTime); // 结束时间
+                detailedInfoBundle.putString(KEY_MODEL, modelStr); // 收费模式
+                msg.setData(detailedInfoBundle);
+                msg.what = SET_DATING_DETAILED_INFO;
+                mHandler.sendMessage(msg);
+
+                Log.d(TAG, " the parsed result we get are : " + appointId + " ; " +
+                        " ; " + "sex" + " ; " + "lookNumber" + " ; " + createTime + " ; " +
                         title + " ; " + address + " ; " + beginTime + " ; " + endTime + " ; " + model);
-            // 以下得到的是已经参加这次活动的人员的列表
-            JSONArray followList = wholeResult.getJSONArray("join_list");
-            final int followSize = followList.length();
-            int i;
-            for (i = 0; i < followSize; ++i)
-            {
-                JSONObject follower = (JSONObject) followList.get(i);
-                String followerId = follower.getString(""); // 已经参加本次活动的人员的id
-                String followerAccount = follower.getString(""); // 已经参加本次活动的人员的account, 这里也就是用户的名字
-                String followerPhotoUrl = follower.getString(""); // 已经参加本次活动的人员的photo的url
-
-                // TODO: 我们需要在这里将我们解析到的json object转换成我们需要的用户的bean对象，
-                // TODO: 然后就可以将下面的GridView显示出来的
-
+                // 以下得到的是已经参加这次活动的人员的列表
+                List<NearbyDatingDetailedAlreadyBean> cachedFollowList = new ArrayList<NearbyDatingDetailedAlreadyBean>();
+                JSONArray followList = wholeResult.getJSONArray("join_list");
+                final int followSize = followList.length();
+                int i;
+                for (i = 0; i < followSize; ++i)
+                {
+                    JSONObject followerJson = (JSONObject) followList.get(i);
+                    if (followerJson != null)
+                    {
+                        String followerId = followerJson.getString("user_id"); // 已经参加本次活动的人员的id
+                        String followerAccount = followerJson.getString("account"); // 已经参加本次活动的人员的account, 这里也就是用户的名字
+                        String followerPhotoUrl = followerJson.getString("img_url"); // 已经参加本次活动的人员的photo的url
+                        if (! TextUtils.isEmpty(followerId) && !TextUtils.isEmpty(followerAccount) && !TextUtils.isEmpty(followerPhotoUrl))
+                        {
+                            NearbyDatingDetailedAlreadyBean follower = new NearbyDatingDetailedAlreadyBean(followerId, followerAccount, followerPhotoUrl);
+                            cachedFollowList.add(follower);
+                        }
+                    }
+                }
+                Log.d(TAG, " the finally follower list we get are : " + cachedFollowList.size());
+                if (cachedFollowList.size() > 0)
+                {
+                    // 然后我们把这个消息发送到mUIHandler当中
+                    mHandler.obtainMessage(RETRIEVE_FOLLOWER_LIST, cachedFollowList).sendToTarget();
+                }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
             Log.d(TAG, " exception happened in parsing the initial json data, and the causing are : " + e.toString());
@@ -429,7 +486,7 @@ public class NearbyBilliardsDatingActivity extends Activity
         requestParams.put("type", type + "");
         requestParams.put("id", nodeId + "");
 
-        String rawResult = HttpUtil.urlClient(HttpConstants.NearbyDating.URL_JOIN_ACTIVITY, requestParams, HttpConstants.RequestMethod.POST);
+        String rawResult = HttpUtil.urlClient(HttpConstants.Favor.STORE_URL, requestParams, HttpConstants.RequestMethod.POST);
 
         Log.d(TAG, " the raw result we get for adding the current dating item to favor collection are  : " + rawResult);
         try {
@@ -500,10 +557,6 @@ public class NearbyBilliardsDatingActivity extends Activity
 
     }
 
-
-
-
-
     /////////////////////////////////////////////////////////////////////////////////
     // TODO: 以下只是我们加载的临时测试数据，在正式测试通过之后就可以直接删除了
     private void initGridList()
@@ -511,7 +564,7 @@ public class NearbyBilliardsDatingActivity extends Activity
         int i;
         for (i = 0; i < 5; ++i)
         {
-            mFollowList.add(new NearbyDatingDetailedAlreadyBean("", "温柔的语"));
+            mFollowList.add(new NearbyDatingDetailedAlreadyBean("", "", "温柔的语"));
         }
     }
 

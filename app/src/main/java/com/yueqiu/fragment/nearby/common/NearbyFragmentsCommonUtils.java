@@ -1,7 +1,12 @@
 package com.yueqiu.fragment.nearby.common;
 
-import android.app.Dialog;
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
@@ -14,19 +19,26 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
+import com.yueqiu.activity.NearbyBilliardRoomActivity;
 import com.yueqiu.adapter.NearbyMateFragmentViewPagerImgAdapter;
+import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by scguo on 15/1/4.
@@ -44,6 +56,12 @@ public class NearbyFragmentsCommonUtils
         public void closePopupWindow();
     }
 
+    // 定义用于保存NearbyActivity当中的Fragment的List以及一些ListView的position的值
+    public static final String KEY_SAVED_LISTVIEW = "savedListView";
+    public static final String KEY_SAVED_REFRESH = "savedRefresh";
+    public static final String KEY_SAVED_LOAD_MORE = "savedLoadMore";
+    public static final String KEY_SAVED_INSTANCE = "savedInstance";
+
     // 定义用于处理从Fragment的ListView点击之后切换到具体的Activity时的切换过程
     // 以下是用于球厅Fragment当中需要传输的数据的详细的key值
     public static final String KEY_BUNDLE_SEARCH_ROOM_FRAGMENT = "searchRoomFragment";
@@ -55,7 +73,9 @@ public class NearbyFragmentsCommonUtils
     public static final String KEY_ROOM_FRAGMENT_NAME = "roomName";
     public static final String KEY_ROOM_FRAGMENT_LEVEL = "roomLevel";
     public static final String KEY_ROOM_FRAGMENT_DETAILED_INFO = "roomDetailedInfo";
-
+    public static final String KEY_ROOM_FRAGMENT_SHOP_HOURS = "roomShopHours"; // 球厅的营业时间
+    public static final String KEY_ROOM_FRAGMENT_LAT = "roomLatitude"; // 球厅的纬度
+    public static final String KEY_ROOM_FRAGMENT_LNG = "roomLongtitude"; // 球厅的经度
 
     // 以下是用于球友Fragment当中需要传输的数据的详细的key值
     public static final String KEY_BUNDLE_SEARCH_MATE_FRAGMENT = "searchMateFragment";
@@ -68,6 +88,7 @@ public class NearbyFragmentsCommonUtils
     public static final String KEY_DATING_FRAGMENT_FOLLOWNUM = "datingFollowNum";
     public static final String KEY_DATING_PUBLISH_TIME = "datingTime";
     public static final String KEY_DATING_TABLE_ID = "datingTableId";
+    public static final String KEY_DATING_USER_NAME = "datingUserName";
 
     // 以下是用于教练Fragment当中需要传输的数据的详细的key值
     public static final String KEY_BUNDLE_SEARCH_COAUCH_FRAGMENT = "searchCoauchFragment";
@@ -86,14 +107,21 @@ public class NearbyFragmentsCommonUtils
                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
     }
 
-    public static void setFragmentEmptyTextView(Context context, final PullToRefreshListView listView, final String emptyText)
+    public static void setFragmentEmptyTextView(Context context, final PullToRefreshListView listView, final String emptyText, boolean disable)
     {
         TextView emptyView = new TextView(context);
         emptyView.setGravity(Gravity.CENTER);
-        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
+        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         emptyView.setTextColor(context.getResources().getColor(R.color.md__defaultBackground));
         emptyView.setText(emptyText);
-        listView.setEmptyView(emptyView);
+        if (! disable)
+        {
+            listView.setEmptyView(emptyView);
+        } else
+        {
+            listView.setEmptyView(null);
+        }
+
     }
 
     public static PopupWindow getFilterPopupWindow(Context context, View anchorView, View popupLayoutView)
@@ -125,8 +153,11 @@ public class NearbyFragmentsCommonUtils
     // TODO: 这里我们加载的是商家推荐的信息的列表，也就是显示在每一个Fragment当中的最上面的滚动的Image Gallery
     private static void retrieveRecommdedRoomInfo()
     {
+        Log.d(TAG, " start retrieving the recommendation image gallery info ... ");
         String rawResult = HttpUtil.urlClient(HttpConstants.NearbyRoomRecommendation.URL, null, HttpConstants.RequestMethod.GET);
         Log.d(TAG, " the recommendation info we get are : " + rawResult);
+
+        List<NearbyRoomSubFragmentRoomBean> cacheRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
 
         if (!TextUtils.isEmpty(rawResult))
         {
@@ -143,31 +174,130 @@ public class NearbyFragmentsCommonUtils
                     for (i = 0; i < count; ++i)
                     {
                         JSONObject dataUnit = resultJsonArr.getJSONObject(i);
+                        String roomId = dataUnit.getString("id");
                         String photoUrl = dataUnit.getString("img_url");
+                        String roomName = dataUnit.getString("name");
+                        String roomAddress = dataUnit.getString("address");
+                        String roomTelephone = dataUnit.getString("telephone");
+                        String roomDetailInfo = dataUnit.getString("detail_info");
+                        String roomPrice = dataUnit.getString("price");
+                        String roomStarLevel = dataUnit.getString("overall_rating");
+                        String roomShopHours = dataUnit.getString("shop_hours");
+                        // TODO: 以下的关于球厅的经度和纬度信息我们暂时还不需要，而且球厅当中也没有定义关于经度纬度信息的详细的存放的位置
+                        // TODO: 所以我们暂时先不管这两个字段了
+                        String roomLongitude = dataUnit.getString("lng");
+                        String roomLatitude = dataUnit.getString("lat");
 
-                        Log.d(TAG, " the photo url we get for the recommendation are : " + photoUrl);
+                        int roomLevelVal = 0;
+                        double roomPriceVal = 0;
+                        try
+                        {
+                            // 我们需要将我们的room的评分的星级的总星级数目设置为100
+                            roomLevelVal = Integer.parseInt(roomStarLevel);
+                            roomPriceVal = Double.parseDouble(roomPrice);
+                        } catch (final Exception e)
+                        {
+                            Log.d(TAG, " exception happened while we parse the start number and the room price, cause to : " + e.toString());
+                        }
+                        NearbyRoomSubFragmentRoomBean roomItem = new NearbyRoomSubFragmentRoomBean(
+                                roomId, // room id
+                                photoUrl, // room photo
+                                roomName, // room name
+                                roomLevelVal, // room level
+                                roomPriceVal, // room price
+                                roomAddress, // room address
+                                "", // room distance(这个在最新版的接口当中被取消了)
+                                roomTelephone, // roomPhone
+                                "", // roomTag
+                                roomDetailInfo ,// roomInfo
+                                roomShopHours // shopHours营业时间
+                        );
+                        cacheRoomList.add(roomItem);
+                        Log.d(TAG, " ----> the photo url we get for the recommendation are : " + roomItem.getRoomPhotoUrl() + "; "
+                                        + roomAddress + "; " + roomLatitude + " ; " + roomLongitude + "; " + roomPrice
+                                        + "; " + roomPriceVal);
                     }
+                    // 现在我们就需要将我们获得的数据传递出去
+                    sWorkerThread.mInternalHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheRoomList).sendToTarget();
+                    Log.d(TAG, " we have send out the data we got to the sWokerThread ... ");
                 }
-
             } catch (JSONException e)
             {
+                // TODO: 我们在后期加入错误的原因，用于Toast的内容显示
+                sWorkerThread.mInternalHandler.obtainMessage(DATA_RETRIEVE_FAILED, "").sendToTarget();
                 e.printStackTrace();
                 Log.d(TAG, " exception happened in parsing the room recommendation detailed information, and the detailed reason are : " + e.toString());
             }
         }
+        sWorkerThread.mInternalHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
     }
 
+    private static final int START_RETRIEVING_DATA = 1 << 1;
+    private static final int DATA_RETRIEVE_SUCCESS = 1 << 2;
+    private static final int DATA_RETRIEVE_FAILED = 1 << 3;
+
+
+    private static class WorkerThread extends Thread
+    {
+        // 这个Handler所关联的Looper是MainLooper，所以在这里我们可以直接进行所有同
+        // UI相关的更新操作
+        public Handler mInternalHandler;
+        @Override
+        public void run()
+        {
+            Looper.prepare();
+            mInternalHandler = new Handler(Looper.getMainLooper())
+            {
+                @Override
+                public void handleMessage(Message msg)
+                {
+                    switch (msg.what)
+                    {
+                        case DATA_RETRIEVE_SUCCESS:
+                            ArrayList<NearbyRoomSubFragmentRoomBean> roomList = (ArrayList<NearbyRoomSubFragmentRoomBean>) msg.obj;
+                            // 然后我们将请求到的数据发送到我们的ImageGallery当中用于获取并inflate图片，
+                            // 同时然后为启动RoomActivity准备数据
+                            sGlobalRoomList = roomList;
+                            // 我们需要在这里通知ImageGallery数据已经获取成功了
+                            Log.d(TAG, " the data has retrieved success, and the list size are : " + sGlobalRoomList.size());
+                            if (sGalleryImgAdapter != null)
+                            {
+                                sGalleryImgAdapter.notifyDataSetChanged();
+                            }
+                            break;
+                        case DATA_RETRIEVE_FAILED:
+                            if (msg.obj != null)
+                            {
+                                String failureReason = (String) msg.obj;
+                                // TODO: 显示Toast，提醒用户数据获取失败
+                                // TODO: 但是由于我们目前无法获得有效的Toast，所以暂时无法弹出Toast
+                                // TODO: 我们在下一步的优化过程当中，第一步工程就是优化CommonUtils这里，这里设计的
+                                // TODO: 乱的就是一坨屎(scguo)
+                                // TODO: 我们需要根据全都是Fragment的设计方式来重新实现这个部分
+
+                            }
+                            break;
+                    }
+                }
+            };
+            Looper.loop();
+        }
+    }
+
+
+    private static WorkerThread sWorkerThread;
 
     // TODO: test
 //    private static ImageView[] sPagerImgArr;
     // TODO: test
+
+    private static List<NearbyRoomSubFragmentRoomBean> sGlobalRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
 
     private static NetworkImageView[] sPagerImgArr;
 
     private static LinearLayout sGalleryIndicatorGroup;
     private static NearbyMateFragmentViewPagerImgAdapter sGalleryImgAdapter;
 
-    private static String[] sPagerImgUrlArr;
     private static ViewPager sImgGalleryViewPager;
 
     private static ImageLoader mImgLoader;
@@ -190,39 +320,31 @@ public class NearbyFragmentsCommonUtils
         if (null == context)
             return;
 
-        mImgLoader = VolleySingleton.getInstance().getImgLoader();
-
-        final ImageView[] sPagerIndicatorImgList;
-
-        // TODO: 以下仅仅是测试数据，在测试接口的时候就删除掉
-        // TODO: 我们通过网络请求将以下的数据获得
-        sPagerImgUrlArr = new String[] {
-                "http://i2.dpfile.com/pc/ceb7b8e75b07ce4e804ccd46390258fb(700x700)/thumb.jpg",
-                "http://i1.dpfile.com/pc/ed638080b3094dddec7760cd8d5d8d43(700x700)/thumb.jpg",
-                "http://i3.dpfile.com/pc/08b5e4c3913e1c102eeca7fe07a7061b(700x700)/thumb.jpg",
-                "http://i1.dpfile.com/pc/36ff75f78af9b0b8d6791251b5dc1744(700x700)/thumb.jpg"
-        };
-
+        sWorkerThread = new WorkerThread();
+        sWorkerThread.start(); // WorkerThread通过start方法开始获取数据(Thread.start()会运行在另一个线程当中)
         new Thread(new Runnable()
         {
             @Override
             public void run()
             {
-                // TODO: 请求商家推荐信息
-                Log.d(TAG, " start retrieving the view pager data here ");
-//                retrieveRecommdedRoomInfo();
+                retrieveRecommdedRoomInfo();
             }
         }).start();
+
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
+
+        final ImageView[] sPagerIndicatorImgList;
 
         sImgGalleryViewPager = (ViewPager) parentView.findViewById(viewPagerId);
         sGalleryIndicatorGroup = (LinearLayout) parentView.findViewById(galleryIndiGroupId);
 
-        sPagerIndicatorImgList = new ImageView[sPagerImgUrlArr.length];
+        sPagerIndicatorImgList = new ImageView[sGlobalRoomList.size()];
 
         final int size = sPagerIndicatorImgList.length;
         Log.d(TAG, " the size we get are : " + size);
         ImageView indicatorView;
         int i;
+        // 用于初始化和控制Image Gallery下面的indicator圆点
         for (i = 0; i < size; ++i)
         {
             indicatorView = new ImageView(context);
@@ -230,9 +352,11 @@ public class NearbyFragmentsCommonUtils
 
             sPagerIndicatorImgList[i] = indicatorView;
             // 用于初始化所有的indicator的初始状态
-            if (i == 0) {
+            if (i == 0)
+            {
                 sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_focused);
-            } else {
+            } else
+            {
                 sPagerIndicatorImgList[i].setBackgroundResource(R.drawable.page_indicator_unfocused);
             }
 
@@ -245,17 +369,48 @@ public class NearbyFragmentsCommonUtils
 
         sPagerImgArr = new NetworkImageView[size];
 
+        Log.d(TAG, " -----------------------> the sGlobalRoomListSize are : " + sGlobalRoomList.size());
+        // 用于初始化具体的ImageGallery
         int j;
         for (j = 0; j < size; ++j)
         {
-            NetworkImageView imgView = new NetworkImageView(context);
-            // TODO: 添加一些用于控制推荐商家的图片信息的控制过程
-            imgView.setScaleType(ImageView.ScaleType.FIT_XY);
+            if (sGlobalRoomList.size() > 0)
+            {
+                final NearbyRoomSubFragmentRoomBean roomItem = sGlobalRoomList.get(j);
 
-            sPagerImgArr[j] = imgView;
-            // 我们在这里为商家推荐的图片信息添加了一张默认图片
-            imgView.setDefaultImageResId(R.drawable.default_reommend_img);
-            imgView.setImageUrl(sPagerImgUrlArr[j], mImgLoader);
+                NetworkImageView imgView = new NetworkImageView(context);
+                // TODO: 添加一些用于控制推荐商家的图片信息的控制过程
+                imgView.setScaleType(ImageView.ScaleType.FIT_XY);
+
+                sPagerImgArr[j] = imgView;
+                // 我们在这里为商家推荐的图片信息添加了一张默认图片
+                imgView.setDefaultImageResId(R.drawable.default_reommend_img);
+                imgView.setImageUrl(roomItem.getRoomPhotoUrl(), mImgLoader);
+                imgView.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        // 我们在这里处理当约球顶部的ImageView被点击之后的处理事件，
+                        // 这里我们设定当被点击之后跳转到球厅详情Activity当中
+                        Intent intent = new Intent((Activity) context, NearbyBilliardRoomActivity.class);
+                        Bundle imgRoomData = new Bundle();
+
+                        imgRoomData.putString(KEY_ROOM_FRAGMENT_PHOTO, roomItem.getRoomPhotoUrl());
+                        imgRoomData.putString(KEY_ROOM_FRAGMENT_ADDRESS, roomItem.getDetailedAddress());
+                        imgRoomData.putString(KEY_ROOM_FRAGMENT_NAME, roomItem.getRoomName());
+                        imgRoomData.putDouble(KEY_ROOM_FRAGMENT_PRICE, roomItem.getPrice());
+                        imgRoomData.putFloat(KEY_ROOM_FRAGMENT_LEVEL, roomItem.getLevel());
+                        imgRoomData.putString(KEY_ROOM_FRAGMENT_SHOP_HOURS, roomItem.getShopHours());
+                        imgRoomData.putString(KEY_ROOM_FRAGMENT_PHONE, roomItem.getRoomPhone());
+                        // TODO: 对于经纬度信息我们暂时不传递了,因为原型界面当中并没有提供经纬度的相关信息
+//                        imgRoomData.putString(KEY_ROOM_FRAGMENT_LAT, roomItem.get);
+
+                        intent.putExtra(KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, imgRoomData);
+                        context.startActivity(intent);
+                    }
+                });
+            }
         }
 
         sGalleryImgAdapter = new NearbyMateFragmentViewPagerImgAdapter(sPagerImgArr);
@@ -270,8 +425,6 @@ public class NearbyFragmentsCommonUtils
             @Override
             public void onPageSelected(int i)
             {
-                Log.d(TAG, " the current page index are : " + i + ", and the selected index are : " + i % sPagerImgArr.length);
-
                 int j;
                 for (j = 0; j < size; ++j)
                 {
@@ -297,13 +450,13 @@ public class NearbyFragmentsCommonUtils
         if (!TextUtils.isEmpty(sexVal)) {
             return sexVal.equals("1") ? context.getString(R.string.man) : context.getString(R.string.woman);
         }
-
         return "";
     }
 
     public static final int parseGenderDrawable(String sexVal)
     {
-        if (!TextUtils.isEmpty(sexVal)) {
+        if (!TextUtils.isEmpty(sexVal))
+        {
             Log.d(TAG, " the sex val we get are :" + sexVal);
             return sexVal.equals("男") ? R.drawable.male : R.drawable.female;
         }
@@ -352,6 +505,4 @@ public class NearbyFragmentsCommonUtils
         }
         return levelStr;
     }
-
-
 }

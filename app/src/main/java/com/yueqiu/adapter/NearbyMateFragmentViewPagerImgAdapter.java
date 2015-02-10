@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.android.volley.toolbox.NetworkImageView;
+
 import java.awt.font.TextAttribute;
 
 /**
@@ -16,9 +18,9 @@ public class NearbyMateFragmentViewPagerImgAdapter extends PagerAdapter
 {
     private static final String TAG = "NearbyMateFragmentViewPagerImgAdapter";
 
-    private ImageView[] mImgList;
+    private NetworkImageView[] mImgList;
 
-    public NearbyMateFragmentViewPagerImgAdapter(ImageView[] imgList)
+    public NearbyMateFragmentViewPagerImgAdapter(NetworkImageView[] imgList)
     {
         this.mImgList = imgList;
     }
@@ -27,16 +29,30 @@ public class NearbyMateFragmentViewPagerImgAdapter extends PagerAdapter
     @Override
     public Object instantiateItem(ViewGroup container, int position)
     {
+        // TODO: 以下的逻辑有一些问题，需要进一步确定
+        // TODO: 因为我现在还不确定这里是否真的是需要removeView()的操作
+//        if (mImgList.length > 0)
+//        {
+//            container.removeView(mImgList[position % mImgList.length]);
+//        }
+
         Log.d(TAG, " the current init item are : " + position);
-        ((ViewPager) container).addView(mImgList[position % mImgList.length], 0);
-        return mImgList[position % mImgList.length];
+        if (mImgList.length > 0)
+        {
+            ((ViewGroup) container.getParent()).addView(mImgList[position % mImgList.length], position);
+            return mImgList[position % mImgList.length];
+        }
+        return null;
     }
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object)
     {
         Log.d(TAG, " the position of : " + position + " is destroyed ");
-        ((ViewPager) container).removeView(mImgList[position % mImgList.length]);
+        if (mImgList.length > 0)
+        {
+            ((ViewPager) container).removeView(mImgList[position % mImgList.length]);
+        }
     }
 
     @Override

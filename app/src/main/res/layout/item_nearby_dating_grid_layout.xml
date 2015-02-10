@@ -7,8 +7,8 @@
 
     <!--用于约球详细Activity当中的GridView当中的item的布局文件-->
     <com.android.volley.toolbox.NetworkImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/listview_item_user_photo_width"
+        android:layout_height="@dimen/listview_item_user_photo_height"
         android:src="@drawable/default_head"
         android:layout_centerHorizontal="true"
         android:id="@+id/img_grid_search_dating_detailed_userphoto"/>
