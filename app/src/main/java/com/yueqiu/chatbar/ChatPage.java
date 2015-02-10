@@ -559,6 +559,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         super.onResume();
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(0);
+        boolean isIMOnline = api.isOnline();
     }
 
     @Override
