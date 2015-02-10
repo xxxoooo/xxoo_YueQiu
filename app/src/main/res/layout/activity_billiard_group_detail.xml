@@ -15,11 +15,11 @@
         android:layout_height="0dp"
         android:layout_weight="1.2"
         android:padding="5dp">
-        <ImageView
+        <com.android.volley.toolbox.NetworkImageView
             android:id="@+id/billiard_group_detail_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/default_head"/>
+            />
         <TextView
             android:id="@+id/billiard_group_detail_owner"
             style="@style/ListItemTvStyle"
@@ -35,7 +35,6 @@
             android:layout_below="@+id/billiard_group_detail_owner"
             android:padding="4dp"
             android:layout_alignLeft="@+id/billiard_group_detail_owner"
-            android:drawableRight="@drawable/male"
             android:drawablePadding="6dp"
             android:layout_marginTop="3dp"
             />

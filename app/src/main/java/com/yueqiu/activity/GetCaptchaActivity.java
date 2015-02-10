@@ -3,6 +3,8 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,14 +18,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.MyURLSpan;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,40 +35,45 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by yinfeng on 15/1/17.
- */
-public class CheckNumActivity extends Activity implements View.OnClickListener {
+
+public class GetCaptchaActivity extends Activity implements View.OnClickListener {
 
     private EditText mEtPhone;
     private EditText mEtCheckNum;
     private TextView mGetCheckNum, mTvLogin, mTvAgree;
     private Button mBtnNext;
     private String mPhone;
-    private String mCode;
+    private int mCode;
     private ActionBar mActionBar;
     private CheckBox mCheckBox;
-    private Handler handler = new Handler() {
+    private ProgressBar mPreProgress;
+    private Drawable mProgressDrawable;
+    private Map<String,String> mParamMap = new HashMap<String, String>();
+    private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch (msg.what) {
 
                 case PublicConstant.GET_SUCCESS:
-                    mCode = (String) msg.obj;
-//                    new AlertDialog.Builder(CheckNumActivity.this).
-//                            setMessage("验证码为：" +  msg.obj).create().show();
-//                    Toast.makeText(CheckNumActivity.this,
-//                            "验证码为：" + msg.obj, Toast.LENGTH_LONG).show();
+                    Bundle arg = (Bundle) msg.obj;
+                    String smsCode = arg.getString("smsCode");
+                    mCode = arg.getInt("code");
+                    if(smsCode.equals("false")){
+                        Utils.showToast(GetCaptchaActivity.this,getString(R.string.send_sms_failed));
+                    }else{
+                        Utils.showToast(GetCaptchaActivity.this,getString(R.string.wait_for_captcha_sms));
+                    }
                     break;
                 case PublicConstant.TIME_OUT:
-                    Utils.showToast(CheckNumActivity.this,getString(R.string.http_request_time_out));
+                    Utils.showToast(GetCaptchaActivity.this,getString(R.string.http_request_time_out));
                     break;
                 case PublicConstant.REQUEST_ERROR:
                     if(null == msg.obj){
-                        Utils.showToast(CheckNumActivity.this,getString(R.string.retry_after_seconds,msg.obj));
+                        Utils.showToast(GetCaptchaActivity.this,getString(R.string.http_request_error));
                     }else{
-                        Utils.showToast(CheckNumActivity.this,getString(R.string.http_request_error));
+                        Utils.showToast(GetCaptchaActivity.this, (String) msg.obj);
                     }
                     break;
 
@@ -76,7 +85,19 @@ public class CheckNumActivity extends Activity implements View.OnClickListener {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_with_captcha);
-        mCode = new String();
+
+        initActionBar();
+        initView();
+    }
+
+    private void initActionBar() {
+        mActionBar = getActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setTitle(getString(R.string.register));
+    }
+
+    private void initView(){
+
         mEtPhone = (EditText) findViewById(R.id.activity_checkphone_et_phone);
         mEtCheckNum = (EditText) findViewById(R.id.activity_checkphone_et_password);
         mGetCheckNum = (TextView) findViewById(R.id.tv_register_getchecknum);
@@ -92,13 +113,12 @@ public class CheckNumActivity extends Activity implements View.OnClickListener {
         mTvLogin.setOnClickListener(this);
         mGetCheckNum.setOnClickListener(this);
         mBtnNext.setOnClickListener(this);
-        initActionBar();
-    }
 
-    private void initActionBar() {
-        mActionBar = getActionBar();
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle(getString(R.string.register));
+        mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(this).build();
+        Rect bounds = mPreProgress.getIndeterminateDrawable().getBounds();
+        mPreProgress.setIndeterminateDrawable(mProgressDrawable);
+        mPreProgress.getIndeterminateDrawable().setBounds(bounds);
     }
 
     @Override
@@ -107,32 +127,33 @@ public class CheckNumActivity extends Activity implements View.OnClickListener {
             case R.id.tv_register_getchecknum:
                 mPhone = mEtPhone.getText().toString();
                 if (mPhone.length() != 11) {
-                    Utils.showToast(CheckNumActivity.this,getString(R.string.please_input_right_number));
+                    Utils.showToast(GetCaptchaActivity.this,getString(R.string.please_input_right_number));
                     return;
                 }
-                new Thread(getCheckNum).start();
+                getCaptcha();
+                Utils.dismissInputMethod(this,mEtPhone);
                 break;
             case R.id.activity_checkphone_btn_register:
                 String code = mEtCheckNum.getText().toString().trim();
                 if (code == null || code.equals("")) {
-                    Utils.showToast(CheckNumActivity.this,getString(R.string.please_input_captcha));
+                    Utils.showToast(GetCaptchaActivity.this,getString(R.string.please_input_captcha));
                     return;
                 }
                 if (!code.equals(mCode)) {
-                    Utils.showToast(CheckNumActivity.this,getString(R.string.captcha_is_wrong));
+                    Utils.showToast(GetCaptchaActivity.this,getString(R.string.captcha_is_wrong));
                     return;
                 }
 
                 if (!mCheckBox.isChecked()) {
-                    Utils.showToast(CheckNumActivity.this,getString(R.string.please_read_article));
+                    Utils.showToast(GetCaptchaActivity.this,getString(R.string.please_read_article));
                     return;
                 }
 
                 Intent intent = new Intent();
                 Bundle bundle = new Bundle();
                 bundle.putString(HttpConstants.RegisterConstant.PHONE, mPhone);
-                bundle.putString(HttpConstants.RegisterConstant.VERFICATION_CODE, mCode);
-                intent.setClass(CheckNumActivity.this, Register1Activity.class);
+                bundle.putString(HttpConstants.RegisterConstant.VERFICATION_CODE, String.valueOf(mCode));
+                intent.setClass(GetCaptchaActivity.this, Register1Activity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
                 finish();
@@ -145,37 +166,53 @@ public class CheckNumActivity extends Activity implements View.OnClickListener {
         }
     }
 
-    private Runnable getCheckNum = new Runnable() {
+    private void getCaptcha(){
+        mParamMap.put(HttpConstants.Captcha.PHONE,mPhone);
+        mParamMap.put(HttpConstants.Captcha.ACTION_TYPE,String.valueOf(3));
+
+        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Captcha.URL);
+        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
+
+        new GetCaptchaTask(mParamMap).execute(mUrlAndMethodMap);
+
+    }
+
+    private class GetCaptchaTask extends AsyncTaskUtil<String>{
+
+        public GetCaptchaTask(Map<String, String> map) {
+            super(map);
+        }
+
         @Override
-        public void run() {
-            Map<String, String> map = new HashMap<String, String>();
-            map.put(HttpConstants.RegisterConstant.PHONE, mPhone);
-            map.put(HttpConstants.RegisterConstant.ACTION_TYPE, "3");
-            String retStr = HttpUtil.urlClient(HttpConstants.RegisterConstant.CODEURL,
-                    map, HttpConstants.RequestMethod.POST);
-            JSONObject object = Utils.parseJson(retStr);
-            Message msg = new Message();
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mPreProgress.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject object) {
+            super.onPostExecute(object);
+            mPreProgress.setVisibility(View.GONE);
             try {
                 if(!object.isNull("code")) {
                     if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                        msg.what = PublicConstant.GET_SUCCESS;
-                        msg.obj = object.getJSONObject("result").getString("code");
+                        Bundle arg = new Bundle();
+                        arg.putString("smsCode",object.getJSONObject("result").getString("smsCode"));
+                        arg.putInt("code", object.getJSONObject("result").getInt("code"));
+                        mHandler.obtainMessage(PublicConstant.GET_SUCCESS,arg).sendToTarget();
                     }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
-                        msg.what = PublicConstant.TIME_OUT;
+                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
                     }else {
-                        msg.what = PublicConstant.REQUEST_ERROR;
-                        msg.obj = object.getJSONObject("result").getString("leftTime");
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,object.getString("msg")).sendToTarget();
                     }
                 }else{
-                    msg.what = PublicConstant.REQUEST_ERROR;
+                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                 }
-                handler.sendMessage(msg);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-    };
-
+    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

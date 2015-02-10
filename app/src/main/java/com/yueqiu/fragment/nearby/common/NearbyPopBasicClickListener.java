@@ -99,7 +99,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         final int len = rawDistance.length();
                         String distance = rawDistance.substring(0, len - 3);
                         mParamsPreference.setAScouchRange(mContext, distance);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_DISTANCE_FILTERED, distance);
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_DISTANCE_FILTERED, distance).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });

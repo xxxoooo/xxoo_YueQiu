@@ -22,10 +22,14 @@ public class PublicConstant {
     public static final int USE_CACHE     = -4;
     public static final int NO_NETWORK    = -5;
     public static final int FAVOR_SUCCESS = 1;
+    public static final int JOIN_SUCCESS  = 2;
 
     public static final int PUBLISHED_DATE_TYPE     = 1;
     public static final int PUBLISHED_ACTIVITY_TYPE = 2;
     public static final int PUBLISHED_GROUP_TYPE    = 3;
+
+    public static final int PART_IN_DATE_TYPE       = 1;
+    public static final int PART_IN_PLAY_TYPE       = 2;
 
     public static final int FAVOR_DATE_TYPE         = 1;
     public static final int FAVPR_ROOM_TYPE         = 2;
@@ -50,6 +54,9 @@ public class PublicConstant {
     public static final int ROOM                    = 2;
     public static final int PLAY                    = 3;
     public static final int GROUP                   = 4;
+
+    public static final int JOIN_TYPE_PLAY          = 2;
+    public static final int JOIN_TYPE_DATE          = 1;
 
 
 

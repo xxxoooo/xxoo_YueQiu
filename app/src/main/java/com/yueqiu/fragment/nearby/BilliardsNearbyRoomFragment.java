@@ -129,7 +129,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private NearbyFragmentsCommonUtils.ControlPopupWindowCallback mCallback;
 
     // 定义的用于下拉刷新过程当中需要用到的变量
-    private boolean mLoadMore, mRefresh, mIsSavedInstance;
+    private boolean mLoadMore, mRefresh, mIsSavedInstance,mIsListEmpty;
     private int mBeforeCount, mAfterCount;
     // 以下是我们用于跟踪page的值的请求(用于大众点评的分页请求过程)
     private int mPage = 1;
@@ -140,7 +140,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
     {
         mView = inflater.inflate(R.layout.fragment_nearby_room_layout, container, false);
 
-        NearbyFragmentsCommonUtils.initViewPager(sContext, mView, R.id.room_fragment_gallery_pager, R.id.room_fragment_gallery_pager_indicator_group);
+        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(sContext);
+        commonUtils.initViewPager(sContext, mView);
 
         mClickListener = new NearbyPopBasicClickListener(sContext, mUIEventsHandler, sParamsPreference);
         (mView.findViewById(R.id.btn_room_district)).setOnClickListener(mClickListener);
@@ -556,13 +557,14 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     loadEmptyTv(true);
 
                     mBeforeCount = mRoomList.size();
+                    mIsListEmpty = mRoomList.isEmpty();
                     List<NearbyRoomSubFragmentRoomBean> roomList = (ArrayList<NearbyRoomSubFragmentRoomBean>) msg.obj;
                     mBeforeCount = mRoomList.size();
                     for (NearbyRoomSubFragmentRoomBean roomBean : roomList)
                     {
                         if (! mRoomList.contains(roomBean))
                         {
-                            if (mRefresh)
+                            if (mRefresh && !mIsListEmpty)
                             {
                                 mRoomList.add(0, roomBean);
                             } else
@@ -906,6 +908,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 {
                     mWorkerThread.fetchRoomData(1);
                 }
+                loadEmptyTv(true);
             } else
             {
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
@@ -928,6 +931,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
             if (mBeforeCount != mAfterCount && !mRefresh)
                 mPage += 1;
             mRefresh = false;
+            loadEmptyTv(true);
             if (Utils.networkAvaiable(sContext))
             {
                 // TODO: 我们在这里进行网络更新的请求
@@ -938,6 +942,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     Log.d(TAG, "PullToRefresh --> have touched the end of the list, and the pageNum we need to request are : " + mPage);
                     mWorkerThread.fetchRoomData(mPage);
                 }
+            }else{
+                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
             }
         }
     };

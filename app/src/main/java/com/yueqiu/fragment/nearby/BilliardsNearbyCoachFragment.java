@@ -98,6 +98,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
     private ProgressBar mPreProgress;
     private TextView mPreTextView;
     private Drawable mProgressDrawable;
+    private boolean mIsListEmpty;
 
     private List<NearbyCoauchSubFragmentCoauchBean> mCoauchList = new ArrayList<NearbyCoauchSubFragmentCoauchBean>();
     private List<NearbyCoauchSubFragmentCoauchBean> mCachedList = new ArrayList<NearbyCoauchSubFragmentCoauchBean>();
@@ -112,7 +113,8 @@ public class BilliardsNearbyCoachFragment extends Fragment
     {
         mView = inflater.inflate(R.layout.fragment_nearby_coauch_layout, container, false);
 
-        NearbyFragmentsCommonUtils.initViewPager(sContext, mView, R.id.coauch_fragment_gallery_pager, R.id.coauch_fragment_gallery_pager_indicator_group);
+        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(sContext);
+        commonUtils.initViewPager(sContext, mView);
 
         mClickListener = new NearbyPopBasicClickListener(sContext,mUIEventsHandler,sParamsPreference);
         (mBtnAbility = (Button) mView.findViewById(R.id.btn_coauch_ability)).setOnClickListener(mClickListener);
@@ -390,12 +392,13 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     loadEmptyTv(true);
 
                     mBeforeCount = mCoauchList.size();
+                    mIsListEmpty = mCoauchList.isEmpty();
                     List<NearbyCoauchSubFragmentCoauchBean> coauchList = (ArrayList<NearbyCoauchSubFragmentCoauchBean>) msg.obj;
                     for (NearbyCoauchSubFragmentCoauchBean bean : coauchList)
                     {
                         if (! mCoauchList.contains(bean))
                         {
-                            if (mRefresh)
+                            if (mRefresh && !mIsListEmpty)
                             {
                                 mCoauchList.add(0, bean);
                             } else
@@ -633,6 +636,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     // 每一次的下拉刷新我们都是要从0开始请求最新的数据
                     mWorker.fetchAllData(0, 9);
                 }
+                loadEmptyTv(true);
             } else
             {
                 mUIEventsHandler.sendEmptyMessage(STATE_FETCH_DATA_FAILED);
@@ -657,12 +661,14 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 mEndNum += 10;
             }
             mRefresh = false;
+            loadEmptyTv(true);
             if (Utils.networkAvaiable(sContext))
             {
                 if (null != mWorker)
                 {
                     mWorker.fetchAllData(mStartNum, mEndNum);
                 }
+
             } else
             {
                 mUIEventsHandler.sendEmptyMessage(NO_NETWORK);

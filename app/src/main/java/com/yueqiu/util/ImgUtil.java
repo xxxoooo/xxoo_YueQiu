@@ -18,6 +18,8 @@ import android.os.Message;
 import android.view.Display;
 import android.widget.ImageView;
 
+import com.yueqiu.view.IssueImageView;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -176,14 +178,15 @@ public class ImgUtil {
         return null;
     }
 
-    public static void clearImageView(List<ImageView> list){
-        for(ImageView imageView : list) {
+    public static void clearImageView(List<IssueImageView> list){
+        for(IssueImageView imageView : list) {
             if (!(imageView.getDrawable() instanceof BitmapDrawable)) {
                 return;
             }
             BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
             drawable.getBitmap().recycle();
             imageView.setImageDrawable(null);
+            imageView.setBitmapBean(null);
         }
     }
     /**

@@ -1,21 +1,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.yueqiu.activity.searchmenu.nearby.SearchBilliardsDatingActivity">
-    <item
-        android:id="@+id/search_room_detail_action_collect"
-        android:orderInCategory="100"
-        android:showAsAction="always"
-        android:icon="@drawable/actionbar_title_collect"
-        android:title="@string/search_dating_detailed_action_collect"/>
-
-    <!-- 球厅的分享功能暂时不支持 -->
     <!--<item-->
-        <!--android:id="@+id/search_room_detail_action_share"-->
+        <!--android:id="@+id/search_room_detail_action_collect"-->
         <!--android:orderInCategory="100"-->
         <!--android:showAsAction="always"-->
-        <!--android:icon="@drawable/actionbar_title_share"-->
-        <!--android:title="@string/search_dating_detailed_action_share"-->
-        <!-->-->
-    <!--</item>-->
+        <!--android:icon="@drawable/actionbar_title_collect"-->
+        <!--android:title="@string/search_dating_detailed_action_collect"/>-->
+
+    <!-- 球厅的分享功能暂时不支持 -->
+    <item
+        android:id="@+id/search_room_detail_action_share"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:icon="@drawable/actionbar_title_share"
+        android:title="@string/search_dating_detailed_action_share"
+        >
+    </item>
 
 </menu>

@@ -44,9 +44,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * Created by yinfeng on 15/1/19.
- */
 public class Register1Activity extends Activity implements View.OnClickListener {
     private ActionBar mActionBar;
     private Intent mIntent;

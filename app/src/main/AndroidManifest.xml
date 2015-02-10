@@ -12,10 +12,11 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.GET_TASKS" />
 
+
     <application
         android:name=".YueQiuApp"
         android:allowBackup="true"
-        android:icon="@drawable/logo"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
@@ -87,7 +88,8 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".activity.FeedbackActivity"
-            android:windowSoftInputMode="adjustUnspecified|stateHidden" />
+            android:windowSoftInputMode="adjustResize|stateHidden"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".activity.UpgradeAssistantActivity"
             android:screenOrientation="portrait" />
@@ -148,7 +150,7 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".activity.CheckNumActivity"
+            android:name=".activity.GetCaptchaActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.Register1Activity"
@@ -188,7 +190,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </receiver>
-        <service android:name=".util.LocationUtil" />
 
         <activity
             android:name=".activity.BilliardGroupDetailActivity"

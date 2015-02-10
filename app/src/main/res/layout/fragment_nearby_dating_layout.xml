@@ -3,62 +3,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-    <!--用于SearchActivity当中的约球子Fragment的布局文件-->
-
+    <include
+        layout="@layout/nearby_view_pager_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
     <LinearLayout
-        android:id="@+id/dating_gallery_view_pager_zone"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:background="@android:color/white"
-        android:orientation="vertical">
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/dating_frament_gallery_pager"
-            android:layout_width="match_parent"
-            android:layout_height="100dp">
-
-        </android.support.v4.view.ViewPager>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_alignParentLeft="true"
-                android:layout_centerVertical="true"
-                android:background="@android:color/background_light"
-                android:id="@+id/tv_dating_gallery_view_pager_indication"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/search_gallery_pager_test_str"
-                android:textStyle="normal"
-                android:textColor="@color/md__defaultBackground"
-                android:padding="2dp"
-                android:textSize="13sp"
-                />
-
-            <LinearLayout
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="5dp"
-                android:id="@+id/dating_fragment_gallery_pager_indicator_group"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:orientation="horizontal"
-                >
-            </LinearLayout>
-        </RelativeLayout>
-
-    </LinearLayout>
-
-
-    <!-- 以下是控制ListView筛选显示的Button组合-->
-    <!-- 在SearchActivity当中，RadioButton只是用于添加额外的选项的，不是用于
-         展示不同的ListView的，每一个Fragment都只是单独的对应于同一个ListView，
-         当我们点击了不同的button之后，添加的只是额外的筛选条件 -->
-    <LinearLayout
-        android:layout_below="@id/dating_gallery_view_pager_zone"
+        android:layout_below="@+id/gallery_view_pager_zone"
         android:layout_width="match_parent"
         android:layout_height="@dimen/nearby_subfragment_filter_btn_height"
         android:layout_weight="1"

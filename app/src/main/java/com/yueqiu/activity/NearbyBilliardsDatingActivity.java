@@ -178,7 +178,7 @@ public class NearbyBilliardsDatingActivity extends Activity
                             {
                                 joinActivity(
                                         YueQiuApp.sUserInfo.getUser_id(), // userId
-                                        2, // current type
+                                        PublicConstant.JOIN_TYPE_DATE, // current type
                                         sNodeId // pid we get from the previous dating item list
                                 );
                             }
@@ -414,7 +414,7 @@ public class NearbyBilliardsDatingActivity extends Activity
     /**
      *
      * @param userId 用户id
-     * @param type 类型, 1对应于活动;2对应于约球
+     * @param type 类型, 1对应于约球;2对应于活动
      * @param pId 即约球Id
      */
     private void joinActivity(int userId, int type, int pId)

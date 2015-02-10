@@ -77,6 +77,7 @@ public class HttpUtil
             sb.deleteCharAt(sb.length() - 1);
         }
         log(sb.toString());
+
         try {
             URL urls = new URL(sb.toString());
             HttpURLConnection conn = (HttpURLConnection)urls.openConnection();
@@ -227,6 +228,6 @@ public class HttpUtil
 
     private static void log(String msg)
     {
-        Log.i(TAG, msg);
+        Log.i(TAG, "msg is ->"+ msg);
     }
 }

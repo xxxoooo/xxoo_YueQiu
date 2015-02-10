@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:src="@drawable/logo"/>
+        android:src="@drawable/default_head"/>
 
     <TextView
         android:id="@+id/mention_me_item_nickname_tv"
@@ -38,7 +38,8 @@
         android:layout_height="wrap_content"
         android:text="@string/agree"
         android:layout_toLeftOf="@+id/mention_me_ignore_btn"
-        android:layout_alignTop="@+id/mention_me_ignore_btn"/>
+        android:layout_alignTop="@+id/mention_me_ignore_btn"
+        android:textColor="@color/md__defaultBackground"/>
 
     <Button
         android:id="@+id/mention_me_ignore_btn"
@@ -48,6 +49,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerInParent="true"
         android:layout_marginRight="20dp"
+        android:textColor="@color/md__defaultBackground"
         android:text="@string/ignore"/>
 
 

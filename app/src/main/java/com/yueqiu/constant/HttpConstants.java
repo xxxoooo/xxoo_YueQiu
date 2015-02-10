@@ -32,10 +32,6 @@ public class HttpConstants
          */
         public static final String URL = "/user/register";
 
-        public static final String CODEURL = "/user/sendCode";
-
-
-        public static final String ACTION_TYPE = "action_type";
 
         public static final String VERFICATION_CODE = "verfication_code";
 
@@ -88,6 +84,11 @@ public class HttpConstants
     {
 
         public static final String URL = "/user/logout";
+    }
+
+    public static final class PartIn{
+
+        public static final String URL = "/center/getJoin";
     }
 
     /**
@@ -157,6 +158,12 @@ public class HttpConstants
 
         // 用于获取约球详情的信息列表的URL
         public static final String URL_DATING_DETAILE = "/home/appointBllDetail";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String TYPE_ID = "type_id";
+
+        public static final String P_ID = "p_id";
     }
 
     /**
@@ -411,6 +418,7 @@ public class HttpConstants
         public static final String URL      = "/store/storeSave";
     }
 
+
     /**
      * 台球圈详情
      */
@@ -480,6 +488,25 @@ public class HttpConstants
          * 请求超时
          */
         public static final int TIME_OUT = 1011;
+    }
+
+    public static class FeedBack{
+        public static final String URL = "/center/suggest";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String TITLE = "title";
+
+        public static final String CONTENT = "content";
+    }
+
+    public static class Captcha{
+
+        public static final String URL = "/user/sendCode";
+
+        public static final String PHONE = "phone";
+
+        public static final String ACTION_TYPE = "action_type";
     }
 
 
