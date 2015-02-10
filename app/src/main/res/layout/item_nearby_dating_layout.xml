@@ -7,8 +7,8 @@
 
     <!-- 用于SearchActivity当中的约球子Fragment当中的ListView当中的item的具体的布局layout文件-->
     <com.android.volley.toolbox.NetworkImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/listview_item_user_photo_width"
+        android:layout_height="@dimen/listview_item_user_photo_height"
         android:layout_centerVertical="true"
         android:id="@+id/img_dating_subfragment_listitem_photo"
         android:padding="2dp"

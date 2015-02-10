@@ -4,60 +4,15 @@
                 android:layout_height="match_parent">
 
 
-    <LinearLayout
-        android:id="@+id/coauch_gallery_view_pager_zone"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:background="@android:color/white"
-        android:orientation="vertical"
-        >
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/coauch_fragment_gallery_pager"
-            android:layout_width="match_parent"
-            android:layout_height="100dp">
-
-        </android.support.v4.view.ViewPager>
-        <!-- the indicator-->
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <!--用于包含5个圆点，用于Viewpager的indicator-->
-            <LinearLayout
-                android:layout_marginRight="5dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:id="@+id/coauch_fragment_gallery_pager_indicator_group"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="right"
-                android:orientation="horizontal">
-
-            </LinearLayout>
-            <!--这个区域是用于显示广告用语的-->
-            <TextView
-                android:background="@android:color/background_light"
-                android:id="@+id/tv_coauch_gallery_view_pager_indication"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:layout_centerVertical="true"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="14dp"
-                android:text="@string/search_gallery_pager_test_str"
-                android:textStyle="normal"
-                android:textColor="@color/md__defaultBackground"
-                android:padding="2dp"
-                android:textSize="13sp"
-                />
-        </RelativeLayout>
-    </LinearLayout>
-
+    <include
+        layout="@layout/nearby_view_pager_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
 
     <!--用于SearchActivity当中的教练子Fragment的布局文件-->
     <LinearLayout
-        android:layout_below="@id/coauch_gallery_view_pager_zone"
+        android:layout_below="@+id/gallery_view_pager_zone"
         android:layout_width="match_parent"
         android:layout_height="@dimen/nearby_subfragment_filter_btn_height"
         android:layout_weight="1"

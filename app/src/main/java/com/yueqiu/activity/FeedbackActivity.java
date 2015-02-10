@@ -458,6 +458,7 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
             bmpBean.imgUri = null;
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth,mAddViewHeight);
             params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
+            params.gravity = Gravity.CENTER_VERTICAL;
             mAddImg.setLayoutParams(params);
             mAddImg.setBitmapBean(bmpBean);
             mAddImg.setImageDrawable(bmpBean.bitmapDrawable);

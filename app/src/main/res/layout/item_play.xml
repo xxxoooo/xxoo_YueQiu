@@ -6,7 +6,6 @@
     android:padding="8dp"
         >
         <com.android.volley.toolbox.NetworkImageView
-            android:src="@drawable/default_head"
             android:id="@+id/activities_lv_item_iv_head"
             android:layout_width="wrap_content"
             android:layout_alignParentLeft="true"

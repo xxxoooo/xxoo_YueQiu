@@ -123,14 +123,17 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                 mEmptyTypeStr = mActivity.getString(R.string.search_billiard_dating_str);
                 break;
             case PublicConstant.FAVPR_ROOM_TYPE:
-                mEmptyTypeStr = mActivity.getString(R.string.search_billiard_room_str);
-                break;
-            case PublicConstant.FAVOR_PLAY_TYPE:
+                //TODO:由于球厅先不做，所以改变一下
+                //mEmptyTypeStr = mActivity.getString(R.string.search_billiard_room_str);
                 mEmptyTypeStr = mActivity.getString(R.string.tab_title_activity);
                 break;
-            case PublicConstant.FAVOR_GROUP_TYPR:
+            case PublicConstant.FAVOR_PLAY_TYPE:
+                //mEmptyTypeStr = mActivity.getString(R.string.tab_title_activity);
                 mEmptyTypeStr = mActivity.getString(R.string.tab_title_billiards_circle);
                 break;
+//            case PublicConstant.FAVOR_GROUP_TYPR:
+//                mEmptyTypeStr = mActivity.getString(R.string.tab_title_billiards_circle);
+//                break;
         }
     }
 
@@ -139,7 +142,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
     @Override
     protected void requestResult() {
         mParamsMap.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
-        mParamsMap.put(HttpConstants.Favor.TYPE,mType);
+        mParamsMap.put(HttpConstants.Favor.TYPE,mType == 1 ? 1 : mType + 1);
         mParamsMap.put(HttpConstants.Favor.START_NO,mStart_no);
         mParamsMap.put(HttpConstants.Favor.END_NO, mEnd_no);
 

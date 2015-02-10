@@ -63,7 +63,7 @@ public class FavorActivity extends FragmentActivity implements ActionBar.TabList
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
         mTitles = new String[]{
             getString(R.string.search_billiard_dating_str),
-            getString(R.string.search_billiard_room_str),
+            //getString(R.string.search_billiard_room_str),
             getString(R.string.tab_title_activity),
             getString(R.string.billiard_group)
         };
@@ -135,7 +135,7 @@ public class FavorActivity extends FragmentActivity implements ActionBar.TabList
 
         @Override
         public int getCount() {
-            return 4;
+            return 3;
         }
 
         @Override

@@ -28,10 +28,11 @@ public class NearbyRoomSubFragmentRoomBean
     private String mRoomPhone;
     private String mRoomTag;
     private String mRoomInfo;
+    private String mShopHours;
 
     public NearbyRoomSubFragmentRoomBean(){}
 
-    public NearbyRoomSubFragmentRoomBean(String roomId, String roomPhoto, String roomName, float level, double price, String address, String distance, String roomPhone, String roomTag, String roomInfo)
+    public NearbyRoomSubFragmentRoomBean(String roomId, String roomPhoto, String roomName, float level, double price, String address, String distance, String roomPhone, String roomTag, String roomInfo, String shopHours)
     {
         this.mRoomId = roomId;
         this.mDetailedAddress = address;
@@ -43,6 +44,8 @@ public class NearbyRoomSubFragmentRoomBean
         this.mRoomPhone = roomPhone;
         this.mRoomTag = roomTag;
         this.mRoomInfo = roomInfo;
+        this.mShopHours = shopHours;
+
     }
 
 
@@ -201,5 +204,15 @@ public class NearbyRoomSubFragmentRoomBean
         }
         Log.d("room_bean", " and the final result we get are : " + result);
         return result;
+    }
+
+    public String getShopHours()
+    {
+        return mShopHours;
+    }
+
+    public void setShopHours(String shopHours)
+    {
+        this.mShopHours = shopHours;
     }
 }

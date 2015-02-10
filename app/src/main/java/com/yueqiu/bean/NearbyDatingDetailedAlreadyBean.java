@@ -12,13 +12,25 @@ import org.json.JSONObject;
  */
 public class NearbyDatingDetailedAlreadyBean
 {
+    private String mUserId;
     private String mUserPhoto;
     private String mUserName;
 
-    public NearbyDatingDetailedAlreadyBean(String photo, String name)
+    public NearbyDatingDetailedAlreadyBean(String userId, String photo, String name)
     {
+        this.mUserId = userId;
         this.mUserPhoto = photo;
         this.mUserName = name;
+    }
+
+    public String getUserId()
+    {
+        return mUserId;
+    }
+
+    public void setUserId(String id)
+    {
+        this.mUserId = id;
     }
 
     public String getUserPhoto()

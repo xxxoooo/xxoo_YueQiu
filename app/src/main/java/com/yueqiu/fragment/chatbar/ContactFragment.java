@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.gotye.api.GotyeChatTarget;
 import com.gotye.api.GotyeUser;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
@@ -60,6 +62,7 @@ public class ContactFragment extends Fragment {
     private List<ContactsList.Contacts> mContactsList = new ArrayList<ContactsList.Contacts>();
     private ContactsDao mContactsDao;
     private List<ContactsList.Contacts> mList;
+    private List<GotyeChatTarget> mTargets;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -98,11 +101,13 @@ public class ContactFragment extends Fragment {
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
                 ContactsList.Contacts contacts = (ContactsList.Contacts) mExpAdapter.getChild(groupPosition, childPosition);
                 //TODO:传入待聊天好友的userid
-                Intent intent = new Intent(getActivity(), ChatActivity.class);
-//                intent.putExtra("user", userProxy.gotyeUser);
-//                intent.putExtra("from", 200);
-                intent.putExtra(MessageFragment.FRIEND_USER_ID, contacts.getUser_id());//fake date
-                intent.putExtra(MessageFragment.FRIEND_USER_NAME, contacts.getUsername());
+                if (TextUtils.isEmpty(contacts.getUsername()))
+                    return false;
+                Intent intent = new Intent(getActivity(), ChatPage.class);
+                intent.putExtra("user", new GotyeUser(contacts.getUsername()));
+                intent.putExtra("from", 200);
+//                intent.putExtra(MessageFragment.FRIEND_USER_ID, contacts.getUser_id());//fake date
+//                intent.putExtra(MessageFragment.FRIEND_USER_NAME, contacts.getUsername());
                 startActivity(intent);
                 getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 return true;

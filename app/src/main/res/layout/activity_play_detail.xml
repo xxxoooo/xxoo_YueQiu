@@ -16,14 +16,13 @@
         android:layout_height="0dp"
         android:layout_weight="1.1">
 
-        <ImageView
+        <com.android.volley.toolbox.NetworkImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/play_detail_img_iv"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_margin="10dp"
-            android:src="@drawable/default_head"
             android:padding="2dp"
             />
         <TextView
@@ -240,7 +239,7 @@
             />
 
         <GridView
-            android:numColumns="5"
+            android:numColumns="4"
             android:layout_below="@id/tv_indicator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -254,7 +253,7 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/btn_search_dating_detailed_iwantin"
+        android:id="@+id/btn_search_dating_detailed_join"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/search_dating_detailed_btn_i_want_in"

@@ -46,9 +46,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * Created by yinfeng on 14/12/18.
- */
+
 public class RegisterActivity extends Activity  implements View.OnClickListener{
     private static final String TAG = "RegisterActivity";
     private static final int REQUESTCODE = 0x03;

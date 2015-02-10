@@ -8,8 +8,8 @@
     <!-- 用于SearchActivity当中的教练Fragment当中的listView每一个item的布局文件-->
     <com.android.volley.toolbox.NetworkImageView
         android:layout_marginTop="4dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/listview_item_user_photo_width"
+        android:layout_height="@dimen/listview_item_user_photo_height"
         android:id="@+id/img_coauch_subfragment_listitem_photo"
         android:src="@drawable/default_head"
         android:layout_centerVertical="true"

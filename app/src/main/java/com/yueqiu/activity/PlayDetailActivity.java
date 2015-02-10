@@ -15,15 +15,20 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.adapter.JoinListAdapter;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.PlayInfo;
+import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -31,8 +36,12 @@ import com.yueqiu.dao.FavorDao;
 import com.yueqiu.dao.PlayDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,17 +49,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by yinfeng on 15/1/6.
  */
-public class PlayDetailActivity extends Activity {
+public class PlayDetailActivity extends Activity implements View.OnClickListener{
 
     private ActionBar mActionBar;
     private TextView mUserNameTv,mSexTv,mBrowseCountTv,mCreateTimeTv;
     private TextView mTitleTv,mTypeTv,mAddressTv,mBeginTimeTv,mEndTimeTv,
             mModuleTv,mContactTv,mPhoneTv,mContentTv,mPreText;
-    private ImageView mHeadImgIv;
+    private Button mJoin;
+    private NetworkImageView mHeadImgIv;
     private PlayDao mPlayDao;
     private ProgressBar mPreProgressBar;
     private Drawable mProgressDrawable;
@@ -58,6 +69,8 @@ public class PlayDetailActivity extends Activity {
     private int mTableId,mInfoType;
     private String mCreateTime;
     private boolean mStroe = false;
+    private ImageLoader mImgLoader;
+    private JoinListAdapter mJoinAdapter;
 
     private Map<String,Integer> mParamMap = new HashMap<String, Integer>();
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
@@ -70,6 +83,7 @@ public class PlayDetailActivity extends Activity {
         setContentView(R.layout.activity_play_detail);
         initActionBar();
         initView();
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
         Bundle args = getIntent().getExtras();
         mTableId = args.getInt(DatabaseConstant.PlayTable.TABLE_ID);
         mCreateTime = args.getString(DatabaseConstant.PlayTable.CREATE_TIME);
@@ -108,6 +122,7 @@ public class PlayDetailActivity extends Activity {
     private void initView(){
 
         mHeadImgIv = Utils.$(this,R.id.play_detail_img_iv);
+        mHeadImgIv.setDefaultImageResId(R.drawable.default_head);
         mUserNameTv = Utils.$(this,R.id.play_detail_name_tv);
         mSexTv = Utils.$(this,R.id.play_detail_gender);
         mBrowseCountTv = Utils.$(this,R.id.play_look_num);
@@ -122,6 +137,7 @@ public class PlayDetailActivity extends Activity {
         mPhoneTv = Utils.$(this,R.id.play_detail_phone_info);
         mContentTv = Utils.$(this,R.id.play_detail_illustration_info);
         mPartInGridView = Utils.$(this,R.id.play_detail_gridview);
+        mJoin = Utils.$(this,R.id.btn_search_dating_detailed_join);
 
         mPreProgressBar = Utils.$(this,R.id.pre_progress);
         mPreText = Utils.$(this,R.id.pre_text);
@@ -129,10 +145,14 @@ public class PlayDetailActivity extends Activity {
         Rect bounds = mPreProgressBar.getIndeterminateDrawable().getBounds();
         mPreProgressBar.setIndeterminateDrawable(mProgressDrawable);
         mPreProgressBar.getIndeterminateDrawable().setBounds(bounds);
+
+        mJoin.setOnClickListener(this);
     }
 
     private void requestDetail(){
-        mParamMap.put(HttpConstants.Play.ID,mTableId);
+        mParamMap.clear();
+        mParamMap.put(HttpConstants.Play.ID, mTableId);
+        mUrlAndMethodMap.clear();
         mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Play.GETDETAIL);
         mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.GET);
 
@@ -158,12 +178,22 @@ public class PlayDetailActivity extends Activity {
             info.setSex(result.getString("sex"));
             info.setContact(result.getString("name"));
             info.setPhone(result.getString("phone"));
+            JSONArray join_list = result.getJSONArray("join_list");
+            for(int i=0;i<join_list.length();i++){
+                UserInfo user = new UserInfo();
+                user.setUsername(join_list.getJSONObject(i).getString("username"));
+                user.setImg_url(join_list.getJSONObject(i).getString("img_url"));
+                user.setUser_id(Integer.parseInt(join_list.getJSONObject(i).getString("user_id")));
+                info.mJoinList.add(user);
+            }
 
         }catch(JSONException e){
             e.printStackTrace();
         }
         return info;
     }
+
+
 
     private class RequestDetailTask extends AsyncTaskUtil<Integer>{
 
@@ -208,6 +238,10 @@ public class PlayDetailActivity extends Activity {
         }
     }
     private void updateUI(PlayInfo info){
+        if (! TextUtils.isEmpty(info.getImg_url()))
+        {
+            mHeadImgIv.setImageUrl(info.getImg_url(), mImgLoader);
+        }
         mUserNameTv.setText(info.getUsername());
         mSexTv.setText(info.getSex().equals("1") ? getString(R.string.man) : getString(R.string.woman));
         if(info.getSex().equals("1")){
@@ -226,6 +260,9 @@ public class PlayDetailActivity extends Activity {
         mContentTv.setText(info.getContent());
         mContactTv.setText(info.getContact());
         mPhoneTv.setText(info.getPhone());
+
+        mJoinAdapter = new JoinListAdapter(this,info.mJoinList);
+        mPartInGridView.setAdapter(mJoinAdapter);
     }
     private String getDetailTypeStr(String type){
         String typeStr;
@@ -306,6 +343,11 @@ public class PlayDetailActivity extends Activity {
                         Intent shareIntent = new Intent(PublicConstant.SLIDE_FAVOR_ACTION);
                         sendBroadcast(shareIntent);
                         Utils.showToast(PlayDetailActivity.this, getString(R.string.store_success));
+                        break;
+                    case PublicConstant.JOIN_SUCCESS:
+                        Intent joinIntent = new Intent(PublicConstant.SLIDE_PART_IN_ACTION);
+                        sendBroadcast(joinIntent);
+                        Utils.showToast(PlayDetailActivity.this, getString(R.string.join_success));
                         break;
                 }
             }
@@ -395,10 +437,12 @@ public class PlayDetailActivity extends Activity {
     }
 
     private void store(){
+        mParamMap.clear();
         mParamMap.put(HttpConstants.Play.TYPE,PublicConstant.PLAY);
         mParamMap.put(HttpConstants.Play.ID,mTableId);
         mParamMap.put(HttpConstants.Play.USER_ID,YueQiuApp.sUserInfo.getUser_id());
 
+        mUrlAndMethodMap.clear();
         mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Favor.STORE_URL);
         mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
         mStroe = true;
@@ -416,6 +460,7 @@ public class PlayDetailActivity extends Activity {
         protected void onPreExecute() {
             super.onPreExecute();
             mPreProgressBar.setVisibility(View.VISIBLE);
+            mPreText.setText(getString(R.string.storing));
             mPreText.setVisibility(View.VISIBLE);
         }
 
@@ -442,4 +487,70 @@ public class PlayDetailActivity extends Activity {
             }
         }
     }
+
+
+    /**
+     * Called when a view has been clicked.
+     *
+     * @param v The view that was clicked.
+     */
+    @Override
+    public void onClick(View v) {
+        join();
+    }
+
+    private void join(){
+        mParamMap.clear();
+        mParamMap.put(HttpConstants.NearbyDating.USER_ID, YueQiuApp.sUserInfo.getUser_id());
+        mParamMap.put(HttpConstants.NearbyDating.TYPE_ID, PublicConstant.JOIN_TYPE_PLAY);
+        mParamMap.put(HttpConstants.NearbyDating.P_ID, mTableId);
+
+        mUrlAndMethodMap.clear();
+        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.NearbyDating.URL_JOIN_ACTIVITY);
+        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
+
+        new JoinTask(mParamMap).execute(mUrlAndMethodMap);
+    }
+
+    private class JoinTask extends AsyncTaskUtil<Integer>{
+
+        public JoinTask(Map<String, Integer> map) {
+            super(map);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mPreProgressBar.setVisibility(View.VISIBLE);
+            mPreText.setText(getString(R.string.joining));
+            mPreText.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onPostExecute(JSONObject jsonObject) {
+            super.onPostExecute(jsonObject);
+            mPreProgressBar.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
+
+            try{
+                if(!jsonObject.isNull("code")){
+                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                        mHandler.sendEmptyMessage(PublicConstant.JOIN_SUCCESS);
+                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                        mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                    }else{
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonObject.getString("msg")).sendToTarget();
+                    }
+                }else{
+                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                }
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+
+
 }

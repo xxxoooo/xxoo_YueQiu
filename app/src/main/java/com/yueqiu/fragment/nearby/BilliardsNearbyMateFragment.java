@@ -141,7 +141,8 @@ public class BilliardsNearbyMateFragment extends Fragment
     {
         mView = inflater.inflate(R.layout.fragment_nearby_mate_layout, container, false);
         // then, inflate the image view pager
-        NearbyFragmentsCommonUtils.initViewPager(sContext, mView, R.id.mate_fragment_gallery_pager, R.id.mate_fragment_gallery_pager_indicator_group);
+        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(sContext);
+        commonUtils.initViewPager(sContext, mView);
 
         mSubFragmentListView = (PullToRefreshListView) mView.findViewById(R.id.search_sub_fragment_list);
         mSubFragmentListView.setMode(PullToRefreshBase.Mode.BOTH);
@@ -263,7 +264,6 @@ public class BilliardsNearbyMateFragment extends Fragment
             mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
             return;
         }
-
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
         requestParams.put("start_no", startNo + "");
         requestParams.put("end_no", endNo + "");
@@ -272,17 +272,15 @@ public class BilliardsNearbyMateFragment extends Fragment
             Log.d(TAG, " inside the real mate request method, and the range(distance) info we get are : " + distance);
             requestParams.put("range", distance);
         }
-
         if (!TextUtils.isEmpty(gender))
         {
             Log.d(TAG, " inside the real mate request method, and the gender(sex) info we get are : " + gender);
             requestParams.put("gender", gender);
         }
-
         List<NearbyMateSubFragmentUserBean> cacheMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
-
+        Log.d("wy","aaa");
         String rawResult = HttpUtil.urlClient(HttpConstants.NearbyMate.URL, requestParams, HttpConstants.RequestMethod.GET);
-
+        Log.d("wy","bbb");
         Log.d(TAG, " the raw result we get for the mate fragment are : " + rawResult);
         if (!TextUtils.isEmpty(rawResult))
         {
@@ -290,7 +288,7 @@ public class BilliardsNearbyMateFragment extends Fragment
             {
                 // initialObj当中包含的是最原始的JSON data，这个Json对象当中还包含了一些包含我们的请求状态的字段值
                 // 我们还需要从initialObj当中解析出我们真正需要的Json对象
-                JSONObject initialObj = new JSONObject(rawResult);
+                JSONObject initialObj = Utils.parseJson(rawResult);
 
                 if (!initialObj.isNull("code"))
                 {
@@ -304,7 +302,7 @@ public class BilliardsNearbyMateFragment extends Fragment
                         Log.d(TAG, " the dataCount we get are : " + dataCount);
                         JSONArray dataList = resultJson.getJSONArray("list_data");
                         int i;
-                        for (i = 0; i < dataCount; ++i)
+                        for (i = 0; i < dataList.length(); ++i)
                         {
                             JSONObject dataObj = (JSONObject) dataList.get(i);
                             String imgUrl = dataObj.getString("img_url");
@@ -320,7 +318,6 @@ public class BilliardsNearbyMateFragment extends Fragment
                         // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
                         mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
                         mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
-
                     } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
                     {
                         mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
@@ -581,7 +578,7 @@ public class BilliardsNearbyMateFragment extends Fragment
         // 因为我们对Handler的初始化是在网络可行的情况下才调用HandlerThread的start()方法，而
         // new HandlerThread().start()的方法的调用才会调用onLooperPrepared()方法，只有这样才可以
         // 初始化我们内部的Handler
-        private Handler mBackgroundHandler = new Handler();
+        private Handler mBackgroundHandler;
 
         public BackgroundWorker()
         {
@@ -627,7 +624,7 @@ public class BilliardsNearbyMateFragment extends Fragment
                             // 每次筛选，都是从第0条开始请求最新的数据
                             // 因为这相当于完全的重新开始了，所以我们需要将我们已经获得的UserList清空才可以
                             if (!TextUtils.isEmpty(sParamsPreference.getMateGender(sContext))) {
-                                retrieveInitialMateInfoList(0, 9, range, sParamsPreference.getMateGender(sContext));
+                                    retrieveInitialMateInfoList(0, 9, range, sParamsPreference.getMateGender(sContext));
                             }
 
                             break;

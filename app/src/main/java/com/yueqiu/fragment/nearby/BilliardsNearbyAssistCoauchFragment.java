@@ -10,7 +10,6 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.os.Process;
 import android.support.v4.app.Fragment;
-import android.text.LoginFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.adapter.NearbyAssistCoauchSubFragmentListAdapter;
@@ -39,9 +37,6 @@ import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -117,7 +112,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
         mView = inflater.inflate(R.layout.fragment_nearby_assistcoauch_layout, container, false);
 
-        NearbyFragmentsCommonUtils.initViewPager(sContext, mView, R.id.assistcoauch_fragment_gallery_pager, R.id.assistcoauch_fragment_gallery_pager_indicator_group);
+        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(getActivity());
+        commonUtils.initViewPager(getActivity(),mView);
 
         mClickListener = new NearbyPopBasicClickListener(sContext, mUIEventsHandler, sParamsPreference);
         (mBtnDistance = (Button) mView.findViewById(R.id.btn_assistcoauch_distance)).setOnClickListener(mClickListener);

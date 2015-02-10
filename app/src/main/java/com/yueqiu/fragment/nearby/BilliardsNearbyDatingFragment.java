@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.NearbyBilliardsDatingActivity;
 import com.yueqiu.adapter.NearbyDatingSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyDatingDetailedAlreadyBean;
@@ -43,6 +44,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.awt.font.TextAttribute;
+import java.io.BufferedReader;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -118,7 +121,8 @@ public class BilliardsNearbyDatingFragment extends Fragment
     {
         mView = inflater.inflate(R.layout.fragment_nearby_dating_layout, container, false);
 
-        NearbyFragmentsCommonUtils.initViewPager(sContext, mView, R.id.dating_frament_gallery_pager, R.id.dating_fragment_gallery_pager_indicator_group);
+        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(sContext);
+        commonUtils.initViewPager(sContext, mView);
 
         mClickListener = new NearbyPopBasicClickListener(sContext,mUIEventsHandler,sParamsPreference);
         (mBtnDistan = (Button) mView.findViewById(R.id.btn_dating_distance)).setOnClickListener(mClickListener);
@@ -156,6 +160,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 Bundle args = new Bundle();
                 args.putString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO, bean.getUserPhoto());
                 args.putInt(NearbyFragmentsCommonUtils.KEY_DATING_TABLE_ID, Integer.parseInt(bean.getId()));
+                args.putString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME, bean.getUserName());
                 Intent intent = new Intent(sContext, NearbyBilliardsDatingActivity.class);
                 intent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_DATING_FRAGMENT, args);
                 Log.d(TAG, " the current dating info table id we get are : " + bean.getId());
@@ -238,6 +243,22 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     sContext.getResources().getString(R.string.network_not_available)).sendToTarget();
             return;
         }
+
+        try
+        {
+            final int userIdInt = Integer.parseInt(userId);
+            Log.d(TAG, " the finally user id we get for requesting the user info are : " + userId);
+            if (userIdInt < 1)
+            {
+                // 当前用户并没有登录，是不可能得到相关的约球信息的，所以必须要先登录才可以
+                mUIEventsHandler.sendEmptyMessage(USER_HAS_NOT_LOGIN);
+                return;
+            }
+        } catch (final Exception e)
+        {
+            Log.d(TAG, " exception happened while we parse the user id value from the YueQiuApp, and cause to : " + e.toString());
+        }
+
 
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
         requestParams.put("user_id", userId);
@@ -357,6 +378,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
     private static final int FETCH_DATA_FAILED = 1 << 7;
 
     private static final int NETWORK_UNAVAILABLE = 1 << 9;
+    private static final int USER_HAS_NOT_LOGIN = 1 << 10;
 
     private Handler mUIEventsHandler = new Handler()
     {
@@ -385,7 +407,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     if (mDatingList.isEmpty())
                     {
                         Log.d(TAG, " the current list should be empty here ??? ");
-                        loadEmptyTv();
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     }
                     Toast.makeText(sContext, infoStr, Toast.LENGTH_SHORT).show();
                     hideProgress();
@@ -404,7 +426,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     mAfterCount = mDatingList.size();
                     if (mDatingList.isEmpty())
                     {
-                        loadEmptyTv();
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     } else
                     {
                         if (mRefresh)
@@ -439,7 +461,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     hideProgress();
                     if (mDatingList.isEmpty())
                     {
-                        loadEmptyTv();
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     }
                     Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
 
@@ -448,13 +470,13 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     // 超时之后的处理策略
                     Utils.showToast(sContext, sContext.getString(R.string.http_request_time_out));
                     if (mDatingList.isEmpty()) {
-                        loadEmptyTv();
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     }
                     hideProgress();
                     break;
                 case PublicConstant.NO_RESULT:
                     if (mDatingList.isEmpty()) {
-                        loadEmptyTv();
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     } else {
                         if (mLoadMore) {
                             Utils.showToast(sContext, sContext.getString(R.string.no_more_info));
@@ -476,24 +498,34 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
                     if (mDatingList.isEmpty())
                     {
-                        loadEmptyTv();
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     }
 
                     hideProgress();
+                    break;
+
+                case USER_HAS_NOT_LOGIN:
+                    //Utils.showToast(sContext, sContext.getString(R.string.please_login_first));
+                    hideProgress();
+                    mDatingListAdapter.notifyDataSetChanged();
+                    if (mDatingList.isEmpty())
+                    {
+                        loadEmptyTv(R.string.search_dating_login_first);
+                    }
                     break;
             }
             mDatingListAdapter.notifyDataSetChanged();
         }
     };
 
-    private void loadEmptyTv()
+    private void loadEmptyTv(final int contentStrId)
     {
         if (mDatingListView.isRefreshing())
         {
             mDatingListView.onRefreshComplete();
         }
 
-        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mDatingListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mDatingListView, sContext.getString(contentStrId));
     }
 
     private void showProgress()
@@ -541,7 +573,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                             Log.d(TAG, " inside the dating fragment, in the workHandler --> and the startNum : " + startNum + " , the endNum : " + endNum);
                             String cacheRange = sParamsPreference.getDatingRange(sContext);
                             String cacheDate = sParamsPreference.getDatingPublishedDate(sContext);
-                            retrieveDatingInfo("1", cacheRange, cacheDate, startNum, endNum);
+                            retrieveDatingInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()), cacheRange, cacheDate, startNum, endNum);
 
                             break;
                         case RETRIEVE_DATA_WITH_DATE_FILTERED:                           
@@ -549,14 +581,14 @@ public class BilliardsNearbyDatingFragment extends Fragment
                             Log.d(TAG, " inside the dating fragment BackgroundHandlerThread --> the publishDate we need to filter are : " + publishDate);
                             String dateCacheRange = sParamsPreference.getDatingRange(sContext);
                             // 每次筛选请求都是从零开始的重新请求
-                            retrieveDatingInfo("1", dateCacheRange, publishDate, 0, 9);
+                            retrieveDatingInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()), dateCacheRange, publishDate, 0, 9);
                             break;
                         case RETRIEVE_DATA_WITH_RANGE_FILTERED:                          
                             String range = (String) msg.obj;
                             Log.d(TAG, " inside the dating fragment BackgroundHandlerThread --> the range we need to filter are : " + range);
                             String rangeCacheDate = sParamsPreference.getDatingPublishedDate(sContext);
                             // 我们需要从0开始重新请求
-                            retrieveDatingInfo("1", range, rangeCacheDate, 0, 9);
+                            retrieveDatingInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()), range, rangeCacheDate, 0, 9);
                             break;
                     }
                 }
@@ -633,9 +665,9 @@ public class BilliardsNearbyDatingFragment extends Fragment
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
             mLoadMore = true;
-            mRefresh = false;
+
             mCurrentPos = mDatingList.size();
-            if (mBeforeCount != mAfterCount)
+            if (mBeforeCount != mAfterCount && mRefresh)
             {
                 mStarNum = mEndNum + (mAfterCount - mBeforeCount);
                 mEndNum += 10 + (mAfterCount - mBeforeCount);
@@ -644,7 +676,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 mStarNum = mEndNum + 1;
                 mEndNum += 10;
             }
-
+            mRefresh = false;
             if (Utils.networkAvaiable(sContext))
             {
                 if (null != mBackgroundHandler)

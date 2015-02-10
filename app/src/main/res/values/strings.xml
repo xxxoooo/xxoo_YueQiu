@@ -49,6 +49,8 @@
     <string name="already_have_account">已有账户？</string>
     <string name="login_right_now">马上登录</string>
     <string name="register_success">注册成功</string>
+    <string name="send_sms_failed">抱歉，发送短信失败</string>
+    <string name="wait_for_captcha_sms">请稍等片刻，短信已发出</string>
 
     <!-- 退出账户 -->
     <string name="logout_success">退出账户成功</string>
@@ -90,6 +92,7 @@
     <string name="search_dating_detailed_btn_i_want_in_success">您已成功提交请求</string>
     <string name="search_dating_detailed_btn_i_want_in_failed">抱歉，您的请求失败了</string>
     <string name="search_dating_detailed_tv_already_in">已参加人员</string>
+    <string name="search_dating_login_first">请您先登录，登录之后查看专属您个人的约球信息</string>
 
     <!-- 约球当中的popupWindow中的string资源 -->
     <string name="search_dating_popupwindow_no_filter">约球时间(智能排序)</string>
@@ -151,8 +154,8 @@
         这个是用于显示助教的价格，这里我们将用到<=这个符号，为了将这个符号完整的拼接到TextView当中，我们最好使用
         Xliff，而不是通过复杂的StringBuilder来实现，因为我们的TextView是有背景图片的，所以我们只能使用这个技巧
     -->
-    <string name="search_assistcaouch_subfragment_listitem_price">大约<xliff:g id="price" /> 元/时</string>
-    <string name="nearby_room_subfragment_listitem_range"><xliff:g id="number" /> 米以内</string>
+    <string name="search_assistcaouch_subfragment_listitem_price">大约<xliff:g id="number" example="38">%1$s</xliff:g> 元/时</string>
+    <string name="nearby_room_subfragment_listitem_range"><xliff:g id="number" example="2500">%1$s</xliff:g> 米以内</string>
 
     <!-- 4.教练子Fragment的title -->
     <string name="search_caouch_subfragment_title_ability">资质</string>
@@ -173,7 +176,7 @@
     <string name="search_room_popupwindow_do_notfilter">区域(不限)</string>
     <!-- 球厅当中的popupWindow的用于筛选的各个区域的名字 -->
     <string name="search_room_popupwindow_region_chaoyang">朝阳区</string>
-    <string name="search_room_popupwindow_region_haidian">海地区</string>
+    <string name="search_room_popupwindow_region_haidian">海淀区</string>
     <string name="search_room_popupwindow_region_dongcheng">通州区</string>
     <string name="search_room_popupwindow_region_xicheng">西城区</string>
     <string name="search_room_popupwindow_region_feitaiqu">丰台区</string>
@@ -394,6 +397,9 @@
     <string name="sorry_no_info">抱歉，没有获取到详情信息</string>
     <string name="store_success">收藏成功，可以进入我的收藏查看</string>
     <string name="store_failure">抱歉，收藏失败</string>
+    <string name="storing">正在收藏中...</string>
+    <string name="joining">正在报名中...</string>
+    <string name="join_success">报名成功</string>
     <!-- 我的资料 -->
     <string name="photo">头像</string>
     <string name="account">账户</string>
@@ -467,4 +473,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
+    <!--IM-->
+    <string name="im_login_other_device">您的账号在另外一台设备上登录了！</string>
+    <string name="im_user_offline">您的账号掉线了！</string>
 </resources>

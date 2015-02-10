@@ -110,7 +110,8 @@ public class BilliardsNearbyCoachFragment extends Fragment
     {
         mView = inflater.inflate(R.layout.fragment_nearby_coauch_layout, container, false);
 
-        NearbyFragmentsCommonUtils.initViewPager(sContext, mView, R.id.coauch_fragment_gallery_pager, R.id.coauch_fragment_gallery_pager_indicator_group);
+        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(sContext);
+        commonUtils.initViewPager(sContext, mView);
 
         mClickListener = new NearbyPopBasicClickListener(sContext,mUIEventsHandler,sParamsPreference);
         (mBtnAbility = (Button) mView.findViewById(R.id.btn_coauch_ability)).setOnClickListener(mClickListener);

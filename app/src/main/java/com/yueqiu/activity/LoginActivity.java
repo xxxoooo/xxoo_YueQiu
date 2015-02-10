@@ -33,7 +33,6 @@ import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.UserDao;
-import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
@@ -172,7 +171,7 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
                 mImm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 break;
             case R.id.activity_login_tv_register:
-                startActivity(new Intent(LoginActivity.this, CheckNumActivity.class));
+                startActivity(new Intent(LoginActivity.this, GetCaptchaActivity.class));
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
         }
@@ -190,16 +189,14 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
         // 判断登陆是否成功
         if (code == GotyeStatusCode.CODE_OK) {
             saveUser(mUserName, mPwd);
-//            Intent i = new Intent(LoginActivity.this, MainActivity.class);
-//            startActivity(i);
 
             Intent toService = new Intent(this, GotyeService.class);
             startService(toService);
-            Toast.makeText(this, "登录成功....", Toast.LENGTH_SHORT).show();
-//            this.finish();
+            Log.d(TAG, "登录时。。IM服务启动");
         } else {
+            Log.d(TAG, "登录时。。IM服务启动失败，code = " + code);
             // 失败,可根据code定位失败原因
-            Toast.makeText(this, "登录失败....", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "IM系统登录失败....", Toast.LENGTH_SHORT).show();
         }
     }
 

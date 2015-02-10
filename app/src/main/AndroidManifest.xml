@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yueqiu" >
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+
 
     <application
         android:name=".YueQiuApp"
@@ -53,7 +58,13 @@
         <!-- 聊吧Activity -->
         <activity
             android:name=".ChatBarActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:parentActivityName=".BilliardNearbyActivity" >
+            <!-- 4.1 以下的版本需要使用meta-data元素 -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".BilliardNearbyActivity" />
+        </activity>
         <activity
             android:name=".activity.FriendSetGroupActivity"
             android:screenOrientation="portrait" />
@@ -139,7 +150,7 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
-            android:name=".activity.CheckNumActivity"
+            android:name=".activity.GetCaptchaActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.Register1Activity"
@@ -155,7 +166,9 @@
         </activity>
         <activity
             android:name=".activity.NearbyBilliardRoomActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:parentActivityName=".BilliardNearbyActivity"
+            />
         <activity
             android:name=".chatbar.ChatPage"
             android:screenOrientation="portrait"
@@ -165,7 +178,18 @@
             android:screenOrientation="portrait"/>
 
         <!-- 服务组件 -->
-        <service android:name=".util.LocationUtil" />
+        <service android:name=".util.LocationUtil"/>
+        <service android:name=".chatbar.GotyeService"/>
+
+        <!--开机启动IM服务-->
+        <receiver android:name=".chatbar.StartServiceReceiver" >
+            <intent-filter android:priority="1000" >
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </receiver>
 
         <activity
             android:name=".activity.BilliardGroupDetailActivity"
