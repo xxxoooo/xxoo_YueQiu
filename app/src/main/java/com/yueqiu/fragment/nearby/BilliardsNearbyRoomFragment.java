@@ -1,5 +1,6 @@
 package com.yueqiu.fragment.nearby;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -85,7 +86,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     // TODO: Rename and change types and number of parameters
     public static BilliardsNearbyRoomFragment newInstance(Context context, String param1)
     {
-        sContext = context;
+//        sContext = context;
         BilliardsNearbyRoomFragment fragment = new BilliardsNearbyRoomFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -93,10 +94,17 @@ public class BilliardsNearbyRoomFragment extends Fragment
         return fragment;
     }
 
-    private static Context sContext;
+    private Context sContext;
 
     public BilliardsNearbyRoomFragment()
     {
+    }
+
+    @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        this.sContext = activity;
     }
 
     private boolean mNetworkAvailable;
@@ -211,22 +219,19 @@ public class BilliardsNearbyRoomFragment extends Fragment
         }
 
 
-        mWorkerThread = new WorkerHandlerThread();
-        if (Utils.networkAvaiable(sContext))
+        mWorkerThread = new WorkerHandlerThread(mPage);
+        mLoadMore = false;
+        mRefresh = false;
+        if (mWorkerThread.getState() == Thread.State.NEW)
         {
-            mLoadMore = false;
-            mRefresh = false;
-            if (null != mWorkerThread && mWorkerThread.getState() == Thread.State.NEW)
-            {
-                Log.d(TAG, " the mWorkerThread has been started in the onCreateView ");
-                // 这里的WorkThread必须调用了start()方法之后，位于WorkThread当中的workHandler才可以正常工作
-                mWorkerThread.start();
-            }
-        } else
+            Log.d(TAG, " the mWorkerThread has been started in the onCreateView ");
+            // 这里的WorkThread必须调用了start()方法之后，位于WorkThread当中的workHandler才可以正常工作
+            mWorkerThread.start();
+        }
+        if (!Utils.networkAvaiable(sContext))
         {
             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
         }
-
         // 开启用于获取地理位置的服务
         getActivity().startService(new Intent(getActivity(), LocationUtil.class));
 
@@ -246,7 +251,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
             } else
             {
                 Location location = bundle.getParcelable(LocationUtil.LOCATION_KEY);
-                Log.d(TAG_1, " the locationInfo we get are --> latitude : " + location.getLatitude() + ", longitude : " + location.getLongitude());
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
@@ -255,12 +259,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 sParamsPreference.setRoomLongi(sContext, (float) longitude);
 
                 mUIEventsHandler.sendEmptyMessage(LOCATION_HAS_GOT);
-                Log.d(TAG_1, " inside the mLocationBroadcastReceiver, and we have get the location that the user needs ");
             }
         }
     };
 
-    private static final String TAG_1 = "roomFragment";
     @Override
     public void onResume()
     {
@@ -329,11 +331,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
         float lati = sParamsPreference.getRoomLati(sContext);
         if (longi != -1 && lati != -1)
         {
-            Log.d(TAG_1, " the latitude and the longitude has get ");
             requestParams.put("latitude", lati + "");
             requestParams.put("longitude", longi + "");
             String rangeVal = TextUtils.isEmpty(range) ? "1000" : range;
-            Log.d(TAG_1, " the range we get are : " + rangeVal);
             requestParams.put("radius", rangeVal);
         }
 
@@ -346,9 +346,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
         requestParams.put("format", "json");
         requestParams.put("has_coupon", 0 + "");
         requestParams.put("page", page + "");
-
-        // TODO: 得到当前用户的经纬度信息,因为我们需要这两个值才能获得以当前用户为中心，附近指定范围内的球店信息
-
 
         String rawResult = HttpUtil.dpUrlClient(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams);
         Log.d(TAG, " the raw result we get are : " + rawResult);
@@ -401,6 +398,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             // TODO: 将这条数据加入到roomList当中(现在由于数据不完整，所以暂时不添加，等数据完整性已经比较好的时候再进行添加)
                             cacheRoomList.add(roomBean);
                         }
+                        if (cacheRoomList.isEmpty())
+                        {
+                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                        }
                         mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheRoomList).sendToTarget();
                         // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
                         mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
@@ -432,6 +433,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 Log.d(TAG, " Exception happened in parsing the resulted json object we get, and the detailed reason are : " + e.toString());
             }
+        }else
+        {
+            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
         }
     }
 
@@ -525,7 +529,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
-            switch (msg.what) {
+            switch (msg.what)
+            {
                 case UI_SHOW_DIALOG:
                     showProgress();
                     break;
@@ -603,7 +608,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     break;
 
                 case REQUEST_ROOM_INFO_RANGE_FILTERED:
-                    Log.d(TAG_1, "inside the mUIEventsHandler --> the REQUEST_ROOM_INFO_RANGE_FILTERED ");
                     // 我们不需要在这里直接获取当前用户请求的范围了，而是从SharedPreference当中进行获取
 //                    String rangeStr = (String) msg.obj;
                     // 开启获取当前用户位置的服务
@@ -618,7 +622,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
                     break;
                 case LOCATION_HAS_GOT:
-                    Log.d(TAG_1, " the location get event has been received ... ");
                     sParamsPreference.ensurePreference(sContext);
                     String rangeStr = sParamsPreference.getRoomRange(sContext);
                     if (!TextUtils.isEmpty(rangeStr))
@@ -678,6 +681,20 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     if (mRoomList.isEmpty())
                         loadEmptyTv(false);
                     break;
+
+                case PublicConstant.NO_RESULT:
+                    if (mRoomList.isEmpty())
+                    {
+                        loadEmptyTv(false);
+                    } else
+                    {
+                        if (mLoadMore)
+                        {
+                            Utils.showToast(sContext, sContext.getString(R.string.no_more_info, sContext.getString(R.string.search_billiard_room_str)));
+                        }
+                    }
+                    hideProgress();
+                    break;
             }
             mSearchRoomAdapter.notifyDataSetChanged();
         }
@@ -685,10 +702,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
     private void loadEmptyTv(boolean disabled)
     {
-        if (mRoomListView.isRefreshing())
-        {
-            mRoomListView.onRefreshComplete();
-        }
         Log.d(TAG, "inside the roomFragment --> we have load the EmptyView ");
         NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mRoomListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str), disabled);
     }
@@ -707,9 +720,11 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
     private class WorkerHandlerThread extends HandlerThread
     {
-        public WorkerHandlerThread()
+        final int mPageNum;
+        public WorkerHandlerThread(int page)
         {
             super(WORKER_HANDLER_THREAD_NAME, Process.THREAD_PRIORITY_BACKGROUND);
+            this.mPageNum = page;
         }
 
         // 参照MateFragment当中的理解
@@ -829,8 +844,11 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     }
                 }
             };
-            // 我们初始情况下的数据请求都是请求最新的数据
-            fetchRoomData(1);
+            if (Utils.networkAvaiable(sContext))
+            {
+                // 我们初始情况下的数据请求都是请求最新的数据
+                fetchRoomData(mPageNum);
+            }
         }
 
         public void fetchRoomData(final int pageNum)
@@ -862,7 +880,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
         public void fetchRoomDataRangeFiltered(String rangeStr)
         {
-            Log.d(TAG_1, " and we start to retrieve the range filtered information ");
             if (! TextUtils.isEmpty(rangeStr))
             {
                 mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_RANGE_FILTERED, rangeStr).sendToTarget();

@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.yueqiu.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 

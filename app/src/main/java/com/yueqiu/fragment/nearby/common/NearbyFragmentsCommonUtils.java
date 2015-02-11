@@ -104,15 +104,14 @@ public class NearbyFragmentsCommonUtils{
         emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         emptyView.setTextColor(context.getResources().getColor(R.color.md__defaultBackground));
         emptyView.setText(emptyText);
-        if (! disable)
+        if (disable)
         {
-            listView.setEmptyView(emptyView);
+            emptyView.setVisibility(View.GONE);
+            listView.setEmptyView(null);
         } else
         {
-            //listView.setEmptyView(null);
-            emptyView.setVisibility(View.GONE);
+            listView.setEmptyView(emptyView);
         }
-
     }
 
     public static PopupWindow getFilterPopupWindow(Context context, View anchorView, View popupLayoutView)

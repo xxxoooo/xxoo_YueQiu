@@ -1,6 +1,7 @@
 package com.yueqiu.fragment.nearby;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -50,12 +51,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BilliardsNearbyAssistCoauchFragment extends Fragment
 {
     private final String TAG = "BilliardsNearbyAssistCoauchFragment";
-
     public final String BILLIARDS_Nearby_ASSIST_COAUCH_FRAGMENT_TAB_NAME = "BilliardsNearbyAssistCoauchFragment";
 
     // 用于展示助教信息的ListView
     private PullToRefreshListView mListView;
-    private static Context sContext;
+    private Context mContext;
 
     @SuppressLint("ValidFragment")
     public BilliardsNearbyAssistCoauchFragment()
@@ -66,7 +66,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
     public static BilliardsNearbyAssistCoauchFragment newInstance(Context context, String params)
     {
-        sContext = context;
+        // TODO: 以下获取Context实例的方法是完全不符合Fragment的设计理念的
+//        sContext = context;
         BilliardsNearbyAssistCoauchFragment instance = new BilliardsNearbyAssistCoauchFragment();
         Bundle args = new Bundle();
         args.putString(KEY_BILLIARDS_NEARBY_PARENT_FRAGMENT, params);
@@ -78,11 +79,18 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     private BackgroundWorkerHandler mWorker;
 
     @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        mContext = activity;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
-        mNetworkAvailable = Utils.networkAvaiable(sContext);
+        mNetworkAvailable = Utils.networkAvaiable(mContext);
     }
 
     private View mView;
@@ -116,7 +124,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(getActivity());
         commonUtils.initViewPager(getActivity(),mView);
 
-        mClickListener = new NearbyPopBasicClickListener(sContext, mUIEventsHandler, sParamsPreference);
+        mClickListener = new NearbyPopBasicClickListener(mContext, mUIEventsHandler, sParamsPreference);
         (mBtnDistance = (Button) mView.findViewById(R.id.btn_assistcoauch_distance)).setOnClickListener(mClickListener);
         (mBtnCost = (Button) mView.findViewById(R.id.btn_assistcoauch_cost)).setOnClickListener(mClickListener);
         (mBtnKinds = (Button) mView.findViewById(R.id.btn_assistcoauch_kinds)).setOnClickListener(mClickListener);
@@ -140,7 +148,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         // TODO: 以下加载的是测试数据,但是我们目前还不能删除这个方法，因为我们还需要这些测试数据来查看整体的UI加载效果
 //        initTestData();
 
-        mAssistCoauchListAdapter = new NearbyAssistCoauchSubFragmentListAdapter(sContext, mAssistCoauchList);
+        mAssistCoauchListAdapter = new NearbyAssistCoauchSubFragmentListAdapter(mContext, mAssistCoauchList);
         mListView.setAdapter(mAssistCoauchListAdapter);
 
         if (null != savedInstanceState)
@@ -152,20 +160,17 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             mUIEventsHandler.obtainMessage(PublicConstant.USE_CACHE, mCachedList).sendToTarget();
         }
 
-        mWorker = new BackgroundWorkerHandler();
-        if (Utils.networkAvaiable(sContext))
+        mWorker = new BackgroundWorkerHandler(mStartNum, mEndNum);
+        mLoadMore = false;
+        mRefresh = false;
+        if (mWorker.getState() == Thread.State.NEW)
         {
-            mLoadMore = false;
-            mRefresh = false;
-            if (null != mWorker && mWorker.getState() == Thread.State.NEW)
-            {
-                mWorker.start();
-            }
-        } else
+            mWorker.start();
+        }
+        if (! Utils.networkAvaiable(mContext))
         {
             mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
         }
-
         return mView;
     }
 
@@ -226,7 +231,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     {
         if (!mNetworkAvailable) {
             mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_FAILED,
-                    sContext.getResources().getString(R.string.network_not_available)).sendToTarget();
+                    mContext.getResources().getString(R.string.network_not_available)).sendToTarget();
             mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
             return;
         }
@@ -263,7 +268,6 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             try
             {
                 JSONObject initialResultJsonObj = new JSONObject(rawResult);
-                Log.d(TAG, " the initial resulted json data are : " + initialResultJsonObj.toString());
 
                 if (! initialResultJsonObj.isNull("code"))
                 {
@@ -271,7 +275,6 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     if (status == HttpConstants.ResponseCode.NORMAL)
                     {
                         JSONObject resultJsonObj = initialResultJsonObj.getJSONObject("result");
-                        Log.d(TAG, " the really part we need to parse are : " + resultJsonObj);
                         JSONArray resultArr = resultJsonObj.getJSONArray("list_data");
                         final int count = resultArr.length();
                         int i;
@@ -295,14 +298,17 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                                     userId,
                                     photoUrl,
                                     name,
-                                    NearbyFragmentsCommonUtils.parseGenderStr(sContext, sex),
-                                    NearbyFragmentsCommonUtils.parseBilliardsKinds(sContext, kinds),
+                                    NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex),
+                                    NearbyFragmentsCommonUtils.parseBilliardsKinds(mContext, kinds),
                                     money,
                                     String.valueOf(range)
                             );
                             cacheASCoauchList.add(assistCoauchBean);
                         }
-
+                        if (cacheASCoauchList.isEmpty())
+                        {
+                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                        }
                         // 然后我们直接将我们得到助教List直接发送到mUIEventHandler进行处理，因为我们只能在MainUIThread当中进行有关于数据的更新操作
                         mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheASCoauchList).sendToTarget();
                         mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
@@ -342,17 +348,17 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                 mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
             }
+        } else
+        {
+            // 我们获取到的数据是空的，即没有任何数据
+            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+            Log.d(TAG, " we have got nothing from the server ");
         }
     }
 
     private void loadEmptyTv(boolean disabled)
     {
-        if (mListView.isRefreshing())
-        {
-            mListView.onRefreshComplete();
-        }
-
-        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str), disabled);
+        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(mContext, mListView, mContext.getString(R.string.search_activity_subfragment_empty_tv_str), disabled);
     }
 
     private static final String KEY_REQUEST_ERROR_MSG = "keyRequestErrorMsg";
@@ -402,7 +408,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     String reasonStr = (String) msg.obj;
                     if (! TextUtils.isEmpty(reasonStr))
                     {
-                        Utils.showToast(sContext, reasonStr);
+                        Utils.showToast(mContext, reasonStr);
                     }
                     if (mAssistCoauchList.isEmpty())
                     {
@@ -454,10 +460,10 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                         {
                             if (mAfterCount == mBeforeCount)
                             {
-                                Utils.showToast(sContext, sContext.getString(R.string.no_newer_info));
+                                Utils.showToast(mContext, mContext.getString(R.string.no_newer_info));
                             } else
                             {
-                                Utils.showToast(sContext, sContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                                Utils.showToast(mContext, mContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }
@@ -490,7 +496,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                         Log.d(TAG, " inside the UIEvents Handler, and we have loaded the EmptyView here ");
                         loadEmptyTv(false);
                     }
-                    Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
+                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     // 当网络不可行时，我们需要将ProgressBar不再显示
                     hideProgress();
                     break;
@@ -500,7 +506,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     break;
                 case PublicConstant.TIME_OUT:
                     // 超时之后的处理策略
-                    Utils.showToast(sContext, sContext.getString(R.string.http_request_time_out));
+                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
                     if (mAssistCoauchList.isEmpty())
                     {
                         loadEmptyTv(false);
@@ -516,7 +522,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     {
                         if (mLoadMore)
                         {
-                            Utils.showToast(sContext, sContext.getString(R.string.no_more_info));
+                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.search_billiard_assist_coauch_str)));
                         }
                     }
                     hideProgress();
@@ -527,10 +533,10 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     String errorInfo = errorData.getString(KEY_REQUEST_ERROR_MSG);
                     if (! TextUtils.isEmpty(errorInfo))
                     {
-                        Utils.showToast(sContext, errorInfo);
+                        Utils.showToast(mContext, errorInfo);
                     } else
                     {
-                        Utils.showToast(sContext, sContext.getString(R.string.http_request_error));
+                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
                     }
                     if (mAssistCoauchList.isEmpty())
                     {
@@ -562,9 +568,13 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     // 用于处理后台任务的处理器
     private class BackgroundWorkerHandler extends HandlerThread
     {
-        public BackgroundWorkerHandler()
+        private final int mInitStartNum, mInitEndNum;
+
+        public BackgroundWorkerHandler(int startNum, int endNum)
         {
             super(BACKGROUND_HANDLER_NAME, Process.THREAD_PRIORITY_BACKGROUND);
+            this.mInitStartNum = startNum;
+            this.mInitEndNum = endNum;
         }
 
         // 参照MateFragment当中的理解
@@ -587,10 +597,10 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                             Bundle requestData = msg.getData();
                             final int startNum = requestData.getInt(KEY_REQUEST_START_NUM);
                             final int endNum = requestData.getInt(KEY_REQUEST_END_NUM);
-                            String cacheRange = sParamsPreference.getAScouchRange(sContext);
-                            String cachePrice = sParamsPreference.getASCouchPrice(sContext);
-                            String cacheLevel = sParamsPreference.getASCouchLevel(sContext);
-                            String cacheClazz = sParamsPreference.getASCouchClazz(sContext);
+                            String cacheRange = sParamsPreference.getAScouchRange(mContext);
+                            String cachePrice = sParamsPreference.getASCouchPrice(mContext);
+                            String cacheLevel = sParamsPreference.getASCouchLevel(mContext);
+                            String cacheClazz = sParamsPreference.getASCouchClazz(mContext);
                             retrieveAllInitialAssistCoauchInfo(cacheRange, cachePrice, cacheClazz, cacheLevel, startNum, endNum);
 
                             break;
@@ -601,9 +611,9 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                             }
                             String level = (String) msg.obj;
                             Log.d(TAG, " Inside the WorkerThread --> the level data we need to filter are : " + level);
-                            String levelCacheClazz = sParamsPreference.getASCouchClazz(sContext);
-                            String levelCachePrice = sParamsPreference.getASCouchPrice(sContext);
-                            String levelCacheRange = sParamsPreference.getAScouchRange(sContext);
+                            String levelCacheClazz = sParamsPreference.getASCouchClazz(mContext);
+                            String levelCachePrice = sParamsPreference.getASCouchPrice(mContext);
+                            String levelCacheRange = sParamsPreference.getAScouchRange(mContext);
                             retrieveAllInitialAssistCoauchInfo(levelCacheRange, levelCachePrice, levelCacheClazz, level, 0, 9);
 
                             break;
@@ -614,9 +624,9 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                             }
                             String clazz = (String) msg.obj;
                             Log.d(TAG, " Inside the WorkerThread --> the clazz we need to filter are : " + clazz);
-                            String clazzCacheRange = sParamsPreference.getAScouchRange(sContext);
-                            String clazzCachePrice = sParamsPreference.getASCouchPrice(sContext);
-                            String clazzCacheLevel = sParamsPreference.getASCouchLevel(sContext);
+                            String clazzCacheRange = sParamsPreference.getAScouchRange(mContext);
+                            String clazzCachePrice = sParamsPreference.getASCouchPrice(mContext);
+                            String clazzCacheLevel = sParamsPreference.getASCouchLevel(mContext);
                             retrieveAllInitialAssistCoauchInfo(clazzCacheRange, clazzCachePrice, clazz, clazzCacheLevel, 0, 9);
 
                             break;
@@ -627,9 +637,9 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                             }
                             String price = (String) msg.obj;
                             Log.d(TAG, " Inside the WorkerThread --> the price we need to filter are : " + price);
-                            String priceCacheRange = sParamsPreference.getAScouchRange(sContext);
-                            String priceCacheClazz = sParamsPreference.getASCouchClazz(sContext);
-                            String priceCacheLevel = sParamsPreference.getASCouchLevel(sContext);
+                            String priceCacheRange = sParamsPreference.getAScouchRange(mContext);
+                            String priceCacheClazz = sParamsPreference.getASCouchClazz(mContext);
+                            String priceCacheLevel = sParamsPreference.getASCouchLevel(mContext);
                             retrieveAllInitialAssistCoauchInfo(priceCacheRange, price, priceCacheClazz, priceCacheLevel, 0, 9);
 
                             break;
@@ -640,17 +650,20 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                             }
                             String distance = (String) msg.obj;
                             Log.d(TAG, " Inside the WorkerThread --> the distance we need to filter are : " + distance);
-                            String rangeCachePrice = sParamsPreference.getASCouchPrice(sContext);
-                            String rangeCacheClazz = sParamsPreference.getASCouchClazz(sContext);
-                            String rangeCacheLevel = sParamsPreference.getASCouchLevel(sContext);
+                            String rangeCachePrice = sParamsPreference.getASCouchPrice(mContext);
+                            String rangeCacheClazz = sParamsPreference.getASCouchClazz(mContext);
+                            String rangeCacheLevel = sParamsPreference.getASCouchLevel(mContext);
                             retrieveAllInitialAssistCoauchInfo(distance, rangeCachePrice, rangeCacheClazz, rangeCacheLevel, 0, 9);
 
                             break;
                     }
                 }
             };
-            // 我们初始请求的数据肯定都是最新的数据，所以从0条开始请求
-            fetchAllData(0, 9);
+            if (Utils.networkAvaiable(mContext))
+            {
+                // 我们初始请求的数据肯定都是最新的数据，所以从0条开始请求
+                fetchAllData(mInitStartNum, mInitEndNum);
+            }
         }
 
         public void fetchAllData(final int startNum, final int endNum)
@@ -661,7 +674,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             requestData.putInt(KEY_REQUEST_END_NUM, endNum);
             msg.setData(requestData);
 
-            mBackgroundHandler.sendEmptyMessage(RETRIEVE_ALL_RAW_INFO);
+            mBackgroundHandler.sendMessage(msg);
         }
 
         public void fetchDataWithPriceFilter(String price)
@@ -713,10 +726,10 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         @Override
         public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView)
         {
-            String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
+            String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
-            if (Utils.networkAvaiable(sContext))
+            if (Utils.networkAvaiable(mContext))
             {
                 mLoadMore = false;
                 mRefresh = true;
@@ -734,14 +747,14 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         @Override
         public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView)
         {
-            String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
+            String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
             mLoadMore = true;
 
             mCurrentPos = mAssistCoauchList.size();
 
-            if (mBeforeCount != mAfterCount && !mRefresh)
+            if (mBeforeCount != mAfterCount && mRefresh)
             {
                 mStartNum = mEndNum + (mAfterCount - mBeforeCount);
                 mEndNum += 10 + (mAfterCount - mBeforeCount);
@@ -752,7 +765,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             }
             mRefresh = false;
             loadEmptyTv(true);
-            if (Utils.networkAvaiable(sContext))
+            if (Utils.networkAvaiable(mContext))
             {
                 if (null != mWorker)
                 {
