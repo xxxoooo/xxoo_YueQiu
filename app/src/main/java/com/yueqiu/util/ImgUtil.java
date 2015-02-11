@@ -15,6 +15,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils;
 import android.view.Display;
 import android.widget.ImageView;
 
@@ -175,6 +176,33 @@ public class ImgUtil {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        return null;
+    }
+
+    public static  Bitmap getOriginBitmapByPath(Activity activity,String path){
+        if(TextUtils.isEmpty(path)){
+            return null;
+        }
+        File file = new File(path);
+        if(!file.exists()){
+            return null;
+        }
+
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        return bitmap;
+    }
+
+    public static  Bitmap getOriginBitmapByUri(Activity activity,Uri uri){
+        if(uri == null){
+            return null;
+        }
+        try {
+            Bitmap bitmap = BitmapFactory.decodeStream(activity.getContentResolver().openInputStream(uri));
+            return bitmap;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 

@@ -73,7 +73,7 @@
                             android:text="@string/photo"
                             android:textColor="@color/md__defaultBackground"/>
 
-                        <ImageView
+                        <com.android.volley.toolbox.NetworkImageView
                             android:id="@+id/my_profile_photo_iv"
                             android:layout_width="50dp"
                             android:layout_height="50dp"

@@ -336,7 +336,7 @@ public class BilliardsNearbyMateFragment extends Fragment
                             }
                             // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
                             mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
-                            mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                            //mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                         }else{
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                             mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
@@ -411,6 +411,7 @@ public class BilliardsNearbyMateFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
+
             switch (msg.what) {
                 case DATA_RETRIEVE_FAILED:
                     if (mUserList.isEmpty())
@@ -432,6 +433,15 @@ public class BilliardsNearbyMateFragment extends Fragment
                 case DATA_RETRIEVE_SUCCESS:
                     // 首先我们需要将我们的EmptyView隐藏掉
                     loadEmptyTv(true);
+
+                    Log.d("wy","isRefreshing->" + mSubFragmentListView.isRefreshing());
+                    if (mSubFragmentListView.isRefreshing())
+                    {
+                        mSubFragmentListView.onRefreshComplete();
+
+                    }
+                    hideProgress();
+
 
                     mBeforeCount = mUserList.size();
                     mIsListEmpty = mUserList.isEmpty();
@@ -605,8 +615,8 @@ public class BilliardsNearbyMateFragment extends Fragment
     private void loadEmptyTv(final boolean whetherHide)
     {
         // 先把正在显示的ProgressBar隐藏掉
-        if (mSubFragmentListView.isRefreshing())
-            mSubFragmentListView.onRefreshComplete();
+//        if (mSubFragmentListView.isRefreshing())
+//            mSubFragmentListView.onRefreshComplete();
 
         NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mSubFragmentListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str), whetherHide);
     }

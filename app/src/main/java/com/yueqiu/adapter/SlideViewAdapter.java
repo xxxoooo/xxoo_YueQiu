@@ -9,20 +9,28 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.drawable.Drawable;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.activity.LoginActivity;
 import com.yueqiu.bean.ISlideListItem;
 import com.yueqiu.bean.SlideAccountItemISlide;
 import com.yueqiu.bean.SlideOtherItemISlide;
+import com.yueqiu.util.BitmapUtil;
+import com.yueqiu.util.ImgUtil;
+import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;
 
@@ -34,10 +42,12 @@ public class SlideViewAdapter extends BaseAdapter {
     private List<ISlideListItem> mList;
     private LayoutInflater mInflater;
 
+
     public SlideViewAdapter(Context context,List<ISlideListItem> list){
         this.mContext = context;
         this.mList = list;
         this.mInflater = LayoutInflater.from(context);
+
     }
 
     /**
@@ -108,8 +118,9 @@ public class SlideViewAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ISlideListItem item = (ISlideListItem) getItem(position);
         int type = item.getType();
-        ViewAccountHolder accountHolder;
+        final ViewAccountHolder accountHolder;
         ViewHolder holder;
+
         switch (type) {
            case ISlideListItem.ITEM_ACCOUNT:
                if(convertView == null) {
@@ -134,21 +145,27 @@ public class SlideViewAdapter extends BaseAdapter {
 
                int user_id = accountItem.getUserId();
                if(user_id > 0){
+
+
+
                    accountHolder.login.setVisibility(View.GONE);
                    accountHolder.name.setVisibility(View.VISIBLE);
                    accountHolder.name.setText(accountItem.getName());
-                   String img = accountItem.getImg();
+                   String imgUrl = accountItem.getImg();
                    Bitmap source = null;
-                   if(img.equals("")){
+                   if(imgUrl.equals("")){
                        source = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.head_img);
                    }else {
-                       try {
-                           byte[] bitmapArray;
-                           bitmapArray = Base64.decode(img, Base64.DEFAULT);
-                           source = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
-                       } catch (Exception e) {
-                           e.printStackTrace();
-                       }
+//                       try {
+//                           byte[] bitmapArray;
+//                           bitmapArray = Base64.decode(img, Base64.DEFAULT);
+//                           source = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
+//                       } catch (Exception e) {
+//                           e.printStackTrace();
+//                       }
+                       ////////////////////////////////////////////
+//                       mImgLoader.queueImage(accountHolder.image,imgUrl);
+                       ///////////////////////////////////////////
                    }
                    accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(),source,embedResId));
                }else {

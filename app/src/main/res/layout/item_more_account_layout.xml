@@ -10,10 +10,11 @@
 
     <ImageView
         android:id="@+id/account_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:src="@drawable/head_img"
         android:layout_centerInParent="true"/>
+
     <TextView
         android:id="@+id/account_name"
         android:layout_width="wrap_content"
