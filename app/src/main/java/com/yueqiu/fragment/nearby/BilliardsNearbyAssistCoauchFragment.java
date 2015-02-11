@@ -471,23 +471,35 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     break;
                 case RETRIEVE_INFO_WITH_DISTANCE_FILTERED:
                     String rangeStr = (String) msg.obj;
-                    Log.d(TAG, " inside the UIEventsHandler, and the range data we get are : " + rangeStr);
-                    mWorker.fetchDataWithRangeFilter(rangeStr);
+                    if (null != mWorker)
+                    {
+                        Log.d(TAG, " inside the UIEventsHandler, and the range data we get are : " + rangeStr);
+                        mWorker.fetchDataWithRangeFilter(rangeStr);
+                    }
                     break;
                 case RETRIEVE_INFO_WITH_LEVEL_FILTERED:
                     String levelStr = (String) msg.obj;
-                    Log.d(TAG, " inside the UIEventsHandler, and the levelStr we get are : " + levelStr);
-                    mWorker.fetchDataWithLevelFilter(levelStr);
+                    if (null != mWorker)
+                    {
+                        Log.d(TAG, " inside the UIEventsHandler, and the levelStr we get are : " + levelStr);
+                        mWorker.fetchDataWithLevelFilter(levelStr);
+                    }
                     break;
                 case RETRIEVE_INFO_WITH_PRICE_FILTERED:
                     String priceStr = (String) msg.obj;
-                    Log.d(TAG, " inside the UIEventsHandler, and the priceStr we get are : " + priceStr);
-                    mWorker.fetchDataWithPriceFilter(priceStr);
+                    if (null != mWorker)
+                    {
+                        Log.d(TAG, " inside the UIEventsHandler, and the priceStr we get are : " + priceStr);
+                        mWorker.fetchDataWithPriceFilter(priceStr);
+                    }
                     break;
                 case RETREIVE_INFO_WITH_KINDS_FILTERED:
                     String clazz = (String) msg.obj;
-                    Log.d(TAG, " inside the UIEventsHandler, and the clazzStr we get are : " + clazz);
-                    mWorker.fetchDataWithClazzFilter(clazz);
+                    if (null != mWorker)
+                    {
+                        Log.d(TAG, " inside the UIEventsHandler, and the clazzStr we get are : " + clazz);
+                        mWorker.fetchDataWithClazzFilter(clazz);
+                    }
                     break;
 
                 case NETWORK_UNAVAILABLE:
@@ -668,18 +680,20 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
         public void fetchAllData(final int startNum, final int endNum)
         {
-            Message msg = mBackgroundHandler.obtainMessage(RETRIEVE_ALL_RAW_INFO);
-            Bundle requestData = new Bundle();
-            requestData.putInt(KEY_REQUEST_START_NUM, startNum);
-            requestData.putInt(KEY_REQUEST_END_NUM, endNum);
-            msg.setData(requestData);
-
-            mBackgroundHandler.sendMessage(msg);
+            if (null != mBackgroundHandler)
+            {
+                Message msg = mBackgroundHandler.obtainMessage(RETRIEVE_ALL_RAW_INFO);
+                Bundle requestData = new Bundle();
+                requestData.putInt(KEY_REQUEST_START_NUM, startNum);
+                requestData.putInt(KEY_REQUEST_END_NUM, endNum);
+                msg.setData(requestData);
+                mBackgroundHandler.sendMessage(msg);
+            }
         }
 
         public void fetchDataWithPriceFilter(String price)
         {
-            if (! TextUtils.isEmpty(price))
+            if (! TextUtils.isEmpty(price) && null != mBackgroundHandler)
             {
                 mBackgroundHandler.obtainMessage(RETRIEVE_INFO_WITH_PRICE_FILTERED,price).sendToTarget();
             }
@@ -687,7 +701,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
         public void fetchDataWithRangeFilter(String range)
         {
-            if (! TextUtils.isEmpty(range))
+            if (! TextUtils.isEmpty(range) && null != mBackgroundHandler)
             {
                 mBackgroundHandler.obtainMessage(RETRIEVE_INFO_WITH_DISTANCE_FILTERED,range).sendToTarget();
             }
@@ -695,7 +709,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
         public void fetchDataWithLevelFilter(String level)
         {
-            if (! TextUtils.isEmpty(level))
+            if (! TextUtils.isEmpty(level) && null != mBackgroundHandler)
             {
                 mBackgroundHandler.obtainMessage(RETRIEVE_INFO_WITH_LEVEL_FILTERED,level).sendToTarget();
             }
@@ -703,7 +717,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
         public void fetchDataWithClazzFilter(String clazz)
         {
-            if (! TextUtils.isEmpty(clazz))
+            if (! TextUtils.isEmpty(clazz) && null != mBackgroundHandler)
             {
                 mBackgroundHandler.obtainMessage(RETREIVE_INFO_WITH_KINDS_FILTERED,clazz).sendToTarget();
             }

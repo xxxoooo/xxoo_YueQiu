@@ -450,13 +450,19 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
                 case RETRIEVE_COAUCH_WITH_LEVEL_FILTERED:
                     String level = (String) msg.obj;
-                    Log.d(TAG, " inside the CoauchFragment UIEventsHandler --> and the level info we get are : " + level);
-                    mWorker.fetchDataWithLevelFiltered(level);
+                    if (null != mWorker)
+                    {
+                        Log.d(TAG, " inside the CoauchFragment UIEventsHandler --> and the level info we get are : " + level);
+                        mWorker.fetchDataWithLevelFiltered(level);
+                    }
                     break;
 
                 case RETRIEVE_COAUCH_WITH_CLASS_FILTERED:
                     String clazz = (String) msg.obj;
-                    mWorker.fetchDataWithClazzFiltered(clazz);
+                    if (mWorker != null)
+                    {
+                        mWorker.fetchDataWithClazzFiltered(clazz);
+                    }
 
                     break;
 
@@ -601,17 +607,20 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
         public void fetchAllData(final int startNum, final int endNum)
         {
-            Message requestMsg = mWorkerHandler.obtainMessage(RETRIEVE_ALL_COAUCH_INFO);
-            Bundle requestData = new Bundle();
-            requestData.putInt(KEY_REQUEST_START_NUM, startNum);
-            requestData.putInt(KEY_REQUEST_END_NUM, endNum);
-            requestMsg.setData(requestData);
-            mWorkerHandler.sendMessage(requestMsg);
+            if (null != mWorkerHandler)
+            {
+                Message requestMsg = mWorkerHandler.obtainMessage(RETRIEVE_ALL_COAUCH_INFO);
+                Bundle requestData = new Bundle();
+                requestData.putInt(KEY_REQUEST_START_NUM, startNum);
+                requestData.putInt(KEY_REQUEST_END_NUM, endNum);
+                requestMsg.setData(requestData);
+                mWorkerHandler.sendMessage(requestMsg);
+            }
         }
 
         public void fetchDataWithClazzFiltered(String clazz)
         {
-            if (! TextUtils.isEmpty(clazz))
+            if (! TextUtils.isEmpty(clazz) && null != mWorkerHandler)
             {
                 mWorkerHandler.obtainMessage(RETRIEVE_COAUCH_WITH_CLASS_FILTERED, clazz).sendToTarget();
             }
@@ -619,7 +628,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
         public void fetchDataWithLevelFiltered(String level)
         {
-            if (! TextUtils.isEmpty(level))
+            if (! TextUtils.isEmpty(level) && null != mWorkerHandler)
             {
                 mWorkerHandler.obtainMessage(RETRIEVE_COAUCH_WITH_LEVEL_FILTERED, level).sendToTarget();
             }

@@ -201,7 +201,6 @@ public class BilliardsNearbyDatingFragment extends Fragment
         {
             mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
         }
-
         return mView;
     }
 
@@ -219,7 +218,6 @@ public class BilliardsNearbyDatingFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-
     }
 
     @Override
@@ -227,14 +225,6 @@ public class BilliardsNearbyDatingFragment extends Fragment
     {
         Log.d(TAG, " the onPause method has been called ");
         mCallback.closePopupWindow();
-        if (null != mBackgroundHandler)
-        {
-            Log.d(TAG, " we need to stop the Background Handler ");
-            mBackgroundHandler.interrupt();
-            mBackgroundHandler = null;
-        }
-
-
         super.onPause();
     }
 
@@ -248,6 +238,12 @@ public class BilliardsNearbyDatingFragment extends Fragment
     @Override
     public void onDestroy()
     {
+        if (null != mBackgroundHandler)
+        {
+            Log.d(TAG, " we need to stop the Background Handler ");
+            mBackgroundHandler.interrupt();
+            mBackgroundHandler = null;
+        }
         super.onDestroy();
     }
 
@@ -512,13 +508,19 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     break;
                 case RETRIEVE_DATA_WITH_RANGE_FILTERED:
                     String range = (String) msg.obj;
-                    mBackgroundHandler.fetchDatingWithRangeFilter(range);
+                    if (mBackgroundHandler != null)
+                    {
+                        mBackgroundHandler.fetchDatingWithRangeFilter(range);
+                    }
 
                     break;
                 case RETRIEVE_DATA_WITH_DATE_FILTERED:
                     String publishDate = (String) msg.obj;
                     Log.d(TAG, " inside the mUIEventsHandler --> we have received the date need to filter are : " + publishDate);
-                    mBackgroundHandler.fetchDatingWithPublishDateFilter(publishDate);
+                    if (null != mBackgroundHandler)
+                    {
+                        mBackgroundHandler.fetchDatingWithPublishDateFilter(publishDate);
+                    }
                     break;
                 case DATA_HAS_BEEN_UPDATED:
                     mDatingListAdapter.notifyDataSetChanged();
@@ -667,17 +669,20 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
         public void fetchDatingData(final int startNum, final int endNum)
         {
-            Message requestMsg = mWorkerHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
-            Bundle data = new Bundle();
-            data.putInt(KEY_REQUEST_START_NUM, startNum);
-            data.putInt(KEY_REQUEST_END_NUM, endNum);
-            requestMsg.setData(data);
-            mWorkerHandler.sendMessage(requestMsg);
+            if (null != mWorkerHandler)
+            {
+                Message requestMsg = mWorkerHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
+                Bundle data = new Bundle();
+                data.putInt(KEY_REQUEST_START_NUM, startNum);
+                data.putInt(KEY_REQUEST_END_NUM, endNum);
+                requestMsg.setData(data);
+                mWorkerHandler.sendMessage(requestMsg);
+            }
         }
 
         public void fetchDatingWithRangeFilter(String range)
         {
-            if (! TextUtils.isEmpty(range))
+            if (! TextUtils.isEmpty(range) && mWorkerHandler != null)
             {
                 mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_RANGE_FILTERED, range).sendToTarget();
             }
@@ -686,7 +691,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
         public void fetchDatingWithPublishDateFilter(String publishDate)
         {
             Log.d(TAG, " inside the method of BackgroundHandler --> the published date we get are : " + publishDate);
-            if (! TextUtils.isEmpty(publishDate))
+            if (! TextUtils.isEmpty(publishDate) && mWorkerHandler != null)
             {
                 mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_DATE_FILTERED, publishDate).sendToTarget();
             }

@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,11 +19,15 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.activity.LoginActivity;
 import com.yueqiu.bean.ISlideListItem;
 import com.yueqiu.bean.SlideAccountItemISlide;
 import com.yueqiu.bean.SlideOtherItemISlide;
+import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;
 
@@ -33,11 +38,14 @@ public class SlideViewAdapter extends BaseAdapter {
     private Context mContext;
     private List<ISlideListItem> mList;
     private LayoutInflater mInflater;
+    private ImageLoader mImgLoader;
 
     public SlideViewAdapter(Context context,List<ISlideListItem> list){
         this.mContext = context;
         this.mList = list;
         this.mInflater = LayoutInflater.from(context);
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
+
     }
 
     /**
@@ -85,7 +93,6 @@ public class SlideViewAdapter extends BaseAdapter {
         return 2;
     }
 
-
     /**
      * Get a View that displays the data at the specified position in the data set. You can either
      * create a View manually or inflate it from an XML layout file. When the View is inflated, the
@@ -108,7 +115,7 @@ public class SlideViewAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ISlideListItem item = (ISlideListItem) getItem(position);
         int type = item.getType();
-        ViewAccountHolder accountHolder;
+        final ViewAccountHolder accountHolder;
         ViewHolder holder;
         switch (type) {
            case ISlideListItem.ITEM_ACCOUNT:
@@ -138,19 +145,58 @@ public class SlideViewAdapter extends BaseAdapter {
                    accountHolder.name.setVisibility(View.VISIBLE);
                    accountHolder.name.setText(accountItem.getName());
                    String img = accountItem.getImg();
-                   Bitmap source = null;
-                   if(img.equals("")){
-                       source = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.head_img);
-                   }else {
-                       try {
-                           byte[] bitmapArray;
-                           bitmapArray = Base64.decode(img, Base64.DEFAULT);
-                           source = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
-                       } catch (Exception e) {
-                           e.printStackTrace();
-                       }
+                   // the following are the source bitmap we need to get from network service
+                   final Bitmap source = null;
+//                   if(img.equals("")){
+//                       source = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.head_img);
+//                   }else {
+//                       try {
+//                           byte[] bitmapArray;
+//                           bitmapArray = Base64.decode(img, Base64.DEFAULT);
+//                           source = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
+//                       } catch (Exception e) {
+//                           e.printStackTrace();
+//                       }
+//                   }
+                   // 以下是一个测试图片的url，我们暂时不删除了，有bug时，我们可以用她来进行测试
+//                   String img_test = "http://byu1145240001.my3w.com/image/11.png";
+                   final int finallyEmbedResId = embedResId;
+                   if (! TextUtils.isEmpty(img))
+                   {
+                       mImgLoader.get(
+                               img, // pass this as test
+                               new ImageLoader.ImageListener()
+                               {
+                                   @Override
+                                   public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate)
+                                   {
+                                       Bitmap sourceBitmap = response.getBitmap();
+                                       if (null != sourceBitmap)
+                                       {
+                                           accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), sourceBitmap, finallyEmbedResId));
+                                       } else
+                                       {
+                                           // 当我们无法获取到网络图片时，我们就在这里进行默认图片的加载和设置
+                                           Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
+                                           accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
+                                       }
+                                   }
+
+                                   @Override
+                                   public void onErrorResponse(VolleyError error)
+                                   {
+                                       // TODO: 当我们传递的URL为空的时候，就会发生这个错误。
+                                       // TODO: 我们也可以在这里设置当获取用户头像失败时我们应该加载的系统默认图片
+                                       // TODO: 如果不满意我们在onResponse()方法加载系统默认图片的做法，我们就在这里加载，
+                                       // TODO: 现阶段暂时没有崩溃的情况，如果遇到了，我们可以尝试将默认用户头像加载到这里也就是onErrorResponse()方法当中
+
+                                   }
+                               },
+                               300, // 这个值是用于设置我们的头像的图片的宽度,但是需要说明的是这个值不起作用，具体的原理需要查看Volley的文档
+                               300 // 这个值是用于设置我们的头像的图片的高度
+                       );
                    }
-                   accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(),source,embedResId));
+
                }else {
                    accountHolder.name.setVisibility(View.GONE);
                    accountHolder.login.setVisibility(View.VISIBLE);

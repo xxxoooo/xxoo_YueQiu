@@ -222,7 +222,7 @@ public class BilliardsNearbyMateFragment extends Fragment
         mLoadMore = false;
         mRefresh = false;
         mWorker = new BackgroundWorker(mStartNum, mEndNum);
-        if (mWorker != null && mWorker.getState() == Thread.State.NEW)
+        if (mWorker.getState() == Thread.State.NEW)
         {
             Log.d(TAG, " the mWorker has started ");
             mWorker.start();
@@ -552,14 +552,20 @@ public class BilliardsNearbyMateFragment extends Fragment
                 case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
                     String gender = (String) msg.obj;
                     Log.d(TAG_1, " inside the mate fragment UIEventsHandler --> the gender filtering string we get are : " + gender);
-                    mWorker.fetchDataWithGenderFiltered(gender);
+                    if (null != mWorker)
+                    {
+                        mWorker.fetchDataWithGenderFiltered(gender);
+                    }
 
                     break;
 
                 case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
                     String range = (String) msg.obj;
                     Log.d(TAG_1, " inside the mate fragment UIEventsHandler --> the range filtering string we get are : " + range);
-                    mWorker.fetchDataWithRangeFilter(range);
+                    if (null != mWorker)
+                    {
+                        mWorker.fetchDataWithRangeFilter(range);
+                    }
                     break;
 
                 case DATA_HAS_BEEN_UPDATED:
@@ -764,20 +770,23 @@ public class BilliardsNearbyMateFragment extends Fragment
 
         public void fetchAllData(final int startNum, final int endNum)
         {
-            Log.d(TAG, " inside the workThread, and the startNum and the endNum we need to retrieve are : " + startNum + " , " + endNum);
-            Message requetMsg = mBackgroundHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
-            Bundle data = new Bundle();
-            data.putInt(KEY_REQUEST_START_NUM, startNum);
-            data.putInt(KEY_REQUEST_END_NUM, endNum);
-            requetMsg.setData(data);
-            mBackgroundHandler.sendMessage(requetMsg);
+            if (null != mBackgroundHandler)
+            {
+                Log.d(TAG, " inside the workThread, and the startNum and the endNum we need to retrieve are : " + startNum + " , " + endNum);
+                Message requetMsg = mBackgroundHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
+                Bundle data = new Bundle();
+                data.putInt(KEY_REQUEST_START_NUM, startNum);
+                data.putInt(KEY_REQUEST_END_NUM, endNum);
+                requetMsg.setData(data);
+                mBackgroundHandler.sendMessage(requetMsg);
+            }
         }
 
         public void fetchDataWithRangeFilter(String range)
         {
             // 当用户添加了筛选之后，我们现在就是一个重新请求的过程了，因此我们需要先将我们之前获得的数据清除才可以
             Log.d(TAG, " inside the mWorker --> fetchDataWithRangeFiltered --> the range data we get are : " + range);
-            if (! TextUtils.isEmpty(range))
+            if (! TextUtils.isEmpty(range) && mBackgroundHandler != null)
             {
                 mBackgroundHandler.obtainMessage(START_RETRIEVE_DATA_WITH_RANGE_FILTER, range).sendToTarget();
             }
@@ -788,7 +797,7 @@ public class BilliardsNearbyMateFragment extends Fragment
             // 同筛选距离的过程一样，我们也是需要先将我们之前的List清除掉，然后开始重新请求(因为我们不清楚我们之前
             // 的请求过程是否时成功的)
             Log.d(TAG, " inside the mWorker --> fetchDataWithGenderFiltered --> the gender data we get are : " + gender);
-            if (! TextUtils.isEmpty(gender))
+            if (! TextUtils.isEmpty(gender) && mBackgroundHandler != null)
             {
                 mBackgroundHandler.obtainMessage(START_RETRIEVE_DATA_WITH_GENDER_FILTER, gender).sendToTarget();
             }

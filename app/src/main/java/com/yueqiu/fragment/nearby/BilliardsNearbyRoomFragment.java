@@ -479,11 +479,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
     @Override
     public void onPause()
     {
-        if (mWorkerThread != null)
-        {
-            mWorkerThread.interrupt();
-            mWorkerThread = null;
-        }
         mCallback.closePopupWindow();
 
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
@@ -495,6 +490,17 @@ public class BilliardsNearbyRoomFragment extends Fragment
     {
         mCallback.closePopupWindow();
         super.onStop();
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        if (mWorkerThread != null)
+        {
+            mWorkerThread.interrupt();
+            mWorkerThread = null;
+        }
     }
 
     private static final String KEY_REQUEST_PAGE_NUM = "keyRequestPageNum";
@@ -626,29 +632,40 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     String rangeStr = sParamsPreference.getRoomRange(sContext);
                     if (!TextUtils.isEmpty(rangeStr))
                     {
-                        mWorkerThread.fetchRoomDataRangeFiltered(rangeStr);
+                        if (null != mWorkerThread)
+                        {
+                            mWorkerThread.fetchRoomDataRangeFiltered(rangeStr);
+                        }
                     }
                     break;
 
                 case REQUEST_ROOM_INFO_PRICE_FILTERED:
                     Log.d(TAG, " inside the mUIEventsHandler --> the REQUEST_ROOM_INFO_PRICE_FILTERED ");
                     String priceStr = (String) msg.obj;
-                    mWorkerThread.fetchRoomDataPriceFiltered(priceStr);
-                    Log.d(TAG, " the price str we get in the mUIEventsHandler are : " + priceStr);
+                    if (null != mWorkerThread)
+                    {
+                        mWorkerThread.fetchRoomDataPriceFiltered(priceStr);
+                        Log.d(TAG, " the price str we get in the mUIEventsHandler are : " + priceStr);
+                    }
                     break;
 
                 case REQUEST_ROOM_INFO_APPRISAL_FILTERED:
                     Log.d(TAG, " inside the mUIEventsHandler --> the REQUEST_ROOM_INFO_APPRISAL_FILTERED ");
                     String apprisalStr = (String) msg.obj;
-                    mWorkerThread.fetchRoomDataApprisalFiltered(apprisalStr);
-                    Log.d(TAG, " the apprisal str we get are : " + apprisalStr);
-
+                    if (null != mWorkerThread)
+                    {
+                        mWorkerThread.fetchRoomDataApprisalFiltered(apprisalStr);
+                        Log.d(TAG, " the apprisal str we get are : " + apprisalStr);
+                    }
                     break;
                 case REQUEST_ROOM_INFO_REGION_FILTERED:
                     Log.d(TAG, " inside the mUIEventsHandler --> the REQUEST_ROOM_INFO_REGION_FILTERED ");
                     String regionStr = (String) msg.obj;
-                    mWorkerThread.fetchRoomDataRegionFiltered(regionStr);
-                    Log.d(TAG, " the region str we get are : " + regionStr);
+                    if (null != mWorkerThread)
+                    {
+                        mWorkerThread.fetchRoomDataRegionFiltered(regionStr);
+                        Log.d(TAG, " the region str we get are : " + regionStr);
+                    }
                     break;
 
                 case DATA_HAS_BEEN_UPDATED:
@@ -853,18 +870,21 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
         public void fetchRoomData(final int pageNum)
         {
-            Log.d(TAG, " the room data we need to retrieve are from page : " + pageNum);
-            Message pageMsg = mWorkerHandler.obtainMessage(REQUEST_ALL_ROOM_INFO);
-            Bundle pageData = new Bundle();
-            pageData.putInt(KEY_REQUEST_PAGE_NUM, pageNum);
-            pageMsg.setData(pageData);
-            mWorkerHandler.sendMessage(pageMsg);
+            if (null != mWorkerHandler)
+            {
+                Log.d(TAG, " the room data we need to retrieve are from page : " + pageNum);
+                Message pageMsg = mWorkerHandler.obtainMessage(REQUEST_ALL_ROOM_INFO);
+                Bundle pageData = new Bundle();
+                pageData.putInt(KEY_REQUEST_PAGE_NUM, pageNum);
+                pageMsg.setData(pageData);
+                mWorkerHandler.sendMessage(pageMsg);
+            }
         }
 
         public void fetchRoomDataRegionFiltered(String regionStr)
         {
             Log.d(TAG, " in the BackgroundWorkerThread : the region str we get are : " + regionStr);
-            if (! TextUtils.isEmpty(regionStr))
+            if (! TextUtils.isEmpty(regionStr) && mWorkerHandler != null)
             {
                 mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_REGION_FILTERED, regionStr).sendToTarget();
             }
@@ -872,7 +892,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
         public void fetchRoomDataPriceFiltered(String priceStr)
         {
-            if (! TextUtils.isEmpty(priceStr))
+            if (! TextUtils.isEmpty(priceStr) && mWorkerHandler != null)
             {
                 mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_PRICE_FILTERED, priceStr).sendToTarget();
             }
@@ -880,7 +900,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
         public void fetchRoomDataRangeFiltered(String rangeStr)
         {
-            if (! TextUtils.isEmpty(rangeStr))
+            if (! TextUtils.isEmpty(rangeStr) && mWorkerHandler != null)
             {
                 mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_RANGE_FILTERED, rangeStr).sendToTarget();
             }
@@ -888,7 +908,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
         public void fetchRoomDataApprisalFiltered(String apprisalStr)
         {
-            if (! TextUtils.isEmpty(apprisalStr))
+            if (! TextUtils.isEmpty(apprisalStr) && mWorkerHandler != null)
             {
                 mWorkerHandler.obtainMessage(REQUEST_ROOM_INFO_APPRISAL_FILTERED, apprisalStr).sendToTarget();
             }

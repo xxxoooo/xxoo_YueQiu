@@ -12,6 +12,14 @@ import android.view.Window;
 public class YueQiuSplashScreen extends Activity
 {
 
+    // TODO: 当我们首次安装约球程序时，或者当前系统资源比较紧张时，约球的首页也就是SplashScreen的加载
+    // TODO: 变慢时，就会首先出现一个带有actionBar的Activity出现，然后出现的才是SplashScreen，这种
+    // TODO: 现象很快，基本上几百毫秒，对于内存大的手机，基本上就见不到这种效果了，仅仅是在首次安装时
+    // TODO: 出现这种现象，第二次启动就没有了。这种现象的原因就是我们的AppTheme设置当中就有了ActionBar
+    // TODO: 的相关设置，我们可以参考之前做的一些Demo(SafeSDKDemo)，将SplashScreen的Theme当中的背景元素直接
+    // TODO: 设置成<android:WindowBackground>@drawable/splach_screen_bg</>，然后再加一个NoTitle
+    // TODO: 的配置，基本上就可以解决问题了。但是却会带出另一个问题，就是首页的activity屏幕上移的问题。
+    // TODO: 当这种现象明显时，我们需要研究一下.上面所有的扯淡，只是为了以后的改进提供一个解决的注意点。
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
