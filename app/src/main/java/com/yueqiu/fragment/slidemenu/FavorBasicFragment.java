@@ -231,6 +231,8 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                     setEmptyViewGone();
                     List<FavorInfo> cacheList = (List<FavorInfo>) msg.obj;
                     mList.addAll(cacheList);
+                    if(mList.isEmpty())
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
                     break;
                 case PublicConstant.GET_SUCCESS:
                     setEmptyViewGone();

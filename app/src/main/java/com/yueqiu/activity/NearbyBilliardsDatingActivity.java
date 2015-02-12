@@ -235,7 +235,7 @@ public class NearbyBilliardsDatingActivity extends Activity
                     Bundle infoBundle = detailedInfoMsg.getData();
                     String appointId = infoBundle.getString(KEY_APPOINT_ID);
                     String sex = infoBundle.getString(KEY_SEX);
-                    String lookNum = infoBundle.getString(KEY_LOOK_NUM);
+//                    String lookNum = infoBundle.getString(KEY_LOOK_NUM);
                     String titleInfo = infoBundle.getString(KEY_TITLE_INFO);
                     String address = infoBundle.getString(KEY_ADDRESS);
                     String startTime = infoBundle.getString(KEY_START_TIME);
@@ -246,11 +246,12 @@ public class NearbyBilliardsDatingActivity extends Activity
                     Log.d(TAG, " the data we get are : " + " titleInfo : " + titleInfo + " , address : " + address + " , startTime :" + startTime
                             + " , endTime : " + endTime + " , model " + model);
 
-                    mUserGender.setText(NearbyFragmentsCommonUtils.parseGenderStr(NearbyBilliardsDatingActivity.this, sex));
-                    mUserGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, parseGenderDrawable(sex), 0);
+                    String realSexStr = NearbyFragmentsCommonUtils.parseGenderStr(NearbyBilliardsDatingActivity.this, sex);
+                    mUserGender.setText(realSexStr);
+                    mUserGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, parseGenderDrawable(realSexStr), 0);
                     mUserGender.setCompoundDrawablePadding(6);
                     mTvTime1.setText(createTime);
-                    mTvFollowNum.setText(lookNum);
+//                    mTvFollowNum.setText(lookNum);
                     mTvTitle.setText(titleInfo);
                     mTvActivityAddress.setText(address);
                     mTvStartTime.setText(startTime);
@@ -295,7 +296,7 @@ public class NearbyBilliardsDatingActivity extends Activity
     // TODO: 以下定义的字段都是我们确定至少需要的
     private static final String KEY_APPOINT_ID = "appointId"; // 活动的ID
     private static final String KEY_SEX = "sex";
-    private static final String KEY_LOOK_NUM = "lookNum";
+//    private static final String KEY_LOOK_NUM = "lookNum";
     private static final String KEY_USER_NAME = "userName";
     private static final String KEY_TIME_1 = "time1";
     private static final String KEY_TIME_2 = "time2";
@@ -330,14 +331,14 @@ public class NearbyBilliardsDatingActivity extends Activity
         Log.d(TAG, " the raw request we get for the dating detailed activity are : " + rawResult);
         try {
             // TODO: 以下有一些字段暂时服务器端还没有完全定义好，并返回，所有效果有一点差
-            Log.d(TAG, " start parsing the json we get ");
             if (! TextUtils.isEmpty(rawResult))
             {
                 JSONObject resultJson = new JSONObject(rawResult);
+                Log.d(TAG_1, " the result json we get are : " + resultJson);
                 JSONObject wholeResult = resultJson.getJSONObject("result"); // 得到的总的json object
                 String appointId = wholeResult.getString("appoint_id"); // 约球id
                 String sex = wholeResult.getString("sex"); // 用户性别
-                String lookNumber = wholeResult.getString("look_number"); // 浏览数目，即眼睛图标对应的那个数字
+//                String lookNumber = wholeResult.getString("look_number"); // 浏览数目，即眼睛图标对应的那个数字
                 String createTime = wholeResult.getString("create_time"); // 活动发布的日期
                 String title = wholeResult.getString("title"); // 活动主题
                 String address = wholeResult.getString("address"); // 活动地点
@@ -361,7 +362,7 @@ public class NearbyBilliardsDatingActivity extends Activity
                 Bundle detailedInfoBundle = new Bundle();
                 detailedInfoBundle.putString(KEY_APPOINT_ID, appointId); // 活动Id
                 detailedInfoBundle.putString(KEY_SEX, sex); // 发布活动的用户的性别
-                detailedInfoBundle.putString(KEY_LOOK_NUM, lookNumber); // 当期活动的关注数目
+//                detailedInfoBundle.putString(KEY_LOOK_NUM, lookNumber); // 当期活动的关注数目
                 detailedInfoBundle.putString(KEY_CREATE_TIME, createTime); // 活动发布日期
                 detailedInfoBundle.putString(KEY_TITLE_INFO, title); // 活动主题
                 detailedInfoBundle.putString(KEY_ADDRESS, address); // 活动地址
@@ -378,6 +379,7 @@ public class NearbyBilliardsDatingActivity extends Activity
                 // 以下得到的是已经参加这次活动的人员的列表
                 List<NearbyDatingDetailedAlreadyBean> cachedFollowList = new ArrayList<NearbyDatingDetailedAlreadyBean>();
                 JSONArray followList = wholeResult.getJSONArray("join_list");
+                Log.d(TAG_1, " the join_list we get are : " + followList.toString());
                 final int followSize = followList.length();
                 int i;
                 for (i = 0; i < followSize; ++i)
@@ -390,7 +392,7 @@ public class NearbyBilliardsDatingActivity extends Activity
                         String followerPhotoUrl = followerJson.getString("img_url"); // 已经参加本次活动的人员的photo的url
                         if (! TextUtils.isEmpty(followerId) && !TextUtils.isEmpty(followerAccount) && !TextUtils.isEmpty(followerPhotoUrl))
                         {
-                            NearbyDatingDetailedAlreadyBean follower = new NearbyDatingDetailedAlreadyBean(followerId, followerAccount, followerPhotoUrl);
+                            NearbyDatingDetailedAlreadyBean follower = new NearbyDatingDetailedAlreadyBean(followerId, followerPhotoUrl, followerAccount);
                             cachedFollowList.add(follower);
                         }
                     }
@@ -404,11 +406,11 @@ public class NearbyBilliardsDatingActivity extends Activity
             }
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.d(TAG, " exception happened in parsing the initial json data, and the causing are : " + e.toString());
+            Log.d(TAG, " ---> exception happened in parsing the initial json data, and the causing are : " + e.toString());
         }
     }
 
-
+    private static final String TAG_1 = "scguo_datingActivity";
     /**
      *
      * @param userId 用户id

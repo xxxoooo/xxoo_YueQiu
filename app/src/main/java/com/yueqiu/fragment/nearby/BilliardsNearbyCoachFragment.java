@@ -1,6 +1,7 @@
 package com.yueqiu.fragment.nearby;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -12,6 +13,8 @@ import android.os.Process;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,7 +64,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
     private PullToRefreshListView mCoauchListView;
 
-    private static Context sContext;
+    private Context mContext;
 
     @SuppressLint("ValidFragment")
     public BilliardsNearbyCoachFragment()
@@ -72,7 +75,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
     public static BilliardsNearbyCoachFragment newInstance(Context context, String params)
     {
-        sContext = context;
+//        mContext = context;
         BilliardsNearbyCoachFragment instance = new BilliardsNearbyCoachFragment();
 
         Bundle args = new Bundle();
@@ -86,17 +89,24 @@ public class BilliardsNearbyCoachFragment extends Fragment
     private BackgroundWorkerThread mWorker;
 
     @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        this.mContext = activity;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mNetworkAvailable = Utils.networkAvaiable(sContext);
+        mNetworkAvailable = Utils.networkAvaiable(mContext);
 
     }
 
     private String mArgs;
 
     private ProgressBar mPreProgress;
-    private TextView mPreTextView;
+    private TextView mPreTextView,mEmptyView;
     private Drawable mProgressDrawable;
     private boolean mIsListEmpty;
 
@@ -113,12 +123,13 @@ public class BilliardsNearbyCoachFragment extends Fragment
     {
         mView = inflater.inflate(R.layout.fragment_nearby_coauch_layout, container, false);
 
-        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(sContext);
-        commonUtils.initViewPager(sContext, mView);
+        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
+        commonUtils.initViewPager(mContext, mView);
 
-        mClickListener = new NearbyPopBasicClickListener(sContext,mUIEventsHandler,sParamsPreference);
+        mClickListener = new NearbyPopBasicClickListener(mContext,mUIEventsHandler,sParamsPreference);
         (mBtnAbility = (Button) mView.findViewById(R.id.btn_coauch_ability)).setOnClickListener(mClickListener);
         (mBtnKinds = (Button) mView.findViewById(R.id.btn_coauch_kinds)).setOnClickListener(mClickListener);
+        mEmptyView = new TextView(getActivity());
 
         mCallback = mClickListener;
 
@@ -138,7 +149,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
         // TODO: 这里加载的是测试数据,暂时还不能删除这个方法，因为我们还要查看总的UI加载效果
 //        initListViewTestData();
-        mCoauchListAdapter = new NearbyCoauchSubFragmentListAdapter(sContext, (ArrayList<NearbyCoauchSubFragmentCoauchBean>) mCoauchList);
+        mCoauchListAdapter = new NearbyCoauchSubFragmentListAdapter(mContext, (ArrayList<NearbyCoauchSubFragmentCoauchBean>) mCoauchList);
         Log.d(TAG, " the source list content are : " + mCoauchList.size());
         mCoauchListView.setAdapter(mCoauchListAdapter);
         mCoauchListAdapter.notifyDataSetChanged();
@@ -154,24 +165,32 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
         }
 
-        mWorker = new BackgroundWorkerThread();
-        if (Utils.networkAvaiable(sContext))
+        mWorker = new BackgroundWorkerThread(mStartNum, mEndNum);
+        mLoadMore = false;
+        mRefresh = false;
+        if (mWorker.getState() == Thread.State.NEW)
         {
-            mLoadMore = false;
-            mRefresh = false;
-            if (mWorker != null && mWorker.getState() == Thread.State.NEW)
-            {
-                mWorker.start();
-            }
-        } else
+            mWorker.start();
+        }
+        if ( !Utils.networkAvaiable(mContext))
         {
             mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
         }
 
-
         return mView;
     }
-
+    private void setEmptyViewVisible(){
+        mEmptyView.setGravity(Gravity.CENTER);
+        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        mEmptyView.setTextColor(getActivity().getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setText(R.string.search_activity_subfragment_empty_tv_str);
+        mCoauchListView.setEmptyView(mEmptyView);
+    }
+    private void setEmptyViewGone(){
+        if(mEmptyView != null){
+            mEmptyView.setVisibility(View.GONE);
+        }
+    }
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
@@ -218,10 +237,10 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
     private void retrieveInitialCoauchInfo(final String clazzRequest, String levelRequest, final int startNo, final int endNo)
     {
-        if (!mNetworkAvailable)
+        if (!Utils.networkAvaiable(getActivity()))
         {
             mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_FAILED,
-                    sContext.getResources().getString(R.string.network_not_available)).sendToTarget();
+                    mContext.getResources().getString(R.string.network_not_available)).sendToTarget();
             return;
         }
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
@@ -253,49 +272,57 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     if (status == HttpConstants.ResponseCode.NORMAL)
                     {
                         JSONObject resultJsonObj = initialResultJson.getJSONObject("result");
-                        Log.d(TAG, " the final json data we need to parse are : " + resultJsonObj);
-                        JSONArray dataArr = resultJsonObj.getJSONArray("list_data");
-                        final int len = dataArr.length();
-                        int i;
-                        for (i = 0; i < len; ++i)
+                        if (null != resultJsonObj)
                         {
-                            JSONObject dataUnit = dataArr.getJSONObject(i);
-                            Log.d(TAG, " the sub data json unit we get are : " + dataUnit);
+                            JSONArray dataArr = resultJsonObj.getJSONArray("list_data");
+                            final int len = dataArr.length();
+                            int i;
+                            for (i = 0; i < len; ++i)
+                            {
+                                JSONObject dataUnit = dataArr.getJSONObject(i);
 
-                            // TODO: 部分字段的值还需要进一步的确认
-                            String userId = dataUnit.getString("user_id");
-                            String photoUrl = dataUnit.getString("img_url");
-                            String userName = dataUnit.getString("username");
-                            // TODO: 这里需要注意的是我们得到的关于资质的字段值是一个数字，我们还需要进一步同服务器端确定以下这几个数字分别代表的具体的含义
-                            String level = dataUnit.getString("zizhi");
-                            String sex = dataUnit.getString("sex");
-                            String kinds = dataUnit.getString("class");
-                            String district = dataUnit.getString("district");
-                            long range = dataUnit.getLong("range");
+                                // TODO: 部分字段的值还需要进一步的确认
+                                String userId = dataUnit.getString("user_id");
+                                String photoUrl = dataUnit.getString("img_url");
+                                String userName = dataUnit.getString("username");
+                                // TODO: 这里需要注意的是我们得到的关于资质的字段值是一个数字，我们还需要进一步同服务器端确定以下这几个数字分别代表的具体的含义
+                                String level = dataUnit.getString("zizhi");
+                                String sex = dataUnit.getString("sex");
+                                String kinds = dataUnit.getString("class");
+                                String district = dataUnit.getString("district");
+                                long range = dataUnit.getLong("range");
 
-                            NearbyCoauchSubFragmentCoauchBean coauchBean = new NearbyCoauchSubFragmentCoauchBean(
-                                    userId,
-                                    photoUrl,
-                                    userName,
-                                    NearbyFragmentsCommonUtils.parseGenderStr(sContext, sex),
-                                    String.valueOf(range),
-                                    NearbyFragmentsCommonUtils.parseCoauchLevel(sContext, level),
-                                    NearbyFragmentsCommonUtils.parseBilliardsKinds(sContext, kinds));
+                                NearbyCoauchSubFragmentCoauchBean coauchBean = new NearbyCoauchSubFragmentCoauchBean(
+                                        userId,
+                                        photoUrl,
+                                        userName,
+                                        NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex),
+                                        String.valueOf(range),
+                                        NearbyFragmentsCommonUtils.parseCoauchLevel(mContext, level),
+                                        NearbyFragmentsCommonUtils.parseBilliardsKinds(mContext, kinds));
 
-                            cacheCoauchList.add(coauchBean);
+                                cacheCoauchList.add(coauchBean);
+                            }
+
+                            if (cacheCoauchList.isEmpty())
+                            {
+                                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            }
+                            mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheCoauchList).sendToTarget();
+//                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
+                        } else
+                        {
+//                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
+                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                         }
-
-                        mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheCoauchList).sendToTarget();
-
-                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
                     } else if (status == HttpConstants.ResponseCode.TIME_OUT)
                     {
                         mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
+//                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
                     } else if (status == HttpConstants.ResponseCode.NO_RESULT)
                     {
                         mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
+//                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
                     } else
                     {
                         Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
@@ -308,24 +335,24 @@ public class BilliardsNearbyCoachFragment extends Fragment
                         }
                         errorMsg.setData(errorData);
                         mUIEventsHandler.sendMessage(errorMsg);
-                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
-                        // 下面的写法理论上是正确的，但是当“msg”为空的时候，Bundle并不为空，
-                        // 所以UIHandler当中仍然会接收到这里传送的数据，但是由于msg是空的,
-                        // 所以我们还是要使用最原始的初始化Message Bundle的做法
-                        // 以下的传递数据的方法虽然简练，但是不正确，会导致空数据的传输,谨慎
-//                        mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR, initialResultJson.getString("msg")).sendToTarget();
+//                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
                     }
                 } else
                 {
                     mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-                    mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
+//                    mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
                 }
-            } catch (JSONException e) {
+            } catch (JSONException e)
+            {
                 e.printStackTrace();
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-                mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
+//                mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
                 Log.d(TAG, " exception happened while we parsing the json object we retrieved, and the reason are : " + e.toString());
             }
+        } else
+        {
+            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+//            mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
         }
     }
 
@@ -349,48 +376,53 @@ public class BilliardsNearbyCoachFragment extends Fragment
     public static final int RETRIEVE_COAUCH_WITH_CLASS_FILTERED = 40 << 3;
 
     private static final int UI_SHOW_PROGRESS = 1 << 6;
-    private static final int UI_HIDE_PROGRESS = 1 << 7;
 
     private  Handler mUIEventsHandler = new Handler()
     {
         @Override
         public void handleMessage(Message msg)
         {
+            if(mCoauchListView.isRefreshing()){
+                mCoauchListView.onRefreshComplete();
+            }
             switch (msg.what)
             {
                 case UI_SHOW_PROGRESS:
                     showProgress();
+                    if(mEmptyView.getVisibility() == View.VISIBLE){
+                        mCoauchListView.setEmptyView(null);
+                        mEmptyView.setVisibility(View.GONE);
+                    }
                     Log.d(TAG, " start showing the progress bar in the Coauch fragment ");
                     break;
-                case UI_HIDE_PROGRESS:
-                    mCoauchListAdapter.notifyDataSetChanged();
-                    hideProgress();
-                    if (mCoauchListView.isRefreshing())
-                    {
-                        mCoauchListView.onRefreshComplete();
-                    }
-                    Log.d(TAG, " hide the progress bar that in the coauch fragment ");
-                    break;
+//                case UI_HIDE_PROGRESS:
+//                    mCoauchListAdapter.notifyDataSetChanged();
+//                    hideProgress();
+//                    if (mCoauchListView.isRefreshing())
+//                    {
+//                        mCoauchListView.onRefreshComplete();
+//                    }
+//                    Log.d(TAG, " hide the progress bar that in the coauch fragment ");
+//                    break;
 
                 case STATE_FETCH_DATA_FAILED:
                     String reasonDesc = (String) msg.obj;
                     Log.d(TAG, " fail to get the data we need, and the detailed reason for that are : " + reasonDesc);
-                    Toast.makeText(sContext, reasonDesc, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, reasonDesc, Toast.LENGTH_SHORT).show();
+                    if(mCoauchList.isEmpty())
+                        setEmptyViewVisible();
+                    hideProgress();
                     break;
                 case PublicConstant.USE_CACHE:
                     ArrayList<NearbyCoauchSubFragmentCoauchBean> cachedList = (ArrayList<NearbyCoauchSubFragmentCoauchBean>) msg.obj;
-                    if (cachedList.size() > 0)
-                    {
-                        // 首先将我们的EmptyView隐藏掉
-                        loadEmptyTv(true);
-                    }
                     mCoauchList.addAll(cachedList);
-                    mCoauchListAdapter.notifyDataSetChanged();
+                    if(mCoauchList.isEmpty())
+                        setEmptyViewVisible();
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
                     // 首先将我们的Empty隐藏掉，每次重新获得数据之后都需要先将EmptyView隐藏掉，然后需要重新判断
-                    loadEmptyTv(true);
-
+                    setEmptyViewGone();
+                    hideProgress();
                     mBeforeCount = mCoauchList.size();
                     mIsListEmpty = mCoauchList.isEmpty();
                     List<NearbyCoauchSubFragmentCoauchBean> coauchList = (ArrayList<NearbyCoauchSubFragmentCoauchBean>) msg.obj;
@@ -418,32 +450,37 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     if (mCoauchList.isEmpty())
                     {
                         Log.d(TAG, " inside the coauchFragment mUIEventsHandler --> we start to load the emptyView");
-                        loadEmptyTv(false);
+                        setEmptyViewVisible();
                     } else
                     {
                         if (mRefresh)
                         {
                             if (mAfterCount == mBeforeCount)
                             {
-                                Utils.showToast(sContext, sContext.getString(R.string.no_newer_info));
+                                Utils.showToast(mContext, mContext.getString(R.string.no_newer_info));
                             } else
                             {
-                                Utils.showToast(sContext, sContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                                Utils.showToast(mContext, mContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }
-                    mCoauchListAdapter.notifyDataSetChanged();
                     break;
 
                 case RETRIEVE_COAUCH_WITH_LEVEL_FILTERED:
                     String level = (String) msg.obj;
-                    Log.d(TAG, " inside the CoauchFragment UIEventsHandler --> and the level info we get are : " + level);
-                    mWorker.fetchDataWithLevelFiltered(level);
+                    if (null != mWorker)
+                    {
+                        Log.d(TAG, " inside the CoauchFragment UIEventsHandler --> and the level info we get are : " + level);
+                        mWorker.fetchDataWithLevelFiltered(level);
+                    }
                     break;
 
                 case RETRIEVE_COAUCH_WITH_CLASS_FILTERED:
                     String clazz = (String) msg.obj;
-                    mWorker.fetchDataWithClazzFiltered(clazz);
+                    if (mWorker != null)
+                    {
+                        mWorker.fetchDataWithClazzFiltered(clazz);
+                    }
 
                     break;
 
@@ -456,16 +493,16 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     hideProgress();
                     if (mCoauchList.isEmpty())
                     {
-                        loadEmptyTv(false);
+                        setEmptyViewVisible();
                     }
-                    Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
+                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     break;
                 case PublicConstant.TIME_OUT:
                     // 超时之后的处理策略
-                    Utils.showToast(sContext, sContext.getString(R.string.http_request_time_out));
+                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
                     if (mCoauchList.isEmpty())
                     {
-                        loadEmptyTv(false);
+                       setEmptyViewVisible();
                     }
                     hideProgress();
                     break;
@@ -473,12 +510,12 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 case PublicConstant.NO_RESULT:
                     if (mCoauchList.isEmpty())
                     {
-                        loadEmptyTv(false);
+                        setEmptyViewVisible();
                     } else
                     {
                         if (mLoadMore)
                         {
-                            Utils.showToast(sContext, sContext.getString(R.string.no_more_info));
+                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.search_billiard_coauch_str)));
                         }
                     }
                     hideProgress();
@@ -489,15 +526,15 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     String errorStr = errorData.getString(KEY_REQUEST_ERROR_MSG);
                     if (! TextUtils.isEmpty(errorStr))
                     {
-                        Utils.showToast(sContext, errorStr);
+                        Utils.showToast(mContext, errorStr);
                     } else
                     {
-                        Utils.showToast(sContext, sContext.getString(R.string.http_request_error));
+                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
                     }
 
                     if (mCoauchList.isEmpty())
                     {
-                        loadEmptyTv(false);
+                        setEmptyViewVisible();
                     }
                     hideProgress();
                     break;
@@ -506,15 +543,11 @@ public class BilliardsNearbyCoachFragment extends Fragment
         }
     };
 
-    private void loadEmptyTv(boolean disabled)
-    {
-        Log.d(TAG, " inside the loadEmptyTV method --> we are start loading the empty view from here ");
-        if (mCoauchListView.isRefreshing())
-        {
-            mCoauchListView.onRefreshComplete();
-        }
-        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mCoauchListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str), disabled);
-    }
+//    private void loadEmptyTv(boolean disabled)
+//    {
+//        Log.d(TAG, " inside the loadEmptyTV method --> we are start loading the empty view from here ");
+//        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(mContext, mCoauchListView,mEmptyView, mContext.getString(R.string.search_activity_subfragment_empty_tv_str), disabled);
+//    }
 
     private void showProgress()
     {
@@ -530,9 +563,12 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
     private class BackgroundWorkerThread extends HandlerThread
     {
-        public BackgroundWorkerThread()
+        private final int mInitStartNO, mInitEndNO;
+        public BackgroundWorkerThread(int startNum, int endNum)
         {
             super(BACKGROUND_WORKER_NAME, Process.THREAD_PRIORITY_BACKGROUND);
+            this.mInitStartNO = startNum;
+            this.mInitEndNO = endNum;
         }
 
         // 参照MateFragment当中的理解
@@ -552,16 +588,19 @@ public class BilliardsNearbyCoachFragment extends Fragment
                         case RETRIEVE_ALL_COAUCH_INFO:
                             // 通知UIHandler开始显示Dialog
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
-                            String cacheClazz = sParamsPreference.getCouchClazz(sContext);
-                            String cacheLevel = sParamsPreference.getCouchLevel(sContext);
-                            retrieveInitialCoauchInfo(cacheClazz, cacheLevel, 0, 9);
+                            Bundle numData = msg.getData();
+                            final int startNum = numData.getInt(KEY_REQUEST_START_NUM);
+                            final int endNum = numData.getInt(KEY_REQUEST_END_NUM);
+                            String cacheClazz = sParamsPreference.getCouchClazz(mContext);
+                            String cacheLevel = sParamsPreference.getCouchLevel(mContext);
+                            retrieveInitialCoauchInfo(cacheClazz, cacheLevel, startNum, endNum);
 
                             break;
                         case RETRIEVE_COAUCH_WITH_CLASS_FILTERED:
                             String clazz = (String) msg.obj;
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
                             Log.d(TAG, " inside the BackgroundThread --> the clazz string we get in the CouachFragment are : " + clazz);
-                            String clazzCacheLevel = sParamsPreference.getCouchLevel(sContext);
+                            String clazzCacheLevel = sParamsPreference.getCouchLevel(mContext);
                             // 我们每次的筛选都要从零开始请求最新的数据
                             retrieveInitialCoauchInfo(clazz, clazzCacheLevel, 0, 9);
 
@@ -569,7 +608,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
                         case RETRIEVE_COAUCH_WITH_LEVEL_FILTERED:
                             String level = (String) msg.obj;
                             Log.d(TAG, " inside the BackgroundThread --> the level string we get in the CoauchFragment are : " + level);
-                            String levelCacheClazz = sParamsPreference.getCouchClazz(sContext);
+                            String levelCacheClazz = sParamsPreference.getCouchClazz(mContext);
                             // 同样的道理，我们筛选的数据请求都要从零开始重新请求
                             retrieveInitialCoauchInfo(levelCacheClazz, level, 0, 9);
 
@@ -577,23 +616,29 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     }
                 }
             };
-            // 初始请求，肯定是请求最新的，即从第0条开始请求就可以了
-            fetchAllData(0, 9);
+            if (Utils.networkAvaiable(mContext))
+            {
+                // 初始请求，肯定是请求最新的，即从第0条开始请求就可以了
+                fetchAllData(mInitStartNO, mInitEndNO);
+            }
         }
 
         public void fetchAllData(final int startNum, final int endNum)
         {
-            Message requestMsg = mWorkerHandler.obtainMessage(RETRIEVE_ALL_COAUCH_INFO);
-            Bundle requestData = new Bundle();
-            requestData.putInt(KEY_REQUEST_START_NUM, startNum);
-            requestData.putInt(KEY_REQUEST_END_NUM, endNum);
-            requestMsg.setData(requestData);
-            mWorkerHandler.sendMessage(requestMsg);
+            if (null != mWorkerHandler)
+            {
+                Message requestMsg = mWorkerHandler.obtainMessage(RETRIEVE_ALL_COAUCH_INFO);
+                Bundle requestData = new Bundle();
+                requestData.putInt(KEY_REQUEST_START_NUM, startNum);
+                requestData.putInt(KEY_REQUEST_END_NUM, endNum);
+                requestMsg.setData(requestData);
+                mWorkerHandler.sendMessage(requestMsg);
+            }
         }
 
         public void fetchDataWithClazzFiltered(String clazz)
         {
-            if (! TextUtils.isEmpty(clazz))
+            if (! TextUtils.isEmpty(clazz) && null != mWorkerHandler)
             {
                 mWorkerHandler.obtainMessage(RETRIEVE_COAUCH_WITH_CLASS_FILTERED, clazz).sendToTarget();
             }
@@ -601,7 +646,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
         public void fetchDataWithLevelFiltered(String level)
         {
-            if (! TextUtils.isEmpty(level))
+            if (! TextUtils.isEmpty(level) && null != mWorkerHandler)
             {
                 mWorkerHandler.obtainMessage(RETRIEVE_COAUCH_WITH_LEVEL_FILTERED, level).sendToTarget();
             }
@@ -616,18 +661,18 @@ public class BilliardsNearbyCoachFragment extends Fragment
     private int mBeforeCount;
     private int mAfterCount;
 
-    private int mStartNum;
-    private int mEndNum;
+    private int mStartNum = 0;
+    private int mEndNum = 9;
 
     private PullToRefreshBase.OnRefreshListener2<ListView> mOnRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>()
     {
         @Override
         public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView)
         {
-            String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
+            String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
-            if (Utils.networkAvaiable(sContext))
+            if (Utils.networkAvaiable(mContext))
             {
                 mLoadMore = false;
                 mRefresh = true;
@@ -636,7 +681,6 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     // 每一次的下拉刷新我们都是要从0开始请求最新的数据
                     mWorker.fetchAllData(0, 9);
                 }
-                loadEmptyTv(true);
             } else
             {
                 mUIEventsHandler.sendEmptyMessage(STATE_FETCH_DATA_FAILED);
@@ -646,12 +690,12 @@ public class BilliardsNearbyCoachFragment extends Fragment
         @Override
         public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView)
         {
-            String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
+            String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
             mLoadMore = true;
             mCurrentPos = mCoauchList.size();
-            if (mBeforeCount != mAfterCount && !mRefresh)
+            if (mBeforeCount != mAfterCount && mRefresh)
             {
                 mStartNum = mEndNum + (mAfterCount - mBeforeCount);
                 mEndNum += 10 + (mAfterCount - mBeforeCount);
@@ -661,8 +705,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 mEndNum += 10;
             }
             mRefresh = false;
-            loadEmptyTv(true);
-            if (Utils.networkAvaiable(sContext))
+            if (Utils.networkAvaiable(mContext))
             {
                 if (null != mWorker)
                 {
@@ -676,15 +719,6 @@ public class BilliardsNearbyCoachFragment extends Fragment
         }
     };
 
-
-    // TODO: 以下是测试数据,在测试接口的时候，将以下的初始化过程删除
-    private void initListViewTestData()
-    {
-        int i;
-        for (i = 0; i < 200; ++i) {
-            mCoauchList.add(new NearbyCoauchSubFragmentCoauchBean("", "", "大力水手", "男", "2000米以内", "前国家队队员", "九球"));
-        }
-    }
 }
 
 

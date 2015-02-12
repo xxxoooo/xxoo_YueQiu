@@ -24,9 +24,11 @@ import com.yueqiu.fragment.nearby.BilliardsNearbyMateFragment;
 import com.yueqiu.fragment.nearby.BilliardsNearbyRoomFragment;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import static com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils.getFilterPopupWindow;
 
@@ -36,6 +38,7 @@ import static com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils.getFi
 public class NearbyPopBasicClickListener implements View.OnClickListener, NearbyFragmentsCommonUtils.ControlPopupWindowCallback
 {
     private static final String TAG = "NearbyPopBasicClickListener";
+    private static final String TAG_1 = "mate_fragemnt_test";
     private Context mContext;
     private LayoutInflater mInflater;
     private View mPopupBaseView;
@@ -77,6 +80,10 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
     @Override
     public void onClick(View view)
     {
+        if (mContext == null)
+        {
+            return;
+        }
         switch (view.getId()) {
             //assistance
             case R.id.btn_assistcoauch_distance:
@@ -95,7 +102,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        String rawDistance = disStrList[position];
+                        final int posVal = position;
+                        String rawDistance = disStrList[posVal];
                         final int len = rawDistance.length();
                         String distance = rawDistance.substring(0, len - 3);
                         mParamsPreference.setAScouchRange(mContext, distance);
@@ -121,7 +129,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        final String priceStr = String.valueOf(position + 1);
+                        final int posVal = position;
+                        final String priceStr = String.valueOf(posVal + 1);
                         mParamsPreference.setAScouchPrice(mContext, priceStr);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_PRICE_FILTERED, priceStr).sendToTarget();
                         mPopupWindow.dismiss();
@@ -144,7 +153,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        final String clazzStr = String.valueOf(position + 1);
+                        final int posVal = position;
+                        final String clazzStr = String.valueOf(posVal + 1);
                         mParamsPreference.setAScouchLevel(mContext, clazzStr);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETREIVE_INFO_WITH_KINDS_FILTERED, clazzStr).sendToTarget();
                         mPopupWindow.dismiss();
@@ -173,7 +183,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        final String levelStr = String.valueOf(position + 1);
+                        final int posVal = position;
+                        final String levelStr = String.valueOf(posVal + 1);
                         mParamsPreference.setAScouchLevel(mContext, levelStr);
 
                         mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_LEVEL_FILTERED, levelStr).sendToTarget();
@@ -197,7 +208,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        final String gender = String.valueOf(position + 1);
+                        final int posVal = position;
+                        final String gender = String.valueOf(posVal + 1);
                         mParamsPreference.setMateGender(mContext, gender);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyMateFragment.START_RETRIEVE_DATA_WITH_GENDER_FILTER, gender).sendToTarget();
                         mPopupWindow.dismiss();
@@ -212,16 +224,21 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         mContext.getResources().getString(R.string.search_mate_popupmenu_item_2000_str),
                         mContext.getResources().getString(R.string.search_mate_popupmenu_item_5000_str)
                 };
+
                 mPopupTitleView.setText(R.string.search_mate_popupmenu_item_filter_str);
                 mPopupListView.setAdapter(new NearbyPopupBaseAdapter(mContext, Arrays.asList(mate_distance)));
+
                 mPopupWindow = getFilterPopupWindow(mContext, view, mPopupBaseView);
+                Log.d(TAG_1, " the popupWindow are --> " + (mPopupWindow == null) + ", and the base view are : " + (mPopupBaseView == null));
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                 {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
+                        Log.d(TAG_1, " the current selected position are : " + position);
                         // 我们要将我们传递的“500米以内”截取成“500”
-                        String rawDistanceStr = mate_distance[position];
+                        final int posVal = position;
+                        String rawDistanceStr = mate_distance[posVal];
                         final int len = rawDistanceStr.length();
                         String distanceVal = rawDistanceStr.substring(0, len - 3);
                         mParamsPreference.setMateRange(mContext, distanceVal);
@@ -249,7 +266,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        String levelStr = levelStrList[position];
+                        final int posVal = position;
+                        String levelStr = levelStrList[posVal];
                         mUIEventsHandler.obtainMessage(BilliardsNearbyCoachFragment.RETRIEVE_COAUCH_WITH_LEVEL_FILTERED, levelStr).sendToTarget();
                         mPopupWindow.dismiss();
                     }
@@ -271,7 +289,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        String clazzStr = String.valueOf(position + 1);
+                        final int posVal = position;
+                        String clazzStr = String.valueOf(posVal + 1);
                         mParamsPreference.setCouchClazz(mContext, clazzStr);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyCoachFragment.RETRIEVE_COAUCH_WITH_CLASS_FILTERED, clazzStr).sendToTarget();
                         mPopupWindow.dismiss();
@@ -295,7 +314,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        String rawRangeStr = dating_distance[position];
+                        final int posVal = position;
+                        String rawRangeStr = dating_distance[posVal];
                         int len = rawRangeStr.length();
                         String range = rawRangeStr.substring(0, len - 3);
                         mParamsPreference.setDatingRange(mContext, range);
@@ -327,7 +347,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        final int timeInterval = position + 1;
+                        final int posVal = position;
+                        final int timeInterval = posVal + 1;
                         Calendar calendar = Calendar.getInstance();
                         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                         calendar.setTime(new Date());
@@ -368,7 +389,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        String regionStr = regionStrList[position];
+                        final int posVal = position;
+                        String regionStr = regionStrList[posVal];
                         mParamsPreference.setRoomRegion(mContext, regionStr);
                         Log.d(TAG, " inside the popupBase click listener, and the params we transfer are : " + regionStr);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_REGION_FILTERED, regionStr).sendToTarget();
@@ -396,9 +418,12 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        String rangeStr = room_distance[position];
-                        mParamsPreference.setRoomRange(mContext, rangeStr);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_RANGE_FILTERED, rangeStr).sendToTarget();
+                        final int posVal = position;
+                        String rawRangeStr = room_distance[posVal];
+                        int len = rawRangeStr.length();
+                        String range = rawRangeStr.substring(0, len - 3);
+                        mParamsPreference.setRoomRange(mContext, range);
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_RANGE_FILTERED, range).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -450,7 +475,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        int apprisalValSort = position + 2;
+                        final int posVal = position;
+                        int apprisalValSort = posVal + 2;
                         String apprisalStr = String.valueOf(apprisalValSort);
                         mParamsPreference.setRoomApprisal(mContext, apprisalStr);
                         Log.d(TAG, " inside the FilterOnClickListener --> the apprisal sort value we get from user are : " + apprisalValSort);

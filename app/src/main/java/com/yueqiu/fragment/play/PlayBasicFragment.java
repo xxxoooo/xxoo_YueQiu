@@ -309,6 +309,9 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                     setEmptyViewGone();
                     List<PlayInfo> cacheList = (List<PlayInfo>) msg.obj;
                     mList.addAll(cacheList);
+                    if(mList.isEmpty()){
+                        setEmptyViewVisible();
+                    }
                     break;
                 case PublicConstant.GET_SUCCESS:
                     setEmptyViewGone();

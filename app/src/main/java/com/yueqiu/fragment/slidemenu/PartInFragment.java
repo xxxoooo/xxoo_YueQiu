@@ -79,6 +79,8 @@ public class PartInFragment extends SlideMenuBasicFragment{
                     setEmptyViewGone();
                     List<PartInInfo> cacheList = (List<PartInInfo>) msg.obj;
                     mList.addAll(cacheList);
+                    if(mList.isEmpty())
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
                     break;
                 case PublicConstant.GET_SUCCESS:
                     setEmptyViewGone();

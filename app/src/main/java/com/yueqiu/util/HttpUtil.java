@@ -1,30 +1,21 @@
 package com.yueqiu.util;
 
 import android.util.Log;
-import android.widget.HeterogeneousExpandableList;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -88,16 +79,16 @@ public class HttpUtil
             conn.setDoOutput(true);
             conn.connect();
             StringBuilder result = new StringBuilder();
-            if(conn.getResponseCode() == 200)
-            {
+            if (conn.getResponseCode() == 200) {
                 InputStream in = conn.getInputStream();
-                BufferedInputStream bis = new BufferedInputStream(in);
-                byte [] data = new byte[1024];
-                while(bis.read(data) > 0)
-                {
+//                BufferedInputStream bis = new BufferedInputStream(in);
+                byte[] data = new byte[1024];
+                while ( -1 != in.read(data,0,data.length)) {
                     result.append(new String(data));
-                }
+                 }
+                in.close();
             }
+            Log.d("wy","qq");
             conn.disconnect();
             return result.toString().trim();
         } catch (MalformedURLException e) {
@@ -228,6 +219,6 @@ public class HttpUtil
 
     private static void log(String msg)
     {
-        Log.i(TAG, "msg is ->"+ msg);
+        Log.i("wy", "msg is ->"+ msg);
     }
 }

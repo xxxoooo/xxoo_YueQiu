@@ -67,13 +67,38 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="@color/devide_line"/>
-    <ListView
-        android:id="@+id/billiard_group_detail_listview"
+    <ScrollView
+        android:id="@+id/billiard_group_detail_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="8.2"
-        android:divider="@null"
-        android:scrollbars="none"/>
+        android:scrollbars="none"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/group_detail_content_container"
+            android:orientation="vertical"
+            android:padding="5dp"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/group_detail_title"
+                android:textSize="16sp"
+                android:textColor="@color/md__defaultBackground"
+                android:padding="3dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/group_detail_content"
+                android:textSize="14sp"
+                android:textColor="@color/search_distance_color"
+                android:padding="3dp"/>
+
+        </LinearLayout>
+
+     </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"

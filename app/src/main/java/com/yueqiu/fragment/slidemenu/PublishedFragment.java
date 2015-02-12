@@ -217,6 +217,8 @@ public class PublishedFragment extends SlideMenuBasicFragment {
                     setEmptyViewGone();
                     List<PublishedInfo> cacheList = (List<PublishedInfo>) msg.obj;
                     mList.addAll(cacheList);
+                    if(mList.isEmpty())
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
                     break;
                 case PublicConstant.GET_SUCCESS:
                     setEmptyViewGone();

@@ -97,23 +97,20 @@ public class NearbyFragmentsCommonUtils{
                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
     }
 
-    public static void setFragmentEmptyTextView(Context context, final PullToRefreshListView listView, final String emptyText, boolean disable)
-    {
-        TextView emptyView = new TextView(context);
-        emptyView.setGravity(Gravity.CENTER);
-        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        emptyView.setTextColor(context.getResources().getColor(R.color.md__defaultBackground));
-        emptyView.setText(emptyText);
-        if (! disable)
-        {
-            listView.setEmptyView(emptyView);
-        } else
-        {
-            //listView.setEmptyView(null);
-            emptyView.setVisibility(View.GONE);
-        }
-
-    }
+//    public static void setFragmentEmptyTextView(Context context, final PullToRefreshListView listView, TextView emptyView,final String emptyText, boolean disable)
+//    {
+//        emptyView.setGravity(Gravity.CENTER);
+//        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+//        emptyView.setTextColor(context.getResources().getColor(R.color.md__defaultBackground));
+//        emptyView.setText(emptyText);
+//        if (disable)
+//        {
+//            emptyView.setVisibility(View.GONE);
+//        } else
+//        {
+//            listView.setEmptyView(emptyView);
+//        }
+//    }
 
     public static PopupWindow getFilterPopupWindow(Context context, View anchorView, View popupLayoutView)
     {
