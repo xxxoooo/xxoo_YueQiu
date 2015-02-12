@@ -12,6 +12,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Gravity;
@@ -51,6 +52,7 @@ import java.util.Map;
  * Created by wangyun on 15/1/20.
  */
 public abstract class SlideMenuBasicFragment extends Fragment {
+    private static final String TAG = "SlideMenu";
     protected Activity mActivity;
     protected View mView;
     protected ProgressBar mPreProgress;
@@ -60,7 +62,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
     protected PullToRefreshListView mPullToRefreshListView;
     protected ListView mListView;
     protected int mType;
-    protected boolean mLoadMore,mRefresh,mIsSavedInstance;
+    protected boolean mLoadMore,mRefresh,mIsSavedInstance,mIsListEmpty;
     private BasicHandler mHandler;
     protected int mStart_no = 0,mEnd_no = 9;
     protected int mCurrPosition;
@@ -110,12 +112,12 @@ public abstract class SlideMenuBasicFragment extends Fragment {
 
 
     }
-    protected void setEmptyViewVisible(){
+    protected void setEmptyViewVisible(String text){
 
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
         mEmptyView.setTextColor(mActivity.getResources().getColor(R.color.md__defaultBackground));
-        mEmptyView.setText(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+        mEmptyView.setText(text);
         mPullToRefreshListView.setEmptyView(mEmptyView);
     }
 
@@ -151,6 +153,8 @@ public abstract class SlideMenuBasicFragment extends Fragment {
         @Override
         protected void onPostExecute(JSONObject jsonResult) {
             super.onPostExecute(jsonResult);
+
+            Log.d(TAG,"jsonResult is ->" + jsonResult);
             mPreProgress.setVisibility(View.GONE);
             mPreText.setVisibility(View.GONE);
 
@@ -198,7 +202,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
             switch (msg.what){
                 case PublicConstant.NO_RESULT:
                     if(mList.isEmpty()) {
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
                     }else{
                         if(mLoadMore)
                             Utils.showToast(mActivity, mActivity.getString(R.string.no_more_info, mEmptyTypeStr));
@@ -211,19 +215,19 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                         Utils.showToast(mActivity, (String) msg.obj);
                     }
                     if(mList.isEmpty()) {
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
                     }
                     break;
                 case PublicConstant.TIME_OUT:
                     Utils.showToast(mActivity,mActivity.getString(R.string.http_request_time_out));
                     if(mList.isEmpty()) {
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
                     }
                     break;
                 case PublicConstant.NO_NETWORK:
                     Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
                     if(mList.isEmpty())
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
                     break;
             }
         }
@@ -333,6 +337,9 @@ public abstract class SlideMenuBasicFragment extends Fragment {
             mPublishUpdateList.clear();
             mFavorInsertList.clear();
             mFavorInsertList.clear();
+            if(mEmptyView.getVisibility() == View.VISIBLE){
+                mEmptyView.setVisibility(View.GONE);
+            }
             if(Utils.networkAvaiable(mActivity)){
                mParamsMap.put(HttpConstants.Published.START_NO,0);
                mParamsMap.put(HttpConstants.Published.END_NO, 9);
@@ -361,7 +368,12 @@ public abstract class SlideMenuBasicFragment extends Fragment {
             mFavorInsertList.clear();
             mFavorUpdateList.clear();
             mCurrPosition = mList.size() ;
-            if(mBeforeCount != mAfterCount && !mRefresh){
+
+            if(mEmptyView.getVisibility() == View.VISIBLE){
+                mEmptyView.setVisibility(View.GONE);
+            }
+
+            if(mBeforeCount != mAfterCount && mRefresh){
                   mStart_no = mEnd_no + (mAfterCount-mBeforeCount);
                   mEnd_no += 10 + (mAfterCount-mBeforeCount);
              }else{

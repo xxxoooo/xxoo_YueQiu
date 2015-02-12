@@ -43,6 +43,7 @@
 
     <style name="ActionBar" parent="android:Widget.ActionBar">
         <item name="android:background">@color/actionbar_color</item>
+        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_example</item>
         <item name="android:icon">@android:color/transparent</item>
         <item name="android:titleTextStyle">@style/ActionBar.TitleText</item>
     </style>

@@ -3,6 +3,7 @@ package com.yueqiu.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayInfo implements Parcelable{
@@ -22,7 +23,7 @@ public class PlayInfo implements Parcelable{
     private String contact;
     private String phone;
     //TODO:已参加人员的list
-    public List<UserInfo> mJoinList;
+    public List<UserInfo> mJoinList = new ArrayList<UserInfo>();
 
     public String getTable_id() {
         return table_id;

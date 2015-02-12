@@ -9,7 +9,7 @@
     android:padding="10dp"
     android:background="@drawable/published_item_bg"
     android:layout_weight="4">
-    <ImageView
+    <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/published_item_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

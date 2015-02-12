@@ -178,11 +178,7 @@ public class PublishedFragment extends SlideMenuBasicFragment {
         mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
     }
 
-    protected void setEmptyViewVisible(){
-        super.setEmptyViewVisible();
-        mEmptyView.setText(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
-        mPullToRefreshListView.setEmptyView(mEmptyView);
-    }
+
 
     @Override
     protected void unCheckAll() {
@@ -225,11 +221,11 @@ public class PublishedFragment extends SlideMenuBasicFragment {
                 case PublicConstant.GET_SUCCESS:
                     setEmptyViewGone();
                     mBeforeCount = mList.size();
+                    mIsListEmpty = mList.isEmpty();
                     List<PublishedInfo> list = (List<PublishedInfo>) msg.obj;
                     for(PublishedInfo info : list){
                         if (!mList.contains(info)) {
-
-                            if(mRefresh) {
+                            if(mRefresh && !mIsListEmpty) {
                                 mList.add(0,info);
                             }else{
                                 if(mIsSavedInstance){
@@ -265,10 +261,9 @@ public class PublishedFragment extends SlideMenuBasicFragment {
 //                        YueQiuApp.sPublishMap.put(identity,info);
                         /////////////////////////////////////////////////////
                     }
-
                     mAfterCount = mList.size();
                     if(mList.isEmpty()){
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(mActivity.getString(R.string.no_your_published_info,mEmptyTypeStr));
                     }else{
                         if(mRefresh){
                             if (mAfterCount == mBeforeCount) {

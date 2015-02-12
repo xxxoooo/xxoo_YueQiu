@@ -17,6 +17,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -56,6 +57,7 @@ import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.CustomDialogBuilder;
 import com.yueqiu.view.GroupTopicScrollView;
+import com.yueqiu.view.IssueImageView;
 import com.yueqiu.view.dlgeffect.EffectsType;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
@@ -70,7 +72,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class GroupIssueTopic extends FragmentActivity implements View.OnClickListener,AdapterView.OnItemClickListener,
+public class GroupIssueTopic extends FragmentActivity implements View.OnClickListener,
         EmojiconsFragment.OnEmojiconBackspaceClickedListener,EmojiconGridFragment.OnEmojiconClickedListener
 {
     private static final String TAG = "IssueTopic";
@@ -81,9 +83,10 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
     private EditText    mTitleEdit;
     private EmojiconEditText mContentEdit;
     private TextView    mTopicTypeTv,mTakePhoto,mSelectPhoto;
-    private ImageView   mIvExpression,mBackExpression,mIvAddImg;//TODO:图片按下的效果
+    private ImageView   mIvExpression,mBackExpression;//TODO:图片按下的效果
+    private IssueImageView mIvAddImg;
     private View        mLinearType;
-    private GridView    mGridView;
+//    private GridView    mGridView;
     private RelativeLayout mRootView,mExpressRelative;
     private GroupTopicScrollView mRootScrollView;
     private FrameLayout mEmotionContainer;
@@ -104,15 +107,15 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
     private boolean mIsEmotionShow;
 
     private CustomDialogBuilder mDlgBuilder;
-    private TopicImgAdapter mImgAdapter;
+//    private TopicImgAdapter mImgAdapter;
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
     private EmojiconsFragment mEmojiFragment;
 
     private Map<String,String> mParamsMap = new HashMap<String, String>();
     private Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
-    private List<ImageView> mAddViewList = new ArrayList<ImageView>();
-    private List<BitmapBean> mBitmapBeanList = new ArrayList<BitmapBean>();
+    private List<IssueImageView> mAddViewList = new ArrayList<IssueImageView>();
+//    private List<BitmapBean> mBitmapBeanList = new ArrayList<BitmapBean>();
 
 
     @Override
@@ -156,11 +159,11 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
                 if(mIsKeyboardShow){
                     mEmotionContainer.setVisibility(View.GONE);
                     mAddImgContainer.setVisibility(View.VISIBLE);
-                    if(!mBitmapBeanList.isEmpty()){
-                        mGridView.setVisibility(View.GONE);
-                    }else{
-                        mGridView.setVisibility(View.VISIBLE);
-                    }
+//                    if(!mBitmapBeanList.isEmpty()){
+//                        mGridView.setVisibility(View.GONE);
+//                    }else{
+//                        mGridView.setVisibility(View.VISIBLE);
+//                    }
                     mIsEmotionShow = false;
                 }else{
                     mOnKeyboardHideListener.onKeyBoardHide();
@@ -202,8 +205,8 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
         mContentEdit = (EmojiconEditText) findViewById(R.id.group_issue_content);
         mTopicTypeTv = (TextView) findViewById(R.id.group_issue_type);
         mLinearType = findViewById(R.id.group_issue_type_linear);
-        mGridView = (GridView) findViewById(R.id.topic_grid_view);
-        mGridView.setVisibility(View.GONE);
+//        mGridView = (GridView) findViewById(R.id.topic_grid_view);
+//        mGridView.setVisibility(View.GONE);
         mRootView = (RelativeLayout) findViewById(R.id.topic_root_relative_view);
         mExpressRelative = (RelativeLayout) findViewById(R.id.topic_expression_relative);
         mRootScrollView = (GroupTopicScrollView) findViewById(R.id.topic_scroll_view);
@@ -211,7 +214,7 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
         mAddImgContainer = (LinearLayout) findViewById(R.id.topic_img_container);
 
         mIvExpression = (ImageView) findViewById(R.id.group_issue_express);
-        mIvAddImg = (ImageView) findViewById(R.id.group_issue_add_img);
+        mIvAddImg = (IssueImageView) findViewById(R.id.group_issue_add_img);
         mBackExpression = (ImageView) findViewById(R.id.topic_backup_expression);
 
         mPreText = (TextView) findViewById(R.id.pre_text);
@@ -223,9 +226,9 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
         mPreProgress.getIndeterminateDrawable().setBounds(bounds);
         mPreText.setText(getString(R.string.activity_issuing));
 
-        mImgAdapter = new TopicImgAdapter();
-        mGridView.setAdapter(mImgAdapter);
-        mGridView.setOnItemClickListener(this);
+//        mImgAdapter = new TopicImgAdapter();
+//        mGridView.setAdapter(mImgAdapter);
+//        mGridView.setOnItemClickListener(this);
 
         mLinearType.setOnClickListener(this);
         mIvAddImg.setOnClickListener(this);
@@ -379,11 +382,11 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
                 if(mIsEmotionShow){
                     mEmotionContainer.setVisibility(View.GONE);
                     mAddImgContainer.setVisibility(View.VISIBLE);
-                    if(!mBitmapBeanList.isEmpty()){
-                        mGridView.setVisibility(View.VISIBLE);
-                    }else{
-                        mGridView.setVisibility(View.GONE);
-                    }
+//                    if(!mBitmapBeanList.isEmpty()){
+//                        mGridView.setVisibility(View.VISIBLE);
+//                    }else{
+//                        mGridView.setVisibility(View.GONE);
+//                    }
                     mIsEmotionShow = false;
                 }else {
                     finish();
@@ -426,11 +429,11 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
                 if(mIsEmotionShow){
                     mEmotionContainer.setVisibility(View.GONE);
                     mAddImgContainer.setVisibility(View.VISIBLE);
-                    if(!mBitmapBeanList.isEmpty()){
-                        mGridView.setVisibility(View.VISIBLE);
-                    }else{
-                        mGridView.setVisibility(View.GONE);
-                    }
+//                    if(!mBitmapBeanList.isEmpty()){
+//                        mGridView.setVisibility(View.VISIBLE);
+//                    }else{
+//                        mGridView.setVisibility(View.GONE);
+//                    }
                     mIsEmotionShow = false;
                 }
                 //表情没有弹起
@@ -446,31 +449,41 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
                 }
                 break;
             case R.id.group_issue_add_img:
-                mDlgBuilder = CustomDialogBuilder.getsInstance(this);
-                mDlgBuilder.withTitle(getString(R.string.select_photo))
-                        .withTitleColor(Color.WHITE)
-                        .withDividerColor(getResources().getColor(R.color.search_distance_color))
-                        .withMessage(null)
-                        .isCancelableOnTouchOutside(true)
-                        .isCancelable(true)
-                        .withDialogColor(R.color.actionbar_color)
-                        .withDuration(700)
-                        .withEffect(EffectsType.SlideLeft)
-                        .setSureButtonVisible(false)
-                        .withCancelButtonText(getString(R.string.btn_message_cancel))
-                        .setCustomView(R.layout.dialog_select_photo, v.getContext())
-                        .setCancelButtonClick(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                mDlgBuilder.dismiss();
-                            }
-                        })
-                        .show();
+                if(mIvAddImg.getBitmapBean() != null){
+                    BitmapBean bean = mIvAddImg.getBitmapBean();
+                    if(bean == null)
+                        return ;
+                    FragmentManager fm = getSupportFragmentManager();
+                    String imgPath = bean.imgFilePath;
+                    Uri imgUri = bean.imgUri;
+                    ImageFragment.newInstance(imgPath,imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
+                }else {
+                    mDlgBuilder = CustomDialogBuilder.getsInstance(this);
+                    mDlgBuilder.withTitle(getString(R.string.select_photo))
+                            .withTitleColor(Color.WHITE)
+                            .withDividerColor(getResources().getColor(R.color.search_distance_color))
+                            .withMessage(null)
+                            .isCancelableOnTouchOutside(true)
+                            .isCancelable(true)
+                            .withDialogColor(R.color.actionbar_color)
+                            .withDuration(700)
+                            .withEffect(EffectsType.SlideLeft)
+                            .setSureButtonVisible(false)
+                            .withCancelButtonText(getString(R.string.btn_message_cancel))
+                            .setCustomView(R.layout.dialog_select_photo, v.getContext())
+                            .setCancelButtonClick(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mDlgBuilder.dismiss();
+                                }
+                            })
+                            .show();
 
-                mTakePhoto = (TextView) mDlgBuilder.findViewById(R.id.take_photo_now);
-                mSelectPhoto = (TextView) mDlgBuilder.findViewById(R.id.select_photo_from_album);
-                mTakePhoto.setOnClickListener(this);
-                mSelectPhoto.setOnClickListener(this);
+                    mTakePhoto = (TextView) mDlgBuilder.findViewById(R.id.take_photo_now);
+                    mSelectPhoto = (TextView) mDlgBuilder.findViewById(R.id.select_photo_from_album);
+                    mTakePhoto.setOnClickListener(this);
+                    mSelectPhoto.setOnClickListener(this);
+                }
 
                 break;
             case R.id.take_photo_now:
@@ -535,9 +548,16 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
             bmpBean.bitmapDrawable = bitmap;
             bmpBean.imgFilePath = mImgFilePath;
             bmpBean.imgUri = null;
-            mBitmapBeanList.add(bmpBean);
-            mImgAdapter.notifyDataSetChanged();
-            mGridView.setVisibility(View.VISIBLE);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth,mAddViewHeight);
+            params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
+            params.gravity = Gravity.CENTER_VERTICAL;
+            mIvAddImg.setLayoutParams(params);
+            mIvAddImg.setBitmapBean(bmpBean);
+            mIvAddImg.setImageDrawable(bmpBean.bitmapDrawable);
+            mAddViewList.add(mIvAddImg);
+//            mBitmapBeanList.add(bmpBean);
+//            mImgAdapter.notifyDataSetChanged();
+//            mGridView.setVisibility(View.VISIBLE);
 //            photoView.setImageDrawable(bitmap);
 //            photoView.setScaleType(ImageView.ScaleType.FIT_XY);
 //            mPhotoContainer.addView(photoView);
@@ -550,23 +570,31 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
             bmpBean.bitmapDrawable = drawable;
             bmpBean.imgFilePath = null;
             bmpBean.imgUri = imageFileUri;
-            mBitmapBeanList.add(bmpBean);
-            mImgAdapter.notifyDataSetChanged();
-            mGridView.setVisibility(View.VISIBLE);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth,mAddViewHeight);
+            params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
+            params.gravity = Gravity.CENTER_VERTICAL;
+            mIvAddImg.setLayoutParams(params);
+            mIvAddImg.setBitmapBean(bmpBean);
+            mIvAddImg.setImageDrawable(bmpBean.bitmapDrawable);
+            mIvAddImg.setBackgroundColor(getResources().getColor(android.R.color.black));
+            mAddViewList.add(mIvAddImg);
+//            mBitmapBeanList.add(bmpBean);
+//            mImgAdapter.notifyDataSetChanged();
+//            mGridView.setVisibility(View.VISIBLE);
         }
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        BitmapBean bean = mBitmapBeanList.get(position);
-        if(bean == null)
-            return ;
-
-        FragmentManager fm = getSupportFragmentManager();
-        String imgPath = bean.imgFilePath;
-        Uri imgUri = bean.imgUri;
-        ImageFragment.newInstance(imgPath,imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
-    }
+//    @Override
+//    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//        BitmapBean bean = mBitmapBeanList.get(position);
+//        if(bean == null)
+//            return ;
+//
+//        FragmentManager fm = getSupportFragmentManager();
+//        String imgPath = bean.imgFilePath;
+//        Uri imgUri = bean.imgUri;
+//        ImageFragment.newInstance(imgPath,imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
+//    }
 
 
     @Override
@@ -593,65 +621,65 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
         }
     }
 
-    private class TopicImgAdapter extends BaseAdapter{
-
-
-        @Override
-        public int getCount() {
-            return mBitmapBeanList.size();
-        }
-
-
-        @Override
-        public Object getItem(int position) {
-            return mBitmapBeanList.get(position);
-        }
-
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-            if(convertView == null){
-                convertView = LayoutInflater.from(GroupIssueTopic.this).inflate(R.layout.item_topic_grid_view,null);
-                holder = new ViewHolder();
-                holder.imageView = (ImageView) convertView.findViewById(R.id.item_topic_imageview);
-                convertView.setTag(holder);
-            }else{
-                holder = (ViewHolder) convertView.getTag();
-            }
-            holder.imageView.setLayoutParams(new GridView.LayoutParams(mAddViewWidth,mAddViewHeight));
-            holder.imageView.getRootView().setBackgroundColor(getResources().getColor(android.R.color.black));
-            holder.imageView.setImageDrawable(mBitmapBeanList.get(position).bitmapDrawable);
-            mAddViewList.add(holder.imageView);
-            return convertView;
-        }
-
-        private class ViewHolder{
-            ImageView imageView;
-        }
-    }
+//    private class TopicImgAdapter extends BaseAdapter{
+//
+//
+//        @Override
+//        public int getCount() {
+//            return mBitmapBeanList.size();
+//        }
+//
+//
+//        @Override
+//        public Object getItem(int position) {
+//            return mBitmapBeanList.get(position);
+//        }
+//
+//
+//        @Override
+//        public long getItemId(int position) {
+//            return position;
+//        }
+//
+//
+//        @Override
+//        public View getView(int position, View convertView, ViewGroup parent) {
+//            ViewHolder holder;
+//            if(convertView == null){
+//                convertView = LayoutInflater.from(GroupIssueTopic.this).inflate(R.layout.item_topic_grid_view,null);
+//                holder = new ViewHolder();
+//                holder.imageView = (ImageView) convertView.findViewById(R.id.item_topic_imageview);
+//                convertView.setTag(holder);
+//            }else{
+//                holder = (ViewHolder) convertView.getTag();
+//            }
+//            holder.imageView.setLayoutParams(new GridView.LayoutParams(mAddViewWidth,mAddViewHeight));
+//            holder.imageView.getRootView().setBackgroundColor(getResources().getColor(android.R.color.black));
+//            holder.imageView.setImageDrawable(mBitmapBeanList.get(position).bitmapDrawable);
+//            mAddViewList.add(holder.imageView);
+//            return convertView;
+//        }
+//
+//        private class ViewHolder{
+//            ImageView imageView;
+//        }
+//    }
 
     private OnKeyboardHideListener mOnKeyboardHideListener = new OnKeyboardHideListener() {
         @Override
         public void onKeyBoardHide() {
             if(mIsEmotionShow){
                 mEmotionContainer.setVisibility(View.VISIBLE);
-                mAddImgContainer.setVisibility(View.INVISIBLE);
-                mGridView.setVisibility(View.GONE);
+                mAddImgContainer.setVisibility(View.GONE);
+//                mGridView.setVisibility(View.GONE);
             }else{
                 mEmotionContainer.setVisibility(View.GONE);
                 mAddImgContainer.setVisibility(View.VISIBLE);
-                if(mBitmapBeanList.isEmpty()){
-                    mGridView.setVisibility(View.GONE);
-                }else{
-                    mGridView.setVisibility(View.VISIBLE);
-                }
+//                if(mBitmapBeanList.isEmpty()){
+//                    mGridView.setVisibility(View.GONE);
+//                }else{
+//                    mGridView.setVisibility(View.VISIBLE);
+//                }
             }
         }
     };

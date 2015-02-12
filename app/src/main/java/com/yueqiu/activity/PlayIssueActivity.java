@@ -2,74 +2,131 @@ package com.yueqiu.activity;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fourmob.datetimepicker.date.DatePickerDialog;
+import com.rockerhieu.emojicon.EmojiconEditText;
+import com.rockerhieu.emojicon.EmojiconGridFragment;
+import com.rockerhieu.emojicon.EmojiconsFragment;
+import com.rockerhieu.emojicon.emoji.Emojicon;
 import com.sleepbot.datetimepicker.time.RadialPickerLayout;
 import com.sleepbot.datetimepicker.time.TimePickerDialog;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 
+import com.yueqiu.bean.BitmapBean;
+import com.yueqiu.bean.OnKeyboardHideListener;
 import com.yueqiu.bean.PlayInfo;
 import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.PublishedDao;
+import com.yueqiu.fragment.group.ImageFragment;
+import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.view.CustomDialogBuilder;
+import com.yueqiu.view.GroupTopicScrollView;
+import com.yueqiu.view.IssueImageView;
+import com.yueqiu.view.dlgeffect.EffectsType;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-public class PlayIssueActivity extends FragmentActivity implements View.OnClickListener,DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener{
+public class PlayIssueActivity extends FragmentActivity implements View.OnClickListener,
+        DatePickerDialog.OnDateSetListener, TimePickerDialog.OnTimeSetListener,
+        EmojiconsFragment.OnEmojiconBackspaceClickedListener,EmojiconGridFragment.OnEmojiconClickedListener
+{
 
+    private static final int CAMERA_REQUEST = 10;
+    private static final int ALBUM_REQUEST = 11;
+    private static final String DIALOG_IMAGE = "image";
     public static final String DATEPICKER_TAG = "datepicker";
     public static final String TIMEPICKER_TAG = "timepicker";
     private static final int START_FLAG = 0;
     private static final int END_FLAG   = 1;
-    private EditText mTitleEdit,mContactEdit,mPhoneEdit,mIllustrationEdit;
-    private TextView mLocationTv,mStartTimeTv,mEndTimeTv,mChargeModuleTv,mPreTextView;
+    private EditText mTitleEdit,mContactEdit,mPhoneEdit;
+    private EmojiconEditText mIllustrationEdit;
+    private TextView mLocationTv,mStartTimeTv,mEndTimeTv,mChargeModuleTv,mPreTextView,mTakePhoto,mSelectPhoto;
     private String mContactStr,mPhoneNumberStr;
     private DatePickerDialog mDatePickerDialog;
     private TimePickerDialog mTimePickerDialog;
     private StringBuilder mStartTimeStr = new StringBuilder(),
             mEndTimeStr = new StringBuilder();
+    private String mImgFilePath;
     private int mTimeFlag;
     private TextView mEtActivityType;
-    private ImageView mIvAddImg, mIvExpression;
+    private ImageView  mIvExpression;
+    private IssueImageView mIvAddImg;
+//    private GridView mGridView;
+    private LinearLayout mAddImgContainer;
+    private GroupTopicScrollView mScrollView;
+    private RelativeLayout mRootView;
+    private FrameLayout mEmotionContainer;
     private static final int SELECT_TYPE = 0x02;
     private int mType = 0;
     private int mModel = 0;
 
+    private int mAddViewWidth, mAddViewHeight;
+    private int mKeyboardHeight;
+    private boolean mIsKeyboardShow,mIsEmotionShow;
+
     private ProgressBar mPreProgress;
     private Drawable mProgressDrawable;
-    private PublishedDao mPublishedDao;
     //TODO:发布成功后他应该把发布成功的table_id返回来
     private PlayInfo mInfo;
+
+    private CustomDialogBuilder mDlgBuilder;
+    private FragmentManager mFragmentManager;
+    private FragmentTransaction mFragmentTransaction;
+    private EmojiconsFragment mEmojiFragment;
+//    private TopicImgAdapter mImgAdapter;
+
+    private List<IssueImageView> mAddViewList = new ArrayList<IssueImageView>();
+//    private List<BitmapBean> mBitmapBeanList = new ArrayList<BitmapBean>();
 
 
     private Handler mHandler = new Handler()
@@ -126,8 +183,68 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         setContentView(R.layout.activity_play_issues);
         initActionBar();
         initView();
-        mPublishedDao = DaoFactory.getPublished(this);
+        mFragmentManager = getSupportFragmentManager();
+
+        ViewTreeObserver addImgObserver = mIvAddImg.getViewTreeObserver();
+        addImgObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mAddViewWidth = mIvAddImg.getWidth();
+                mAddViewHeight = mIvAddImg.getHeight();
+            }
+        });
+        ViewTreeObserver rootViewObserver = mRootView.getViewTreeObserver();
+        rootViewObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect rect = new Rect();
+                mRootView.getRootView().getWindowVisibleDisplayFrame(rect);
+                int screenHeight = mRootView.getRootView().getHeight();
+                mKeyboardHeight = screenHeight - (rect.bottom - rect.top);
+                if(mIsKeyboardShow){
+                    mEmotionContainer.setVisibility(View.GONE);
+                    mAddImgContainer.setVisibility(View.VISIBLE);
+//                    if(!mBitmapBeanList.isEmpty()){
+//                        mGridView.setVisibility(View.GONE);
+//                    }else{
+//                        mGridView.setVisibility(View.VISIBLE);
+//                    }
+                    mIsEmotionShow = false;
+                }else{
+                    mOnKeyboardHideListener.onKeyBoardHide();
+                }
+            }
+        });
+        mScrollView.setOnSizeChangeListener(new GroupTopicScrollView.OnSizeChangedListener() {
+            @Override
+            public void onSizeChanged(int w, int h, int oldw, int oldh) {
+                if(oldh > h){
+                    mIsKeyboardShow = true;
+                }else{
+                    mIsKeyboardShow = false;
+                }
+            }
+        });
     }
+
+    private OnKeyboardHideListener mOnKeyboardHideListener = new OnKeyboardHideListener() {
+        @Override
+        public void onKeyBoardHide() {
+            if(mIsEmotionShow){
+                mEmotionContainer.setVisibility(View.VISIBLE);
+                mAddImgContainer.setVisibility(View.GONE);
+//                mGridView.setVisibility(View.GONE);
+            }else{
+                mEmotionContainer.setVisibility(View.GONE);
+                mAddImgContainer.setVisibility(View.VISIBLE);
+//                if(mBitmapBeanList.isEmpty()){
+//                    mGridView.setVisibility(View.GONE);
+//                }else{
+//                    mGridView.setVisibility(View.VISIBLE);
+//                }
+            }
+        }
+    };
     private void initActionBar(){
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -138,15 +255,22 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         mTitleEdit          = (EditText) findViewById(R.id.activitie_title_edit_text);
         mContactEdit    = (EditText) findViewById(R.id.activity_contact_edit_text);
         mPhoneEdit      = (EditText) findViewById(R.id.activity_contact_phone_edit_text);
-        mIllustrationEdit   = (EditText) findViewById(R.id.activity_illustrate_edit_text);
+        mIllustrationEdit   = (EmojiconEditText) findViewById(R.id.activity_illustrate_edit_text);
 
         mStartTimeTv      = (TextView) findViewById(R.id.activity_start_time_text);
         mEndTimeTv        = (TextView) findViewById(R.id.activity_end_time_text);
         mChargeModuleTv   = (TextView) findViewById(R.id.activity_charge_module_text);
         mLocationTv       = (TextView) findViewById(R.id.activity_location_text);
 
+//        mGridView = (GridView) findViewById(R.id.play_topic_grid_view);
+//        mGridView.setVisibility(View.GONE);
+        mAddImgContainer = (LinearLayout) findViewById(R.id.play_add_img_container);
+        mScrollView = (GroupTopicScrollView) findViewById(R.id.play_topic_scroll_view);
+        mRootView = (RelativeLayout) findViewById(R.id.play_topic_root_relative_view);
+        mEmotionContainer = (FrameLayout) findViewById(R.id.play_topic_emotion_container);
+
         mEtActivityType = (TextView) findViewById(R.id.activitie_title_edit_type);
-        mIvAddImg = (ImageView) findViewById(R.id.activitiy_issues_iv_add_img);
+        mIvAddImg = (IssueImageView) findViewById(R.id.activitiy_issues_iv_add_img);
         mIvExpression = (ImageView) findViewById(R.id.activity_issues_expression);
 
         mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
@@ -175,6 +299,11 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         mEtActivityType.setOnClickListener(this);
         mIvExpression.setOnClickListener(this);
         mIvAddImg.setOnClickListener(this);
+
+
+//        mImgAdapter = new TopicImgAdapter();
+//        mGridView.setAdapter(mImgAdapter);
+//        mGridView.setOnItemClickListener(this);
 
 
     }
@@ -241,8 +370,88 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.activity_issues_expression:
+                if(mIsEmotionShow){
+                    mEmotionContainer.setVisibility(View.GONE);
+                    mAddImgContainer.setVisibility(View.VISIBLE);
+//                    if(!mBitmapBeanList.isEmpty()){
+//                        mGridView.setVisibility(View.VISIBLE);
+//                    }else{
+//                        mGridView.setVisibility(View.GONE);
+//                    }
+                    mIsEmotionShow = false;
+                }
+                //表情没有弹起
+                else{
+                    //设置表情弹起标志为true
+                    mIsEmotionShow = true;
+                    if(mIsKeyboardShow){
+                        Utils.dismissInputMethod(this,mIllustrationEdit);
+                    }else{
+                        mOnKeyboardHideListener.onKeyBoardHide();
+                    }
+
+                }
                 break;
             case R.id.activitiy_issues_iv_add_img:
+
+
+                if(mIvAddImg.getBitmapBean() != null){
+                    BitmapBean bean = mIvAddImg.getBitmapBean();
+                    if(bean == null)
+                        return ;
+                    FragmentManager fm = getSupportFragmentManager();
+                    String imgPath = bean.imgFilePath;
+                    Uri imgUri = bean.imgUri;
+                    ImageFragment.newInstance(imgPath,imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
+                }else {
+                    mDlgBuilder = CustomDialogBuilder.getsInstance(this);
+                    mDlgBuilder.withTitle(getString(R.string.select_photo))
+                            .withTitleColor(Color.WHITE)
+                            .withDividerColor(getResources().getColor(R.color.search_distance_color))
+                            .withMessage(null)
+                            .isCancelableOnTouchOutside(true)
+                            .isCancelable(true)
+                            .withDialogColor(R.color.actionbar_color)
+                            .withDuration(700)
+                            .withEffect(EffectsType.SlideLeft)
+                            .setSureButtonVisible(false)
+                            .withCancelButtonText(getString(R.string.btn_message_cancel))
+                            .setCustomView(R.layout.dialog_select_photo, v.getContext())
+                            .setCancelButtonClick(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    mDlgBuilder.dismiss();
+                                }
+                            })
+                            .show();
+
+                    mTakePhoto = (TextView) mDlgBuilder.findViewById(R.id.take_photo_now);
+                    mSelectPhoto = (TextView) mDlgBuilder.findViewById(R.id.select_photo_from_album);
+                    mTakePhoto.setOnClickListener(this);
+                    mSelectPhoto.setOnClickListener(this);
+                }
+                break;
+            case R.id.take_photo_now:
+                Uri imageFileUri = null;
+                if(FileUtil.isSDCardReady()){
+                    mImgFilePath = FileUtil.getSDCardPath() + "/yueqiu/" + UUID.randomUUID().toString() + ".jpg";
+                    File imageFile = new File(mImgFilePath);
+                    if(!imageFile.exists()){
+                        imageFile.getParentFile().mkdirs();
+                    }
+                    imageFileUri = Uri.fromFile(imageFile);
+                }
+                Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                captureIntent.putExtra(MediaStore.EXTRA_OUTPUT,imageFileUri);
+                startActivityForResult(captureIntent, CAMERA_REQUEST);
+                if(mDlgBuilder != null)
+                    mDlgBuilder.dismiss();
+                break;
+            case R.id.select_photo_from_album:
+                Intent albumIntent = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(albumIntent,ALBUM_REQUEST);
+                if(mDlgBuilder != null)
+                    mDlgBuilder.dismiss();
                 break;
             case R.id.activitie_title_edit_type:
                 Intent intentType = new Intent();
@@ -375,8 +584,6 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
                 mModel = SelectChargeModuleActivity.MODULE_AA;
             }
         }
-
-
         else if(requestCode == SELECT_TYPE && resultCode == RESULT_OK)
         {
             String type = data.getStringExtra("type");
@@ -401,9 +608,133 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
                 mType = 5;
             }
         }
+
+        //capture photo from camera
+        else if(requestCode == CAMERA_REQUEST && resultCode == RESULT_OK){
+            BitmapDrawable bitmap = ImgUtil.getThumbnailScaledBitmap(this, mImgFilePath, mAddViewWidth, mAddViewHeight);
+            BitmapBean bmpBean = new BitmapBean();
+            bmpBean.bitmapDrawable = bitmap;
+            bmpBean.imgFilePath = mImgFilePath;
+            bmpBean.imgUri = null;
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth,mAddViewHeight);
+            params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
+            params.gravity = Gravity.CENTER_VERTICAL;
+            mIvAddImg.setLayoutParams(params);
+            mIvAddImg.setBitmapBean(bmpBean);
+            mIvAddImg.setImageDrawable(bmpBean.bitmapDrawable);
+            mAddViewList.add(mIvAddImg);
+//            mBitmapBeanList.add(bmpBean);
+//            mImgAdapter.notifyDataSetChanged();
+//            mGridView.setVisibility(View.VISIBLE);
+        }
+
+        else if(requestCode == ALBUM_REQUEST && resultCode == RESULT_OK){
+            Uri imageFileUri = data.getData();
+            BitmapDrawable drawable = ImgUtil.getThumbnailScaleBitmapByUri(this,imageFileUri,mAddViewWidth,mAddViewHeight);
+            BitmapBean bmpBean = new BitmapBean();
+            bmpBean.bitmapDrawable = drawable;
+            bmpBean.imgFilePath = null;
+            bmpBean.imgUri = imageFileUri;
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth,mAddViewHeight);
+            params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
+            params.gravity = Gravity.CENTER_VERTICAL;
+            mIvAddImg.setLayoutParams(params);
+            mIvAddImg.setBitmapBean(bmpBean);
+            mIvAddImg.setImageDrawable(bmpBean.bitmapDrawable);
+            mIvAddImg.setBackgroundColor(getResources().getColor(android.R.color.black));
+            mAddViewList.add(mIvAddImg);
+//            mBitmapBeanList.add(bmpBean);
+//            mImgAdapter.notifyDataSetChanged();
+//            mGridView.setVisibility(View.VISIBLE);
+        }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mEmojiFragment = EmojiconsFragment.newInstance(false);
+        mFragmentTransaction = mFragmentManager.beginTransaction();
+        mFragmentTransaction.replace(R.id.play_topic_emotion_container, mEmojiFragment).commit();
+    }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ImgUtil.clearImageView(mAddViewList);
+        File dir = new File(FileUtil.getSdDirectory() + "/yueqiu/");
+        if(dir.exists()){
+            File[] files = dir.listFiles(new FileUtil.FileNameFilter("jpg"));
+            for(File file : files){
+                file.delete();
+            }
+        }
+    }
+
+//    @Override
+//    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//        BitmapBean bean = mBitmapBeanList.get(position);
+//        if(bean == null)
+//            return ;
+//
+//        FragmentManager fm = getSupportFragmentManager();
+//        String imgPath = bean.imgFilePath;
+//        Uri imgUri = bean.imgUri;
+//        ImageFragment.newInstance(imgPath,imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
+//    }
+
+    @Override
+    public void onEmojiconBackspaceClicked(View v) {
+        EmojiconsFragment.backspace(mIllustrationEdit);
+    }
+
+    @Override
+    public void onEmojiconClicked(Emojicon emojicon) {
+        EmojiconsFragment.input(mIllustrationEdit,emojicon);
+    }
+
+//    private class TopicImgAdapter extends BaseAdapter {
+//
+//
+//        @Override
+//        public int getCount() {
+//            return mBitmapBeanList.size();
+//        }
+//
+//
+//        @Override
+//        public Object getItem(int position) {
+//            return mBitmapBeanList.get(position);
+//        }
+//
+//
+//        @Override
+//        public long getItemId(int position) {
+//            return position;
+//        }
+//
+//
+//        @Override
+//        public View getView(int position, View convertView, ViewGroup parent) {
+//            ViewHolder holder;
+//            if(convertView == null){
+//                convertView = LayoutInflater.from(PlayIssueActivity.this).inflate(R.layout.item_topic_grid_view,null);
+//                holder = new ViewHolder();
+//                holder.imageView = (ImageView) convertView.findViewById(R.id.item_topic_imageview);
+//                convertView.setTag(holder);
+//            }else{
+//                holder = (ViewHolder) convertView.getTag();
+//            }
+//            holder.imageView.setLayoutParams(new GridView.LayoutParams(mAddViewWidth,mAddViewHeight));
+//            holder.imageView.getRootView().setBackgroundColor(getResources().getColor(android.R.color.black));
+//            holder.imageView.setImageDrawable(mBitmapBeanList.get(position).bitmapDrawable);
+//            mAddViewList.add(holder.imageView);
+//            return convertView;
+//        }
+//
+//        private class ViewHolder{
+//            ImageView imageView;
+//        }
+//    }
 
     private String getType(String type)
     {
@@ -455,11 +786,17 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                finish();
-                overridePendingTransition(R.anim.top_in,R.anim.top_out);
+                if(mIsEmotionShow){
+                    mEmotionContainer.setVisibility(View.GONE);
+                    mAddImgContainer.setVisibility(View.VISIBLE);
+                    mIsEmotionShow = false;
+                }else {
+                    finish();
+                    overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                }
                 break;
         }
-        return super.onKeyDown(keyCode, event);
+        return true;
     }
 
     //TODO:由于目前不需要缓存，所以暂时先不调用该方法

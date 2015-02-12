@@ -30,6 +30,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.GroupNoteInfo;
@@ -38,6 +40,7 @@ import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONException;
@@ -50,7 +53,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
     private View mPraiseView,mReplyView;
     private TextView mTvYueqiu, mTvYueqiuCircle, mTvFriendCircle,
             mTvWeichat, mTvQQZone, mTvTencentWeibo, mTvSinaWeibo, mTvRenren;
-    private ImageView mOwnerImg;
+    private NetworkImageView mOwnerImg;
     private TextView mOwnerTv,mOwnerSexTv,mReadCountTv,mCreateTimeTv,mPaiseCountTv,mReplyCountTv;
     private ListView mListView;
     private Button mBtnCancel;
@@ -60,6 +63,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
     private TextView mPreTextView;
     private Drawable mProgressDrawable;
     private GroupNoteInfo mGroupInfo;
+    private ImageLoader mImageLoader;
 
     private Map<String,Integer> mParamsMap = new HashMap<String,Integer>();
     private Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
@@ -73,7 +77,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
         actionBar.setTitle(getString(R.string.billiard_group_detail));
 
         initView();
-
+        mImageLoader = VolleySingleton.getInstance().getImgLoader();
         Bundle args = getIntent().getExtras();
         mNoteId = args.getInt(DatabaseConstant.GroupInfo.NOTE_ID);
         mReplyCount = args.getInt(DatabaseConstant.GroupInfo.COMMENT_COUNT);
@@ -89,7 +93,8 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
         mPraiseView = findViewById(R.id.billiard_group_praise_view);
         mReplyView = findViewById(R.id.billiard_group_reply_view);
 
-        mOwnerImg = (ImageView) findViewById(R.id.billiard_group_detail_img);
+        mOwnerImg = (NetworkImageView) findViewById(R.id.billiard_group_detail_img);
+        mOwnerImg.setDefaultImageResId(R.drawable.default_head);
         mOwnerTv = (TextView) findViewById(R.id.billiard_group_detail_owner);
         mOwnerSexTv = (TextView) findViewById(R.id.billiard_group_detail_ower_sex);
         mReadCountTv = (TextView) findViewById(R.id.billiard_group_detail_read_count_tv);
@@ -184,6 +189,10 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
     }
 
     private void updateUI(GroupNoteInfo info){
+        if (! TextUtils.isEmpty(info.getImg_url()))
+        {
+            mOwnerImg.setImageUrl(info.getImg_url(), mImageLoader);
+        }
         mOwnerTv.setText(info.getUserName());
         mOwnerSexTv.setText(info.getSex() == 1 ? getString(R.string.man) : getString(R.string.woman));
         if(info.getSex() == 1){

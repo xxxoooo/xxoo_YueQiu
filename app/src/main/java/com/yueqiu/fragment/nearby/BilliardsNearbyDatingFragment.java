@@ -1,5 +1,6 @@
 package com.yueqiu.fragment.nearby;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
@@ -12,6 +13,8 @@ import android.os.Process;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,13 +29,12 @@ import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.NearbyBilliardsDatingActivity;
 import com.yueqiu.adapter.NearbyDatingSubFragmentListAdapter;
-import com.yueqiu.bean.NearbyDatingDetailedAlreadyBean;
 import com.yueqiu.bean.NearbyDatingSubFragmentDatingBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
-import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
+import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
+import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
@@ -43,13 +45,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.awt.font.TextAttribute;
-import java.io.BufferedReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -62,8 +58,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BilliardsNearbyDatingFragment extends Fragment
 {
     private static final String TAG = "BilliardsNearbyDatingFragment";
-
-    private static Context sContext;
+    private Context mContext;
 
     public BilliardsNearbyDatingFragment()
     {
@@ -71,7 +66,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
     public static BilliardsNearbyDatingFragment newInstance(Context context, String params)
     {
-        sContext = context;
+//        mContext = context;
         BilliardsNearbyDatingFragment instance = new BilliardsNearbyDatingFragment();
 
         Bundle args = new Bundle();
@@ -81,7 +76,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
         return instance;
     }
 
-    private boolean mNetworkAvailable;
+    private boolean mNetworkAvailable,mIsListEmpty;
 
     private BackgroundWorkerHandler mBackgroundHandler;
 
@@ -92,13 +87,20 @@ public class BilliardsNearbyDatingFragment extends Fragment
     private static NearbyParamsPreference sParamsPreference = NearbyParamsPreference.getInstance();
 
     @Override
+    public void onAttach(Activity activity)
+    {
+        super.onAttach(activity);
+        this.mContext = activity;
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
 
         // TODO: 我们最好将判断网络状况的变量放到onResume()方法当中进行判断，而不是放到onCreate()方法，因为这里调用的次数有限
         // TODO: 但是将她直接放到onResume()方法当中又会使Fragment之间的切换变的卡。稍后在做决定？？？？
-        mNetworkAvailable = Utils.networkAvaiable(sContext);
+        mNetworkAvailable = Utils.networkAvaiable(mContext);
     }
 
     public static final String KEY_DATING_FRAGMENT = "BilliardsNearbyDatingFragment";
@@ -123,9 +125,10 @@ public class BilliardsNearbyDatingFragment extends Fragment
     {
         mView = inflater.inflate(R.layout.fragment_nearby_dating_layout, container, false);
 
-        NearbyFragmentsCommonUtils.initViewPager(sContext, mView, R.id.dating_frament_gallery_pager, R.id.dating_fragment_gallery_pager_indicator_group);
+        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
+        commonUtils.initViewPager(mContext, mView);
 
-        mClickListener = new NearbyPopBasicClickListener(sContext,mUIEventsHandler,sParamsPreference);
+        mClickListener = new NearbyPopBasicClickListener(mContext,mUIEventsHandler,sParamsPreference);
         (mBtnDistan = (Button) mView.findViewById(R.id.btn_dating_distance)).setOnClickListener(mClickListener);
         (mBtnPublishDate = (Button) mView.findViewById(R.id.btn_dating_publichdate)).setOnClickListener(mClickListener);
 
@@ -149,7 +152,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
         // TODO: 以下加载的是测试数据，我们以后需要移除, 但是目前还不能移除，只是暂时注释掉，用于展示完整的UI效果
 //        initTestData();
 
-        mDatingListAdapter = new NearbyDatingSubFragmentListAdapter(sContext, (ArrayList<NearbyDatingSubFragmentDatingBean>) mDatingList);
+        mDatingListAdapter = new NearbyDatingSubFragmentListAdapter(mContext, (ArrayList<NearbyDatingSubFragmentDatingBean>) mDatingList);
         mDatingListView.setAdapter(mDatingListAdapter);
 
         mDatingListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -162,10 +165,10 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 args.putString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO, bean.getUserPhoto());
                 args.putInt(NearbyFragmentsCommonUtils.KEY_DATING_TABLE_ID, Integer.parseInt(bean.getId()));
                 args.putString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME, bean.getUserName());
-                Intent intent = new Intent(sContext, NearbyBilliardsDatingActivity.class);
+                Intent intent = new Intent(mContext, NearbyBilliardsDatingActivity.class);
                 intent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_DATING_FRAGMENT, args);
                 Log.d(TAG, " the current dating info table id we get are : " + bean.getId());
-                sContext.startActivity(intent);
+                mContext.startActivity(intent);
             }
         });
 
@@ -180,26 +183,19 @@ public class BilliardsNearbyDatingFragment extends Fragment
         }
 
 
-        mBackgroundHandler = new BackgroundWorkerHandler();
-        Log.d(TAG, " DatingFragment --> inside the onCreateView() method");
-        if (Utils.networkAvaiable(sContext))
+        mBackgroundHandler = new BackgroundWorkerHandler(mStarNum, mEndNum);
+        mLoadMore = false;
+        mRefresh = false;
+        // 我们仅在网络可行的情况下进行网络请求，减少不必要的网络请求
+        if (mBackgroundHandler.getState() == Thread.State.NEW)
         {
-            Log.d(TAG, " inside the onCreateView() method, and we have detected the netWork is available, but just cannot get data ");
-            mLoadMore = false;
-            mRefresh = false;
-            Log.d(TAG, " the state of the current HandlerThread are : " + mBackgroundHandler.getState() + " , " + (mBackgroundHandler == null));
-            // 我们仅在网络可行的情况下进行网络请求，减少不必要的网络请求
-            if (mBackgroundHandler != null && mBackgroundHandler.getState() == Thread.State.NEW)
-            {
-                Log.d(TAG, " in the onCreateView --> start the background handler ");
-                mBackgroundHandler.start();
-            }
-        } else
+            Log.d(TAG, " in the onCreateView --> start the background handler ");
+            mBackgroundHandler.start();
+        }
+        if (! Utils.networkAvaiable(mContext))
         {
-            Log.d(TAG, " in the onCreateView --> we have detected network unavailable ");
             mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
         }
-
         return mView;
     }
 
@@ -217,7 +213,6 @@ public class BilliardsNearbyDatingFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-
     }
 
     @Override
@@ -225,14 +220,6 @@ public class BilliardsNearbyDatingFragment extends Fragment
     {
         Log.d(TAG, " the onPause method has been called ");
         mCallback.closePopupWindow();
-        if (null != mBackgroundHandler)
-        {
-            Log.d(TAG, " we need to stop the Background Handler ");
-            mBackgroundHandler.interrupt();
-            mBackgroundHandler = null;
-        }
-
-
         super.onPause();
     }
 
@@ -246,6 +233,12 @@ public class BilliardsNearbyDatingFragment extends Fragment
     @Override
     public void onDestroy()
     {
+        if (null != mBackgroundHandler)
+        {
+            Log.d(TAG, " we need to stop the Background Handler ");
+            mBackgroundHandler.interrupt();
+            mBackgroundHandler = null;
+        }
         super.onDestroy();
     }
 
@@ -260,41 +253,53 @@ public class BilliardsNearbyDatingFragment extends Fragment
      */
     private void retrieveDatingInfo(final String userId, final String range, final String date, final int startNum, final int endNum)
     {
-        if (!mNetworkAvailable) {
+        if (!mNetworkAvailable)
+        {
             mUIEventsHandler.obtainMessage(FETCH_DATA_FAILED,
-                    sContext.getResources().getString(R.string.network_not_available)).sendToTarget();
+                    mContext.getResources().getString(R.string.network_not_available)).sendToTarget();
             return;
         }
 
-        try
-        {
-            final int userIdInt = Integer.parseInt(userId);
-            Log.d(TAG, " the finally user id we get for requesting the user info are : " + userId);
-            if (userIdInt < 1)
-            {
-                // 当前用户并没有登录，是不可能得到相关的约球信息的，所以必须要先登录才可以
-                mUIEventsHandler.sendEmptyMessage(USER_HAS_NOT_LOGIN);
-                return;
-            }
-        } catch (final Exception e)
-        {
-            Log.d(TAG, " exception happened while we parse the user id value from the YueQiuApp, and cause to : " + e.toString());
-        }
+        // TODO: 以下的部分是用于判断当前的用户是否登录的逻辑，但是现在不需要了，所以我们注掉了
+        // TODO: 但是不知道会不会变策略，所以暂时还是不要直接删掉了
+//        try
+//        {
+//            final int userIdInt = Integer.parseInt(userId);
+//            Log.d(TAG, " the finally user id we get for requesting the user info are : " + userId);
+//            if (userIdInt < 1)
+//            {
+//                // 当前用户并没有登录，是不可能得到相关的约球信息的，所以必须要先登录才可以
+//                mUIEventsHandler.sendEmptyMessage(USER_HAS_NOT_LOGIN);
+//                return;
+//            }
+//        } catch (final Exception e)
+//        {
+//            Log.d(TAG, " exception happened while we parse the user id value from the YueQiuApp, and cause to : " + e.toString());
+//        }
 
 
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
-        requestParams.put("user_id", userId);
+        // TODO: 现在约球的设计是不需要传递UserId的
+//        requestParams.put("user_id", userId);
+
         // 我们将range的默认值置为1000
-        String rangeVal = TextUtils.isEmpty(range) ? "1000" : range;
-        requestParams.put("range", rangeVal);
-        // 我们将date的默认值设置为当前的请求时间，日期格式设置为2015-01-31
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-        calendar.setTime(new Date());
-        String currentDateStr = dateFormatter.format(calendar.getTime());
-        Log.d(TAG, " the detailed date we get for today are : " + currentDateStr);
-        String dateStr = TextUtils.isEmpty(date) ? currentDateStr : date;
-        requestParams.put("date", dateStr);
+        // 默认不传参数，即空参数
+        if (! TextUtils.isEmpty(range))
+        {
+//            String rangeVal = TextUtils.isEmpty(range) ? "1000" : range;
+            requestParams.put("range", range);
+        }
+        // 现在的策略是如果没有需要的话，默认的date参数直接置为空就可以了，即不传递这个参数
+//        // 我们将date的默认值设置为当前的请求时间，日期格式设置为2015-01-31
+//        Calendar calendar = Calendar.getInstance();
+//        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+//        calendar.setTime(new Date());
+//        String currentDateStr = dateFormatter.format(calendar.getTime());
+//        Log.d(TAG, " the detailed date we get for today are : " + currentDateStr);
+        if (! TextUtils.isEmpty(date))
+        {
+            requestParams.put("date", date);
+        }
         requestParams.put("start_no", startNum + "");
         requestParams.put("end_no", endNum + "");
 
@@ -314,28 +319,36 @@ public class BilliardsNearbyDatingFragment extends Fragment
                         final int statusCode = rawJsonObj.getInt("code");
                         if (statusCode == HttpConstants.ResponseCode.NORMAL)
                         {
-                            // TODO: 然后进行以后的具体的解析过程的处理
-                            JSONArray resultJsonArr = rawJsonObj.getJSONArray("result");
-                            final int size = resultJsonArr.length();
-                            int i;
-                            for (i = 0; i < size; ++i)
+                            if (! "null".equals(rawJsonObj.get("result").toString()))
                             {
-                                JSONObject subJsonObj = (JSONObject) resultJsonArr.get(i);
-                                String imgUrl = subJsonObj.getString("img_url");
-                                String datingId = subJsonObj.getString("id");
-                                String title = subJsonObj.getString("title");
-                                String userName = subJsonObj.getString("username");
-                                long distance = subJsonObj.getLong("range");
-                                NearbyDatingSubFragmentDatingBean datingBean = new NearbyDatingSubFragmentDatingBean(datingId, imgUrl, userName, title, String.valueOf(distance));
+                                JSONArray resultJsonArr = rawJsonObj.getJSONArray("result");
+                                final int size = resultJsonArr.length();
+                                int i;
+                                for (i = 0; i < size; ++i)
+                                {
+                                    JSONObject subJsonObj = (JSONObject) resultJsonArr.get(i);
+                                    String imgUrl = subJsonObj.getString("img_url");
+                                    String datingId = subJsonObj.getString("id");
+                                    String title = subJsonObj.getString("title");
+                                    String userName = subJsonObj.getString("username");
+                                    long distance = subJsonObj.getLong("range");
+                                    NearbyDatingSubFragmentDatingBean datingBean = new NearbyDatingSubFragmentDatingBean(datingId, imgUrl, userName, title, String.valueOf(distance));
 
-                                // 将我们解析得到的datingBean插入到我们创建的数据库当中
-                                cacheDatingList.add(datingBean);
+                                    // 将我们解析得到的datingBean插入到我们创建的数据库当中
+                                    cacheDatingList.add(datingBean);
+                                }
+                                if (cacheDatingList.isEmpty())
+                                {
+                                    mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                }
+                                // TODO: 我们应该在这里通知UI主线程数据请求工作已经全部完成了，停止显示ProgressBar或者显示一个Toast全部数据已经加载完的提示
+                                mUIEventsHandler.obtainMessage(FETCH_DATA_SUCCESSED, cacheDatingList).sendToTarget();
+                                mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                            } else
+                            {
+                                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                             }
-
-                            // TODO: 我们应该在这里通知UI主线程数据请求工作已经全部完成了，停止显示ProgressBar或者显示一个Toast全部数据已经加载完的提示
-                            mUIEventsHandler.obtainMessage(FETCH_DATA_SUCCESSED, cacheDatingList).sendToTarget();
-                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
-
                         } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
                         {
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
@@ -359,9 +372,13 @@ public class BilliardsNearbyDatingFragment extends Fragment
                         }
                     } else
                     {
-                        mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                        mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                         mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                     }
+                } else
+                {
+                    mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                    mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 }
             } catch (JSONException e)
             {
@@ -369,13 +386,10 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 // 发生异常了之后，我们应该准确的通知UIHandler没有获取到任何的数据
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                 mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
-                Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
             }
         } else
         {
-            Log.d(TAG, " exception happened on some special devices, and this should occur for the network failure, but the Android does" +
-                    "not detect it as netWork failure, and it sign it as Server(the service provider) error ");
-            mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
             mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
         }
     }
@@ -429,29 +443,30 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     if (mDatingList.isEmpty())
                     {
                         Log.d(TAG, " the current list should be empty here ??? ");
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     }
-                    Toast.makeText(sContext, infoStr, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, infoStr, Toast.LENGTH_SHORT).show();
                     hideProgress();
                     Log.d(TAG, " fail to get data due to the reason as : " + infoStr);
                     break;
                 case PublicConstant.USE_CACHE:
                     // 首先将我们的EmptyView隐藏掉
-                    loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, true);
+                    setEmptyViewGone();
                     ArrayList<NearbyDatingSubFragmentDatingBean> cachedList = (ArrayList<NearbyDatingSubFragmentDatingBean>) msg.obj;
                     mDatingList.addAll(cachedList);
                     mDatingListAdapter.notifyDataSetChanged();
                     break;
 
                 case FETCH_DATA_SUCCESSED:
-                    loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, true);
+                    setEmptyViewGone();
                     mBeforeCount = mDatingList.size();
+                    mIsListEmpty = mDatingList.isEmpty();
                     List<NearbyDatingSubFragmentDatingBean> datingList = (ArrayList<NearbyDatingSubFragmentDatingBean>) msg.obj;
                     for (NearbyDatingSubFragmentDatingBean datingBean : datingList)
                     {
                         if (! mDatingList.contains(datingBean))
                         {
-                            if (mRefresh)
+                            if (mRefresh && !mIsListEmpty)
                             {
                                 mDatingList.add(0, datingBean);
                             } else
@@ -470,17 +485,17 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     mAfterCount = mDatingList.size();
                     if (mDatingList.isEmpty())
                     {
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     } else
                     {
                         if (mRefresh)
                         {
                             if (mAfterCount == mBeforeCount)
                             {
-                                Utils.showToast(sContext, sContext.getString(R.string.no_newer_info));
+                                Utils.showToast(mContext, mContext.getString(R.string.no_newer_info));
                             } else
                             {
-                                Utils.showToast(sContext, sContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                                Utils.showToast(mContext, mContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }
@@ -488,13 +503,19 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     break;
                 case RETRIEVE_DATA_WITH_RANGE_FILTERED:
                     String range = (String) msg.obj;
-                    mBackgroundHandler.fetchDatingWithRangeFilter(range);
+                    if (mBackgroundHandler != null)
+                    {
+                        mBackgroundHandler.fetchDatingWithRangeFilter(range);
+                    }
 
                     break;
                 case RETRIEVE_DATA_WITH_DATE_FILTERED:
                     String publishDate = (String) msg.obj;
                     Log.d(TAG, " inside the mUIEventsHandler --> we have received the date need to filter are : " + publishDate);
-                    mBackgroundHandler.fetchDatingWithPublishDateFilter(publishDate);
+                    if (null != mBackgroundHandler)
+                    {
+                        mBackgroundHandler.fetchDatingWithPublishDateFilter(publishDate);
+                    }
                     break;
                 case DATA_HAS_BEEN_UPDATED:
                     mDatingListAdapter.notifyDataSetChanged();
@@ -505,25 +526,26 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     hideProgress();
                     if (mDatingList.isEmpty())
                     {
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     }
-                    Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
+                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
 
                     break;
                 case PublicConstant.TIME_OUT:
                     // 超时之后的处理策略
-                    Utils.showToast(sContext, sContext.getString(R.string.http_request_time_out));
+                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
                     if (mDatingList.isEmpty()) {
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     }
                     hideProgress();
                     break;
                 case PublicConstant.NO_RESULT:
                     if (mDatingList.isEmpty()) {
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     } else {
-                        if (mLoadMore) {
-                            Utils.showToast(sContext, sContext.getString(R.string.no_more_info));
+                        if (mLoadMore)
+                        {
+                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.search_billiard_dating_str)));
                         }
                     }
                     hideProgress();
@@ -534,27 +556,27 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     String errorInfo = errorData.getString(KEY_REQUEST_ERROR_DATING);
                     if (! TextUtils.isEmpty(errorInfo))
                     {
-                        Utils.showToast(sContext, errorInfo);
+                        Utils.showToast(mContext, errorInfo);
                     } else
                     {
-                        Utils.showToast(sContext, sContext.getString(R.string.http_request_error));
+                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
                     }
 
                     if (mDatingList.isEmpty())
                     {
-                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str, false);
+                        loadEmptyTv(R.string.search_activity_subfragment_empty_tv_str);
                     }
 
                     hideProgress();
                     break;
 
                 case USER_HAS_NOT_LOGIN:
-                    Utils.showToast(sContext, sContext.getString(R.string.please_login_first));
+                    //Utils.showToast(mContext, mContext.getString(R.string.please_login_first));
                     hideProgress();
                     mDatingListAdapter.notifyDataSetChanged();
                     if (mDatingList.isEmpty())
                     {
-                        loadEmptyTv(R.string.search_dating_login_first, false);
+                        loadEmptyTv(R.string.search_dating_login_first);
                     }
                     break;
             }
@@ -562,14 +584,25 @@ public class BilliardsNearbyDatingFragment extends Fragment
         }
     };
 
-    private void loadEmptyTv(final int contentStrId, boolean disabled)
+    private TextView mEmptyView;
+    // 我们通过将disable的值设置为false来进行加载EmptyView
+    // 通过将disable的值设置为true来隐藏emptyView
+    private void loadEmptyTv(final int contentStrId)
     {
-        if (mDatingListView.isRefreshing())
-        {
-            mDatingListView.onRefreshComplete();
-        }
+        mEmptyView = new TextView(mContext);
+        mEmptyView.setGravity(Gravity.CENTER);
+        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        mEmptyView.setTextColor(mContext.getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setText(mContext.getString(contentStrId));
+        mDatingListView.setEmptyView(mEmptyView);
+    }
 
-        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mDatingListView, sContext.getString(contentStrId), disabled);
+    private void setEmptyViewGone()
+    {
+        if (null != mEmptyView)
+        {
+            mEmptyView.setVisibility(View.GONE);
+        }
     }
 
     private void showProgress()
@@ -590,9 +623,12 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
     private class BackgroundWorkerHandler extends HandlerThread
     {
-        public BackgroundWorkerHandler()
+        private final int mStartNO, mEndNO;
+        public BackgroundWorkerHandler(int startNum, int endNum)
         {
             super(BACKGROUDN_WORKER_NAME, Process.THREAD_PRIORITY_BACKGROUND);
+            this.mStartNO = startNum;
+            this.mEndNO = endNum;
         }
 
         // 参照MateFragment当中的理解
@@ -614,45 +650,50 @@ public class BilliardsNearbyDatingFragment extends Fragment
                             Bundle requestInfo = msg.getData();
                             final int startNum = requestInfo.getInt(KEY_REQUEST_START_NUM);
                             final int endNum = requestInfo.getInt(KEY_REQUEST_END_NUM);
-                            Log.d(TAG, " inside the dating fragment, in the workHandler --> and the startNum : " + startNum + " , the endNum : " + endNum);
-                            String cacheRange = sParamsPreference.getDatingRange(sContext);
-                            String cacheDate = sParamsPreference.getDatingPublishedDate(sContext);
+                            String cacheRange = sParamsPreference.getDatingRange(mContext);
+                            String cacheDate = sParamsPreference.getDatingPublishedDate(mContext);
                             retrieveDatingInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()), cacheRange, cacheDate, startNum, endNum);
 
                             break;
                         case RETRIEVE_DATA_WITH_DATE_FILTERED:                           
                             String publishDate = (String) msg.obj;
                             Log.d(TAG, " inside the dating fragment BackgroundHandlerThread --> the publishDate we need to filter are : " + publishDate);
-                            String dateCacheRange = sParamsPreference.getDatingRange(sContext);
+                            String dateCacheRange = sParamsPreference.getDatingRange(mContext);
                             // 每次筛选请求都是从零开始的重新请求
                             retrieveDatingInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()), dateCacheRange, publishDate, 0, 9);
                             break;
                         case RETRIEVE_DATA_WITH_RANGE_FILTERED:                          
                             String range = (String) msg.obj;
                             Log.d(TAG, " inside the dating fragment BackgroundHandlerThread --> the range we need to filter are : " + range);
-                            String rangeCacheDate = sParamsPreference.getDatingPublishedDate(sContext);
+                            String rangeCacheDate = sParamsPreference.getDatingPublishedDate(mContext);
                             // 我们需要从0开始重新请求
                             retrieveDatingInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()), range, rangeCacheDate, 0, 9);
                             break;
                     }
                 }
             };
-            fetchDatingData(0, 9);
+            if (Utils.networkAvaiable(mContext))
+            {
+                fetchDatingData(mStartNO, mEndNO);
+            }
         }
 
         public void fetchDatingData(final int startNum, final int endNum)
         {
-            Message requestMsg = mWorkerHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
-            Bundle data = new Bundle();
-            data.putInt(KEY_REQUEST_START_NUM, startNum);
-            data.putInt(KEY_REQUEST_END_NUM, endNum);
-            requestMsg.setData(data);
-            mWorkerHandler.sendMessage(requestMsg);
+            if (null != mWorkerHandler)
+            {
+                Message requestMsg = mWorkerHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
+                Bundle data = new Bundle();
+                data.putInt(KEY_REQUEST_START_NUM, startNum);
+                data.putInt(KEY_REQUEST_END_NUM, endNum);
+                requestMsg.setData(data);
+                mWorkerHandler.sendMessage(requestMsg);
+            }
         }
 
         public void fetchDatingWithRangeFilter(String range)
         {
-            if (! TextUtils.isEmpty(range))
+            if (! TextUtils.isEmpty(range) && mWorkerHandler != null)
             {
                 mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_RANGE_FILTERED, range).sendToTarget();
             }
@@ -661,7 +702,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
         public void fetchDatingWithPublishDateFilter(String publishDate)
         {
             Log.d(TAG, " inside the method of BackgroundHandler --> the published date we get are : " + publishDate);
-            if (! TextUtils.isEmpty(publishDate))
+            if (! TextUtils.isEmpty(publishDate) && mWorkerHandler != null)
             {
                 mWorkerHandler.obtainMessage(RETRIEVE_DATA_WITH_DATE_FILTERED, publishDate).sendToTarget();
             }
@@ -686,10 +727,10 @@ public class BilliardsNearbyDatingFragment extends Fragment
         @Override
         public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView)
         {
-            String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
+            String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-
-            if (Utils.networkAvaiable(sContext))
+            setEmptyViewGone();
+            if (Utils.networkAvaiable(mContext))
             {
                 mRefresh = true;
                 mLoadMore = false;
@@ -706,13 +747,14 @@ public class BilliardsNearbyDatingFragment extends Fragment
         @Override
         public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView)
         {
-            String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
+            String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
             mLoadMore = true;
 
             mCurrentPos = mDatingList.size();
-            if (mBeforeCount != mAfterCount && !mRefresh)
+
+            if (mBeforeCount != mAfterCount && mRefresh)
             {
                 mStarNum = mEndNum + (mAfterCount - mBeforeCount);
                 mEndNum += 10 + (mAfterCount - mBeforeCount);
@@ -722,12 +764,11 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 mEndNum += 10;
             }
             mRefresh = false;
-
-            if (Utils.networkAvaiable(sContext))
+            setEmptyViewGone();
+            if (Utils.networkAvaiable(mContext))
             {
                 if (null != mBackgroundHandler)
                 {
-                    Log.d(TAG, " in the dating fragment --> loading more data --> startNum : " + mStarNum + " , and the endNum : " + mEndNum);
                     mBackgroundHandler.fetchDatingData(mStarNum, mEndNum);
                 }
             } else

@@ -49,6 +49,8 @@
     <string name="already_have_account">已有账户？</string>
     <string name="login_right_now">马上登录</string>
     <string name="register_success">注册成功</string>
+    <string name="send_sms_failed">抱歉，发送短信失败</string>
+    <string name="wait_for_captcha_sms">请稍等片刻，短信已发出</string>
 
     <!-- 退出账户 -->
     <string name="logout_success">退出账户成功</string>
@@ -268,19 +270,26 @@
     <string name="slide_account_golden">金币:</string>
     <string name="md__drawerOpenIndicatorDesc">Close drawer</string>
     <string name="md__drawerClosedIndicatorDesc">Open drawer</string>
-    <string name="published_action_mode_title">选择活动</string>
-    <string name="my_colloec_action_mode_title">选择收藏</string>
+    <string name="published_action_mode_title">选择发布信息</string>
+    <string name="my_colloec_action_mode_title">选择收藏信息</string>
+    <string name="part_in_action_mode_title">选择参与信息</string>
     <string name="published_confirm_str">确认</string>
     <string name="published_cancel_str">取消</string>
     <string name="published_delete_content">确定要删除所选的<xliff:g id="number" example="15">%1$s</xliff:g>条记录吗？</string>
-    <string name="your_published_info_is_empty">你还没有发布任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
+    <string name="your_published_info_is_empty">未获取任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
+    <string name="no_your_published_info">你还没有发布任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
     <string name="http_request_error">网络请求错误</string>
     <string name="http_request_time_out">网络请求超时，请稍后再试</string>
     <string name="location_request_time_out">请求超时！请检查GPS或者网络是否可用！</string>
     <string name="no_published_info">网络请求发生错误，未获取发布信息</string>
     <string name="no_store_info">网络请求错误，未获取收藏信息</string>
-    <string name="your_favor_is_empty">你还没有收藏任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
+    <string name="your_favor_is_empty">未获取任何<xliff:g id="number" example="15">%1$s</xliff:g>收藏信息</string>
+    <string name="no_favor_info">你还有收藏任何<xliff:g id="number" example="15">%1$s</xliff:g></string>
     <string name="no_more_info">没有更多<xliff:g id="number" example="15">%1$s</xliff:g>信息了</string>
+    <string name="your_partin_is_null">未获取任何<xliff:g>%1$s</xliff:g>参与信息</string>
+    <string name="no_part_in_info">你还没有参与任何<xliff:g>%1$s</xliff:g></string>
+    <string name="feed_backing">正在提交中...</string>
+    <string name="feed_back_success">反馈成功</string>
 
     <!-- 聊吧 -->
     <string name="btn_liaoba_message">消息</string>
@@ -391,6 +400,9 @@
     <string name="sorry_no_info">抱歉，没有获取到详情信息</string>
     <string name="store_success">收藏成功，可以进入我的收藏查看</string>
     <string name="store_failure">抱歉，收藏失败</string>
+    <string name="storing">正在收藏中...</string>
+    <string name="joining">正在报名中...</string>
+    <string name="join_success">报名成功</string>
     <!-- 我的资料 -->
     <string name="photo">头像</string>
     <string name="account">账户</string>
@@ -439,7 +451,7 @@
     <string name="activities_detail">活动详情</string>
     <string name="activities_collect">收藏</string>
     <string name="activities_share">分享</string>
-    <string name="activities_type">活动类型:</string>
+    <string name="activities_type">活动类型</string>
     <string name="groupactivity">群活动</string>
     <string name="meetstar">球星见面会</string>
     <string name="taiqiuzhan">台球展</string>

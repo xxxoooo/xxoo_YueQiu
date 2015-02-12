@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<com.yueqiu.view.GroupTopicScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:scrollbars="none">
+    android:scrollbars="none"
+    android:id="@+id/feed_back_scroll_view">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/feedback_root_relative_view">
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,12 +26,13 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="5"
-        android:weightSum="1">
+        android:weightSum="5">
         <LinearLayout
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_width="match_parent"
-            android:layout_height="60dp">
+            android:layout_height="0dp"
+            android:layout_weight="1">
             <TextView
                 android:textSize="20sp"
                 android:layout_marginLeft="10dp"
@@ -46,7 +52,7 @@
                 android:layout_marginLeft="10dp"
                 android:background="@null"
                 android:singleLine="true"
-                android:layout_height="20dp"
+                android:layout_height="match_parent"
                 android:textColor="@color/md__defaultBackground"/>
             </LinearLayout>
 
@@ -56,16 +62,19 @@
             android:layout_height="1dp">
         </LinearLayout>
 
-        <LinearLayout
+        <RelativeLayout
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_width="match_parent"
-            android:layout_height="60dp">
+            android:layout_height="0dp"
+            android:layout_weight="1">
             <TextView
+                android:id="@+id/feedback_content_tv"
                 android:textSize="20sp"
                 android:layout_marginLeft="10dp"
                 android:text="@string/search_feedback_acti_content_indi_str"
                 style="@style/ListItemTvStyle"
+                android:layout_centerVertical="true"
                  />
             <LinearLayout
                 android:layout_width="2dp"
@@ -73,26 +82,39 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
-                android:layout_height="match_parent"/>
-        </LinearLayout>
-        <EditText
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@+id/feedback_content_tv"/>
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/emotion_bg"
+                android:id="@+id/feed_back_backup_expression"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10dp"
+                android:visibility="gone"
+                />
+        </RelativeLayout>
+        <com.rockerhieu.emojicon.EmojiconEditText
             android:id="@+id/feed_back_content"
             android:layout_width="match_parent"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
             android:gravity="top"
             android:background="@null"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_height="0dp"
+            android:layout_weight="3"
             android:textColor="@color/md__defaultBackground"/>
         <RelativeLayout
+            android:id="@+id/feed_back_emotion_relative"
             android:layout_marginBottom="10dp"
             android:layout_width="match_parent"
             android:layout_marginRight="10dp"
             android:layout_height="wrap_content">
             <ImageView
                 android:layout_centerVertical="true"
-                android:src="@drawable/expression"
+                android:src="@drawable/emotion_bg"
                 android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -107,7 +129,14 @@
         android:background="@color/devide_line"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"/>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:visibility="gone"
+        android:id="@+id/feed_back_emotion_container"/>
     <LinearLayout
+        android:id="@+id/feed_back_add_img_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1.5"
@@ -115,13 +144,21 @@
         android:layout_marginRight="10dp"
         android:background="@drawable/login_shape"
         android:orientation="horizontal">
-        <ImageView
+        <com.yueqiu.view.IssueImageView
             android:id="@+id/feed_back_add_img"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/add_img"
+            android:src="@drawable/add_img_bg"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"/>
     </LinearLayout>
 </LinearLayout>
-</ScrollView>
+
+        <include
+            layout="@layout/pre_load"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            />
+    </RelativeLayout>
+</com.yueqiu.view.GroupTopicScrollView>

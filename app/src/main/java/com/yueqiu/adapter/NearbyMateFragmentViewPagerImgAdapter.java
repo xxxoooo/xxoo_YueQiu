@@ -1,5 +1,8 @@
 package com.yueqiu.adapter;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -29,18 +32,21 @@ public class NearbyMateFragmentViewPagerImgAdapter extends PagerAdapter
     @Override
     public Object instantiateItem(ViewGroup container, int position)
     {
-        // TODO: 以下的逻辑有一些问题，需要进一步确定
-        // TODO: 因为我现在还不确定这里是否真的是需要removeView()的操作
-//        if (mImgList.length > 0)
-//        {
-//            container.removeView(mImgList[position % mImgList.length]);
-//        }
 
         Log.d(TAG, " the current init item are : " + position);
-        if (mImgList.length > 0)
-        {
-            ((ViewGroup) container.getParent()).addView(mImgList[position % mImgList.length], position);
-            return mImgList[position % mImgList.length];
+        if (mImgList.length > 0) {
+
+            if (mImgList.length == 1) {
+                container.addView(mImgList[position]);
+                return mImgList[position];
+            } else {
+                ViewGroup parent = (ViewGroup) mImgList[position % mImgList.length].getParent();
+                if (parent != null) {
+                    parent.removeView(mImgList[position % mImgList.length]);
+                }
+                container.addView(mImgList[position % mImgList.length], 0);
+                return mImgList[position % mImgList.length];
+            }
         }
         return null;
     }
@@ -48,10 +54,10 @@ public class NearbyMateFragmentViewPagerImgAdapter extends PagerAdapter
     @Override
     public void destroyItem(ViewGroup container, int position, Object object)
     {
-        Log.d(TAG, " the position of : " + position + " is destroyed ");
-        if (mImgList.length > 0)
+        Log.d(TAG, " the position of : " + position % mImgList.length + " is destroyed ");
+        if (mImgList.length > 2)
         {
-            ((ViewPager) container).removeView(mImgList[position % mImgList.length]);
+            container.removeView(mImgList[position % mImgList.length]);
         }
     }
 
@@ -59,7 +65,12 @@ public class NearbyMateFragmentViewPagerImgAdapter extends PagerAdapter
     public int getCount()
     {
         Log.d(TAG, " the count value are : " + mImgList.length);
-        return Integer.MAX_VALUE;
+        if(mImgList.length > 1){
+            return Integer.MAX_VALUE;
+        }else{
+            return mImgList.length;
+        }
+
     }
 
     @Override

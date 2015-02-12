@@ -95,6 +95,9 @@ public class LocationUtil extends Service {
             Log.e(TAG, "culocationGPS = " + culocationGPS);
             culocationNetwork = myLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             Log.e(TAG, "culocationNetwork = " + culocationNetwork);
+            Log.d("roomFragment", " inside the Locationuril : " + culocationGPS);
+            culocationNetwork = myLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Log.d("roomFragment", " inside the Locationuril : " + culocationNetwork);
             if (culocationGPS == null && culocationNetwork == null) {
                 retLocation = myLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
                 if (retLocation == null) {

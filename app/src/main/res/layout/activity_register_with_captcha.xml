@@ -47,7 +47,8 @@
                 android:background="@drawable/basic_textview_bg"
                 android:id="@+id/tv_register_getchecknum"
                 android:layout_marginRight="13dp"
-                style="@style/ListItemTvStyle" />
+                style="@style/ListItemTvStyle"
+                android:padding="5dp"/>
             </RelativeLayout>
 
         <LinearLayout
@@ -137,4 +138,10 @@
             android:textSize="18sp"
             android:text="@string/login_right_now" />
     </LinearLayout>
+    <include
+        layout="@layout/pre_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        />
 </RelativeLayout>

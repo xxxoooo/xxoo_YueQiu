@@ -66,18 +66,22 @@ public class HttpUtil
             while (iter.hasNext())
             {
                 Map.Entry<String, T> entry = (Map.Entry<String, T>)iter.next();
-                try {
+                try
+                {
                     sb.append(entry.getKey()).append("=").
                             append(URLEncoder.encode(String.valueOf(entry.getValue()), CHARSET)).
                             append("&");
-                } catch (UnsupportedEncodingException e) {
+                } catch (UnsupportedEncodingException e)
+                {
                     e.printStackTrace();
                 }
             }
             sb.deleteCharAt(sb.length() - 1);
         }
         log(sb.toString());
-        try {
+
+        try
+        {
             URL urls = new URL(sb.toString());
             HttpURLConnection conn = (HttpURLConnection)urls.openConnection();
             String requestMethod = (null == method || "".equals(method)) ? "GET" : method;
@@ -107,6 +111,11 @@ public class HttpUtil
             e.printStackTrace();
         }
         return realResult;
+    }
+
+    public static <T> String simpleUrlClient()
+    {
+
     }
 
 
@@ -227,6 +236,6 @@ public class HttpUtil
 
     private static void log(String msg)
     {
-        Log.i(TAG, msg);
+        Log.i(TAG, "msg is ->"+ msg);
     }
 }

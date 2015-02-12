@@ -166,13 +166,13 @@ public class NearbyBilliardRoomActivity extends Activity
         int id = item.getItemId();
 
         switch (id) {
-            case R.id.search_room_detail_action_collect:
-                mUIEventsHandler.sendEmptyMessage(ADD_TO_FAVOR);
-                break;
-//            case R.id.search_room_detail_action_share:
-//                Dialog dlg = Utils.showSheet(this);
-//                dlg.show();
+//            case R.id.search_room_detail_action_collect:
+//                mUIEventsHandler.sendEmptyMessage(ADD_TO_FAVOR);
 //                break;
+            case R.id.search_room_detail_action_share:
+                Dialog dlg = Utils.showSheet(this);
+                dlg.show();
+                break;
             case android.R.id.home:
                 finish();
                 overridePendingTransition(R.anim.top_in,R.anim.top_out);;
