@@ -157,7 +157,7 @@ public class SlideViewAdapter extends BaseAdapter {
 //                           e.printStackTrace();
 //                       }
 //                   }
-                    String img_test = "http://byu1145240001.my3w.com/image/11.png";
+//                   String img_test = "http://byu1145240001.my3w.com/image/11.png";
 //                   if (! TextUtils.isEmpty(img_test))
 //                   {
 //                       Log.d(TAG_1, " fuck goes here .... ");
@@ -176,61 +176,64 @@ public class SlideViewAdapter extends BaseAdapter {
 //                       Log.d(TAG_1, " the " + embedBitmap(mContext.getResources(),source,embedResId));
 //                       accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(),source,embedResId));
 //                   }
-                    final int finallyEmbedResId = embedResId;
-                    if (! TextUtils.isEmpty(img))
-                    {
-                        Log.d(TAG_1, " we are entering image loading process ");
-                        mImgLoader.get(
-                                img, // pass this as test
-                                new ImageLoader.ImageListener()
-                                {
-                                    @Override
-                                    public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate)
-                                    {
+                   final int finallyEmbedResId = embedResId;
+                   if (! TextUtils.isEmpty(img))
+                   {
+                       Log.d(TAG_1, " we are entering image loading process ");
+                       mImgLoader.get(
+                               img, // pass this as test
+                               new ImageLoader.ImageListener()
+                               {
+                                   @Override
+                                   public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate)
+                                   {
                                         Log.d(TAG_1, " we are getting the right result here ");
-                                        Bitmap sourceBitmap = response.getBitmap();
-                                        Log.d(TAG_1, " we have get the source bitmap finally ");
-                                        if (null != sourceBitmap)
-                                        {
-                                            Log.d(TAG_1, " the embeded resource id : " + finallyEmbedResId + ", and the source are: " + sourceBitmap);
-                                            accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), sourceBitmap, finallyEmbedResId));
-                                        } else
-                                        {
-                                            Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
-                                            accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
-                                        }
-                                    }
+                                       Bitmap sourceBitmap = response.getBitmap();
+                                       Log.d(TAG_1, " we have get the source bitmap finally ");
+                                       if (null != sourceBitmap)
+                                       {
+                                           Log.d(TAG_1, " the embeded resource id : " + finallyEmbedResId + ", and the source are: " + sourceBitmap);
+                                           accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), sourceBitmap, finallyEmbedResId));
+                                       } else
+                                       {
+                                           Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
+                                           accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
+                                       }
+                                   }
 
-                                    @Override
-                                    public void onErrorResponse(VolleyError error)
-                                    {
+                                   @Override
+                                   public void onErrorResponse(VolleyError error)
+                                   {
                                         Log.d(TAG_1, " some error happened, and the detailed error info are: " + error.toString());
-                                        // TODO: 当我们传递的URL为空的时候，就会发生这个错误。
-                                        // TODO: 我们也可以在这里设置当获取用户头像失败时我们应该加载的系统默认图片
-                                        // TODO: 如果不满意我们在onResponse()方法加载系统默认图片的做法，我们就在这里加载，
+                                       // TODO: 当我们传递的URL为空的时候，就会发生这个错误。
+                                       // TODO: 我们也可以在这里设置当获取用户头像失败时我们应该加载的系统默认图片
+                                       // TODO: 如果不满意我们在onResponse()方法加载系统默认图片的做法，我们就在这里加载，
 
 
-                                    }
-                                },
-                                300,
-                                300
-                        );
-                    }
+                                   }
+                               },
+                               300,
+                               300
+                       );
+                   } else
+                   {
+                       // 现在是没有Url的情况，即服务器端传递到的url为空的情况，我们需要在这里直接加载我们的默认图片
+                       Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
+                       accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
+                   }
 
-                }else {
-                    accountHolder.name.setVisibility(View.GONE);
-                    accountHolder.login.setVisibility(View.VISIBLE);
-                    accountHolder.login.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            Intent intent = new Intent(mContext, LoginActivity.class);
-                            mContext.startActivity(intent);
-                        }
-                    });
-                    accountHolder.image.setImageResource(R.drawable.head_img);
-                }
-
-
+               } else {
+                   accountHolder.name.setVisibility(View.GONE);
+                   accountHolder.login.setVisibility(View.VISIBLE);
+                   accountHolder.login.setOnClickListener(new View.OnClickListener() {
+                       @Override
+                       public void onClick(View v) {
+                           Intent intent = new Intent(mContext, LoginActivity.class);
+                           mContext.startActivity(intent);
+                       }
+                   });
+                   accountHolder.image.setImageResource(R.drawable.head_img);
+               }
                 //accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accountItem.getGolden());
                 break;
             case ISlideListItem.ITEM_BASIC:
@@ -264,7 +267,6 @@ public class SlideViewAdapter extends BaseAdapter {
     }
 
     private class ViewAccountHolder{
-        //        NetworkImageView image;
         ImageView image;
         TextView  name;
         TextView  golden;
@@ -292,6 +294,7 @@ public class SlideViewAdapter extends BaseAdapter {
             embedded = source.copy(Bitmap.Config.ARGB_8888,true);
             // TODO: 以下的是之前的实现，移除之后可以结合Volley当中的ImageLoader 使用，但是不移除的
             // TODO: 话，暂时还不确定是否会影响内存资源的回收问题
+            // TODO: 关于source.recycle()内部的具体操作还不确定。需要参考StackOverflow上面的分析理解
 //            source.recycle();
         }
 

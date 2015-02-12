@@ -106,7 +106,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
     private String mArgs;
 
     private ProgressBar mPreProgress;
-    private TextView mPreTextView,mEmptyView;
+    private TextView mPreTextView;
     private Drawable mProgressDrawable;
     private boolean mIsListEmpty;
 
@@ -179,18 +179,8 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
         return mView;
     }
-    private void setEmptyViewVisible(){
-        mEmptyView.setGravity(Gravity.CENTER);
-        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        mEmptyView.setTextColor(getActivity().getResources().getColor(R.color.md__defaultBackground));
-        mEmptyView.setText(R.string.search_activity_subfragment_empty_tv_str);
-        mCoauchListView.setEmptyView(mEmptyView);
-    }
-    private void setEmptyViewGone(){
-        if(mEmptyView != null){
-            mEmptyView.setVisibility(View.GONE);
-        }
-    }
+
+
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
@@ -415,6 +405,11 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     break;
                 case PublicConstant.USE_CACHE:
                     ArrayList<NearbyCoauchSubFragmentCoauchBean> cachedList = (ArrayList<NearbyCoauchSubFragmentCoauchBean>) msg.obj;
+                    if (cachedList.size() > 0)
+                    {
+                        // 首先将我们的EmptyView隐藏掉
+                        setEmptyViewGone();
+                    }
                     mCoauchList.addAll(cachedList);
                     if(mCoauchList.isEmpty())
                         setEmptyViewVisible();
@@ -543,11 +538,25 @@ public class BilliardsNearbyCoachFragment extends Fragment
         }
     };
 
-//    private void loadEmptyTv(boolean disabled)
-//    {
-//        Log.d(TAG, " inside the loadEmptyTV method --> we are start loading the empty view from here ");
-//        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(mContext, mCoauchListView,mEmptyView, mContext.getString(R.string.search_activity_subfragment_empty_tv_str), disabled);
-//    }
+    private TextView mEmptyView;
+    // 我们通过将disable的值设置为false来进行加载EmptyView
+    // 通过将disable的值设置为true来隐藏emptyView
+    private void setEmptyViewVisible()
+    {
+        mEmptyView.setGravity(Gravity.CENTER);
+        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        mEmptyView.setTextColor(mContext.getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setText(mContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+        mCoauchListView.setEmptyView(mEmptyView);
+    }
+
+    private void setEmptyViewGone()
+    {
+        if (null != mEmptyView)
+        {
+            mEmptyView.setVisibility(View.GONE);
+        }
+    }
 
     private void showProgress()
     {

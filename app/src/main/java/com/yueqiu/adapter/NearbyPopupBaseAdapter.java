@@ -53,7 +53,7 @@ public class NearbyPopupBaseAdapter extends BaseAdapter
     {
         ViewHolder holder;
         if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.item_popup_basic, null);
+            convertView = mInflater.inflate(R.layout.item_popup_basic, parent, false);
             holder = new ViewHolder();
             holder.tv = (TextView) convertView.findViewById(R.id.search_pop_base_button);
             convertView.setTag(holder);

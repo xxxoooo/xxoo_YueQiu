@@ -82,7 +82,7 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
 
     private EditText    mTitleEdit;
     private EmojiconEditText mContentEdit;
-    private TextView    mTopicTypeTv,mTakePhoto,mSelectPhoto;
+    private TextView    mTopicTypeTv,mTakePhoto,mSelectPhoto,mDeletePhoto;
     private ImageView   mIvExpression,mBackExpression;//TODO:图片按下的效果
     private IssueImageView mIvAddImg;
     private View        mLinearType;
@@ -234,6 +234,40 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
         mIvAddImg.setOnClickListener(this);
         mIvExpression.setOnClickListener(this);
         mBackExpression.setOnClickListener(this);
+
+        mIvAddImg.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mDlgBuilder = CustomDialogBuilder.getsInstance(GroupIssueTopic.this);
+                mDlgBuilder.withTitle(getString(R.string.select_photo))
+                        .withTitleColor(Color.WHITE)
+                        .withDividerColor(getResources().getColor(R.color.search_distance_color))
+                        .withMessage(null)
+                        .isCancelableOnTouchOutside(true)
+                        .isCancelable(true)
+                        .withDialogColor(R.color.actionbar_color)
+                        .withDuration(700)
+                        .withEffect(EffectsType.SlideLeft)
+                        .setSureButtonVisible(false)
+                        .withCancelButtonText(getString(R.string.btn_message_cancel))
+                        .setCustomView(R.layout.dialog_long_click_view, v.getContext())
+                        .setCancelButtonClick(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDlgBuilder.dismiss();
+                            }
+                        })
+                        .show();
+
+                mTakePhoto = (TextView) mDlgBuilder.findViewById(R.id.take_photo_now);
+                mSelectPhoto = (TextView) mDlgBuilder.findViewById(R.id.select_photo_from_album);
+                mDeletePhoto = (TextView) mDlgBuilder.findViewById(R.id.delete_photo);
+                mTakePhoto.setOnClickListener(GroupIssueTopic.this);
+                mSelectPhoto.setOnClickListener(GroupIssueTopic.this);
+                mDeletePhoto.setOnClickListener(GroupIssueTopic.this);
+                return true;
+            }
+        });
 
     }
     private void requestPublish(){
@@ -447,6 +481,17 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
                     }
 
                 }
+                break;
+            case R.id.delete_photo:
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth,mAddViewHeight);
+                params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
+                params.gravity = Gravity.CENTER_VERTICAL;
+                mIvAddImg.setLayoutParams(params);
+                mIvAddImg.setBitmapBean(null);
+                mIvAddImg.setImageResource(R.drawable.add_img_bg);
+                mIvAddImg.setBackgroundColor(getResources().getColor(android.R.color.white));
+                if(mDlgBuilder != null)
+                    mDlgBuilder.dismiss();
                 break;
             case R.id.group_issue_add_img:
                 if(mIvAddImg.getBitmapBean() != null){

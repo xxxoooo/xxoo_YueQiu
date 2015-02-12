@@ -9,7 +9,6 @@ import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -25,11 +24,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.activity.NearbyBilliardRoomActivity;
@@ -37,9 +34,9 @@ import com.yueqiu.adapter.NearbyRoomSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
+import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
@@ -50,13 +47,10 @@ import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.sql.CommonDataSource;
 
 /**
  * @author scguo
@@ -132,7 +126,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     // 加载王赟开发的ProgressBar
     private ProgressBar mPreProgress;
     private Drawable mProgressDrawable;
-    private TextView mPreTextView,mEmptyView;
+    private TextView mPreTextView;
 
     private NearbyPopBasicClickListener mClickListener;
 
@@ -231,7 +225,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
             // 这里的WorkThread必须调用了start()方法之后，位于WorkThread当中的workHandler才可以正常工作
             mWorkerThread.start();
         }
-        if (!Utils.networkAvaiable(getActivity()))
+        if (!Utils.networkAvaiable(mContext))
         {
             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
         }
@@ -265,19 +259,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
             }
         }
     };
-
-    private void setEmptyViewVisible(){
-        mEmptyView.setGravity(Gravity.CENTER);
-        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        mEmptyView.setTextColor(getActivity().getResources().getColor(R.color.md__defaultBackground));
-        mEmptyView.setText(R.string.search_activity_subfragment_empty_tv_str);
-        mRoomListView.setEmptyView(mEmptyView);
-    }
-    private void setEmptyViewGone(){
-        if(mEmptyView != null){
-            mEmptyView.setVisibility(View.GONE);
-        }
-    }
 
     @Override
     public void onResume()
@@ -323,13 +304,13 @@ public class BilliardsNearbyRoomFragment extends Fragment
      */
     private void retrieveRoomListInfo(final String city, final String region, final String range, final String sort, final int limit, final int page)
     {
-        if (!Utils.networkAvaiable(getActivity()))
+        if (!mNetworkAvailable)
         {
             Log.d(TAG, " the network are really sucked off, and we have to stop fetching any more data from the server any more ");
             mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_FAILED,
                     mContext.getResources().getString(R.string.network_not_available)).sendToTarget();
             // 在请求网络任务的刚开始的时候，我们已经打开了ProgressDialog，现在既然已经确定无法继续请求，所以应该先把已经打开的ProgressDialog关闭
-//            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
         }
 
         List<NearbyRoomSubFragmentRoomBean> cacheRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
@@ -420,7 +401,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         }
                         mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheRoomList).sendToTarget();
                         // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
-//                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
 
                     } else if (status.equals("ERROR"))
                     {
@@ -433,20 +414,20 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         Bundle errorHandlerData = new Bundle();
                         errorHandlerData.putString(KEY_REQUEST_ERROR_MSG_ROOM, errorInfo.toString());
                         mUIEventsHandler.sendMessage(errorHandlerMsg);
-//                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                     }
                 } else
                 {
                     // 什么错误信息都没有获取到，甚至连error都没有
                     mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-//                    mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                    mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 }
 
             } catch (JSONException e)
             {
                 e.printStackTrace();
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-//                mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 Log.d(TAG, " Exception happened in parsing the resulted json object we get, and the detailed reason are : " + e.toString());
             }
         }else
@@ -524,6 +505,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private static final String WORKER_HANDLER_THREAD_NAME = "workerHandlerThread";
 
     private static final int UI_SHOW_DIALOG = 1 << 6;
+    private static final int UI_HIDE_DIALOG = 1 << 7;
 
     private static final int STATE_FETCH_DATA_FAILED = 1 << 8;
     private static final int STATE_FETCH_DATA_SUCCESS = 1 << 9;
@@ -550,9 +532,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
-            if(mRoomListView.isRefreshing()){
-                mRoomListView.onRefreshComplete();
-            }
             switch (msg.what)
             {
                 case UI_SHOW_DIALOG:
@@ -563,23 +542,19 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     }
                     break;
 
-//                case UI_HIDE_DIALOG:
-//                    // 此时数据已经加载完毕，我们需要通知List的Adpter数据源已经发生改变
-//                    mSearchRoomAdapter.notifyDataSetChanged();
-//                    hideProgress();
-//                    if (mRoomListView.isRefreshing())
-//                    {
-//                        mRoomListView.onRefreshComplete();
-//                    }
-//                    break;
+                case UI_HIDE_DIALOG:
+                    // 此时数据已经加载完毕，我们需要通知List的Adpter数据源已经发生改变
+                    mSearchRoomAdapter.notifyDataSetChanged();
+                    hideProgress();
+                    if (mRoomListView.isRefreshing())
+                    {
+                        mRoomListView.onRefreshComplete();
+                    }
+                    break;
 
                 case STATE_FETCH_DATA_FAILED:
                     Bundle failData = msg.getData();
                     String failStr = failData.getString(KEY_FETCH_DATA_FAILED);
-                    if(mRoomList.isEmpty()){
-                        setEmptyViewVisible();
-                    }
-                    hideProgress();
                     Log.d(TAG, " we have fail to fetch the data for the room fragment, and the reason are : " + failStr);
                     break;
                 case PublicConstant.USE_CACHE:
@@ -587,14 +562,12 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     setEmptyViewGone();
                     ArrayList<NearbyRoomSubFragmentRoomBean> cachedList = (ArrayList<NearbyRoomSubFragmentRoomBean>) msg.obj;
                     mRoomList.addAll(cachedList);
-                    if(mRoomList.isEmpty()){
-                        setEmptyViewVisible();
-                    }
+                    mSearchRoomAdapter.notifyDataSetChanged();
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
                     // 依然是首先将我们的EmpttyView隐藏掉
                     setEmptyViewGone();
-                    hideProgress();
+
                     mBeforeCount = mRoomList.size();
                     mIsListEmpty = mRoomList.isEmpty();
                     List<NearbyRoomSubFragmentRoomBean> roomList = (ArrayList<NearbyRoomSubFragmentRoomBean>) msg.obj;
@@ -718,7 +691,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         Log.d(TAG, " the room list we get are : " + mRoomList.size());
                         setEmptyViewVisible();
                     }
-                    hideProgress();
+
                     break;
                 case PublicConstant.NO_NETWORK:
                     hideProgress();
@@ -745,11 +718,26 @@ public class BilliardsNearbyRoomFragment extends Fragment
         }
     };
 
-//    private void loadEmptyTv(boolean disabled)
-//    {
-//        Log.d(TAG, "inside the roomFragment --> we have load the EmptyView ");
-//        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(mContext, mRoomListView,mEmptyView, mContext.getString(R.string.search_activity_subfragment_empty_tv_str), disabled);
-//    }
+
+    private TextView mEmptyView;
+    // 我们通过将disable的值设置为false来进行加载EmptyView
+    // 通过将disable的值设置为true来隐藏emptyView
+    private void setEmptyViewVisible()
+    {
+        mEmptyView.setGravity(Gravity.CENTER);
+        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        mEmptyView.setTextColor(mContext.getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setText(mContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+        mRoomListView.setEmptyView(mEmptyView);
+    }
+
+    private void setEmptyViewGone()
+    {
+        if (null != mEmptyView)
+        {
+            mEmptyView.setVisibility(View.GONE);
+        }
+    }
 
     private void showProgress()
     {
@@ -1010,7 +998,4 @@ public class BilliardsNearbyRoomFragment extends Fragment
             }
         }
     };
-
-
-
 }

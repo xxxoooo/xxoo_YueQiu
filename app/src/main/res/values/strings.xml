@@ -34,6 +34,8 @@
     <string name="select_photo">选择照片</string>
     <string name="take_photo_now">现在拍摄</string>
     <string name="select_photo_from_album">选择相册图片</string>
+    <string name="delete_this_photo">删除图片</string>
+
 
     <!-- 登录注册 -->
     <string name="login_without_phone_or_account">请输入手机号或账号</string>
@@ -371,7 +373,7 @@
     <string name="activity_title_cannot_empty">请填写活动主题</string>
     <string name="activity_title_length_less">活动主题字数不能少于4个字</string>
     <string name="activity_title_length_more">活动主题字数不能多于30个字</string>
-    <string name="activity_location_cannot_empty">活动地点不能为空</string>
+    <string name="activity_location_cannot_empty">请填写活动地点</string>
     <string name="activity_start_time_cannot_empty">请选择活动开始时间</string>
     <string name="activity_end_time_cannot_empty">请选择活动结束时间</string>
     <string name="activity_start_cannot_more_than_end">开始时间不能大于结束时间</string>

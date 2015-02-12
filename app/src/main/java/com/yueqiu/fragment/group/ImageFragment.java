@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.yueqiu.R;
 import com.yueqiu.util.ImgUtil;
@@ -69,9 +71,29 @@ public class ImageFragment extends DialogFragment {
         }
         if(null != mImgUri){
             image = ImgUtil.getLargeScaleBitmapFromUri(getActivity(),mImgUri);
-        }
-        mImageView.setImageDrawable(image);
 
+        }
+        int imageWidth = image.getIntrinsicWidth();
+        int imageHeight = image.getIntrinsicHeight();
+        RelativeLayout.LayoutParams params;
+        int viewWidth,viewHeight;
+        if(imageWidth < 300){
+            viewWidth = 300;
+        }else{
+            viewWidth = RelativeLayout.LayoutParams.WRAP_CONTENT;
+        }
+
+        if(imageHeight < 300){
+            viewHeight = 300;
+        }else{
+            viewHeight = RelativeLayout.LayoutParams.WRAP_CONTENT;
+        }
+
+        params = new RelativeLayout.LayoutParams(viewWidth,viewHeight);
+        params.addRule(RelativeLayout.CENTER_IN_PARENT);
+        mImageView.setLayoutParams(params);
+        mImageView.setScaleType(ImageView.ScaleType.FIT_XY);
+        mImageView.setImageDrawable(image);
         mList.add(mImageView);
         return view;
     }
