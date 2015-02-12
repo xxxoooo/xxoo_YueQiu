@@ -9,7 +9,6 @@ import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -19,15 +18,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.activity.NearbyBilliardRoomActivity;
@@ -35,9 +34,9 @@ import com.yueqiu.adapter.NearbyRoomSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
+import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
@@ -48,13 +47,10 @@ import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.sql.CommonDataSource;
 
 /**
  * @author scguo
@@ -86,7 +82,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     // TODO: Rename and change types and number of parameters
     public static BilliardsNearbyRoomFragment newInstance(Context context, String param1)
     {
-//        sContext = context;
+//        mContext = context;
         BilliardsNearbyRoomFragment fragment = new BilliardsNearbyRoomFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -94,7 +90,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
         return fragment;
     }
 
-    private Context sContext;
+    private Context mContext;
 
     public BilliardsNearbyRoomFragment()
     {
@@ -104,7 +100,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     public void onAttach(Activity activity)
     {
         super.onAttach(activity);
-        this.sContext = activity;
+        this.mContext = activity;
     }
 
     private boolean mNetworkAvailable;
@@ -117,7 +113,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mNetworkAvailable = Utils.networkAvaiable(sContext);
+        mNetworkAvailable = Utils.networkAvaiable(mContext);
 
     }
 
@@ -148,10 +144,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
     {
         mView = inflater.inflate(R.layout.fragment_nearby_room_layout, container, false);
 
-        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(sContext);
-        commonUtils.initViewPager(sContext, mView);
+        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
+        commonUtils.initViewPager(mContext, mView);
 
-        mClickListener = new NearbyPopBasicClickListener(sContext, mUIEventsHandler, sParamsPreference);
+        mClickListener = new NearbyPopBasicClickListener(mContext, mUIEventsHandler, sParamsPreference);
         (mView.findViewById(R.id.btn_room_district)).setOnClickListener(mClickListener);
         (mView.findViewById(R.id.btn_room_distance)).setOnClickListener(mClickListener);
         (mView.findViewById(R.id.btn_room_price)).setOnClickListener(mClickListener);
@@ -163,7 +159,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
         mRoomListView.setMode(PullToRefreshBase.Mode.BOTH);
         mRoomListView.setOnRefreshListener(onRefreshListener);
 
-        mSearchRoomAdapter = new NearbyRoomSubFragmentListAdapter(sContext, (ArrayList<NearbyRoomSubFragmentRoomBean>) mRoomList);
+        mSearchRoomAdapter = new NearbyRoomSubFragmentListAdapter(mContext, (ArrayList<NearbyRoomSubFragmentRoomBean>) mRoomList);
         mRoomListView.setAdapter(mSearchRoomAdapter);
 
         // 初始化ProgressBar
@@ -201,10 +197,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, bean.getRoomPhone());
 
                 // set the arguments into the bundle, and transferred into the RoomDetailedActivity
-                Intent intent = new Intent(sContext, NearbyBilliardRoomActivity.class);
+                Intent intent = new Intent(mContext, NearbyBilliardRoomActivity.class);
                 intent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, bundle);
 
-                sContext.startActivity(intent);
+                mContext.startActivity(intent);
             }
         });
 
@@ -228,7 +224,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
             // 这里的WorkThread必须调用了start()方法之后，位于WorkThread当中的workHandler才可以正常工作
             mWorkerThread.start();
         }
-        if (!Utils.networkAvaiable(sContext))
+        if (!Utils.networkAvaiable(mContext))
         {
             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
         }
@@ -254,9 +250,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 double latitude = location.getLatitude();
                 double longitude = location.getLongitude();
                 // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
-                sParamsPreference.ensurePreference(sContext);
-                sParamsPreference.setRoomLati(sContext, (float) latitude);
-                sParamsPreference.setRoomLongi(sContext, (float) longitude);
+                sParamsPreference.ensurePreference(mContext);
+                sParamsPreference.setRoomLati(mContext, (float) latitude);
+                sParamsPreference.setRoomLongi(mContext, (float) longitude);
 
                 mUIEventsHandler.sendEmptyMessage(LOCATION_HAS_GOT);
             }
@@ -311,7 +307,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
         {
             Log.d(TAG, " the network are really sucked off, and we have to stop fetching any more data from the server any more ");
             mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_FAILED,
-                    sContext.getResources().getString(R.string.network_not_available)).sendToTarget();
+                    mContext.getResources().getString(R.string.network_not_available)).sendToTarget();
             // 在请求网络任务的刚开始的时候，我们已经打开了ProgressDialog，现在既然已经确定无法继续请求，所以应该先把已经打开的ProgressDialog关闭
             mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
         }
@@ -327,8 +323,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
         requestParams.put("region", regionVal);
 
         // 将我们的经纬度信息参数传递到服务器端
-        float longi = sParamsPreference.getRoomLongi(sContext);
-        float lati = sParamsPreference.getRoomLati(sContext);
+        float longi = sParamsPreference.getRoomLongi(mContext);
+        float lati = sParamsPreference.getRoomLati(mContext);
         if (longi != -1 && lati != -1)
         {
             requestParams.put("latitude", lati + "");
@@ -558,14 +554,14 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     break;
                 case PublicConstant.USE_CACHE:
                     // 首先将我们的EmptyView隐藏掉
-                    loadEmptyTv(true);
+                    setEmptyViewGone();
                     ArrayList<NearbyRoomSubFragmentRoomBean> cachedList = (ArrayList<NearbyRoomSubFragmentRoomBean>) msg.obj;
                     mRoomList.addAll(cachedList);
                     mSearchRoomAdapter.notifyDataSetChanged();
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
                     // 依然是首先将我们的EmpttyView隐藏掉
-                    loadEmptyTv(true);
+                    setEmptyViewGone();
 
                     mBeforeCount = mRoomList.size();
                     mIsListEmpty = mRoomList.isEmpty();
@@ -594,17 +590,17 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     if (mRoomList.isEmpty())
                     {
                         Log.d(TAG, " inside the room fragment UIEventsHandler --> have send the message to load the Empty TextView ");
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     } else
                     {
                         if (mRefresh)
                         {
                             if (mAfterCount == mBeforeCount)
                             {
-                                Utils.showToast(sContext, sContext.getString(R.string.no_newer_info));
+                                Utils.showToast(mContext, mContext.getString(R.string.no_newer_info));
                             } else
                             {
-                                Utils.showToast(sContext, sContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                                Utils.showToast(mContext, mContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }
@@ -628,8 +624,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
                     break;
                 case LOCATION_HAS_GOT:
-                    sParamsPreference.ensurePreference(sContext);
-                    String rangeStr = sParamsPreference.getRoomRange(sContext);
+                    sParamsPreference.ensurePreference(mContext);
+                    String rangeStr = sParamsPreference.getRoomRange(mContext);
                     if (!TextUtils.isEmpty(rangeStr))
                     {
                         if (null != mWorkerThread)
@@ -680,34 +676,34 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     if (! TextUtils.isEmpty(errorMsg))
                     {
                         Log.d(TAG, " the error data we get are : " + errorMsg);
-                        Utils.showToast(sContext, errorMsg);
+                        Utils.showToast(mContext, errorMsg);
                     } else {
-                        Utils.showToast(sContext, sContext.getString(R.string.http_request_error));
+                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
                     }
 
                     if (mRoomList.isEmpty())
                     {
                         Log.d(TAG, " the room list we get are : " + mRoomList.size());
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     }
 
                     break;
                 case PublicConstant.NO_NETWORK:
                     hideProgress();
-                    Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
+                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     if (mRoomList.isEmpty())
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     break;
 
                 case PublicConstant.NO_RESULT:
                     if (mRoomList.isEmpty())
                     {
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     } else
                     {
                         if (mLoadMore)
                         {
-                            Utils.showToast(sContext, sContext.getString(R.string.no_more_info, sContext.getString(R.string.search_billiard_room_str)));
+                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.search_billiard_room_str)));
                         }
                     }
                     hideProgress();
@@ -717,10 +713,26 @@ public class BilliardsNearbyRoomFragment extends Fragment
         }
     };
 
-    private void loadEmptyTv(boolean disabled)
+
+    private TextView mEmptyView;
+    // 我们通过将disable的值设置为false来进行加载EmptyView
+    // 通过将disable的值设置为true来隐藏emptyView
+    private void loadEmptyTv()
     {
-        Log.d(TAG, "inside the roomFragment --> we have load the EmptyView ");
-        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mRoomListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str), disabled);
+        mEmptyView = new TextView(mContext);
+        mEmptyView.setGravity(Gravity.CENTER);
+        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        mEmptyView.setTextColor(mContext.getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setText(mContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+        mRoomListView.setEmptyView(mEmptyView);
+    }
+
+    private void setEmptyViewGone()
+    {
+        if (null != mEmptyView)
+        {
+            mEmptyView.setVisibility(View.GONE);
+        }
     }
 
     private void showProgress()
@@ -767,14 +779,14 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             final int pageNum = pageData.getInt(KEY_REQUEST_PAGE_NUM);
                             Log.d(TAG, " inside the WorkThreadHandler, and the pageNum we get are : " + pageNum);
                             // 然后开始正式的加载数据
-                            String cachedRegion = sParamsPreference.getRoomRegion(sContext);
-                            String cachedRange = sParamsPreference.getRoomRange(sContext);
+                            String cachedRegion = sParamsPreference.getRoomRegion(mContext);
+                            String cachedRange = sParamsPreference.getRoomRange(mContext);
                             // 因为按照好评度排序和按照价格排序这两种排序规则只能存在一种，
                             // 因为请求函数一次只能接受一个参数，要么星级要么价格排序，所以我们选择不为空的那一个
                             // 当然如果两个都为空的话，那么我们就都传空的参数，然后由具体的请求函数做判断
                             // 因为我们这里只要保证只传递一个参数就可以了
-                            String cachedApprisal = sParamsPreference.getRoomApprisal(sContext);
-                            String cachedPrice = sParamsPreference.getRoomPrice(sContext);
+                            String cachedApprisal = sParamsPreference.getRoomApprisal(mContext);
+                            String cachedPrice = sParamsPreference.getRoomPrice(mContext);
                             String sortFilterVal = TextUtils.isEmpty(cachedApprisal) ? cachedPrice : cachedApprisal;
                             retrieveRoomListInfo("北京", cachedRegion, cachedRange, sortFilterVal, 20, pageNum);
                             break;
@@ -794,9 +806,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             // 所以我们这里决定一旦筛选了价格，那么就把ParamsPreference当中的好评度的值清零，同样的对于好评度筛选
                             // 时，我们也需要将价格在ParamsPreference当中存储的值情况
                             // 这样，当我们进行距离和区域的筛选时，就会发现价格和好评度只有一个存在，而不是两个，方便筛选(当然如果大众点评同时提供两个接口就不用这么麻烦了)
-                            sParamsPreference.setRoomPrice(sContext, "");
-                            String apprisalRangeStr = sParamsPreference.getRoomRange(sContext);
-                            String apprisalRegionStr = sParamsPreference.getRoomRegion(sContext);
+                            sParamsPreference.setRoomPrice(mContext, "");
+                            String apprisalRangeStr = sParamsPreference.getRoomRange(mContext);
+                            String apprisalRegionStr = sParamsPreference.getRoomRegion(mContext);
 
                             // 每次都是重新请求，所以我们将页码的数目设置为1
                             retrieveRoomListInfo("北京", apprisalRegionStr, apprisalRangeStr, apprisalStr, 20, 1);
@@ -813,9 +825,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
                             // 由于价格和好评度每次只能选择一个，这里按用户的要求是进行价格的筛选，所以我们干脆就把好评度不管了
                             // 首先将好评度在ParamsPreference当中的值清空
-                            sParamsPreference.setRoomApprisal(sContext, "");
-                            String priceRangeStr = sParamsPreference.getRoomRange(sContext);
-                            String priceRegionStr = sParamsPreference.getRoomRegion(sContext);
+                            sParamsPreference.setRoomApprisal(mContext, "");
+                            String priceRangeStr = sParamsPreference.getRoomRange(mContext);
+                            String priceRegionStr = sParamsPreference.getRoomRegion(mContext);
                             // 每次筛选都是重新进行筛选的，所以我们将页码的数目设置为1
                             retrieveRoomListInfo("北京", priceRegionStr, priceRangeStr, priceStr, 20, 1);
 
@@ -829,9 +841,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             String rangeStr = (String) msg.obj;
                             Log.d(TAG, " in the internal mWorkThread --> the range string we get are : " + rangeStr);
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            String rangePriceStr = sParamsPreference.getRoomPrice(sContext);
-                            String rangeApprisalStr = sParamsPreference.getRoomApprisal(sContext);
-                            String rangeRegionStr = sParamsPreference.getRoomRegion(sContext);
+                            String rangePriceStr = sParamsPreference.getRoomPrice(mContext);
+                            String rangeApprisalStr = sParamsPreference.getRoomApprisal(mContext);
+                            String rangeRegionStr = sParamsPreference.getRoomRegion(mContext);
                             String rangeSortStr = TextUtils.isEmpty(rangePriceStr) ? rangeApprisalStr : rangePriceStr;
                             Log.d(TAG, " the sort value we get are " + rangeSortStr);
 
@@ -850,9 +862,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             Log.d(TAG, " we have received the string to send the message, and the string are : " + regionStr);
                             // 我们在这里开始真正的请求过程(即进行网络请求，请求参数即为我们这里获取到的region字符串)
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            String regionPriceStr = sParamsPreference.getRoomPrice(sContext);
-                            String regionApprisalStr = sParamsPreference.getRoomApprisal(sContext);
-                            String regionRangeStr = sParamsPreference.getRoomRange(sContext);
+                            String regionPriceStr = sParamsPreference.getRoomPrice(mContext);
+                            String regionApprisalStr = sParamsPreference.getRoomApprisal(mContext);
+                            String regionRangeStr = sParamsPreference.getRoomRange(mContext);
 
                             String regionSortVal = TextUtils.isEmpty(regionPriceStr) ? regionApprisalStr : regionPriceStr;
 
@@ -861,7 +873,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     }
                 }
             };
-            if (Utils.networkAvaiable(sContext))
+            if (Utils.networkAvaiable(mContext))
             {
                 // 我们初始情况下的数据请求都是请求最新的数据
                 fetchRoomData(mPageNum);
@@ -931,12 +943,12 @@ public class BilliardsNearbyRoomFragment extends Fragment
         @Override
         public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView)
         {
-            String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
+            String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
             mRefresh = true;
             mLoadMore = false;
-            if (Utils.networkAvaiable(sContext))
+            if (Utils.networkAvaiable(mContext))
             {
                 // 我们将我们的page数增加
                 // 因为我们向下拉的时候，加载的总是最新的数据，所以我们将这里的page的数目置成1，
@@ -945,7 +957,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 {
                     mWorkerThread.fetchRoomData(1);
                 }
-                loadEmptyTv(true);
+                setEmptyViewGone();
             } else
             {
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
@@ -961,15 +973,15 @@ public class BilliardsNearbyRoomFragment extends Fragment
         @Override
         public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView)
         {
-            String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
+            String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
             mLoadMore = true;
 
             if (mBeforeCount != mAfterCount && !mRefresh)
                 mPage += 1;
             mRefresh = false;
-            loadEmptyTv(true);
-            if (Utils.networkAvaiable(sContext))
+            setEmptyViewGone();
+            if (Utils.networkAvaiable(mContext))
             {
                 // TODO: 我们在这里进行网络更新的请求
                 // TODO: 只是大众点评并没有提供完整的开始请求条数和结束请求条数，而是直接的按分页
@@ -991,7 +1003,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     // use the static data to init the BilliardsNearbyRoomFragment
     private void initListStaticTestData()
     {
-        Resources mRes = sContext.getResources();
+        Resources mRes = mContext.getResources();
         String roomName = mRes.getString(R.string.search_room_sub_fragment_listitem_roomname);
         float level = 3.5f;
         double price = 36;

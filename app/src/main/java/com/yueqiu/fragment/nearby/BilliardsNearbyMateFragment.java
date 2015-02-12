@@ -14,6 +14,8 @@ import android.os.Process;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,10 +68,11 @@ public class BilliardsNearbyMateFragment extends Fragment
     private static final String TAG = "DeskBallFragment";
     private static final String TAG_1 = "mate_filter_test";
     private static final String TAG_2 = "mate_handler_test";
+    private static final String TAG_3 = "popupwindow_index_bug";
     public static final String BILLIARD_SEARCH_TAB_NAME = "billiard_search_tab_name";
     private View mView;
     private String mArgs;
-    private Context sContext;
+    private Context mContext;
 
     private PullToRefreshListView mSubFragmentListView;
 
@@ -84,7 +87,7 @@ public class BilliardsNearbyMateFragment extends Fragment
 
     public static BilliardsNearbyMateFragment newInstance(Context context, String params)
     {
-//        sContext = context;
+//        mContext = context;
         BilliardsNearbyMateFragment fragment = new BilliardsNearbyMateFragment();
 
         Bundle args = new Bundle();
@@ -97,7 +100,7 @@ public class BilliardsNearbyMateFragment extends Fragment
     public void onAttach(Activity activity)
     {
         super.onAttach(activity);
-        this.sContext = activity;
+        this.mContext = activity;
     }
 
     // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
@@ -116,10 +119,10 @@ public class BilliardsNearbyMateFragment extends Fragment
         mRequestParms = NearbyParamsPreference.getInstance();
 
         // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
-//        mMateListAdapterateDaoImpl = new NearbyMateDaoImpl(sContext);
+//        mMateListAdapterateDaoImpl = new NearbyMateDaoImpl(mContext);
         // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 
-        mIsNetworkAvailable = Utils.networkAvaiable(sContext);
+        mIsNetworkAvailable = Utils.networkAvaiable(mContext);
     }
 
     private ProgressBar mPreProgress;
@@ -157,8 +160,8 @@ public class BilliardsNearbyMateFragment extends Fragment
     {
         mView = inflater.inflate(R.layout.fragment_nearby_mate_layout, container, false);
         // then, inflate the image view pager
-        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(sContext);
-        commonUtils.initViewPager(sContext, mView);
+        NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
+        commonUtils.initViewPager(mContext, mView);
 
         mSubFragmentListView = (PullToRefreshListView) mView.findViewById(R.id.search_sub_fragment_list);
         mSubFragmentListView.setMode(PullToRefreshBase.Mode.BOTH);
@@ -171,7 +174,7 @@ public class BilliardsNearbyMateFragment extends Fragment
         mPreProgress.setIndeterminateDrawable(mProgressDrawable);
         mPreProgress.getIndeterminateDrawable().setBounds(bounds);
 
-        mClickListener = new NearbyPopBasicClickListener(sContext, mUIEventsHandler, sParamsPreference);
+        mClickListener = new NearbyPopBasicClickListener(mContext, mUIEventsHandler, sParamsPreference);
         (mView.findViewById(R.id.btn_mate_distance)).setOnClickListener(mClickListener);
         (mView.findViewById(R.id.btn_mate_gender)).setOnClickListener(mClickListener);
         mPopupwindowCallback = mClickListener;
@@ -214,7 +217,7 @@ public class BilliardsNearbyMateFragment extends Fragment
         }
 
 
-        mMateListAdapter = new NearbyMateSubFragmentListAdapter(sContext,  mUserList);
+        mMateListAdapter = new NearbyMateSubFragmentListAdapter(mContext,  mUserList);
         mSubFragmentListView.setAdapter(mMateListAdapter);
 
 //        mMateListAdapter.notifyDataSetChanged();
@@ -228,7 +231,7 @@ public class BilliardsNearbyMateFragment extends Fragment
             mWorker.start();
         }
 
-        if (! Utils.networkAvaiable(sContext))
+        if (! Utils.networkAvaiable(mContext))
         {
             // 我们的数据请求只是发生于网络可行的情况下
             mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
@@ -246,7 +249,6 @@ public class BilliardsNearbyMateFragment extends Fragment
     public void onResume()
     {
         super.onResume();
-
     }
 
     @Override
@@ -257,7 +259,7 @@ public class BilliardsNearbyMateFragment extends Fragment
             mWorker.interrupt();
             mWorker = null;
         }
-        Log.d("mate_onpause", " inside mate fragment --> the current mate fragment is onPause ... ");
+        Log.d(TAG_3, " inside mate fragment --> the current mate fragment is onPause ... ");
         mPopupwindowCallback.closePopupWindow();
         super.onPause();
     }
@@ -269,7 +271,7 @@ public class BilliardsNearbyMateFragment extends Fragment
         // TODO: 我们目前采用的策略只是简单的直接获取数据的方式，如果需要升级我们还需要通过添加BroadcastReceiver来
         // TODO: 监听数据的获取状态，然后在onStop()方法当中解注册这个BroadcastReceiver
 
-        Log.d("mate_onstop", " inside mate fragment --> the current mate fragment is onStop ... ");
+        Log.d(TAG_3, " inside mate fragment --> the current mate fragment is onStop ... ");
         mPopupwindowCallback.closePopupWindow();
         super.onStop();
     }
@@ -284,7 +286,7 @@ public class BilliardsNearbyMateFragment extends Fragment
      */
     private void retrieveInitialMateInfoList(final int startNo, final int endNo, final String distance, final String gender)
     {
-        if (!Utils.networkAvaiable(sContext))
+        if (!Utils.networkAvaiable(mContext))
         {
             mUIEventsHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
             mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
@@ -295,18 +297,18 @@ public class BilliardsNearbyMateFragment extends Fragment
         requestParams.put("end_no", endNo + "");
         if (!TextUtils.isEmpty(distance))
         {
-            Log.d(TAG, " inside the real mate request method, and the range(distance) info we get are : " + distance);
+            Log.d(TAG_2, " inside the real mate request method, and the range(distance) info we get are : " + distance);
             requestParams.put("range", distance);
         }
         if (!TextUtils.isEmpty(gender))
         {
-            Log.d(TAG, " inside the real mate request method, and the gender(sex) info we get are : " + gender);
+            Log.d(TAG_2, " inside the real mate request method, and the gender(sex) info we get are : " + gender);
             requestParams.put("gender", gender);
         }
         List<NearbyMateSubFragmentUserBean> cacheMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
         String rawResult = HttpUtil.urlClient(HttpConstants.NearbyMate.URL, requestParams, HttpConstants.RequestMethod.GET);
 
-        Log.d(TAG, " the raw result we get for the mate fragment are : " + rawResult);
+        Log.d(TAG_2, " the raw result we get for the mate fragment are : " + rawResult);
         if (!TextUtils.isEmpty(rawResult))
         {
             try
@@ -337,7 +339,7 @@ public class BilliardsNearbyMateFragment extends Fragment
                                 String userId = dataObj.getString("user_id");
                                 int range = dataObj.getInt("range");
                                 String district = dataObj.getString("district");
-                                NearbyMateSubFragmentUserBean mateUserBean = new NearbyMateSubFragmentUserBean(userId, imgUrl, userName, NearbyFragmentsCommonUtils.parseGenderStr(sContext, sex), district, String.valueOf(range));
+                                NearbyMateSubFragmentUserBean mateUserBean = new NearbyMateSubFragmentUserBean(userId, imgUrl, userName, NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex), district, String.valueOf(range));
 
                                 cacheMateList.add(mateUserBean);
                             }
@@ -416,7 +418,6 @@ public class BilliardsNearbyMateFragment extends Fragment
     // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 
     private static final int NO_NETWORK = 1 << 11;
-    private boolean mHasLoadEmptyView = false;
 
     // 这个Handler主要是用于处理UI相关的事件,例如涉及到UI的事件的直接处理，例如Toast或者ProgressBar的显示控制
     private Handler mUIEventsHandler = new Handler()
@@ -427,18 +428,18 @@ public class BilliardsNearbyMateFragment extends Fragment
             switch (msg.what)
             {
                 case DATA_RETRIEVE_FAILED:
-                    loadEmptyTv(true);
-                    if (mUserList.isEmpty() && ! mHasLoadEmptyView)
+                    setEmptyViewGone();
+                    if (mUserList.isEmpty())
                     {
                         Log.d("scguo_tag", "load emptyView 1");
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     }
-                    Toast.makeText(sContext, sContext.getResources().getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, mContext.getResources().getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
                     hideProgress();
                     break;
                 case PublicConstant.USE_CACHE:
                     // 我们需要首先将我们之前加载的EmptyView不再显示
-                    loadEmptyTv(true);
+                    setEmptyViewGone();
                     List<NearbyMateSubFragmentUserBean> cacheList = (ArrayList<NearbyMateSubFragmentUserBean>) msg.obj;
                     mUserList.addAll(cacheList);
                     mMateListAdapter.notifyDataSetChanged();
@@ -446,7 +447,7 @@ public class BilliardsNearbyMateFragment extends Fragment
 
                 case DATA_RETRIEVE_SUCCESS:
                     // 首先我们需要将我们的EmptyView隐藏掉
-                    loadEmptyTv(true);
+                    setEmptyViewGone();
 
                     mBeforeCount = mUserList.size();
                     mIsListEmpty = mUserList.isEmpty();
@@ -486,10 +487,10 @@ public class BilliardsNearbyMateFragment extends Fragment
                     mAfterCount = mUserList.size();
                     Log.d(TAG, " mUIEventsHandler --> the final user list size are : " + mAfterCount);
 
-                    if (mUserList.isEmpty() && !mHasLoadEmptyView)
+                    if (mUserList.isEmpty())
                     {
                         Log.d("scguo_tag", "load emptyView 2");
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     } else
                     {
                         // 如果触发DATA_RETRIEVE_SUCCESS的事件是来自用户的下拉刷新
@@ -498,10 +499,10 @@ public class BilliardsNearbyMateFragment extends Fragment
                         {
                             if (mAfterCount == mBeforeCount)
                             {
-                                Utils.showToast(sContext, sContext.getString(R.string.no_newer_info));
+                                Utils.showToast(mContext, mContext.getString(R.string.no_newer_info));
                             } else
                             {
-                                Utils.showToast(sContext, sContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
+                                Utils.showToast(mContext, mContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }
@@ -516,13 +517,13 @@ public class BilliardsNearbyMateFragment extends Fragment
 //                    break;
                 // TODO: ------------------------UNCOMMENT LATER------------------------------------------
                 case NO_NETWORK:
-                    loadEmptyTv(true);
-                    Utils.showToast(sContext, sContext.getString(R.string.network_not_available));
+                    setEmptyViewGone();
+                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
 
-                    if (mUserList.isEmpty() && !mHasLoadEmptyView)
+                    if (mUserList.isEmpty())
                     {
                         Log.d("scguo_tag", "load emptyView 3");
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     }
 
                     break;
@@ -532,7 +533,7 @@ public class BilliardsNearbyMateFragment extends Fragment
 
                     break;
                 case HIDE_PROGRESSBAR:
-                    loadEmptyTv(true);
+                    setEmptyViewGone();
                     mMateListAdapter.notifyDataSetChanged();
                     hideProgress();
                     // 当我们将数据获取完之后，就需要经Refresh的标记去掉，否则会一直在那里转
@@ -541,11 +542,11 @@ public class BilliardsNearbyMateFragment extends Fragment
                         mSubFragmentListView.onRefreshComplete();
                     }
 
-//                    if (mUserList.isEmpty())
-//                    {
-//                        Log.d("scguo_tag", "load emptyView 4");
-//                        loadEmptyTv(false);
-//                    }
+                    if (mUserList.isEmpty())
+                    {
+                        Log.d("scguo_tag", "load emptyView 4");
+                        loadEmptyTv();
+                    }
                     Log.d(TAG, " hiding the progress bar ");
 
                     break;
@@ -575,51 +576,50 @@ public class BilliardsNearbyMateFragment extends Fragment
                     break;
 
                 case PublicConstant.TIME_OUT:
-                    loadEmptyTv(true);
+                    setEmptyViewGone();
                     // 超时之后的处理策略
-                    Utils.showToast(sContext, sContext.getString(R.string.http_request_time_out));
-                    if (mUserList.isEmpty() && !mHasLoadEmptyView)
+                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
+                    if (mUserList.isEmpty())
                     {
                         Log.d("scguo_tag", "load emptyView 5");
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     }
                     hideProgress();
                     break;
 
                 case PublicConstant.NO_RESULT:
-                    loadEmptyTv(true);
-                    if (mUserList.isEmpty() && !mHasLoadEmptyView)
+                    setEmptyViewGone();
+                    if (mUserList.isEmpty())
                     {
                         Log.d("scguo_tag", "load emptyView 6");
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     } else
                     {
                         if (mLoadMore)
                         {
-                            Utils.showToast(sContext, sContext.getString(R.string.no_more_info, sContext.getString(R.string.search_billiard_mate_str)));
+                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.search_billiard_mate_str)));
                         }
                     }
                     hideProgress();
                     break;
 
                 case PublicConstant.REQUEST_ERROR:
-                    // TODO: 以下的这个方法应该工作的，但是却没有正常，因为并没有将我们的EmptyView隐藏掉
-                    loadEmptyTv(true);
+                    setEmptyViewGone();
                     Bundle errorData = msg.getData();
                     String errorInfo = errorData.getString(KEY_REQUEST_ERROR_MSG);
                     Log.d(TAG, " inside the UIEventsProcessingHandler --> have exception while we make the network request, and the error msg : " + errorInfo);
                     if (! TextUtils.isEmpty(errorInfo))
                     {
-                        Utils.showToast(sContext, errorInfo);
+                        Utils.showToast(mContext, errorInfo);
                     } else
                     {
-                        Utils.showToast(sContext, sContext.getString(R.string.http_request_error));
+                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
                     }
 
-                    if (mUserList.isEmpty() && !mHasLoadEmptyView)
+                    if (mUserList.isEmpty())
                     {
                         Log.d("scguo_tag", " fuck goes here ! load emptyView 7");
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     }
                     hideProgress();
                     break;
@@ -628,15 +628,25 @@ public class BilliardsNearbyMateFragment extends Fragment
         }
     };
 
+    private TextView mEmptyView;
     // 我们通过将disable的值设置为false来进行加载EmptyView
     // 通过将disable的值设置为true来隐藏emptyView
-    private void loadEmptyTv(final boolean whetherHide)
+    private void loadEmptyTv()
     {
-        if (! whetherHide)
+        mEmptyView = new TextView(mContext);
+        mEmptyView.setGravity(Gravity.CENTER);
+        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        mEmptyView.setTextColor(mContext.getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setText(mContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+        mSubFragmentListView.setEmptyView(mEmptyView);
+    }
+
+    private void setEmptyViewGone()
+    {
+        if (null != mEmptyView)
         {
-            mHasLoadEmptyView = true;
+            mEmptyView.setVisibility(View.GONE);
         }
-        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(sContext, mSubFragmentListView, sContext.getString(R.string.search_activity_subfragment_empty_tv_str), whetherHide);
     }
 
     private void showProgress()
@@ -691,8 +701,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                             final int startNum = requestInfo.getInt(KEY_REQUEST_START_NUM);
                             final int endNum = requestInfo.getInt(KEY_REQUEST_END_NUM);
                             Log.d(TAG, "inside the mWorker event processing Looper, and the startNum : " + startNum + " , and the endNum are : " + endNum);
-                            String rangeParams = mRequestParms.getMateRange(sContext);
-                            String genderParams = mRequestParms.getMateGender(sContext);
+                            String rangeParams = mRequestParms.getMateRange(mContext);
+                            String genderParams = mRequestParms.getMateGender(mContext);
                             Log.d(TAG, " inside the mWorker event processing Looper --> And the request params that we stored in the SharedPreference : range : " + rangeParams + " , gender " + genderParams);
                             retrieveInitialMateInfoList(startNum, endNum, rangeParams, genderParams);
 
@@ -710,8 +720,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                             mUIEventsHandler.sendEmptyMessage(SHOW_PROGRESSBAR);
                             // 每次筛选，都是从第0条开始请求最新的数据
                             // 因为这相当于完全的重新开始了，所以我们需要将我们已经获得的UserList清空才可以
-                            if (!TextUtils.isEmpty(sParamsPreference.getMateGender(sContext))) {
-                                retrieveInitialMateInfoList(0, 9, range, sParamsPreference.getMateGender(sContext));
+                            if (!TextUtils.isEmpty(sParamsPreference.getMateGender(mContext))) {
+                                retrieveInitialMateInfoList(0, 9, range, sParamsPreference.getMateGender(mContext));
                             }
 
                             break;
@@ -726,10 +736,10 @@ public class BilliardsNearbyMateFragment extends Fragment
                             Log.d(TAG, " inside the workThread --> start filtering the mate list based on the gender of the current user " + gender);
                             mUIEventsHandler.sendEmptyMessage(SHOW_PROGRESSBAR);
 
-                            if (!TextUtils.isEmpty(sParamsPreference.getMateRange(sContext))) {
+                            if (!TextUtils.isEmpty(sParamsPreference.getMateRange(mContext))) {
                                 // TODO: 现在我们正式完成了筛选的工作了，但是却还有一个问题，那就是我们
                                 // TODO: 确定所要加载的条目
-                                retrieveInitialMateInfoList(0, 9, sParamsPreference.getMateRange(sContext), gender);
+                                retrieveInitialMateInfoList(0, 9, sParamsPreference.getMateRange(mContext), gender);
                             }
 
                             break;
@@ -762,7 +772,7 @@ public class BilliardsNearbyMateFragment extends Fragment
             // 这里，我们需要理清一个基本前提的逻辑，那就是我们现在
             // 是没有保持任何缓存的，所以我们在任何时候进入到这个应用的时候，也就是onResume()方法当中的时候，
             // 我们仅仅只是单纯的加载我们所需要的最新的10条数据就可以了
-            if (Utils.networkAvaiable(sContext))
+            if (Utils.networkAvaiable(mContext))
             {
                 fetchAllData(mStartNO, mEndNO);
             }
@@ -846,10 +856,10 @@ public class BilliardsNearbyMateFragment extends Fragment
         @Override
         public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView)
         {
-            String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
+            String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-            loadEmptyTv(true);
-            if (Utils.networkAvaiable(sContext))
+            setEmptyViewGone();
+            if (Utils.networkAvaiable(mContext))
             {
                 mRefresh = true;
                 mLoadMore = false;
@@ -871,7 +881,7 @@ public class BilliardsNearbyMateFragment extends Fragment
         public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView)
         {
             Log.d(TAG, " the user has touched the end of the current list in the BilliardsNearbyMateFragment ");
-            String label = NearbyFragmentsCommonUtils.getLastedTime(sContext);
+            String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
             mLoadMore = true;
@@ -894,8 +904,8 @@ public class BilliardsNearbyMateFragment extends Fragment
             }
 
             mRefresh = false;
-            loadEmptyTv(true);
-            if (Utils.networkAvaiable(sContext))
+            setEmptyViewGone();
+            if (Utils.networkAvaiable(mContext))
             {
                 // 网络可行的情况,我们直接在我们已经得到的startNum和endNum基础之上进行数据的请求
                 // 我们应该在这里首先判断，用户是都已经添加了筛选参数，

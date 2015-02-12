@@ -13,6 +13,8 @@ import android.os.Process;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,9 +28,9 @@ import com.yueqiu.adapter.NearbyAssistCoauchSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyAssistCoauchSubFragmentBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
+import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
@@ -38,6 +40,7 @@ import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -67,7 +70,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     public static BilliardsNearbyAssistCoauchFragment newInstance(Context context, String params)
     {
         // TODO: 以下获取Context实例的方法是完全不符合Fragment的设计理念的
-//        sContext = context;
+//        mContext = context;
         BilliardsNearbyAssistCoauchFragment instance = new BilliardsNearbyAssistCoauchFragment();
         Bundle args = new Bundle();
         args.putString(KEY_BILLIARDS_NEARBY_PARENT_FRAGMENT, params);
@@ -356,10 +359,27 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         }
     }
 
-    private void loadEmptyTv(boolean disabled)
+    private TextView mEmptyView;
+    // 我们通过将disable的值设置为false来进行加载EmptyView
+    // 通过将disable的值设置为true来隐藏emptyView
+    private void loadEmptyTv()
     {
-        NearbyFragmentsCommonUtils.setFragmentEmptyTextView(mContext, mListView, mContext.getString(R.string.search_activity_subfragment_empty_tv_str), disabled);
+        mEmptyView = new TextView(mContext);
+        mEmptyView.setGravity(Gravity.CENTER);
+        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+        mEmptyView.setTextColor(mContext.getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setText(mContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+        mListView.setEmptyView(mEmptyView);
     }
+
+    private void setEmptyViewGone()
+    {
+        if (null != mEmptyView)
+        {
+            mEmptyView.setVisibility(View.GONE);
+        }
+    }
+
 
     private static final String KEY_REQUEST_ERROR_MSG = "keyRequestErrorMsg";
     private static final String KEY_REQUEST_START_NUM = "keyRequestStartNum";
@@ -412,13 +432,13 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     }
                     if (mAssistCoauchList.isEmpty())
                     {
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     }
                     Log.d(TAG, " fail to fetch the data, and the reason are : " + reasonStr);
                     break;
 
                 case PublicConstant.USE_CACHE:
-                    loadEmptyTv(true);
+                    setEmptyViewGone();
                     ArrayList<NearbyAssistCoauchSubFragmentBean> cachedList = (ArrayList<NearbyAssistCoauchSubFragmentBean>) msg.obj;
                     mAssistCoauchList.addAll(cachedList);
                     mAssistCoauchListAdapter.notifyDataSetChanged();
@@ -426,7 +446,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
                     // 首先隐藏EmptyView
-                    loadEmptyTv(true);
+                    setEmptyViewGone();
                     mBeforeCount = mAssistCoauchList.size();
                     List<NearbyAssistCoauchSubFragmentBean> asList = (ArrayList<NearbyAssistCoauchSubFragmentBean>) msg.obj;
                     for (NearbyAssistCoauchSubFragmentBean asBean : asList)
@@ -453,7 +473,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     // 判断一下，当前的List是否是空的，如果是空的，我们就需要加载一下当list为空时，显示的TextView
                     if (mAssistCoauchList.isEmpty())
                     {
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     } else
                     {
                         if (mRefresh)
@@ -506,7 +526,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     if (mAssistCoauchList.isEmpty())
                     {
                         Log.d(TAG, " inside the UIEvents Handler, and we have loaded the EmptyView here ");
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     }
                     Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     // 当网络不可行时，我们需要将ProgressBar不再显示
@@ -521,7 +541,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
                     if (mAssistCoauchList.isEmpty())
                     {
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     }
 
                     hideProgress();
@@ -529,7 +549,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                 case PublicConstant.NO_RESULT:
                     if (mAssistCoauchList.isEmpty())
                     {
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     } else
                     {
                         if (mLoadMore)
@@ -552,7 +572,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     }
                     if (mAssistCoauchList.isEmpty())
                     {
-                        loadEmptyTv(false);
+                        loadEmptyTv();
                     }
 
                     hideProgress();
@@ -747,7 +767,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             {
                 mLoadMore = false;
                 mRefresh = true;
-                loadEmptyTv(true);
+                setEmptyViewGone();
                 if (mWorker != null)
                 {
                     mWorker.fetchAllData(0, 9);
@@ -778,7 +798,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                 mEndNum += 10;
             }
             mRefresh = false;
-            loadEmptyTv(true);
+            setEmptyViewGone();
             if (Utils.networkAvaiable(mContext))
             {
                 if (null != mWorker)

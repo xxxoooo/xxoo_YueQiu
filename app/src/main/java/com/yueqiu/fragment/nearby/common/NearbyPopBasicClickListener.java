@@ -228,13 +228,13 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                 mPopupTitleView.setText(R.string.search_mate_popupmenu_item_filter_str);
                 mPopupListView.setAdapter(new NearbyPopupBaseAdapter(mContext, Arrays.asList(mate_distance)));
                 mPopupWindow = getFilterPopupWindow(mContext, view, mPopupBaseView);
-                Log.d(TAG_1, " the popupWindow are --> " + (mPopupWindow == null) + ", and the base view are : " + (mPopupBaseView == null));
+                Log.d(TAG_1, " the popupWindow are --> " + (mPopupWindow != null) + ", and the base view are : " + (mPopupBaseView != null));
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                 {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                     {
-                        Log.d(TAG_1, " the current selected position are : " + position);
+                        Log.d(TAG_1, " the current selected position are : " + position +", and the list size are : " + mate_distance.length);
                         // 我们要将我们传递的“500米以内”截取成“500”
                         final int posVal = position;
                         String rawDistanceStr = mate_distance[posVal];
@@ -243,6 +243,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         mParamsPreference.setMateRange(mContext, distanceVal);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyMateFragment.START_RETRIEVE_DATA_WITH_RANGE_FILTER, distanceVal).sendToTarget();
                         mPopupWindow.dismiss();
+                        Log.d(TAG_1, " we are almost come to the end of the popupWindow processing ");
                     }
                 });
                 break;

@@ -10,7 +10,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +20,6 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.activity.LoginActivity;
 import com.yueqiu.bean.ISlideListItem;
@@ -93,6 +91,7 @@ public class SlideViewAdapter extends BaseAdapter {
         return 2;
     }
 
+    private static final String TAG_1 = "bitmap_debug";
     /**
      * Get a View that displays the data at the specified position in the data set. You can either
      * create a View manually or inflate it from an XML layout file. When the View is inflated, the
@@ -158,11 +157,29 @@ public class SlideViewAdapter extends BaseAdapter {
 //                           e.printStackTrace();
 //                       }
 //                   }
-                   // 以下是一个测试图片的url，我们暂时不删除了，有bug时，我们可以用她来进行测试
 //                   String img_test = "http://byu1145240001.my3w.com/image/11.png";
+//                   if (! TextUtils.isEmpty(img_test))
+//                   {
+//                       Log.d(TAG_1, " fuck goes here .... ");
+//                       source = mImgLoader.get(
+//                               img_test, // the url to download the image
+//                               ImageLoader.getImageListener(accountHolder.image,
+//                                       R.drawable.head_img,
+//                                       R.drawable.ic_launcher), // the ImageListener
+//                               300, // the finally image width we need
+//                               300  // the finally image height we need
+//                       ).getBitmap();
+//                   }
+//                   if (null != source)
+//                   {
+//                       Log.d(TAG_1, " the source bitmap are : " + source);
+//                       Log.d(TAG_1, " the " + embedBitmap(mContext.getResources(),source,embedResId));
+//                       accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(),source,embedResId));
+//                   }
                    final int finallyEmbedResId = embedResId;
                    if (! TextUtils.isEmpty(img))
                    {
+                       Log.d(TAG_1, " we are entering image loading process ");
                        mImgLoader.get(
                                img, // pass this as test
                                new ImageLoader.ImageListener()
@@ -170,13 +187,15 @@ public class SlideViewAdapter extends BaseAdapter {
                                    @Override
                                    public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate)
                                    {
+                                        Log.d(TAG_1, " we are getting the right result here ");
                                        Bitmap sourceBitmap = response.getBitmap();
+                                       Log.d(TAG_1, " we have get the source bitmap finally ");
                                        if (null != sourceBitmap)
                                        {
+                                           Log.d(TAG_1, " the embeded resource id : " + finallyEmbedResId + ", and the source are: " + sourceBitmap);
                                            accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), sourceBitmap, finallyEmbedResId));
                                        } else
                                        {
-                                           // 当我们无法获取到网络图片时，我们就在这里进行默认图片的加载和设置
                                            Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
                                            accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
                                        }
@@ -185,19 +204,25 @@ public class SlideViewAdapter extends BaseAdapter {
                                    @Override
                                    public void onErrorResponse(VolleyError error)
                                    {
+                                        Log.d(TAG_1, " some error happened, and the detailed error info are: " + error.toString());
                                        // TODO: 当我们传递的URL为空的时候，就会发生这个错误。
                                        // TODO: 我们也可以在这里设置当获取用户头像失败时我们应该加载的系统默认图片
                                        // TODO: 如果不满意我们在onResponse()方法加载系统默认图片的做法，我们就在这里加载，
-                                       // TODO: 现阶段暂时没有崩溃的情况，如果遇到了，我们可以尝试将默认用户头像加载到这里也就是onErrorResponse()方法当中
+
 
                                    }
                                },
-                               300, // 这个值是用于设置我们的头像的图片的宽度,但是需要说明的是这个值不起作用，具体的原理需要查看Volley的文档
-                               300 // 这个值是用于设置我们的头像的图片的高度
+                               300,
+                               300
                        );
+                   } else
+                   {
+                       // 现在是没有Url的情况，即服务器端传递到的url为空的情况，我们需要在这里直接加载我们的默认图片
+                       Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
+                       accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
                    }
 
-               }else {
+               } else {
                    accountHolder.name.setVisibility(View.GONE);
                    accountHolder.login.setVisibility(View.VISIBLE);
                    accountHolder.login.setOnClickListener(new View.OnClickListener() {
@@ -244,6 +269,7 @@ public class SlideViewAdapter extends BaseAdapter {
     }
 
     private class ViewAccountHolder{
+//        NetworkImageView image;
         ImageView image;
         TextView  name;
         TextView  golden;
@@ -269,7 +295,10 @@ public class SlideViewAdapter extends BaseAdapter {
             embedded = source;
         }else{
             embedded = source.copy(Bitmap.Config.ARGB_8888,true);
-            source.recycle();
+            // TODO: 以下的是之前的实现，移除之后可以结合Volley当中的ImageLoader 使用，但是不移除的
+            // TODO: 话，暂时还不确定是否会影响内存资源的回收问题
+            // TODO: 关于source.recycle()内部的具体操作还不确定。需要参考StackOverflow上面的分析理解
+//            source.recycle();
         }
 
         embedded.setHasAlpha(true);
