@@ -45,7 +45,7 @@ import com.yueqiu.activity.MyParticipationActivity;
 import com.yueqiu.activity.MyProfileActivity;
 import com.yueqiu.activity.PublishedInfoActivity;
 import com.yueqiu.adapter.SlideViewAdapter;
-import com.yueqiu.chatbar.GotyeService;
+import com.yueqiu.im.GotyeService;
 import com.yueqiu.bean.ISlideListItem;
 import com.yueqiu.bean.SlideAccountItemISlide;
 import com.yueqiu.bean.SlideOtherItemISlide;
@@ -76,8 +76,7 @@ import java.util.Map;
 /**
  * 首页的SearchActivity
  */
-public class BilliardNearbyActivity extends FragmentActivity implements ActionBar.TabListener, LoginListener
-{
+public class BilliardNearbyActivity extends FragmentActivity implements ActionBar.TabListener, LoginListener {
     private static final String TAG = "BilliardNearbyActivity";
 
     private static final String STATE_MENUDRAWER = "com.yueqiu.menuDrawer";
@@ -86,8 +85,6 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private static final String FRAGMENT_PAGER_LAST_POSITION = "fragmentPagerLastPosition";
     private static final String CURRENT_KEY = "nearby_current_item";
 
-    private static final int LOGOUT_SUCCESS = 0;
-    private static final int LOGOUT_FAILED = 1;
 
     private ViewPager mViewPager;
     private String[] mTitles;
@@ -111,8 +108,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private static int sPagerPos = 0;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, " the onCreate has been called ");
         super.onCreate(savedInstanceState);
 
@@ -140,19 +136,16 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
         mGroup = (RadioGroup) findViewById(R.id.search_parent_radio_group);
         mNearbyRadio = (RadioButton) findViewById(R.id.first_title_nearby);
-        mGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
-        {
+        mGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId)
-            {
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId) {
                     case R.id.first_title_nearby:
                         break;
                     case R.id.first_title_chatbar:
-                        if (checkUserId()){
+                        if (checkUserId()) {
                             mIntent.setClass(BilliardNearbyActivity.this, ChatBarActivity.class);
-                        }
-                        else {
+                        } else {
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                             mIntent.setClass(BilliardNearbyActivity.this, LoginActivity.class);
                         }
@@ -181,37 +174,37 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         filter.addAction(PublicConstant.SLIDE_FAVOR_ACTION);
         filter.addAction(PublicConstant.SLIDE_PUBLISH_ACTION);
         filter.addAction(PublicConstant.SLIDE_ACCOUNT_ACTION);
-        registerReceiver(mReceiver,filter);
+        registerReceiver(mReceiver, filter);
 
-
-        //登录IM
-        GotyeAPI.getInstance().addListerer(this);
-        if(checkUserId())
-            login();
 
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume() {
         super.onResume();
 //        setupTabs();
 //        initDrawer();
         mNearbyRadio.setChecked(true);
         mViewPager.setCurrentItem(sPagerPos);
+        if (checkUserId()) {
+            //登录IM
+            GotyeAPI.getInstance().addListerer(this);
+            login();
+        } else {
+            Log.e(TAG, "IM已经退出了！！！");
+            resetUSerInfo();
+        }
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
         //mActionBar.removeAllTabs();
         sPagerPos = mViewPager.getCurrentItem();
     }
 
     @Override
-    protected void onDestroy()
-    {
+    protected void onDestroy() {
         Log.d(TAG, " the onDestroy has been called ");
         super.onDestroy();
         mContext = null;
@@ -219,8 +212,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         unregisterReceiver(mReceiver);
     }
 
-    private void setupTabs()
-    {
+    private void setupTabs() {
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
         mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         mActionBar.setHomeButtonEnabled(true);
@@ -228,11 +220,9 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         mActionBar.setTitle(getString(R.string.app_name));
 
         mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
-        {
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
-            public void onPageSelected(int position)
-            {
+            public void onPageSelected(int position) {
                 mActionBar.setSelectedNavigationItem(position);
             }
         });
@@ -250,20 +240,17 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     }
 
     @Override
-    public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
-    {
+    public void onTabSelected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
         mViewPager.setCurrentItem(tab.getPosition());
     }
 
     @Override
-    public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
-    {
+    public void onTabUnselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
 
     }
 
     @Override
-    public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft)
-    {
+    public void onTabReselected(ActionBar.Tab tab, android.app.FragmentTransaction ft) {
 
     }
 
@@ -277,73 +264,73 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
      * 登录IM
      */
     private void login() {
-        Log.e(TAG, "isOnline --> " + GotyeAPI.getInstance().isOnline());
         if (!GotyeAPI.getInstance().isOnline()) {
             int i = GotyeAPI.getInstance().login(YueQiuApp.sUserInfo.getUsername(), null);
             // 根据返回的code判断
             if (i == GotyeStatusCode.CODE_OK) {
                 // 已经登陆
                 onLogin(i, null);
+                GotyeAPI.getInstance().removeListener(this);
             }
         }
     }
 
     /**
      * IM 登出
+     *
      * @param code 状态码 参见 {@link com.gotye.api.GotyeStatusCode}
      */
     @Override
     public void onLogout(int code) {
-        if (code == GotyeStatusCode.CODE_FORCELOGOUT) {
-            Toast.makeText(this, getString(R.string.im_login_other_device), Toast.LENGTH_SHORT).show();
-        } else if (code == GotyeStatusCode.CODE_NETWORD_DISCONNECTED) {
-            Toast.makeText(this, getString(R.string.im_user_offline), Toast.LENGTH_SHORT).show();
-
-        }
-        if (Utils.networkAvaiable(BilliardNearbyActivity.this)) {
-            new Thread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    logout();
-                }
-            }).start();
-        } else {
-            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
-        }
+//        GotyeAPI.getInstance().logout();
+////        if (code == GotyeStatusCode.CODE_FORCELOGOUT) {
+////            Toast.makeText(this, getString(R.string.im_login_other_device), Toast.LENGTH_SHORT).show();
+////        } else if (code == GotyeStatusCode.CODE_NETWORD_DISCONNECTED) {
+////            Toast.makeText(this, getString(R.string.im_user_offline), Toast.LENGTH_SHORT).show();
+////        }
+//        if (Utils.networkAvaiable(BilliardNearbyActivity.this)) {
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    logout();
+//                }
+//            }).start();
+//        } else {
+//            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
+//        }
     }
 
     /**
      * IM 登录
-     * @param code 状态码 参见 {@link com.gotye.api.GotyeStatusCode}
+     *
+     * @param code             状态码 参见 {@link com.gotye.api.GotyeStatusCode}
      * @param currentLoginUser 当前登录用户
      */
     @Override
     public void onLogin(int code, GotyeUser currentLoginUser) {
+        Log.e(TAG, ">>>>>>>>>>>>>>>>>Billiardnearbayactivity------onLogin<<<<<<<<<<<<<<<<<<");
         // 判断登陆是否成功
         if (code == GotyeStatusCode.CODE_OK) {
+            //由于掉线YueQiuApp类中的监听器会被迫remove掉，这里登录成功在注册一次
+            ((YueQiuApp) YueQiuApp.getAppContext()).registerListener();
+            Log.e(TAG, ">>>>>>>>>>>>>>>>>Billiardnearbayactivity-onLogin-CODE_OK<<<<<<<<<<<<<<<<<<");
             Intent toService = new Intent(this, GotyeService.class);
             startService(toService);
-//            Toast.makeText(this, "IM登录callback....", Toast.LENGTH_SHORT).show();
             Log.d(TAG, "IM登录成功");
         } else {
             // 失败,可根据code定位失败原因
-            Toast.makeText(this, "IM系统登录失败....", Toast.LENGTH_SHORT).show();
+            Log.d(TAG, "IM登录失败");
         }
     }
 
 
-    private class SectionPagerAdapter extends FragmentPagerAdapter
-    {
-        public SectionPagerAdapter(FragmentManager fm)
-        {
+    private class SectionPagerAdapter extends FragmentPagerAdapter {
+        public SectionPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
         @Override
-        public Fragment getItem(int index)
-        {
+        public Fragment getItem(int index) {
             Log.d(TAG, " the current Fragment index are : " + index);
             Fragment fragment;
             Bundle args;
@@ -403,22 +390,19 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         }
 
         @Override
-        public int getCount()
-        {
+        public int getCount() {
             return NUM_OF_FRAGMENTS;
         }
 
         @Override
-        public CharSequence getPageTitle(int position)
-        {
+        public CharSequence getPageTitle(int position) {
             return mTitles[position];
         }
     }
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.billiard_search, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
@@ -443,19 +427,15 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
             searchField.setAccessible(true);
             ImageView searchHintIcon = (ImageView) searchField.get(searchView);
             searchHintIcon.setImageResource(R.drawable.search);
-        } catch (NoSuchFieldException e)
-        {
+        } catch (NoSuchFieldException e) {
             Log.d(TAG, " Exception happened while we retrieving the mSearchHintIcon, and the reason goes to : " + e.toString());
             e.printStackTrace();
-        } catch (IllegalAccessException e)
-        {
+        } catch (IllegalAccessException e) {
             Log.d(TAG, " Exception happened as we have no right to access this filed, and the reason goes to : " + e.toString());
             e.printStackTrace();
-        } catch (final Exception e)
-        {
+        } catch (final Exception e) {
             Log.d(TAG, " exception happened while we make the search button : " + e.toString());
         }
-
 
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
@@ -465,8 +445,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
 
         int id = item.getItemId();
         switch (id) {
@@ -480,17 +459,15 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
 
     @Override
-    protected void onNewIntent(Intent intent)
-    {
+    protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
     }
 
-    private void initDrawer()
-    {
+    private void initDrawer() {
 
         //mItemList.clear();
         SlideAccountItemISlide accountItem = new SlideAccountItemISlide(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
-                100, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
+                100, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(accountItem);
 
         String[] values = new String[]{
@@ -523,7 +500,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
         SlideOtherItemISlide otherItem;
         for (int i = 0; i < values.length; i++) {
-            boolean hasMsg = mSharedPreferences.getBoolean(spf_values[i],false);
+            boolean hasMsg = mSharedPreferences.getBoolean(spf_values[i], false);
             otherItem = new SlideOtherItemISlide(resIds[i], values[i], hasMsg);
             mItemList.add(otherItem);
         }
@@ -533,112 +510,110 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         mMenuList = (ListView) findViewById(R.id.menu_drawer_list);
         mMenuList.setAdapter(mAdapter);
 
-        mMenuList.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+        mMenuList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-            {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent();
                 switch (position) {
                     case 0:
                         int user_id = YueQiuApp.sUserInfo.getUser_id();
-                        if(user_id < 1) {
+                        if (user_id < 1) {
                             intent.setClass(BilliardNearbyActivity.this, LoginActivity.class);
-                        }else{
-                            intent.setClass(BilliardNearbyActivity.this,MyProfileActivity.class);
+                        } else {
+                            intent.setClass(BilliardNearbyActivity.this, MyProfileActivity.class);
                         }
                         startActivity(intent);
-                        overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         break;
                     case 1:
-                        if(checkUserId()) {
+                        if (checkUserId()) {
                             intent.setClass(BilliardNearbyActivity.this, MyProfileActivity.class);
                             startActivity(intent);
-                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
-                        }else{
+                            overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
+                        } else {
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case 2:
-                        if(checkUserId()) {
+                        if (checkUserId()) {
                             intent.setClass(BilliardNearbyActivity.this, MyParticipationActivity.class);
                             startActivity(intent);
-                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
+                            overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
                             SlideOtherItemISlide partinItem = (SlideOtherItemISlide) mItemList.get(1);
-                            if(partinItem.hasMsg()){
+                            if (partinItem.hasMsg()) {
                                 partinItem.setHasMsg(false);
                                 mAdapter.notifyDataSetChanged();
-                                mEditor.putBoolean(spf_values[1],false);
+                                mEditor.putBoolean(spf_values[1], false);
                                 mEditor.apply();
                             }
-                        }else{
+                        } else {
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case 3:
-                        if(checkUserId()) {
+                        if (checkUserId()) {
                             intent.setClass(BilliardNearbyActivity.this, FavorActivity.class);
                             startActivity(intent);
-                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
+                            overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
                             SlideOtherItemISlide favorItem = (SlideOtherItemISlide) mItemList.get(3);
-                            if(favorItem.hasMsg()){
+                            if (favorItem.hasMsg()) {
                                 favorItem.setHasMsg(false);
                                 mAdapter.notifyDataSetChanged();
-                                mEditor.putBoolean(spf_values[2],false);
+                                mEditor.putBoolean(spf_values[2], false);
                                 mEditor.apply();
                             }
-                        }else{
+                        } else {
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case 4:
-                        if(checkUserId()) {
+                        if (checkUserId()) {
                             intent.setClass(BilliardNearbyActivity.this, PublishedInfoActivity.class);
                             startActivity(intent);
-                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
+                            overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
                             SlideOtherItemISlide publishedItem = (SlideOtherItemISlide) mItemList.get(4);
-                            if(publishedItem.hasMsg()) {
+                            if (publishedItem.hasMsg()) {
                                 publishedItem.setHasMsg(false);
                                 mAdapter.notifyDataSetChanged();
-                                mEditor.putBoolean(spf_values[3],false);
+                                mEditor.putBoolean(spf_values[3], false);
                                 mEditor.apply();
                             }
-                        }else{
+                        } else {
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case 5:
-                        if(checkUserId()) {
+                        if (checkUserId()) {
                             intent.setClass(BilliardNearbyActivity.this, PlayIssueActivity.class);
                             startActivity(intent);
-                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
-                        }else{
+                            overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
+                        } else {
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case 6:
-                        if(checkUserId()) {
+                        if (checkUserId()) {
                             intent.setClass(BilliardNearbyActivity.this, FeedbackActivity.class);
                             startActivity(intent);
-                            overridePendingTransition(R.anim.push_bottom_in,R.anim.push_bottom_out);
-                        }else{
+                            overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
+                        } else {
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
                         }
                         break;
                     case 7:
-//                        if (Utils.networkAvaiable(BilliardNearbyActivity.this)) {
-//                            new Thread(new Runnable()
-//                            {
-//                                @Override
-//                                public void run()
-//                                {
-//                                    logout();
-//                                }
-//                            }).start();
-//                        } else {
-//                            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
-//                        }
-                        onLogout(-100);
+                        if (!checkUserId())
+                            return;
+                        if (Utils.networkAvaiable(BilliardNearbyActivity.this)) {
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    logout();
+                                }
+                            }).start();
+                        } else {
+                            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
+                        }
+
                         break;
                 }
 
@@ -652,25 +627,23 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         });
     }
 
-    private Handler mHandler = new Handler()
-    {
+    private Handler mHandler = new Handler() {
         @Override
-        public void handleMessage(Message msg)
-        {
+        public void handleMessage(Message msg) {
             switch (msg.what) {
-                case LOGOUT_SUCCESS:
+                case YueQiuApp.LOGOUT_SUCCESS:
                     resetUSerInfo();
+                    GotyeAPI.getInstance().logout();
                     Toast.makeText(BilliardNearbyActivity.this, getString(R.string.logout_success), Toast.LENGTH_SHORT).show();
                     break;
-                case LOGOUT_FAILED:
+                case YueQiuApp.LOGOUT_FAILED:
                     Toast.makeText(BilliardNearbyActivity.this, getString(R.string.logout_failed), Toast.LENGTH_SHORT).show();
                     break;
             }
         }
     };
 
-    private void logout()
-    {
+    private void logout() {
         Map<String, String> map = new HashMap<String, String>();
         map.put(DatabaseConstant.UserTable.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
         String result = HttpUtil.urlClient(HttpConstants.LogoutConstant.URL,
@@ -679,43 +652,40 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
             JSONObject resultJson = new JSONObject(result);
             int rtCode = resultJson.getInt("code");
             if (rtCode == HttpConstants.ResponseCode.NORMAL) {
-                mHandler.sendEmptyMessage(LOGOUT_SUCCESS);
+                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_SUCCESS);
             } else {
-                mHandler.sendEmptyMessage(LOGOUT_FAILED);
+                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_FAILED);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private void resetUSerInfo()
-    {
+    private void resetUSerInfo() {
         YueQiuApp.sUserInfo.setImg_url("");
         YueQiuApp.sUserInfo.setUsername(getString(R.string.guest));
         YueQiuApp.sUserInfo.setUser_id(0);
         YueQiuApp.sUserInfo.setPhone("");
 
-        mEditor.putString(DatabaseConstant.UserTable.USERNAME,getString(R.string.guest));
-        mEditor.putString(DatabaseConstant.UserTable.USER_ID,"0");
-        mEditor.putString(DatabaseConstant.UserTable.IMG_URL,"");
-        mEditor.putString(DatabaseConstant.UserTable.PHONE,"");
+        mEditor.putString(DatabaseConstant.UserTable.USERNAME, getString(R.string.guest));
+        mEditor.putString(DatabaseConstant.UserTable.USER_ID, "0");
+        mEditor.putString(DatabaseConstant.UserTable.IMG_URL, "");
+        mEditor.putString(DatabaseConstant.UserTable.PHONE, "");
         mEditor.apply();
 
 
         mItemList.remove(0);
         SlideAccountItemISlide accountItem = new SlideAccountItemISlide(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
-                0, YueQiuApp.sUserInfo.getTitle(),YueQiuApp.sUserInfo.getUser_id());
+                0, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(0, accountItem);
         mAdapter.notifyDataSetChanged();
 
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle state)
-    {
+    protected void onRestoreInstanceState(Bundle state) {
         super.onRestoreInstanceState(state);
-        if (null != state)
-        {
+        if (null != state) {
             mMenuDrawer.restoreState(state.getParcelable(STATE_MENUDRAWER));
             int pos = state.getInt(FRAGMENT_PAGER_LAST_POSITION, 0);
             mViewPager.setCurrentItem(pos);
@@ -724,8 +694,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState)
-    {
+    protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(STATE_MENUDRAWER, mMenuDrawer.saveState());
         outState.putInt(FRAGMENT_PAGER_LAST_POSITION, mViewPager.getCurrentItem());
@@ -733,8 +702,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         final int drawerState = mMenuDrawer.getDrawerState();
         if (drawerState == MenuDrawer.STATE_OPEN || drawerState == MenuDrawer.STATE_OPENING) {
             mMenuDrawer.closeMenu();
@@ -742,9 +710,10 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         }
         super.onBackPressed();
     }
-    private boolean checkUserId(){
+
+    private boolean checkUserId() {
         int user_id = YueQiuApp.sUserInfo.getUser_id();
-        if(user_id < 1)
+        if (user_id < 1)
             return false;
         return true;
 
@@ -754,25 +723,25 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if(action.equals(PublicConstant.SLIDE_PART_IN_ACTION)){
+            if (action.equals(PublicConstant.SLIDE_PART_IN_ACTION)) {
                 SlideOtherItemISlide partInItem = (SlideOtherItemISlide) mItemList.get(2);
                 partInItem.setHasMsg(true);
                 mAdapter.notifyDataSetChanged();
-                mEditor.putBoolean("part_in",true);
+                mEditor.putBoolean("part_in", true);
                 mEditor.apply();
-            }else if(action.equals(PublicConstant.SLIDE_FAVOR_ACTION)){
+            } else if (action.equals(PublicConstant.SLIDE_FAVOR_ACTION)) {
                 SlideOtherItemISlide favorItem = (SlideOtherItemISlide) mItemList.get(3);
                 favorItem.setHasMsg(true);
                 mAdapter.notifyDataSetChanged();
-                mEditor.putBoolean("favor",true);
+                mEditor.putBoolean("favor", true);
                 mEditor.apply();
-            }else if(action.equals(PublicConstant.SLIDE_PUBLISH_ACTION)){
+            } else if (action.equals(PublicConstant.SLIDE_PUBLISH_ACTION)) {
                 SlideOtherItemISlide publishItem = (SlideOtherItemISlide) mItemList.get(4);
                 publishItem.setHasMsg(true);
                 mAdapter.notifyDataSetChanged();
-                mEditor.putBoolean("publish",true);
+                mEditor.putBoolean("publish", true);
                 mEditor.apply();
-            }else if(action.equals(PublicConstant.SLIDE_ACCOUNT_ACTION)){
+            } else if (action.equals(PublicConstant.SLIDE_ACCOUNT_ACTION)) {
                 SlideAccountItemISlide accountItemISlide = (SlideAccountItemISlide) mItemList.get(0);
                 accountItemISlide.setName(YueQiuApp.sUserInfo.getUsername());
                 accountItemISlide.setUserId(YueQiuApp.sUserInfo.getUser_id());

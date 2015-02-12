@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/devide_line">
+    <include
+        layout="@layout/pre_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        />
 <ListView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/friends_application_container"
@@ -18,5 +24,14 @@
         android:scrollbars="none"
         android:background="@color/white"
         />
-</LinearLayout>
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/friends_application_empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="暂无好友申请消息"
+        android:textSize="16sp"
+        android:textColor="@color/md__defaultBackground"/>
+</FrameLayout>
 

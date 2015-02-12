@@ -21,12 +21,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,7 +47,7 @@ public class VerificationFragment extends Fragment {
     private FragmentManager mFragmentManager;
     private ActionBar mActionBar;
     public static final String ARGUMENTS_KEY = "com.yueqiu.fragment.requestaddfriend.arguments_key";
-    private ImageView mPhoto;
+    private NetworkImageView mPhoto;
     private String mAccount;
     private String mGender;
     private String mDistrict;
@@ -52,6 +55,8 @@ public class VerificationFragment extends Fragment {
     private TextView mAccountTextView, mGenderTextView, mDistrictTextView;
     private EditText mEditText;
     private String mNews = "我是谁";
+    private String mPhotoUrl;
+    private ImageLoader mImageLoader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -67,6 +72,9 @@ public class VerificationFragment extends Fragment {
         mGender = getArguments().getString(FriendProfileFragment.GENDER_KEY);
         mDistrict = getArguments().getString(FriendProfileFragment.DISTRICT_KEY);
         mFriendUserId = getArguments().getString(FriendProfileFragment.FRIEND_USER_ID);
+        mPhotoUrl = getArguments().getString(FriendProfileFragment.IMG_URL_REAL_KEY);
+        mImageLoader = VolleySingleton.getInstance().getImgLoader();
+        Log.e(TAG, "mPhotoUrl = " + mPhotoUrl);
     }
 
     @Override
@@ -98,13 +106,14 @@ public class VerificationFragment extends Fragment {
     }
 
     private void init(View v) {
-        mPhoto = (ImageView) v.findViewById(R.id.account_iv);
+        mPhoto = (NetworkImageView) v.findViewById(R.id.account_iv);
         mAccountTextView = (TextView) v.findViewById(R.id.account_tv);
         mGenderTextView = (TextView) v.findViewById(R.id.gender_tv);
         mDistrictTextView = (TextView) v.findViewById(R.id.district_tv);
         mAccountTextView.setText(mAccount);
         mGenderTextView.setText(mGender);
         mDistrictTextView.setText(mDistrict);
+        mPhoto.setImageUrl(mPhotoUrl, mImageLoader);
     }
 
     @Override

@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.UserInfo;
@@ -19,6 +21,7 @@ import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.UserDao;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
 
 import android.app.ActionBar;
 import android.view.View;
@@ -47,7 +50,8 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     private TextView mNickNameTextView, mRegionTextView, mLevelTextView, mBallTypeTextView,
             mBilliardsCueTextView, mCueHabitsTextView, mPlayAgeTextView, mIdolTextView,
             mSignTextView, mAccountTextView, mGenderTextView;
-    private ImageView mPhotoImageView, mTheNewestPostImageView;
+    private ImageView  mTheNewestPostImageView;
+    private NetworkImageView mPhotoImageView;
 
     public static final String EXTRA_FRAGMENT_ID =
             "com.yueqiu.activity.searchmenu.myprofileactivity.fragment_id";
@@ -64,11 +68,13 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     private static final int DATA_SUCCESS = 2;
     private Map<String, String> mMap = new HashMap<String, String>();
     private UserDao mUserDao;
+    private ImageLoader mImgLoader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_myprofile);
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
         mUserDao = DaoFactory.getUser(this);
         mMap.put(DatabaseConstant.UserTable.USER_ID, String.valueOf(mUserId));
         ActionBar actionBar = getActionBar();
@@ -109,7 +115,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         mIdolTextView = (TextView) findViewById(R.id.my_profile_idol_tv);
         mSignTextView = (TextView) findViewById(R.id.my_profile_sign_tv);
 
-        mPhotoImageView = (ImageView) findViewById(R.id.my_profile_photo_iv);
+        mPhotoImageView = (NetworkImageView) findViewById(R.id.my_profile_photo_iv);
         mTheNewestPostImageView = (ImageView) findViewById(R.id.my_profile_the_new_post_im);
     }
 
@@ -208,15 +214,19 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                         Utils.showToast(MyProfileActivity.this, (String) msg.obj);
                     }
                     getMyProfileFromLocal();
+                    mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
                     updateUI(mUserInfo);
                     break;
                 case DATA_SUCCESS:
                     mUserDao.updateUserInfo(mMap);
+                    String url = ((UserInfo) msg.obj).getImg_url();
+                    mPhotoImageView.setImageUrl(url, mImgLoader);
                     updateUI((UserInfo) msg.obj);
                     break;
                 case PublicConstant.TIME_OUT:
                     Toast.makeText(MyProfileActivity.this, getString(R.string.http_request_time_out), Toast.LENGTH_SHORT).show();
                     getMyProfileFromLocal();
+                    mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
                     updateUI(mUserInfo);
                     break;
             }

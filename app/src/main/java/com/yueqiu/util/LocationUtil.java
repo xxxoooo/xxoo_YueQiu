@@ -92,7 +92,9 @@ public class LocationUtil extends Service {
         Location retLocation = null;
         if ((flagGetGPSDone || flagNetworkDone)) {
             culocationGPS = myLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            Log.e(TAG, "culocationGPS = " + culocationGPS);
             culocationNetwork = myLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            Log.e(TAG, "culocationNetwork = " + culocationNetwork);
             if (culocationGPS == null && culocationNetwork == null) {
                 retLocation = myLocationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
                 if (retLocation == null) {
@@ -114,6 +116,8 @@ public class LocationUtil extends Service {
         flagNetworkEnable = myLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         flagGetGPSDone = !flagGPSEnable;
         flagNetworkDone = !flagNetworkEnable;
+        Log.e(TAG, "flagGPSEnable = " + flagGPSEnable + "\nflagNetworkEnable = " + flagNetworkEnable
+                + "\nflagGetGPSDone = " + flagGetGPSDone + "\nflagNetworkDone = " + flagNetworkDone);
         bestLocation = null;
         counts = 0;
         startAllUpdate();

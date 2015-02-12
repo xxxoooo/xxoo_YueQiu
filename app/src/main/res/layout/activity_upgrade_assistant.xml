@@ -41,7 +41,8 @@
                             android:layout_centerVertical="true"
                             android:text="@string/photo"/>
 
-                        <ImageView
+                        <com.android.volley.toolbox.NetworkImageView
+                            android:id="@+id/upgrade_assistant_photo"
                             android:textColor="@color/md__defaultBackground"
                             android:layout_width="50dp"
                             android:layout_height="50dp"

@@ -1,4 +1,4 @@
-package com.yueqiu.chatbar;
+package com.yueqiu.im;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

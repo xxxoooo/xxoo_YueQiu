@@ -1,4 +1,4 @@
-package com.yueqiu.chatbar;
+package com.yueqiu.im;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeMessage;
@@ -40,7 +41,6 @@ public class GotyeService extends Service implements NotifyListener {
     @Override
     public void onCreate() {
         super.onCreate();
-        GotyeAPI.getInstance().addListerer(this);
     }
 
     @Override
@@ -51,6 +51,7 @@ public class GotyeService extends Service implements NotifyListener {
                         YueQiuApp.APPKEY, YueQiuApp.PACKAGENAME);
             }
         }
+        GotyeAPI.getInstance().addListerer(this);
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -63,8 +64,7 @@ public class GotyeService extends Service implements NotifyListener {
 
     private void notify(String msg) {
         String currentActivityName = AppUtil.getCurrentActivityName(getBaseContext());
-
-        if (currentActivityName.equals("com.yueqiu.chatbar.ChatPage") ||
+        if (currentActivityName.equals("com.yueqiu.im.ChatPage") ||
                 currentActivityName.equals("com.yueqiu.ChatBarActivity")) {
             return;
         }

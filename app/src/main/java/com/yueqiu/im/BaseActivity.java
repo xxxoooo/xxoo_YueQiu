@@ -1,4 +1,4 @@
-package com.yueqiu.chatbar;
+package com.yueqiu.im;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;

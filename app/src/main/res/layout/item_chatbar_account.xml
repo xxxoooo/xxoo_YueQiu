@@ -7,7 +7,7 @@
                 android:minHeight="?android:attr/listPreferredItemHeight">
 
 
-    <ImageView
+    <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/chatbar_item_account_iv"
         android:layout_alignParentLeft="true"
         android:layout_marginRight="8dp"

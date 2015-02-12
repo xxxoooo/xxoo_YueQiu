@@ -1,7 +1,6 @@
 package com.yueqiu;
 
 import android.app.ActionBar;
-import android.app.NotificationManager;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -25,7 +24,6 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 
 import com.yueqiu.activity.SearchResultActivity;
@@ -36,15 +34,14 @@ import com.gotye.api.GotyeNotify;
 import com.gotye.api.GotyeStatusCode;
 import com.gotye.api.GotyeUser;
 import com.gotye.api.PathUtil;
-import com.gotye.api.listener.LoginListener;
 import com.gotye.api.listener.NotifyListener;
-import com.yueqiu.chatbar.GotyeService;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.chatbar.ContactFragment;
 import com.yueqiu.fragment.chatbar.MessageFragment;
 import com.yueqiu.util.BeepManager;
 import com.yueqiu.util.BitmapUtil;
 import com.yueqiu.util.FileUtil;
+import com.yueqiu.util.Utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -107,6 +104,10 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener 
         }
         returnNotify = false;
         mainRefresh();
+        Log.e(TAG, "IM isOnline? " + GotyeAPI.getInstance().isOnline());
+        if (!GotyeAPI.getInstance().isOnline()){
+            Utils.showToast(this, "您已经掉线了！！");
+        }
     }
 
     @Override

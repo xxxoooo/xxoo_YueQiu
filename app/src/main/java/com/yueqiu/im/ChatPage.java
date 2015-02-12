@@ -1,12 +1,10 @@
-package com.yueqiu.chatbar;
+package com.yueqiu.im;
 
-import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,19 +17,16 @@ import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gotye.api.GotyeChatTarget;
 import com.gotye.api.GotyeGroup;
 import com.gotye.api.GotyeMessage;
 import com.gotye.api.GotyeMessageType;
@@ -39,17 +34,16 @@ import com.gotye.api.GotyeRoom;
 import com.gotye.api.GotyeStatusCode;
 import com.gotye.api.GotyeUser;
 import com.gotye.api.PathUtil;
-import com.gotye.api.WhineMode;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
 import com.yueqiu.R;
-import com.yueqiu.activity.MyProfileActivity;
 import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.ProgressDialogUtil;
 import com.yueqiu.util.SendImageMessageTask;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.CustomListView;
+import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -70,6 +64,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     public static final int VOICE_MAX_TIME = 60 * 1000;
     private CustomListView pullListView;
+//    private PullToRefreshListView mPullToRefreshListView;
     private ChatMessageAdapter adapter;
     private GotyeUser user;
     private GotyeRoom room;
@@ -123,7 +118,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         currentLoginUser = api.getCurrentLoginUser();
         api.addListerer(this);
         user = (GotyeUser) getIntent().getSerializableExtra("user");
-        Log.e("ddd", "user->initialize = " + user.name);
         room = (GotyeRoom) getIntent().getSerializableExtra("room");
         group = (GotyeGroup) getIntent().getSerializableExtra("group");
         mActionBar = getActionBar();
@@ -307,6 +301,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             }
         });*/
         adapter = new ChatMessageAdapter(this, new ArrayList<GotyeMessage>());
+        pullListView.setClickable(false);
         pullListView.setAdapter(adapter);
         pullListView.setSelection(adapter.getCount());
         setListViewInfo();
@@ -403,8 +398,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     //发送文本消息
     private void sendTextMessage(String text) {
         if (!TextUtils.isEmpty(text)) {
-            Log.e("ddd", "currentLoginUser = " + currentLoginUser + " receiver = " + user.name);
-            Log.e("ddd", "text = " + text);
             GotyeMessage toSend;
             if (chatType == 0) {
                 toSend = GotyeMessage.createTextMessage(currentLoginUser, user,
@@ -692,7 +685,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onSendMessage(int code, GotyeMessage message) {
-        Log.d("OnSend", "code= " + code + "message = " + message);
+        Log.d("ddd", "code= " + code + "message = " + message);
         // GotyeChatManager.getInstance().insertChatMessage(message);
         adapter.updateMessage(message);
         if (message.getType() == GotyeMessageType.GotyeMessageTypeAudio) {
@@ -850,7 +843,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 */
     @Override
     public void onRequestUserInfo(int code, GotyeUser user) {
-//        Log.e("ddd", "onRequestUserInfo>>user = " + user.name);
 //        this.user = user;
     }
 
@@ -959,7 +951,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     @Override
     protected void onStart() {
         super.onStart();
-        Log.e("ddd", "加载emojicons。。。。。");
         //加载表情Fragment
         if (getSupportFragmentManager().findFragmentById(R.id.chat_container_emotion) == null) {
             getSupportFragmentManager()
