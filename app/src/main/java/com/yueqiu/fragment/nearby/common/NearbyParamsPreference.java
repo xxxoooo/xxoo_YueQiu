@@ -3,6 +3,7 @@ package com.yueqiu.fragment.nearby.common;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 /**
  * Created by scguo on 15/1/21.
@@ -77,7 +78,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putFloat(KEY_ROOM_LATI, lati);
-        editor.commit();
+        editor.apply();
     }
 
     public void setRoomLongi(Context context, float longi)
@@ -85,7 +86,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putFloat(KEY_ROOM_LONGI, longi);
-        editor.commit();
+        editor.apply();
     }
 
     public String getMateRange(Context context)
@@ -105,7 +106,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_MATE_RANGE_PARAMS, range);
-        editor.commit();
+        editor.apply();
     }
 
     public void setMateGender(Context context, String gender)
@@ -113,7 +114,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_MATE_GENDER_PARAMS, gender);
-        editor.commit();
+        editor.apply();
     }
 
     public String getDatingRange(Context context)
@@ -133,7 +134,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_DATING_RANGE_PARAMS, range);
-        editor.commit();
+        editor.apply();
     }
 
     public void setDatingPublishedDate(Context context, String publishedDate)
@@ -141,7 +142,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_DATING_PUBLISHED_DATE_PARAMS, publishedDate);
-        editor.commit();
+        editor.apply();
     }
 
     public String getAScouchRange(Context context)
@@ -173,7 +174,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_ASCOUCH_RANGE_PARANS, range);
-        editor.commit();
+        editor.apply();
     }
 
     public void setAScouchLevel(Context context, String level)
@@ -181,21 +182,21 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_ASCOUCH_LEVEL_PARAMS, level);
-        editor.commit();
+        editor.apply();
     }
     public void setAScouchPrice(Context context, String price)
     {
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_ASCOUCH_PRICE_PARAMS, price);
-        editor.commit();
+        editor.apply();
     }
     public void setAScouchClazz(Context context, String clazz)
     {
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_ASCOUCH_CLAZZ_PARAMS, clazz);
-        editor.commit();
+        editor.apply();
     }
 
     public String getCouchLevel(Context context)
@@ -215,14 +216,14 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_COUCH_LEVEL_PARAMS, level);
-        editor.commit();
+        editor.apply();
     }
     public void setCouchClazz(Context context, String clazz)
     {
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_COUCH_CLAZZ_PARAMS, clazz);
-        editor.commit();
+        editor.apply();
     }
 
     public String getRoomRange(Context context)
@@ -235,7 +236,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_ROOM_RANGE, range);
-        editor.commit();
+        editor.apply();
     }
 
     public String getRoomRegion(Context context)
@@ -249,7 +250,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_ROOM_REGION, region);
-        editor.commit();
+        editor.apply();
     }
 
     public String getRoomPrice(Context context)
@@ -263,7 +264,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_ROOM_PRICE, price);
-        editor.commit();
+        editor.apply();
     }
 
     public String getRoomApprisal(Context context)
@@ -277,7 +278,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
         ensurePreference(context);
         SharedPreferences.Editor editor = mSharedPreference.edit();
         editor.putString(KEY_ROOM_APPRISAL, apprisal);
-        editor.commit();
+        editor.apply();
     }
 
     /**
@@ -293,7 +294,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key)
     {
-
+        Log.d(TAG, " SharedPreference has been changed here ");
     }
 }
 

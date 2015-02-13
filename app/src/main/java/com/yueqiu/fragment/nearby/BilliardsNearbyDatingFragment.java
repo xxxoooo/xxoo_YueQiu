@@ -241,6 +241,11 @@ public class BilliardsNearbyDatingFragment extends Fragment
             mBackgroundHandler.interrupt();
             mBackgroundHandler = null;
         }
+
+        // 将所有的筛选参数置空
+        sParamsPreference.setDatingPublishedDate(mContext, "");
+        sParamsPreference.setDatingRange(mContext, "");
+
         super.onDestroy();
     }
 
@@ -343,11 +348,13 @@ public class BilliardsNearbyDatingFragment extends Fragment
                                 if (cacheDatingList.isEmpty())
                                 {
                                     mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                                }else {
+
+                                } else
+                                {
                                     // TODO: 我们应该在这里通知UI主线程数据请求工作已经全部完成了，停止显示ProgressBar或者显示一个Toast全部数据已经加载完的提示
                                     mUIEventsHandler.obtainMessage(FETCH_DATA_SUCCESSED, cacheDatingList).sendToTarget();
+//                                    mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                                 }
-                                //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                             } else
                             {
                                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
@@ -425,7 +432,9 @@ public class BilliardsNearbyDatingFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
-            if(mDatingListView.isRefreshing()){
+
+            if (mDatingListView.isRefreshing())
+            {
                 mDatingListView.onRefreshComplete();
             }
             switch (msg.what)

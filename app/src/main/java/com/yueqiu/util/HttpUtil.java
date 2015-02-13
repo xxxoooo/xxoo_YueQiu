@@ -25,6 +25,7 @@ public class HttpUtil
 {
 
     private static final String TAG = "HttpUtil";
+    private static final String TAG_1 = "http_outofbounds_debug";
 
     private static final int READLENGTH = 1024;
 
@@ -100,14 +101,14 @@ public class HttpUtil
             realResult = "{\"code\":1011}";
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (final Exception e)
+        {
+            e.printStackTrace();
+            Log.d(TAG_1, " finally exception happened here, and the reason are : " + e.toString());
         }
         return realResult;
     }
 
-//    public static <T> String simpleUrlClient()
-//    {
-//
-//    }
 
 
     /**
@@ -134,7 +135,7 @@ public class HttpUtil
         if (flag) {
             sb.append("?");
             sb.append(getQueryString(appKey, appSecret, (Map<String, String>) map));
-            Log.d(TAG, " the finally request url are : " + sb.toString());
+            Log.d(TAG, " dp request --> the finally request url are : " + sb.toString());
         }
 
         HttpClient client = new DefaultHttpClient();

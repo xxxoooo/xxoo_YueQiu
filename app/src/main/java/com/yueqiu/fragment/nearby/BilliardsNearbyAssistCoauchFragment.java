@@ -215,6 +215,12 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     @Override
     public void onDestroy()
     {
+        // 将我们的请求筛选参数置空
+        sParamsPreference.setAScouchLevel(mContext, "");
+        sParamsPreference.setAScouchPrice(mContext, "");
+        sParamsPreference.setAScouchClazz(mContext, "");
+        sParamsPreference.setAScouchRange(mContext, "");
+
         super.onDestroy();
     }
 
@@ -310,9 +316,12 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                         if (cacheASCoauchList.isEmpty())
                         {
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                        } else
+                        {
+                            // 然后我们直接将我们得到助教List直接发送到mUIEventHandler进行处理，因为我们只能在MainUIThread当中进行有关于数据的更新操作
+                            mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheASCoauchList).sendToTarget();
+//                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                         }
-                        // 然后我们直接将我们得到助教List直接发送到mUIEventHandler进行处理，因为我们只能在MainUIThread当中进行有关于数据的更新操作
-                        mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheASCoauchList).sendToTarget();
                     } else if (status == HttpConstants.ResponseCode.TIME_OUT)
                     {
                         // 进行超时处理的请求

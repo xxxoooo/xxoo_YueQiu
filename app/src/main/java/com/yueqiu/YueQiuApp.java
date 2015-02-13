@@ -104,7 +104,6 @@ public class YueQiuApp extends Application implements LoginListener {
 
     private void jumpToIndexPage() {
         String str = AppUtil.getCurrentActivityName(sAppContext);
-        Log.d(TAG, "current activity name : " + str);
 //        if (!str.equals("com.yueqiu.BilliardNearbyActivity")) {
             Intent intent = new Intent(this, BilliardNearbyActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -168,7 +167,6 @@ public class YueQiuApp extends Application implements LoginListener {
      */
     @Override
     public void onLogout(int code) {
-        Log.e(TAG, ">>>>>>>>>>>YueqiuApp------onLogout<<<<<<<<<<<<<<<<");
         if (YueQiuApp.sUserInfo.getUser_id() == 0)
             return;//已经退出
         if (code == GotyeStatusCode.CODE_FORCELOGOUT) {
@@ -200,7 +198,6 @@ public class YueQiuApp extends Application implements LoginListener {
     }
 
     public void registerListener() {
-        Log.e(TAG, ">>>>>>>>>>>>>>registerListener<<<<<<<<<<<<");
         GotyeAPI.getInstance().addListerer(this);
     }
 
