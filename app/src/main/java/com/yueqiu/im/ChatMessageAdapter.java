@@ -85,14 +85,6 @@ public class ChatMessageAdapter extends BaseAdapter {
         }
     }
 
-    // public GotyeMessageProxy getLastMessage() {
-    // if (messageList == null || messageList.size() == 0) {
-    // return null;
-    // } else {
-    // return messageList.get(messageList.size() - 1);
-    // }
-    // }
-
     public void addMessagesToTop(List<GotyeMessage> histMessages) {
         messageList.addAll(0, histMessages);
     }
@@ -297,87 +289,6 @@ public class ChatMessageAdapter extends BaseAdapter {
         }
     }
 
-    /**
-     * 处理语音类型的item
-     *
-     * @param message
-     * @param holder
-     * @param position
-     * @param convertView
-     */
-    /*private void handleVoiceMessage(final GotyeMessage message,
-            final ViewHolder holder, final int position, View convertView) {
-		holder.tv.setText(TimeUtil.getVoiceTime(message.getMedia()
-				.getDuration()));
-        //TODO:播放语音的listener是这句
-		holder.iv.setOnClickListener(new GotyeVoicePlayClickListener(message,
-				holder.iv, this, chatPage));
-
-		boolean isPlaying = isPlaying(message);
-		if (isPlaying) {
-			AnimationDrawable voiceAnimation;
-			if (getDirect(message) == MESSAGE_DIRECT_RECEIVE) {
-				holder.iv.setImageResource(R.anim.voice_from_icon);
-			} else {
-				holder.iv.setImageResource(R.anim.voice_to_icon);
-			}
-			voiceAnimation = (AnimationDrawable) holder.iv.getDrawable();
-			voiceAnimation.start();
-		} else {
-			if (getDirect(message) == MESSAGE_DIRECT_RECEIVE) {
-				holder.iv.setImageResource(R.drawable.chatfrom_voice_playing);
-			} else {
-				holder.iv.setImageResource(R.drawable.chatto_voice_playing);
-			}
-		}
-		if (getDirect(message) == MESSAGE_DIRECT_RECEIVE) {
-			if (message.getStatus() == GotyeMessage.ACK_UNREAD) {// if
-				// holder.iv_read_status.setVisibility(View.INVISIBLE);
-				holder.iv_read_status.setVisibility(View.VISIBLE);
-			} else {
-				holder.iv_read_status.setVisibility(View.INVISIBLE);
-			}
-			return;
-		}
-
-		// until here, deal with send voice msg
-		switch (message.getStatus()) {
-		case GotyeMessage.STATUS_SENT:
-			holder.pb.setVisibility(View.GONE);
-			holder.staus_iv.setVisibility(View.GONE);
-			break;
-		case GotyeMessage.STATUS_SENDFAILED:
-			holder.pb.setVisibility(View.GONE);
-			holder.staus_iv.setVisibility(View.VISIBLE);
-			break;
-		case GotyeMessage.STATUS_SENDING:
-			holder.pb.setVisibility(View.VISIBLE);
-			holder.staus_iv.setVisibility(View.GONE);
-			break;
-		default:
-			holder.pb.setVisibility(View.GONE);
-			holder.staus_iv.setVisibility(View.GONE);
-		}
-		switch (message.getMedia().getStatus()) {
-		case Media.MEDIA_STATUS_DOWNLOADING:
-			holder.pb.setVisibility(View.VISIBLE);
-			break;
-		default:
-			holder.pb.setVisibility(View.GONE);
-			break;
-		}
-	}
-
-	private boolean isPlaying(GotyeMessage msg) {
-		long id = msg.getDbId();
-		long pid = chatPage.getPlayingId();
-		if (id == pid) {
-			return true;
-		} else {
-			return false;
-		}
-
-	}*/
     private View createViewByMessage(GotyeMessage message, int position) {
         switch (message.getType()) {
             case GotyeMessageTypeImage:
@@ -468,6 +379,7 @@ public class ChatMessageAdapter extends BaseAdapter {
                             if (checkImgMsgCount > 20) {
                                 intent.putExtra(ShowBigImage.EXTRA_TIMEOUT, true);
                                 chatPage.startActivity(intent);
+                                checkImgMsgCount = 0;
                             }else {
                                 checkImgMsgCount += 1;
                                 onClick(v);
@@ -478,7 +390,6 @@ public class ChatMessageAdapter extends BaseAdapter {
 
             }
         });
-        // holder.pb.setVisibility(View.VISIBLE);
 
     }
 
