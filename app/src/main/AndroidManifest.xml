@@ -146,10 +146,6 @@
             android:parentActivityName=".activity.GroupIssueTopic"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.ChatActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateHidden" />
-        <activity
             android:name=".activity.GetCaptchaActivity"
             android:screenOrientation="portrait" />
         <activity
@@ -175,7 +171,8 @@
             android:windowSoftInputMode="adjustResize|stateHidden"/>
         <activity
             android:name=".im.ShowBigImage"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop"/>
 
         <!-- 服务组件 -->
         <service android:name=".util.LocationUtil"/>

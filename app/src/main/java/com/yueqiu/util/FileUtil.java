@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class FileUtil {
 
@@ -50,7 +52,7 @@ public class FileUtil {
     }
 
     public static byte[] getBytes(String filePath) {
-        if(TextUtils.isEmpty(filePath)){
+        if (TextUtils.isEmpty(filePath)) {
             return null;
         }
         byte[] buffer = null;
@@ -74,13 +76,17 @@ public class FileUtil {
         return buffer;
     }
 
-    public static String  uriToPath(Context context, Uri selectedImage) {
+    public static String uriToPath(Context context, Uri selectedImage) {
         // String[] filePathColumn = { MediaStore.Images.Media.DATA };
         Cursor cursor = context.getContentResolver().query(selectedImage, null,
                 null, null, null);
         if (cursor != null) {
             cursor.moveToFirst();
             int columnIndex = cursor.getColumnIndex("_data");
+            if (columnIndex == -1) {
+                Utils.showToast(context, "找不到图片");
+                return null;
+            }
             String picturePath = cursor.getString(columnIndex);
             cursor.close();
             cursor = null;
@@ -102,30 +108,31 @@ public class FileUtil {
 
     }
 
-	private static String path="";
-	static{
-		if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)){
-			path= Environment.getExternalStorageDirectory()+"/yueqiu";
-		}else{
-			path= Environment.getDataDirectory().getAbsolutePath()+"/yueqiu";
-		}
-	}
-	
-	public static String getRecentChatPath(){
-		File file=new File(path+"/RecentChat/");
-		if(!file.exists()){
-			file.mkdirs();
-		}
-		return path+"/RecentChat/";
-	}
-	
-	public static String getWaterPhotoPath(){
-		File file=new File(path+"/WaterPhoto/");
-		if(!file.exists()){
-			file.mkdirs();
-		}
-		return path+"/WaterPhoto/";
-	}
+    private static String path = "";
+
+    static {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            path = Environment.getExternalStorageDirectory() + "/yueqiu";
+        } else {
+            path = Environment.getDataDirectory().getAbsolutePath() + "/yueqiu";
+        }
+    }
+
+    public static String getRecentChatPath() {
+        File file = new File(path + "/RecentChat/");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        return path + "/RecentChat/";
+    }
+
+    public static String getWaterPhotoPath() {
+        File file = new File(path + "/WaterPhoto/");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        return path + "/WaterPhoto/";
+    }
 
     /**
      * 得到sd卡真实路径
@@ -135,12 +142,14 @@ public class FileUtil {
     public static String getSDCardPath() {
         return Environment.getExternalStorageDirectory().getAbsolutePath();
     }
+
     /**
      * 判断SD卡是否有效
      */
     public static boolean isSDCardReady() {
         return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
     }
+
     /**
      * 得到SD卡路径
      */
@@ -148,13 +157,14 @@ public class FileUtil {
         return Environment.getExternalStorageDirectory().getPath();
     }
 
-    public static class FileNameFilter implements FilenameFilter{
+    public static class FileNameFilter implements FilenameFilter {
 
         private String mExtension = ".";
 
-        public FileNameFilter(String fileExtName){
+        public FileNameFilter(String fileExtName) {
             mExtension += fileExtName;
         }
+
         /**
          * Indicates if a specific filename matches this filter.
          *
@@ -169,7 +179,7 @@ public class FileUtil {
             return filename.endsWith(mExtension);
         }
     }
-	
+
 //	////////////////////////////////////////////////////////////
 //	private static String ANDROID_SECURE = "/mnt/sdcard/.android_secure";
 //

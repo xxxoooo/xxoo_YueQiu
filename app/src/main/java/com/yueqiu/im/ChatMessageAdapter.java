@@ -3,8 +3,8 @@ package com.yueqiu.im;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -43,13 +43,15 @@ public class ChatMessageAdapter extends BaseAdapter {
     public static final int MESSAGE_DIRECT_RECEIVE = 1;
     public static final int MESSAGE_DIRECT_SEND = 0;
 
-    private ChatPage chatPage;
+    private final ChatPage chatPage;
     private List<GotyeMessage> messageList;
 
     private LayoutInflater inflater;
     private String currentLoginName;
 
     private GotyeAPI api;
+    private Handler mHandler = new Handler();
+    private int checkImgMsgCount;//点击图片消息查看大图,计次
 
     public ChatMessageAdapter(ChatPage activity, List<GotyeMessage> messageList) {
         this.chatPage = activity;
@@ -304,7 +306,7 @@ public class ChatMessageAdapter extends BaseAdapter {
      * @param convertView
      */
     /*private void handleVoiceMessage(final GotyeMessage message,
-			final ViewHolder holder, final int position, View convertView) {
+            final ViewHolder holder, final int position, View convertView) {
 		holder.tv.setText(TimeUtil.getVoiceTime(message.getMedia()
 				.getDuration()));
         //TODO:播放语音的listener是这句
@@ -426,9 +428,6 @@ public class ChatMessageAdapter extends BaseAdapter {
         }
     }
 
-//    private void setVolleyIcon() {
-//
-//    }
 
 
     //TODO:在handleImageMessage里调用
@@ -448,19 +447,33 @@ public class ChatMessageAdapter extends BaseAdapter {
         }
         msgImageView.setOnClickListener(new OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
 
-                Intent intent = new Intent(chatPage, ShowBigImage.class);
+                final Intent intent = new Intent(chatPage, ShowBigImage.class);
                 String path = msg.getMedia().getPath_ex();
                 if (!TextUtils.isEmpty(path) && new File(path).exists()) {
                     Uri uri = Uri.fromFile(new File(path));
-                    intent.putExtra("uri", uri);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra(ShowBigImage.EXTRA_URI, uri);
                     chatPage.startActivity(intent);
                 } else {
-                    Utils.showToast(chatPage, "正在下载...");
-                    api.downloadMessage(msg);
-                    return;
+                    if (!Utils.networkAvaiable(chatPage)){
+                        Utils.showToast(chatPage, "当前网络不可用，请检查网络后重试！");
+                        return;
+                    }
+                    int code = api.downloadMessage(msg);
+                    chatPage.startActivity(intent);
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (checkImgMsgCount > 20) {
+                                intent.putExtra(ShowBigImage.EXTRA_TIMEOUT, true);
+                                chatPage.startActivity(intent);
+                            }else {
+                                checkImgMsgCount += 1;
+                                onClick(v);
+                            }
+                        }
+                    }, 200);
                 }
 
             }

@@ -64,7 +64,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     public static final int VOICE_MAX_TIME = 60 * 1000;
     private CustomListView pullListView;
-//    private PullToRefreshListView mPullToRefreshListView;
+    //    private PullToRefreshListView mPullToRefreshListView;
     private ChatMessageAdapter adapter;
     private GotyeUser user;
     private GotyeRoom room;
@@ -145,7 +145,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             api.activeSession(group);
             loadData();
         }
-
 
 
     }
@@ -614,9 +613,10 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     }
 
     private void takePic() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
-        intent.setType("image/*");
-        startActivityForResult(intent, REQUEST_PIC);
+//        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
+//        intent.setType("image/*");
+        Intent albumIntent = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(albumIntent, REQUEST_PIC);
     }
 
     private void takePhoto() {
@@ -647,7 +647,8 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 Uri selectedImage = data.getData();
                 if (selectedImage != null) {
                     String path = FileUtil.uriToPath(this, selectedImage);
-                    sendPicture(path);
+                    if (null != path && !"".equals(path))
+                        sendPicture(path);
                 }
             }
 
