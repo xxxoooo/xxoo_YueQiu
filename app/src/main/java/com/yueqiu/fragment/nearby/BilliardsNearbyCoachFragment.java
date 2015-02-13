@@ -218,6 +218,10 @@ public class BilliardsNearbyCoachFragment extends Fragment
     @Override
     public void onDestroy()
     {
+        // 将所有的筛选参数置空
+        sParamsPreference.setCouchClazz(mContext, "");
+        sParamsPreference.setCouchLevel(mContext, "");
+
         super.onDestroy();
     }
 
@@ -295,9 +299,11 @@ public class BilliardsNearbyCoachFragment extends Fragment
                             if (cacheCoauchList.isEmpty())
                             {
                                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            } else
+                            {
+                                mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheCoauchList).sendToTarget();
+                                mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
                             }
-                            mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheCoauchList).sendToTarget();
-                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
                         } else
                         {
                             mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
@@ -371,6 +377,10 @@ public class BilliardsNearbyCoachFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
+            if (mCoauchListView.isRefreshing())
+            {
+                mCoauchListView.onRefreshComplete();
+            }
             switch (msg.what)
             {
                 case UI_SHOW_PROGRESS:

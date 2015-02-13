@@ -62,6 +62,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BilliardsNearbyRoomFragment extends Fragment
 {
     private static final String TAG = "BilliardsNearbyRoomFragment";
+    private static final String TAG_1 = "emptyview__debug";
+    private static final String TAG_2 = "room_data_retrieve_debug";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -342,9 +344,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
         requestParams.put("format", "json");
         requestParams.put("has_coupon", 0 + "");
         requestParams.put("page", page + "");
+        Log.d(TAG_2, " the request params are : " + requestParams.toString());
 
         String rawResult = HttpUtil.dpUrlClient(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams);
-        Log.d(TAG, " the raw result we get are : " + rawResult);
+        Log.d(TAG_2, " the raw result we get are : " + rawResult);
         if (!TextUtils.isEmpty(rawResult))
         {
             try
@@ -397,11 +400,12 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         if (cacheRoomList.isEmpty())
                         {
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                        } else
+                        {
+                            mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheRoomList).sendToTarget();
+                            // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
+                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                         }
-                        mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheRoomList).sendToTarget();
-                        // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
-                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
-
                     } else if (status.equals("ERROR"))
                     {
                         JSONObject errorObj = resultJsonObj.getJSONObject("error");
@@ -491,12 +495,18 @@ public class BilliardsNearbyRoomFragment extends Fragment
     @Override
     public void onDestroy()
     {
-        super.onDestroy();
         if (mWorkerThread != null)
         {
             mWorkerThread.interrupt();
             mWorkerThread = null;
         }
+
+        // 每当用户退出时，我们需要重新将所有的筛选的参数置空，这样当用户再次进入时就可以得到所有的信息列表
+        sParamsPreference.setRoomApprisal(mContext, "");
+        sParamsPreference.setRoomPrice(mContext, "");
+        sParamsPreference.setRoomRegion(mContext, "");
+        sParamsPreference.setRoomRange(mContext, "");
+        super.onDestroy();
     }
 
     private static final String KEY_REQUEST_PAGE_NUM = "keyRequestPageNum";
@@ -531,10 +541,16 @@ public class BilliardsNearbyRoomFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
+            if (mRoomListView.isRefreshing())
+            {
+                mRoomListView.onRefreshComplete();
+            }
             switch (msg.what)
             {
                 case UI_SHOW_DIALOG:
+                    Log.d(TAG_1, " hide empty view 1 ");
                     showProgress();
+                    setEmptyViewGone();
                     break;
 
                 case UI_HIDE_DIALOG:
@@ -555,6 +571,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 case PublicConstant.USE_CACHE:
                     // 首先将我们的EmptyView隐藏掉
                     setEmptyViewGone();
+                    Log.d(TAG_1, " hide empty view 2 ");
                     ArrayList<NearbyRoomSubFragmentRoomBean> cachedList = (ArrayList<NearbyRoomSubFragmentRoomBean>) msg.obj;
                     mRoomList.addAll(cachedList);
                     mSearchRoomAdapter.notifyDataSetChanged();
@@ -562,6 +579,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 case STATE_FETCH_DATA_SUCCESS:
                     // 依然是首先将我们的EmpttyView隐藏掉
                     setEmptyViewGone();
+                    Log.d(TAG_1, " hide empty view 3 ");
 
                     mBeforeCount = mRoomList.size();
                     mIsListEmpty = mRoomList.isEmpty();
@@ -589,8 +607,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     mAfterCount = mRoomList.size();
                     if (mRoomList.isEmpty())
                     {
-                        Log.d(TAG, " inside the room fragment UIEventsHandler --> have send the message to load the Empty TextView ");
-                        loadEmptyTv();
+                        Log.d(TAG_1, " load empty view 1");
+                        final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
+                        loadEmptyTv(range);
                     } else
                     {
                         if (mRefresh)
@@ -683,8 +702,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
                     if (mRoomList.isEmpty())
                     {
-                        Log.d(TAG, " the room list we get are : " + mRoomList.size());
-                        loadEmptyTv();
+                        Log.d(TAG_1, " load empty view 2");
+                        final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
+                        loadEmptyTv(range);
                     }
 
                     break;
@@ -692,13 +712,20 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     hideProgress();
                     Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     if (mRoomList.isEmpty())
-                        loadEmptyTv();
+                    {
+                        Log.d(TAG_1, " load empty view 3");
+                        final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
+                        loadEmptyTv(range);
+                    }
                     break;
 
                 case PublicConstant.NO_RESULT:
+                    setEmptyViewGone();
                     if (mRoomList.isEmpty())
                     {
-                        loadEmptyTv();
+                        Log.d(TAG_1, " load empty view 4");
+                        final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
+                        loadEmptyTv(range);
                     } else
                     {
                         if (mLoadMore)
@@ -717,13 +744,14 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private TextView mEmptyView;
     // 我们通过将disable的值设置为false来进行加载EmptyView
     // 通过将disable的值设置为true来隐藏emptyView
-    private void loadEmptyTv()
+    private void loadEmptyTv(final int rangeNum)
     {
+        Log.d("scguo_empty", " enable empty view ");
         mEmptyView = new TextView(mContext);
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         mEmptyView.setTextColor(mContext.getResources().getColor(R.color.md__defaultBackground));
-        mEmptyView.setText(mContext.getString(R.string.search_activity_subfragment_empty_tv_str));
+        mEmptyView.setText(mContext.getString(R.string.search_activity_roomfragment_empty_tv_str, rangeNum));
         mRoomListView.setEmptyView(mEmptyView);
     }
 
@@ -731,6 +759,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     {
         if (null != mEmptyView)
         {
+            Log.d("scguo_empty", " disable empty view ");
             mEmptyView.setVisibility(View.GONE);
         }
     }
@@ -957,6 +986,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 {
                     mWorkerThread.fetchRoomData(1);
                 }
+                Log.d(TAG_1, " on pull down to refresh --> hide empty view ");
                 setEmptyViewGone();
             } else
             {
@@ -980,6 +1010,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
             if (mBeforeCount != mAfterCount && !mRefresh)
                 mPage += 1;
             mRefresh = false;
+            Log.d(TAG_1, " on pull up to load more --> hide empty view ");
             setEmptyViewGone();
             if (Utils.networkAvaiable(mContext))
             {
