@@ -33,6 +33,8 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.RequestAddFriendActivity;
@@ -42,6 +44,7 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONArray;
@@ -72,11 +75,13 @@ public class AddPersonFragment extends Fragment {
     public static final String FRIEND_INFO_USERNAME = "com.yueqiu.fragment.chatbar.friend_info.username";
     private View mEmptyView;
     private TextView mProgressBarText;
+    private ImageLoader mImageLoader;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mImageLoader = VolleySingleton.getInstance().getImgLoader();
     }
 
     @Override
@@ -394,7 +399,7 @@ public class AddPersonFragment extends Fragment {
             if (convertView == null) {
                 convertView = mInflater.inflate(R.layout.item_chatbar_account, null);
                 viewHolder = new ViewHolder();
-                viewHolder.mImageView = (ImageView) convertView.findViewById(R.id.chatbar_item_account_iv);
+                viewHolder.mImageView = (NetworkImageView) convertView.findViewById(R.id.chatbar_item_account_iv);
                 viewHolder.mNickName = (TextView) convertView.findViewById(R.id.chatbar_item_account_tv);
                 viewHolder.mGender = (TextView) convertView.findViewById(R.id.chatbar_item_gender_tv);
                 viewHolder.mDistrict = (TextView) convertView.findViewById(R.id.chatbar_item_district_tv);
@@ -404,7 +409,8 @@ public class AddPersonFragment extends Fragment {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             Log.e(TAG, String.valueOf(convertView));
-//            viewHolder.mImageView.setImageDrawable();//设置头像
+            viewHolder.mImageView.setDefaultImageResId(R.drawable.default_head);
+            viewHolder.mImageView.setImageUrl(mList.get(position).getImg_url(), mImageLoader);
             viewHolder.mNickName.setText(mList.get(position).getUsername());
             viewHolder.mGender.setText(mList.get(position).getSex() == 1 ? getString(R.string.man) : getString(R.string.woman));
             String district = mList.get(position).getDistrict();
@@ -413,7 +419,7 @@ public class AddPersonFragment extends Fragment {
         }
 
         final class ViewHolder {
-            public ImageView mImageView;
+            public NetworkImageView mImageView;
             public TextView mNickName;
             public TextView mGender;
             public TextView mDistrict;

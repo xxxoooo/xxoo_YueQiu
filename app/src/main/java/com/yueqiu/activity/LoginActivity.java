@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,12 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gotye.api.GotyeAPI;
-import com.gotye.api.GotyeStatusCode;
-import com.gotye.api.GotyeUser;
-import com.gotye.api.listener.LoginListener;
 import com.yueqiu.R;
-import com.yueqiu.chatbar.GotyeService;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -43,7 +37,7 @@ import java.util.HashMap;
 
 import java.util.Map;
 
-public class LoginActivity extends Activity implements View.OnClickListener, LoginListener{
+public class LoginActivity extends Activity implements View.OnClickListener{
     private static final String TAG = "LoginActivity";
 
     private Button mBtnLogin;
@@ -178,27 +172,27 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
 
     }
 
-    @Override
-    public void onLogout(int code) {
-
-    }
-
-    @Override
-    public void onLogin(int code, GotyeUser currentLoginUser) {
-        Log.e("gotyeapi", "onLogin-->callback   code = " + code);
-        // 判断登陆是否成功
-        if (code == GotyeStatusCode.CODE_OK) {
-            saveUser(mUserName, mPwd);
-
-            Intent toService = new Intent(this, GotyeService.class);
-            startService(toService);
-            Log.d(TAG, "登录时。。IM服务启动");
-        } else {
-            Log.d(TAG, "登录时。。IM服务启动失败，code = " + code);
-            // 失败,可根据code定位失败原因
-            Toast.makeText(this, "IM系统登录失败....", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    @Override
+//    public void onLogout(int code) {
+//
+//    }
+//
+//    @Override
+//    public void onLogin(int code, GotyeUser currentLoginUser) {
+//        Log.e("gotyeapi", "onLogin-->callback   code = " + code);
+//        // 判断登陆是否成功
+//        if (code == GotyeStatusCode.CODE_OK) {
+//            saveUser(mUserName, mPwd);
+//
+//            Intent toService = new Intent(this, GotyeService.class);
+//            startService(toService);
+//            Log.d(TAG, "登录时。。IM服务启动");
+//        } else {
+//            Log.d(TAG, "登录时。。IM服务启动失败，code = " + code);
+//            // 失败,可根据code定位失败原因
+////            Toast.makeText(this, "IM系统登录失败....", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     private static final String CONFIG = "chatbar_login_config";
 
@@ -255,24 +249,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
                                 getString(DatabaseConstant.UserTable.PHONE));
                         successObj.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
                                 getString(DatabaseConstant.UserTable.IMG_URL));
-
-                        //登陆成功后，登录亲加云服务器保持好友IM通讯
-                        // 登录的时候要传入登录监听，当重复登录时会直接返回登录状态
-                        GotyeAPI.getInstance().addListerer(LoginActivity.this);
-//                        ProgressDialogUtil.showProgress(LoginPage.this, "正在登录...");
-                        Log.e("gotyeapi", "username = " + successObj.get(DatabaseConstant.UserTable.USERNAME) +
-                                            "  password = " + successObj.get(DatabaseConstant.UserTable.PASSWORD));
-                        int i = GotyeAPI.getInstance().login(successObj.get(DatabaseConstant.UserTable.USERNAME),
-                                null);
-                        Log.e("gityeapi", "result = " + i);
-                        // 根据返回的code判断
-                        if (i == GotyeStatusCode.CODE_OK) {
-                            // 已经登陆
-                            saveUser(successObj.get(DatabaseConstant.UserTable.USERNAME),
-                                    successObj.get(DatabaseConstant.UserTable.PASSWORD));
-                            onLogin(i, null);
-                        }
-
                         mHandler.obtainMessage(PublicConstant.GET_SUCCESS,successObj).sendToTarget();
                     }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
                         mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
@@ -320,7 +296,6 @@ public class LoginActivity extends Activity implements View.OnClickListener, Log
     @Override
     protected void onDestroy() {
         // 移除监听
-        GotyeAPI.getInstance().removeListener(this);
         super.onDestroy();
     }
 }

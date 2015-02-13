@@ -1,6 +1,7 @@
 package com.yueqiu.view;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -102,16 +103,16 @@ public class CustomListView extends ListView implements AbsListView.OnScrollList
     private void init(Context context) {
         inflater = LayoutInflater.from(context);
         headView = (LinearLayout) inflater
-                .inflate(R.layout.pulllist_head, null);
+                .inflate(R.layout.pull_to_refresh_header, null);
         arrowImageView = (ImageView) headView
-                .findViewById(R.id.head_arrowImageView);
+                .findViewById(R.id.pull_to_refresh_image);
+//        headView.findViewById(R.id.pull_update_indicator).setVisibility(GONE);
         // arrowImageView.setMinimumWidth(70);
         // arrowImageView.setMinimumHeight(50);
         progressBar = (ProgressBar) headView
-                .findViewById(R.id.head_progressBar);
-        tipsTextview = (TextView) headView.findViewById(R.id.head_tipsTextView);
-        //lastUpdatedTextView = (TextView) headView
-        //.findViewById(R.id.head_lastUpdatedTextView);
+                .findViewById(R.id.pull_to_refresh_progress);
+        tipsTextview = (TextView) headView.findViewById(R.id.pull_to_refresh_text);
+//        lastUpdatedTextView = (TextView) headView.findViewById(R.id.head_lastUpdatedTextView);
 
         measureView(headView);
         headContentHeight = headView.getMeasuredHeight();
@@ -160,6 +161,8 @@ public class CustomListView extends ListView implements AbsListView.OnScrollList
 
     }
 
+    private Handler mHandler = new Handler();
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
@@ -182,12 +185,24 @@ public class CustomListView extends ListView implements AbsListView.OnScrollList
                             state = DONE;
                             changeHeaderViewByState();
 
+
                             Log.v(TAG, "由下拉刷新状态，到done状态");
                         }
                         if (state == RELEASE_To_REFRESH) {
                             state = REFRESHING;
-                            changeHeaderViewByState();
-                            onRefresh();
+                            headView.setPadding(0, 0, 0, 0);
+                            arrowImageView.clearAnimation();
+                            arrowImageView.setVisibility(GONE);
+                            progressBar.setVisibility(VISIBLE);
+                            mHandler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    changeHeaderViewByState();
+                                    onRefresh();
+                                }
+                            }, 300);
+
+
 
                             Log.v(TAG, "由松开刷新状态，到done状态");
                         }
@@ -339,7 +354,7 @@ public class CustomListView extends ListView implements AbsListView.OnScrollList
 
                 progressBar.setVisibility(View.GONE);
                 arrowImageView.clearAnimation();
-                arrowImageView.setImageResource(R.drawable.pulltorefresh);
+//                arrowImageView.setImageResource(R.drawable.pulltorefresh);
                 tipsTextview.setText("pull_to_refresh");
                 //lastUpdatedTextView.setVisibility(View.VISIBLE);
 

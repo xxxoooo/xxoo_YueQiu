@@ -8,7 +8,7 @@ import android.os.Message;
 
 import com.gotye.api.listener.GotyeListener;
 import com.gotye.api.listener.NotifyListener;
-import com.yueqiu.chatbar.GotyeService;
+import com.yueqiu.im.GotyeService;
 
 import org.json.JSONArray;
 import org.json.JSONException;

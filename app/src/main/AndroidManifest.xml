@@ -170,19 +170,19 @@
             android:parentActivityName=".BilliardNearbyActivity"
             />
         <activity
-            android:name=".chatbar.ChatPage"
+            android:name=".im.ChatPage"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateHidden"/>
         <activity
-            android:name=".chatbar.ShowBigImage"
+            android:name=".im.ShowBigImage"
             android:screenOrientation="portrait"/>
 
         <!-- 服务组件 -->
         <service android:name=".util.LocationUtil"/>
-        <service android:name=".chatbar.GotyeService"/>
+        <service android:name=".im.GotyeService"/>
 
         <!--开机启动IM服务-->
-        <receiver android:name=".chatbar.StartServiceReceiver" >
+        <receiver android:name=".im.StartServiceReceiver" >
             <intent-filter android:priority="1000" >
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />

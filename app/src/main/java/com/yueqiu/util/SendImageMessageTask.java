@@ -2,11 +2,12 @@ package com.yueqiu.util;
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeChatTarget;
 import com.gotye.api.GotyeMessage;
-import com.yueqiu.chatbar.ChatPage;
+import com.yueqiu.im.ChatPage;
 
 import java.io.File;
 
