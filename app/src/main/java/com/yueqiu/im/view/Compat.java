@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.yueqiu.chatbar.view;
+package com.yueqiu.im.view;
 
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;

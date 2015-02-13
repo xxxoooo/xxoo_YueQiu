@@ -614,6 +614,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
         if (null != mEmptyView)
         {
             mEmptyView.setVisibility(View.GONE);
+            mDatingListView.setEmptyView(null);
         }
     }
 

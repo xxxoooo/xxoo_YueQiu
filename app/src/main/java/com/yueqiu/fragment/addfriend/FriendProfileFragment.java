@@ -8,6 +8,7 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,12 +18,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,7 +42,7 @@ public class FriendProfileFragment extends Fragment {
     private FragmentManager mFragmentManager;
     private ActionBar mActionBar;
     private Button mButton;
-    private ImageView mImageView;
+    private NetworkImageView mImageView;
     private TextView mAccountTextView, mGenderTextView,
             mNickNameTextView, mDistrictTextView, mLevelTextView,
             mBallTypeTextView, mUsedTypeTextView, mBallArmTextView;
@@ -52,6 +56,7 @@ public class FriendProfileFragment extends Fragment {
     public static final String FRIEND_USER_ID = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.friend_user_id_key";
 
     private String img_path, account, gender, nick_name, district, level, ball_type, ball_arm, used_type, user_id;
+    private ImageLoader mImageLoader;
 
 
     @Override
@@ -65,6 +70,7 @@ public class FriendProfileFragment extends Fragment {
         setHasOptionsMenu(true);
         mFragmentManager = getActivity().getSupportFragmentManager();
         mUserId = getActivity().getIntent().getIntExtra(AddPersonFragment.FRIEND_INFO_USER_ID, 0);
+        mImageLoader = VolleySingleton.getInstance().getImgLoader();
     }
 
     @Override
@@ -101,7 +107,7 @@ public class FriendProfileFragment extends Fragment {
     }
 
     private void initView(View view) {
-        mImageView = (ImageView) view.findViewById(R.id.friend_profile_photo);
+        mImageView = (NetworkImageView) view.findViewById(R.id.friend_profile_photo);
         mAccountTextView = (TextView) view.findViewById(R.id.friend_profile_account);
         mGenderTextView = (TextView) view.findViewById(R.id.friend_profile_gender);
         mNickNameTextView = (TextView) view.findViewById(R.id.friend_profile_nick_name);
@@ -180,7 +186,8 @@ public class FriendProfileFragment extends Fragment {
                 ? getString(R.string.habit_1) : (2 == mFriendInfo.getUsedType() ?
                 getString(R.string.habit_2) : getString(R.string.habit_3));
 
-//        mImageView.setImageDrawable();
+        mImageView.setDefaultImageResId(R.drawable.default_head);
+        mImageView.setImageUrl(img_url, mImageLoader);
         mAccountTextView.setText(account);
         mGenderTextView.setText(gender);
         mNickNameTextView.setText(nick_name);

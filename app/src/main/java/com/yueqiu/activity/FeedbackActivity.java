@@ -72,7 +72,8 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
     private static final int ALBUM_REQUEST = 2;
     private EditText mEtFeedbackTitle;
     private EmojiconEditText mEtFeedbackContent;
-    private ImageView mEmotionView,mBackupEmotionView,mDeletePhoto;
+    private ImageView mEmotionView,mBackupEmotionView;
+    private TextView mDeletePhoto;
     private LinearLayout mAddImgContainer;
     private RelativeLayout mRootView,mExpressRelative;
     private IssueImageView mAddImg;
@@ -222,7 +223,7 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
 
                 mTakePhoto = (TextView) mDlgBuilder.findViewById(R.id.take_photo_now);
                 mSelectPhoto = (TextView) mDlgBuilder.findViewById(R.id.select_photo_from_album);
-                mDeletePhoto = (ImageView) mDlgBuilder.findViewById(R.id.delete_photo);
+                mDeletePhoto = (TextView) mDlgBuilder.findViewById(R.id.delete_photo);
                 mTakePhoto.setOnClickListener(FeedbackActivity.this);
                 mSelectPhoto.setOnClickListener(FeedbackActivity.this);
                 mDeletePhoto.setOnClickListener(FeedbackActivity.this);

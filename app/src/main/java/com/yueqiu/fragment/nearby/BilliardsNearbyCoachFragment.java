@@ -555,6 +555,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
         if (null != mEmptyView)
         {
             mEmptyView.setVisibility(View.GONE);
+            mCoauchListView.setEmptyView(null);
         }
     }
 

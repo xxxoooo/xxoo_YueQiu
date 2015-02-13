@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.yueqiu.chatbar;
+package com.yueqiu.im;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -25,7 +25,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 
 import com.yueqiu.R;
-import com.yueqiu.chatbar.view.PhotoView;
+import com.yueqiu.im.view.PhotoView;
 import com.yueqiu.util.FileUtil;
 
 import java.io.File;

@@ -14,6 +14,7 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewStub;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethod;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -28,10 +29,12 @@ import com.rockerhieu.emojicon.emoji.Emojicon;
 import com.yueqiu.R;
 import com.yueqiu.adapter.ChatMsgViewAdapter;
 import com.yueqiu.bean.ChatMsgEntity;
+import com.yueqiu.bean.OnKeyboardHideListener;
 import com.yueqiu.bean.RecentChatEntity;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.db.DBUtils;
 import com.yueqiu.fragment.chatbar.MessageFragment;
+import com.yueqiu.util.Utils;
 import com.yueqiu.view.CustomListView;
 
 import java.util.ArrayList;
@@ -46,7 +49,7 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
         EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
     private ImageView mEmotion, mAssistToggle;
-    private View mExtension, mEmotionToggle;
+    private View mExtension, mEmotionToggle,mRootView;
     private EditText mEditText;
     private InputMethodManager mInputMethodManager;
     private Button mSend;
@@ -57,10 +60,10 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
     private int mFriendUserId;
     private String mUserName;
     private View mMessageMore;
-    private boolean isDisplayInputMethod;//键盘
-    private boolean isShowExtension;//扩展(包括表情和插件)
-    private boolean isDisplayPlugin;//插件
-    private boolean isDisplayEmoji;//表情，三者（键盘、插件、表情）只能显示一个或1者都不显示，当键盘消失时需延时加载其他控件
+    private boolean mIsDisplayInputMethod;//键盘
+    private boolean mIsShowExtension;//扩展(包括表情和插件)
+    private boolean mIsDisplayPlugin;//插件
+    private boolean mIsDisplayEmoji;//表情，三者（键盘、插件、表情）只能显示一个或1者都不显示，当键盘消失时需延时加载其他控件
     private static final int DISPLAY_INPUT_METHOD = 0;
     private static final int UNDISPLAY_INPUT_METHOD = 1;
 
@@ -90,6 +93,7 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
         mSend = $(R.id.chat_container_send_btn);
         mListView = $(R.id.chat_container_list_item);
         mMessageMore = $(R.id.chat_container_message_more);
+        mRootView = $(R.id.chat_root_view);
     }
 
     private void setListener() {
@@ -103,10 +107,48 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
         ((CustomListView) mListView).setOnResizeListener(new CustomListView.OnResizeListener() {
             @Override
             public void onResize(int w, int h, int oldw, int oldh) {
-                isDisplayInputMethod = !isShowExtension;
+//                isDisplayInputMethod = !isShowExtension;
+                if(oldh > h){
+                    mIsDisplayInputMethod = true;
+                }else{
+                    mIsDisplayInputMethod = false;
+                }
             }
         });
+        ViewTreeObserver rootObserver = mRootView.getViewTreeObserver();
+        rootObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if(mIsDisplayInputMethod){
+                    mExtension.setVisibility(View.GONE);
+                    mEmotionToggle.setVisibility(View.GONE);
+
+                    mIsDisplayEmoji = false;
+                    mIsDisplayPlugin = false;
+                }else{
+                    mOnKeyHideListener.onKeyBoardHide();
+                }
+            }
+        });
+
     }
+
+    private OnKeyboardHideListener mOnKeyHideListener = new OnKeyboardHideListener() {
+        @Override
+        public void onKeyBoardHide() {
+            if(mIsDisplayPlugin){
+                mIsDisplayPlugin = true;
+                mIsDisplayEmoji = false;
+                mExtension.setVisibility(View.VISIBLE);
+                mEmotionToggle.setVisibility(View.GONE);
+            }else if(mIsDisplayEmoji){
+                mIsDisplayEmoji = true;
+                mIsDisplayPlugin = false;
+                mEmotionToggle.setVisibility(View.VISIBLE);
+                mExtension.setVisibility(View.GONE);
+            }
+        }
+    };
 
     private void initData() {
         //从本地读取聊天记录
@@ -144,25 +186,50 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.chat_container_open_emotion:
-                isDisplayEmoji = true;
-                isDisplayPlugin = false;
-                showExtension(true);
-                isShowExtension = true;
+                Log.d("wy","aaaaa");
+//                isDisplayEmoji = true;
+//                isDisplayPlugin = false;
+//                showExtension(true);
+//                isShowExtension = true;
+                mIsDisplayPlugin = false;
+                if(mIsDisplayEmoji){
+                    mEmotionToggle.setVisibility(View.GONE);
+                    mIsDisplayEmoji = false;
+                }else{
+                    mIsDisplayEmoji = true;
+                    if(mIsDisplayInputMethod){
+                        Utils.dismissInputMethod(this,mEditText);
+                    }else{
+                        mOnKeyHideListener.onKeyBoardHide();
+                    }
+                }
                 break;
             case R.id.chat_container_open_assist_toggle:
 
-                isDisplayEmoji = false;
-                isDisplayPlugin = !isDisplayPlugin;
-                showExtension(isDisplayPlugin);
+//                isDisplayEmoji = false;
+//                isDisplayPlugin = !isDisplayPlugin;
+//                showExtension(isDisplayPlugin);
+                mIsDisplayEmoji = false;
+                if(mIsDisplayPlugin){
+                    mExtension.setVisibility(View.GONE);
+                    mIsDisplayPlugin = false;
+                }else{
+                    mIsDisplayPlugin = true;
+                    if(mIsDisplayInputMethod){
+                        Utils.dismissInputMethod(this,mEditText);
+                    }else{
+                        mOnKeyHideListener.onKeyBoardHide();
+                    }
+                }
 
-                isShowExtension = isDisplayPlugin;
+//                isShowExtension = isDisplayPlugin;
                 break;
             case R.id.chat_container_text_ed:
-                isDisplayPlugin = false;
-                isDisplayEmoji = false;
+//                isDisplayPlugin = false;
+//                isDisplayEmoji = false;
                 mEditText.setFocusable(true);
-                showExtension(false);
-                isShowExtension = false;
+//                showExtension(false);
+//                isShowExtension = false;
                 break;
             case R.id.chat_container_send_btn:
                 sendMessage();
@@ -178,48 +245,48 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
         }
     }
 
-    private void showExtension(boolean isShow) {
-        if (isShow) {
-            mHandler.sendEmptyMessage(isDisplayInputMethod ? DISPLAY_INPUT_METHOD : UNDISPLAY_INPUT_METHOD);
-        } else {
-            mExtension.setVisibility(View.GONE);
-            mEmotionToggle.setVisibility(View.GONE);
-        }
-    }
+//    private void showExtension(boolean isShow) {
+//        if (isShow) {
+//            //mHandler.sendEmptyMessage(isDisplayInputMethod ? DISPLAY_INPUT_METHOD : UNDISPLAY_INPUT_METHOD);
+//        } else {
+//            mExtension.setVisibility(View.GONE);
+//            mEmotionToggle.setVisibility(View.GONE);
+//        }
+//    }
 
-    Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case DISPLAY_INPUT_METHOD:
-                    mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            showExtensionDetail();
-                        }
-                    }, 300);
-                    break;
-                case UNDISPLAY_INPUT_METHOD:
-                    showExtensionDetail();
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
+//    Handler mHandler = new Handler() {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            super.handleMessage(msg);
+//            switch (msg.what) {
+//                case DISPLAY_INPUT_METHOD:
+//                    mInputMethodManager.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
+//                    mHandler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            showExtensionDetail();
+//                        }
+//                    }, 300);
+//                    break;
+//                case UNDISPLAY_INPUT_METHOD:
+//                    showExtensionDetail();
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
+//    };
 
-    private void showExtensionDetail() {
-        if (isDisplayPlugin) {
-            mExtension.setVisibility(View.VISIBLE);
-            mEmotionToggle.setVisibility(View.GONE);
-        }
-        if (isDisplayEmoji) {
-            mEmotionToggle.setVisibility(View.VISIBLE);
-            mExtension.setVisibility(View.GONE);
-        }
-    }
+//    private void showExtensionDetail() {
+//        if (isDisplayPlugin) {
+//            mExtension.setVisibility(View.VISIBLE);
+//            mEmotionToggle.setVisibility(View.GONE);
+//        }
+//        if (isDisplayEmoji) {
+//            mEmotionToggle.setVisibility(View.VISIBLE);
+//            mExtension.setVisibility(View.GONE);
+//        }
+//    }
 
     @Override
     protected void onStart() {
@@ -275,10 +342,17 @@ public class ChatActivity extends FragmentActivity implements View.OnClickListen
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                if (isShowExtension) {
-                    isShowExtension = false;
-                    showExtension(isShowExtension);
-                }else {
+//                if (isShowExtension) {
+//                    isShowExtension = false;
+////                    showExtension(isShowExtension);
+                if(mIsDisplayEmoji){
+                    mEmotionToggle.setVisibility(View.GONE);
+                    mIsDisplayEmoji = false;
+                }else if(mIsDisplayPlugin){
+                    mExtension.setVisibility(View.GONE);
+                    mIsDisplayInputMethod = false;
+                }
+                else {
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 }

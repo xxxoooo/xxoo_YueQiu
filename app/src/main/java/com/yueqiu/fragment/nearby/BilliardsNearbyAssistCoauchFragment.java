@@ -369,6 +369,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         if (null != mEmptyView)
         {
             mEmptyView.setVisibility(View.GONE);
+            mListView.setEmptyView(null);
         }
     }
 

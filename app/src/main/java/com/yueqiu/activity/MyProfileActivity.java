@@ -75,6 +75,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_myprofile);
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
         mUserDao = DaoFactory.getUser(this);
         mMap.put(DatabaseConstant.UserTable.USER_ID, String.valueOf(mUserId));
         ActionBar actionBar = getActionBar();
@@ -118,6 +119,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
 
         mPhotoImageView = (NetworkImageView) findViewById(R.id.my_profile_photo_iv);
         mTheNewestPostImageView = (ImageView) findViewById(R.id.my_profile_the_new_post_im);
+        mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
     }
 
     //初始化我的资料数据
@@ -233,7 +235,6 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
 
     private void updateUI(UserInfo userInfo) {
         String unset = getString(R.string.unset);
-        mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
         mPhotoImageView.setImageUrl(userInfo.getImg_url(),mImgLoader);
         mAccountTextView.setText(userInfo.getUsername());
         mGenderTextView.setText(userInfo.getSex() == 1

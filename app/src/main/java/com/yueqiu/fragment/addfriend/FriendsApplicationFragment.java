@@ -2,6 +2,8 @@ package com.yueqiu.fragment.addfriend;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +23,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +36,7 @@ import com.yueqiu.dao.ApplicationDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,6 +53,9 @@ import java.util.Map;
 public class FriendsApplicationFragment extends Fragment {
     private static final String TAG = "FriendsApplicationFragment";
     private ListView mListView;
+    private TextView mEmptyView, mProgressBarText;
+    private ProgressBar mProgressBar;
+    private Drawable mProgressDrawable;
     private MyAdapter mMyAdapter;
     private FragmentManager mFragmentManager;
     private static final int GET_ASK_SUCCESS = 0;
@@ -62,17 +69,12 @@ public class FriendsApplicationFragment extends Fragment {
         setHasOptionsMenu(true);
         mFragmentManager = getActivity().getSupportFragmentManager();
         mApplicationDao = DaoFactory.getApplication(getActivity());
-        getFriendApplication();//todo:logic confirm
-        //伪造一条数据
-        FriendsApplication a = new FriendsApplication("1", "jay", "xiaoming", "2012-4-5", "", 0);
-        mApplicationDao.insertApplication(a);
-        FriendsApplication b = new FriendsApplication("2", "ddd", "张学友", "2014-4-5", "", 0);
-        mApplicationDao.insertApplication(b);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        getFriendApplication();//todo:logic confirm
     }
 
     @Override
@@ -84,11 +86,23 @@ public class FriendsApplicationFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friends_application, container, false);
-        mListView = (ListView) view.findViewById(R.id.friends_application_container);
+        init(view);
         mList = mApplicationDao.getApplication();
         mMyAdapter = new MyAdapter(getActivity(), mList);
         mListView.setAdapter(mMyAdapter);
         return view;
+    }
+
+    private void init(View view) {
+        mListView = (ListView) view.findViewById(R.id.friends_application_container);
+        mEmptyView = (TextView) view.findViewById(R.id.friends_application_empty_view);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.pre_progress);
+        mProgressBarText = (TextView) view.findViewById(R.id.pre_text);
+        mProgressBarText.setText(getString(R.string.xlistview_header_hint_loading));
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(getActivity()).build();
+        Rect bounds = mProgressBar.getIndeterminateDrawable().getBounds();
+        mProgressBar.setIndeterminateDrawable(mProgressDrawable);
+        mProgressBar.getIndeterminateDrawable().setBounds(bounds);
     }
 
     @Override
@@ -112,6 +126,17 @@ public class FriendsApplicationFragment extends Fragment {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void showProgressBar(boolean isShow) {
+        mEmptyView.setVisibility(View.GONE);
+        if (isShow) {
+            mProgressBar.setVisibility(View.VISIBLE);
+            mProgressBarText.setVisibility(View.VISIBLE);
+        } else {
+            mProgressBar.setVisibility(View.GONE);
+            mProgressBarText.setVisibility(View.GONE);
         }
     }
 
@@ -140,6 +165,7 @@ public class FriendsApplicationFragment extends Fragment {
 
         @Override
         protected void onPreExecute() {
+            showProgressBar(true);
         }
 
         @Override
@@ -178,18 +204,23 @@ public class FriendsApplicationFragment extends Fragment {
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            showProgressBar(false);
             switch (msg.what) {
                 case PublicConstant.GET_SUCCESS:
                     mList = (List<FriendsApplication>) msg.obj;
                     mMyAdapter.notifyDataSetChanged();
+                    showEmptyView(false);
                     break;
                 case PublicConstant.NO_RESULT:
+                    showEmptyView(true);
                     Toast.makeText(getActivity(), "暂无好友申请信息！", Toast.LENGTH_LONG).show();
                     break;
                 case PublicConstant.TIME_OUT:
+                    showEmptyView(true);
                     Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
                     break;
                 case PublicConstant.REQUEST_ERROR:
+                    showEmptyView(true);
                     if (null == msg.obj) {
                         Utils.showToast(getActivity(), getString(R.string.http_request_error));
                     } else {
@@ -202,6 +233,11 @@ public class FriendsApplicationFragment extends Fragment {
         }
     };
 
+    private void showEmptyView(boolean isShow) {
+        if (isShow)
+            mEmptyView.setVisibility(View.VISIBLE);
+        else mEmptyView.setVisibility(View.GONE);
+    }
 
     private class MyAdapter extends BaseAdapter {
         private Context mContext;

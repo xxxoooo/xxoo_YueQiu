@@ -3,6 +3,7 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +14,9 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.bean.UserInfo;
+import com.yueqiu.dao.DaoFactory;
+import com.yueqiu.dao.UserDao;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
 
@@ -25,7 +29,10 @@ public class UpgradeAssistantActivity extends Activity {
             ,mBallType,mBallArm,mUsedTypeTv,mBallAge,mIdolTv,mSignTv,mCostTv
             ,mTypeTv,mExperienceTv;
     private NetworkImageView mPhotoView,mNewerPhotoView;
+
     private ImageLoader mImgLoader;
+    private UserDao mUserDao;
+    private UserInfo mUserInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +93,14 @@ public class UpgradeAssistantActivity extends Activity {
                 ? unset : YueQiuApp.sUserInfo.getIdol());
         //TODO:最新照片、费用、经历、类型没数据，类型是啥？定义不明确
 
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
+        mUserDao = DaoFactory.getUser(this);
+        mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle(getString(R.string.update_to_assistant));
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

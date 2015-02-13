@@ -532,6 +532,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
+            if(mRoomListView.isRefreshing()){
+                mRoomListView.onRefreshComplete();
+            }
             switch (msg.what)
             {
                 case UI_SHOW_DIALOG:
@@ -546,10 +549,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     // 此时数据已经加载完毕，我们需要通知List的Adpter数据源已经发生改变
                     mSearchRoomAdapter.notifyDataSetChanged();
                     hideProgress();
-                    if (mRoomListView.isRefreshing())
-                    {
-                        mRoomListView.onRefreshComplete();
-                    }
                     break;
 
                 case STATE_FETCH_DATA_FAILED:
@@ -736,6 +735,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
         if (null != mEmptyView)
         {
             mEmptyView.setVisibility(View.GONE);
+            mRoomListView.setEmptyView(null);
         }
     }
 

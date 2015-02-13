@@ -91,7 +91,7 @@ public class HttpUtil
                  }
                 in.close();
             }
-            Log.d("wy","qq");
+
             conn.disconnect();
             return result.toString().trim();
         } catch (MalformedURLException e) {

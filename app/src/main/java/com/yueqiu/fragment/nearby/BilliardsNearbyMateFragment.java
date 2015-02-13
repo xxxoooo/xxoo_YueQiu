@@ -348,9 +348,10 @@ public class BilliardsNearbyMateFragment extends Fragment
                             if (cacheMateList.isEmpty())
                             {
                                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            }else {
+                                mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
+                                mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                             }
-                            mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
-                            mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                         } else
                         {
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
@@ -426,6 +427,9 @@ public class BilliardsNearbyMateFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
+            if(mSubFragmentListView.isRefreshing()){
+                mSubFragmentListView.onRefreshComplete();
+            }
             switch (msg.what)
             {
                 case DATA_RETRIEVE_FAILED:
@@ -653,6 +657,7 @@ public class BilliardsNearbyMateFragment extends Fragment
         if (null != mEmptyView)
         {
             mEmptyView.setVisibility(View.GONE);
+            mSubFragmentListView.setEmptyView(null);
         }
     }
 
