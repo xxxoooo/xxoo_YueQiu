@@ -120,8 +120,6 @@ public class HttpUtil
 
     public static <T> String simpleUrlClient()
     {
-
-
         return "";
     }
 

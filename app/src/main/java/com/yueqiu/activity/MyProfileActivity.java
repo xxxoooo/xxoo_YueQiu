@@ -219,6 +219,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     break;
                 case DATA_SUCCESS:
                     mUserDao.updateUserInfo(mMap);
+                    mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
                     String url = ((UserInfo) msg.obj).getImg_url();
                     mPhotoImageView.setImageUrl(url, mImgLoader);
                     updateUI((UserInfo) msg.obj);

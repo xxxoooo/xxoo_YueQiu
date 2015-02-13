@@ -174,6 +174,8 @@ public class MessageFragment extends Fragment implements DownloadListener{
         int position = info.position;
         switch (item.getItemId()) {
             case R.id.menu_item_delete_message:
+                if (position == 0)
+                    return false;
                 GotyeChatTarget target = mAdapter.getItem(position);
                 api.deleteSession(target);
                 updateList();
