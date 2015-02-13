@@ -307,14 +307,10 @@ public class BilliardsNearbyMateFragment extends Fragment
         {
             try
             {
-                Log.d(TAG_2, " ----> fuck goes here ... ");
                 // initialObj当中包含的是最原始的JSON data，这个Json对象当中还包含了一些包含我们的请求状态的字段值
                 // 我们还需要从initialObj当中解析出我们真正需要的Json对象
 //                JSONObject initialObj = Utils.parseJson(rawResult);
                 JSONObject initialObj = new JSONObject(rawResult);
-                Log.d(TAG_2, " ----> the initial json object we get are : " + initialObj);
-                Log.d(TAG_2, " ----> before we parsing data we get, the code value are : " + initialObj.get("code"));
-//                if (!initialObj.isNull("code"))
                 if (! TextUtils.isEmpty(initialObj.get("code").toString()))
                 {
                     final int statusCode = initialObj.getInt("code");
