@@ -276,6 +276,7 @@ public class BilliardsNearbyMateFragment extends Fragment
         super.onStop();
     }
 
+
     /**
      * 用于请求首页当中的球友的信息列表
      *
@@ -347,9 +348,11 @@ public class BilliardsNearbyMateFragment extends Fragment
                             if (cacheMateList.isEmpty())
                             {
                                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            } else
+                            {
+                                mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
+                                mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                             }
-                            mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
-                            mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                         } else
                         {
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
@@ -425,6 +428,11 @@ public class BilliardsNearbyMateFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
+            if (mSubFragmentListView.isRefreshing())
+            {
+                mSubFragmentListView.onRefreshComplete();
+            }
+
             switch (msg.what)
             {
                 case DATA_RETRIEVE_FAILED:
@@ -837,6 +845,9 @@ public class BilliardsNearbyMateFragment extends Fragment
     @Override
     public void onDestroy()
     {
+        // 将所有的预筛选参数全部置空
+        sParamsPreference.setMateRange(mContext, "");
+        sParamsPreference.setMateGender(mContext, "");
         super.onDestroy();
     }
 
