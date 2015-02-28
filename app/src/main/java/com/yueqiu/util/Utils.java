@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
@@ -15,6 +16,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.InflateException;
@@ -370,13 +372,21 @@ public class Utils {
         return sdp.format(new Date());
     }
 
+    public static Dialog showSheet(Context context)
+    {
+        return showSheet(context, null);
+    }
+
     /**
      * 弹出底部对话框,并初始化所有view
      * @param context
      * @return
      */
-    public static Dialog showSheet(Context context)
+    public static Dialog showSheet(Context context, Intent intent)
     {
+        // 创建用于实现微信分享的实例
+        final WeChatShareManager weChatShareManager = WeChatShareManager.getInstance(context, intent);
+
         final Dialog dlg = new Dialog(context, R.style.ActionSheet);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         RelativeLayout layout = (RelativeLayout) inflater.inflate(R.layout.dialog_share, null);
@@ -424,6 +434,17 @@ public class Utils {
                     case R.id.img_search_dating_detail_share_yueqiucircle:
                         break;
                     case R.id.img_search_dating_detail_share_weichat:
+                        // TODO: 实现分享到微信的处理过程
+                        // 我们需要分享的内容包括球厅的图片，球厅的价格以及球厅的活动信息说明
+                        if (null != weChatShareManager)
+                        {
+                            Log.d("wechat_share", " share to we chat ");
+//                            weChatShareManager.shareByWeChat(weChatShareManager.new SharePicContent(R.drawable.ic_launcher),
+//                                    WeChatShareManager.WECHAT_SHARE_WAY_PIC);
+
+                            weChatShareManager.shareByWeChat(weChatShareManager.new ShareTextContent("以下内容来自微信SDK测试，与本人立场有关，十分TMD有关"),
+                                    WeChatShareManager.WECHAT_SHARE_WAY_TEXT);
+                        }
                         break;
                     case R.id.img_search_dating_detail_share_qqzone:
                         break;

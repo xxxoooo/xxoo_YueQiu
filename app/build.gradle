@@ -22,6 +22,14 @@ android {
         abortOnError false
     }
 
+    // 由于我们需要使用微信的分享接口，所以我们需要在这里提供我们自己的KeyStore，而不是默认的keyStore
+//    signingConfigs {
+//        debug {
+//            storeFile file("")
+//        }
+//    }
+
+
     task copyNativeLibs(type: Copy) {
         from fileTree(dir: 'libs', include: '*/*.so' )  into  'build/native-libs'
     }

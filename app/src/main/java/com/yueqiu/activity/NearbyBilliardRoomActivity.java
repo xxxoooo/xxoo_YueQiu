@@ -3,6 +3,7 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.util.WeChatShareManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -170,7 +172,10 @@ public class NearbyBilliardRoomActivity extends Activity
 //                mUIEventsHandler.sendEmptyMessage(ADD_TO_FAVOR);
 //                break;
             case R.id.search_room_detail_action_share:
-                Dialog dlg = Utils.showSheet(this);
+                // 我们需要传入Intent来进行微信分享请求的结果监听
+                // 我们可以在这个Intent当中传递我们需要的分享的具体数据
+                // 我们目前需要分享包括基本的球厅的信息，球厅图片(Bitmap),球厅活动说明
+                Dialog dlg = Utils.showSheet(this, getIntent());
                 dlg.show();
                 break;
             case android.R.id.home:
@@ -211,7 +216,6 @@ public class NearbyBilliardRoomActivity extends Activity
         (mTvYueqiuFriend = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_yueqiucircle)).setOnClickListener(new OnShareIconClickListener());
         (mTvFriendCircle = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_friendcircle)).setOnClickListener(new OnShareIconClickListener());
         (mTvWeichat = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_weichat)).setOnClickListener(new OnShareIconClickListener());
-
         (mTvQQZone = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_qqzone)).setOnClickListener(new OnShareIconClickListener());
         (mTvTencentWeibo = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_qqweibo)).setOnClickListener(new OnShareIconClickListener());
         (mTvSinaWeibo = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_sinaweibo)).setOnClickListener(new OnShareIconClickListener());
@@ -234,7 +238,6 @@ public class NearbyBilliardRoomActivity extends Activity
         mPopupWindow.showAtLocation(findViewById(R.id.search_room_detailed_whole_container), Gravity.BOTTOM, 0, 0);
 //        mWindowRootElem.getForeground().setAlpha(160);
     }
-
 
     private class OnShareIconClickListener implements View.OnClickListener
     {
