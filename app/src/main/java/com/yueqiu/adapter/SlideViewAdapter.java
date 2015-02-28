@@ -117,35 +117,35 @@ public class SlideViewAdapter extends BaseAdapter {
         final ViewAccountHolder accountHolder;
         ViewHolder holder;
         switch (type) {
-           case ISlideListItem.ITEM_ACCOUNT:
-               if(convertView == null) {
-                   convertView = mInflater.inflate(R.layout.item_more_account_layout, null);
-                   accountHolder = new ViewAccountHolder();
-                   accountHolder.image = (ImageView) convertView.findViewById(R.id.account_image);
-                   accountHolder.name = (TextView) convertView.findViewById(R.id.account_name);
-                   accountHolder.login = (TextView) convertView.findViewById(R.id.slide_login);
-                   convertView.setTag(accountHolder);
-               }else{
-                   accountHolder = (ViewAccountHolder) convertView.getTag();
-               }
-               SlideAccountItemISlide accountItem = (SlideAccountItemISlide) item;
-               int embedResId = R.drawable.lable_friend;
-               if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_assist_coauch_str))){
-                   embedResId = R.drawable.lable_assistant;
-               }else if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_mate_str))){
-                   embedResId = R.drawable.lable_friend;
-               }else if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_coauch_str))){
-                   embedResId = R.drawable.lable_coach;
-               }
+            case ISlideListItem.ITEM_ACCOUNT:
+                if(convertView == null) {
+                    convertView = mInflater.inflate(R.layout.item_more_account_layout, null);
+                    accountHolder = new ViewAccountHolder();
+                    accountHolder.image = (ImageView) convertView.findViewById(R.id.account_image);
+                    accountHolder.name = (TextView) convertView.findViewById(R.id.account_name);
+                    accountHolder.login = (TextView) convertView.findViewById(R.id.slide_login);
+                    convertView.setTag(accountHolder);
+                }else{
+                    accountHolder = (ViewAccountHolder) convertView.getTag();
+                }
+                SlideAccountItemISlide accountItem = (SlideAccountItemISlide) item;
+                int embedResId = R.drawable.lable_friend;
+                if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_assist_coauch_str))){
+                    embedResId = R.drawable.lable_assistant;
+                }else if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_mate_str))){
+                    embedResId = R.drawable.lable_friend;
+                }else if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_coauch_str))){
+                    embedResId = R.drawable.lable_coach;
+                }
 
-               int user_id = accountItem.getUserId();
-               if(user_id > 0){
-                   accountHolder.login.setVisibility(View.GONE);
-                   accountHolder.name.setVisibility(View.VISIBLE);
-                   accountHolder.name.setText(accountItem.getName());
-                   String img = accountItem.getImg();
-                   // the following are the source bitmap we need to get from network service
-                   final Bitmap source = null;
+                int user_id = accountItem.getUserId();
+                if(user_id > 0){
+                    accountHolder.login.setVisibility(View.GONE);
+                    accountHolder.name.setVisibility(View.VISIBLE);
+                    accountHolder.name.setText(accountItem.getName());
+                    String img = accountItem.getImg();
+                    // the following are the source bitmap we need to get from network service
+                    final Bitmap source = null;
 //                   if(img.equals("")){
 //                       source = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.head_img);
 //                   }else {
@@ -234,10 +234,8 @@ public class SlideViewAdapter extends BaseAdapter {
                    });
                    accountHolder.image.setImageResource(R.drawable.head_img);
                }
-
-
-               //accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accountItem.getGolden());
-               break;
+                //accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accountItem.getGolden());
+                break;
             case ISlideListItem.ITEM_BASIC:
                 if(convertView == null){
                     convertView = mInflater.inflate(R.layout.item_more_other_layout,null);
@@ -269,7 +267,6 @@ public class SlideViewAdapter extends BaseAdapter {
     }
 
     private class ViewAccountHolder{
-//        NetworkImageView image;
         ImageView image;
         TextView  name;
         TextView  golden;

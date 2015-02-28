@@ -2,6 +2,8 @@ package com.yueqiu.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
+import android.graphics.drawable.Drawable;
 
 import com.gotye.api.PathUtil;
 
@@ -60,6 +62,13 @@ public class BitmapUtil {
 		return inSampleSize;
 	}
 
+    /**
+     * 根据比例裁剪
+     * @param filePath
+     * @param w
+     * @param h
+     * @return
+     */
 	public static Bitmap getSmallBitmap(String filePath, int w, int h) {
 		final BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;
@@ -74,6 +83,11 @@ public class BitmapUtil {
 		return BitmapFactory.decodeFile(filePath, options);
 	}
 
+    /**
+     * 获取原图
+     * @param path
+     * @return
+     */
 	public static Bitmap getBitmap(String path) {
 		if (path == null) {
 			return null;
@@ -138,5 +152,24 @@ public class BitmapUtil {
 		 
 		return null;
 	}
+
+    public static byte[] convertBitmapToByte(Bitmap bitmap){
+        if(bitmap == null){
+            return null;
+        }
+
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100,os);
+        return os.toByteArray();
+    }
+    public static Bitmap drawableToBitmap(Drawable drawable){
+
+        Bitmap bitmap = Bitmap.createBitmap(
+                drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(),
+                drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
+
+        return bitmap;
+    }
 
 }

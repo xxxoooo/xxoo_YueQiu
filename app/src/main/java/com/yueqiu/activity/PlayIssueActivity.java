@@ -14,6 +14,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -88,9 +89,9 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
     public static final String TIMEPICKER_TAG = "timepicker";
     private static final int START_FLAG = 0;
     private static final int END_FLAG   = 1;
-    private EditText mTitleEdit,mContactEdit,mPhoneEdit;
+    private EditText mTitleEdit,mContactEdit,mPhoneEdit,mLocationTv;
     private EmojiconEditText mIllustrationEdit;
-    private TextView mLocationTv,mStartTimeTv,mEndTimeTv,mChargeModuleTv,mPreTextView,mTakePhoto,mSelectPhoto;
+    private TextView mStartTimeTv,mEndTimeTv,mChargeModuleTv,mPreTextView,mTakePhoto,mSelectPhoto,mDeletePhoto;
     private String mContactStr,mPhoneNumberStr;
     private DatePickerDialog mDatePickerDialog;
     private TimePickerDialog mTimePickerDialog;
@@ -260,7 +261,7 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         mStartTimeTv      = (TextView) findViewById(R.id.activity_start_time_text);
         mEndTimeTv        = (TextView) findViewById(R.id.activity_end_time_text);
         mChargeModuleTv   = (TextView) findViewById(R.id.activity_charge_module_text);
-        mLocationTv       = (TextView) findViewById(R.id.activity_location_text);
+        mLocationTv       = (EditText) findViewById(R.id.activity_location_text);
 
 //        mGridView = (GridView) findViewById(R.id.play_topic_grid_view);
 //        mGridView.setVisibility(View.GONE);
@@ -300,6 +301,39 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         mIvExpression.setOnClickListener(this);
         mIvAddImg.setOnClickListener(this);
 
+        mIvAddImg.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mDlgBuilder = CustomDialogBuilder.getsInstance(PlayIssueActivity.this);
+                mDlgBuilder.withTitle(getString(R.string.select_photo))
+                        .withTitleColor(Color.WHITE)
+                        .withDividerColor(getResources().getColor(R.color.search_distance_color))
+                        .withMessage(null)
+                        .isCancelableOnTouchOutside(true)
+                        .isCancelable(true)
+                        .withDialogColor(R.color.actionbar_color)
+                        .withDuration(700)
+                        .withEffect(EffectsType.SlideLeft)
+                        .setSureButtonVisible(false)
+                        .withCancelButtonText(getString(R.string.btn_message_cancel))
+                        .setCustomView(R.layout.dialog_long_click_view, v.getContext())
+                        .setCancelButtonClick(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDlgBuilder.dismiss();
+                            }
+                        })
+                        .show();
+
+                mTakePhoto = (TextView) mDlgBuilder.findViewById(R.id.take_photo_now);
+                mSelectPhoto = (TextView) mDlgBuilder.findViewById(R.id.select_photo_from_album);
+                mDeletePhoto = (TextView) mDlgBuilder.findViewById(R.id.delete_photo);
+                mTakePhoto.setOnClickListener(PlayIssueActivity.this);
+                mSelectPhoto.setOnClickListener(PlayIssueActivity.this);
+                mDeletePhoto.setOnClickListener(PlayIssueActivity.this);
+                return true;
+            }
+        });
 
 //        mImgAdapter = new TopicImgAdapter();
 //        mGridView.setAdapter(mImgAdapter);
@@ -431,6 +465,17 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
                     mSelectPhoto.setOnClickListener(this);
                 }
                 break;
+            case R.id.delete_photo:
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth,mAddViewHeight);
+                params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
+                params.gravity = Gravity.CENTER_VERTICAL;
+                mIvAddImg.setLayoutParams(params);
+                mIvAddImg.setBitmapBean(null);
+                mIvAddImg.setImageResource(R.drawable.add_img_bg);
+                mIvAddImg.setBackgroundColor(getResources().getColor(android.R.color.white));
+                if(mDlgBuilder != null)
+                    mDlgBuilder.dismiss();
+                break;
             case R.id.take_photo_now:
                 Uri imageFileUri = null;
                 if(FileUtil.isSDCardReady()){
@@ -523,8 +568,13 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
             return null;
         }
         map.put("title", title);
-        int address = 0;
-        map.put("address",address);
+        String address = mLocationTv.getText().toString();
+        if(TextUtils.isEmpty(address)){
+            Utils.showToast(this,getString(R.string.activity_location_cannot_empty));
+            return null;
+        }
+
+
         String beginTime = mStartTimeTv.getText().toString().trim();
         if(beginTime.equals(""))
         {

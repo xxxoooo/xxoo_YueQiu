@@ -42,7 +42,7 @@
                             android:text="@string/photo"/>
 
                         <com.android.volley.toolbox.NetworkImageView
-                            android:id="@+id/upgrade_assistant_photo"
+                            android:id="@+id/upgrade_photo_view"
                             android:textColor="@color/md__defaultBackground"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
@@ -72,6 +72,7 @@
                             android:text="@string/account"/>
 
                         <TextView
+                            android:id="@+id/upgrade_account_name"
                             android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -101,6 +102,7 @@
                             android:text="@string/gender"/>
 
                         <TextView
+                            android:id="@+id/upgrade_sex"
                             android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -143,7 +145,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_nickname"/>
                     </RelativeLayout>
 
                     <View
@@ -172,7 +175,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_district"/>
                     </RelativeLayout>
 
                     <View
@@ -201,7 +205,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_level"/>
                     </RelativeLayout>
 
                     <View
@@ -230,7 +235,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_ball_type"/>
                     </RelativeLayout>
 
                     <View
@@ -259,7 +265,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_ball_arm"/>
                     </RelativeLayout>
 
                     <View
@@ -288,7 +295,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_use_type"/>
                     </RelativeLayout>
 
                     <View
@@ -317,7 +325,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_ball_age"/>
                     </RelativeLayout>
 
                     <View
@@ -346,7 +355,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_idol"/>
                     </RelativeLayout>
 
                     <View
@@ -375,7 +385,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_sign"/>
                     </RelativeLayout>
 
                     <View
@@ -397,12 +408,13 @@
                             android:layout_centerVertical="true"
                             android:text="@string/the_new_post"/>
 
-                        <ImageView
+                        <com.android.volley.toolbox.NetworkImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
-                            android:layout_alignParentRight="true"/>
+                            android:layout_alignParentRight="true"
+                            android:id="@+id/upgrade_newer_photo"/>
                     </RelativeLayout>
 
                 </LinearLayout>
@@ -426,7 +438,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/cost"/>
+                            android:text="@string/cost"
+                            />
 
                         <TextView
                             android:textColor="@color/md__defaultBackground"
@@ -435,7 +448,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_cost"/>
                     </RelativeLayout>
 
                     <View
@@ -464,7 +478,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_type"/>
                     </RelativeLayout>
 
                     <View
@@ -493,7 +508,8 @@
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:text="@string/unset"/>
+                            android:text="@string/unset"
+                            android:id="@+id/upgrade_experience"/>
                     </RelativeLayout>
 
 

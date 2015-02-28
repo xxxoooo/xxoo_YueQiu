@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -42,7 +43,7 @@ import java.util.Map;
  * Created by doushuqi on 14/12/19.
  * 我的资料主Activity
  */
-public class MyProfileActivity extends Activity implements View.OnClickListener {
+public class MyProfileActivity extends FragmentActivity implements View.OnClickListener {
     private static final String TAG = "MyProfileActivity";
     private Button mAssistant, mCoach;
     private RelativeLayout mPhoto, mAccount, mGender, mNickName, mRegion, mLevel, mBallType,
@@ -50,7 +51,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     private TextView mNickNameTextView, mRegionTextView, mLevelTextView, mBallTypeTextView,
             mBilliardsCueTextView, mCueHabitsTextView, mPlayAgeTextView, mIdolTextView,
             mSignTextView, mAccountTextView, mGenderTextView;
-    private ImageView  mTheNewestPostImageView;
+    private ImageView mTheNewestPostImageView;
     private NetworkImageView mPhotoImageView;
 
     public static final String EXTRA_FRAGMENT_ID =
@@ -80,6 +81,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(getString(R.string.search_my_profile_str));
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
         initView();
         setClickListener();
         initData();
@@ -117,6 +119,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
 
         mPhotoImageView = (NetworkImageView) findViewById(R.id.my_profile_photo_iv);
         mTheNewestPostImageView = (ImageView) findViewById(R.id.my_profile_the_new_post_im);
+        mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
     }
 
     //初始化我的资料数据
@@ -214,20 +217,16 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                         Utils.showToast(MyProfileActivity.this, (String) msg.obj);
                     }
                     getMyProfileFromLocal();
-                    mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
                     updateUI(mUserInfo);
                     break;
                 case DATA_SUCCESS:
                     mUserDao.updateUserInfo(mMap);
-                    mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
-                    String url = ((UserInfo) msg.obj).getImg_url();
-                    mPhotoImageView.setImageUrl(url, mImgLoader);
                     updateUI((UserInfo) msg.obj);
+                    updateGlobalUserId((UserInfo) msg.obj);
                     break;
                 case PublicConstant.TIME_OUT:
                     Toast.makeText(MyProfileActivity.this, getString(R.string.http_request_time_out), Toast.LENGTH_SHORT).show();
                     getMyProfileFromLocal();
-                    mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
                     updateUI(mUserInfo);
                     break;
             }
@@ -236,7 +235,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
 
     private void updateUI(UserInfo userInfo) {
         String unset = getString(R.string.unset);
-//        mPhotoImageView.setImageDrawable();
+        mPhotoImageView.setImageUrl(userInfo.getImg_url(),mImgLoader);
         mAccountTextView.setText(userInfo.getUsername());
         mGenderTextView.setText(userInfo.getSex() == 1
                 ? getString(R.string.man) : getString(R.string.woman));
@@ -261,6 +260,20 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         mSignTextView.setText("".equals(userInfo.getIdol_name())
                 ? unset : userInfo.getIdol_name());
 //        mTheNewestPostImageView.setImageDrawable();
+    }
+
+    private void updateGlobalUserId(UserInfo user){
+        YueQiuApp.sUserInfo.setUsername(user.getUsername());
+        YueQiuApp.sUserInfo.setSex(user.getSex());
+        YueQiuApp.sUserInfo.setNick(user.getNick());
+        YueQiuApp.sUserInfo.setDistrict(user.getDistrict());
+        YueQiuApp.sUserInfo.setLevel(user.getLevel());
+        YueQiuApp.sUserInfo.setBall_type(user.getBall_type());
+        YueQiuApp.sUserInfo.setBallArm(user.getBallArm());
+        YueQiuApp.sUserInfo.setUsedType(user.getUsedType());
+        YueQiuApp.sUserInfo.setBallAge(user.getBallAge());
+        YueQiuApp.sUserInfo.setIdol(user.getIdol());
+        YueQiuApp.sUserInfo.setIdol_name(user.getIdol_name());
     }
 
     @Override

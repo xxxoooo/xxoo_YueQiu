@@ -11,9 +11,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -51,6 +54,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
     private String mUserName;
     private String mPwd;
     private UserDao mUserDao;
+    private View mRootView;
 
 
     private Handler mHandler = new Handler() {
@@ -115,6 +119,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         mTvRegister = (TextView) findViewById(R.id.activity_login_tv_register);
         mEtUserId = (EditText) findViewById(R.id.activity_login_et_username);
         mEtPwd = (EditText) findViewById(R.id.activity_login_et_password);
+        mRootView = findViewById(R.id.login_root_view);
 
 
         mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
@@ -128,6 +133,22 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         mBtnLogin.setOnClickListener(this);
         mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mTvRegister.setOnClickListener(this);
+
+        ViewTreeObserver observer = mRootView.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect rect = new Rect();
+                mRootView.getRootView().getWindowVisibleDisplayFrame(rect);
+                int screenHeight = mRootView.getRootView().getHeight();
+                int keyboardHeight = screenHeight - (rect.bottom - rect.top);
+                Log.d("wy", "keyboard height is ->" + keyboardHeight);
+                Log.d("wy","rect.top is ->" + rect.top);
+                if(keyboardHeight != rect.top){
+                    YueQiuApp.sKeyboardHeight = keyboardHeight;
+                }
+            }
+        });
     }
 
 

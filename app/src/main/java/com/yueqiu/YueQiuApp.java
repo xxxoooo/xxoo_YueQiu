@@ -72,9 +72,12 @@ public class YueQiuApp extends Application implements LoginListener {
     public static final String APPKEY = "007b7931-bd77-4aec-876f-47f6f9b58db2";
     public static final String PACKAGENAME = "com.yueqiu";
 
+
     //登录状态
     public static final int LOGOUT_SUCCESS = 0;
     public static final int LOGOUT_FAILED = 1;
+
+    public static int sKeyboardHeight;
 
     public Handler mHandler = new Handler() {
         @Override

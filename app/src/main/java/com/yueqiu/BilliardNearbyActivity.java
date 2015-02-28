@@ -112,6 +112,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         Log.d(TAG, " the onCreate has been called ");
         super.onCreate(savedInstanceState);
 
+
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
 

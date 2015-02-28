@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -38,6 +40,7 @@ import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
 import com.yueqiu.R;
+import com.yueqiu.bean.OnKeyboardHideListener;
 import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.ProgressDialogUtil;
 import com.yueqiu.util.SendImageMessageTask;
@@ -55,6 +58,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         EditText.OnEditorActionListener, EmojiconGridFragment.OnEmojiconClickedListener,
         EmojiconsFragment.OnEmojiconBackspaceClickedListener {
 
+    private static final String TAG = "ChatPage";
     public static final int REALTIMEFROM_OTHER = 2;
     public static final int REALTIMEFROM_SELF = 1;
     public static final int REALTIMEFROM_NO = 0;
@@ -87,17 +91,18 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     private ActionBar mActionBar;
     private Button mSend;
     private View mMessageMore;
-    private boolean isDisplayInputMethod;//键盘
-    private boolean isShowExtension;//扩展(包括表情和插件)
-    private boolean isDisplayPlugin;//插件
-    private boolean isDisplayEmoji;//表情，三者（键盘、插件、表情）只能显示一个或1者都不显示，当键盘消失时需延时加载其他控件
+    private boolean mIsDisplayInputMethod;//键盘
+    //    private boolean mIsShowExtension;//扩展(包括表情和插件)
+    private boolean mIsDisplayPlugin;//插件
+    private boolean mIsDisplayEmoji;//表情，三者（键盘、插件、表情）只能显示一个或1者都不显示，当键盘消失时需延时加载其他控件
     private static final int DISPLAY_INPUT_METHOD = 0;
     private static final int UNDISPLAY_INPUT_METHOD = 1;
     private ImageView mEmotion, mAssistToggle;
-    private View mExtension, mEmotionToggle, mSendFromePic, mSendfromCamera;
+    private View mExtension, mEmotionToggle, mSendFromePic, mSendfromCamera, mRootView;
     private InputMethodManager mInputMethodManager;
 
     private Fragment emojiconFragment = EmojiconsFragment.newInstance(false);
+    private int mKeyboardHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +143,22 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
 
     }
-
+    private OnKeyboardHideListener mOnKeyHideListener = new OnKeyboardHideListener() {
+        @Override
+        public void onKeyBoardHide() {
+            if (mIsDisplayPlugin) {
+                mIsDisplayPlugin = true;
+                mIsDisplayEmoji = false;
+                mExtension.setVisibility(View.VISIBLE);
+                mEmotionToggle.setVisibility(View.GONE);
+            } else if (mIsDisplayEmoji) {
+                mIsDisplayEmoji = true;
+                mIsDisplayPlugin = false;
+                mEmotionToggle.setVisibility(View.VISIBLE);
+                mExtension.setVisibility(View.GONE);
+            }
+        }
+    };
     private <T extends View> T $(int id) {
         return (T) findViewById(id);
     }
@@ -151,13 +171,37 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         mMessageMore.setOnClickListener(this);
         mSendFromePic.setOnClickListener(this);
         mSendfromCamera.setOnClickListener(this);
-        //用于判断当前屏幕是否显示了软键盘
-        ((CustomListView) pullListView).setOnResizeListener(new CustomListView.OnResizeListener() {
+        ViewTreeObserver rootObserver = mRootView.getViewTreeObserver();
+        rootObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-            public void onResize(int w, int h, int oldw, int oldh) {
-                isDisplayInputMethod = !isShowExtension;
+            public void onGlobalLayout() {
+                Rect rect = new Rect();
+                mRootView.getRootView().getWindowVisibleDisplayFrame(rect);
+                int screenHeight = mRootView.getRootView().getHeight();
+                mKeyboardHeight = screenHeight - (rect.bottom - rect.top);
+                if (mKeyboardHeight == rect.top) {
+                    mIsDisplayInputMethod = false;
+                } else {
+                    mIsDisplayInputMethod = true;
+                }
+                if (mIsDisplayInputMethod) {
+                    mExtension.setVisibility(View.GONE);
+                    mEmotionToggle.setVisibility(View.GONE);
+
+                    mIsDisplayEmoji = false;
+                    mIsDisplayPlugin = false;
+                } else {
+                    mOnKeyHideListener.onKeyBoardHide();
+                }
             }
         });
+//        //用于判断当前屏幕是否显示了软键盘
+//        pullListView.setOnResizeListener(new CustomListView.OnResizeListener() {
+//            @Override
+//            public void onResize(int w, int h, int oldw, int oldh) {
+////                isDisplayInputMethod = !isShowExtension;
+//            }
+//        });
     }
 
     private void initView() {
@@ -386,48 +430,48 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         scrollToBottom();
     }
 
-    private void showExtension(boolean isShow) {
-        if (isShow) {
-            mHandler.sendEmptyMessage(isDisplayInputMethod ? DISPLAY_INPUT_METHOD : UNDISPLAY_INPUT_METHOD);
-        } else {
-            mExtension.setVisibility(View.GONE);
-            mEmotionToggle.setVisibility(View.GONE);
-        }
-    }
+//    private void showExtension(boolean isShow) {
+//        if (isShow) {
+//            mHandler.sendEmptyMessage(isDisplayInputMethod ? DISPLAY_INPUT_METHOD : UNDISPLAY_INPUT_METHOD);
+//        } else {
+//            mExtension.setVisibility(View.GONE);
+//            mEmotionToggle.setVisibility(View.GONE);
+//        }
+//    }
+//
+//    Handler mHandler = new Handler() {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            super.handleMessage(msg);
+//            switch (msg.what) {
+//                case DISPLAY_INPUT_METHOD:
+//                    mInputMethodManager.hideSoftInputFromWindow(textMessage.getWindowToken(), 0);
+//                    mHandler.postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            showExtensionDetail();
+//                        }
+//                    }, 300);
+//                    break;
+//                case UNDISPLAY_INPUT_METHOD:
+//                    showExtensionDetail();
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
+//    };
 
-    Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case DISPLAY_INPUT_METHOD:
-                    mInputMethodManager.hideSoftInputFromWindow(textMessage.getWindowToken(), 0);
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            showExtensionDetail();
-                        }
-                    }, 300);
-                    break;
-                case UNDISPLAY_INPUT_METHOD:
-                    showExtensionDetail();
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
-    private void showExtensionDetail() {
-        if (isDisplayPlugin) {
-            mExtension.setVisibility(View.VISIBLE);
-            mEmotionToggle.setVisibility(View.GONE);
-        }
-        if (isDisplayEmoji) {
-            mEmotionToggle.setVisibility(View.VISIBLE);
-            mExtension.setVisibility(View.GONE);
-        }
-    }
+//    private void showExtensionDetail() {
+//        if (isDisplayPlugin) {
+//            mExtension.setVisibility(View.VISIBLE);
+//            mEmotionToggle.setVisibility(View.GONE);
+//        }
+//        if (isDisplayEmoji) {
+//            mEmotionToggle.setVisibility(View.VISIBLE);
+//            mExtension.setVisibility(View.GONE);
+//        }
+//    }
 
     @Override
     protected void onDestroy() {
@@ -480,25 +524,48 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.chat_container_open_emotion:
-                isDisplayEmoji = true;
-                isDisplayPlugin = false;
-                showExtension(true);
-                isShowExtension = true;
+//                isDisplayEmoji = true;
+//                isDisplayPlugin = false;
+//                showExtension(true);
+//                isShowExtension = true;
+                mIsDisplayPlugin = false;
+                if (mIsDisplayEmoji) {
+                    mEmotionToggle.setVisibility(View.GONE);
+                    mIsDisplayEmoji = false;
+                } else {
+                    mIsDisplayEmoji = true;
+                    if (mIsDisplayInputMethod) {
+                        Utils.dismissInputMethod(this, textMessage);
+                    } else {
+                        mOnKeyHideListener.onKeyBoardHide();
+                    }
+                }
                 break;
             case R.id.chat_container_open_assist_toggle:
-
-                isDisplayEmoji = false;
-                isDisplayPlugin = !isDisplayPlugin;
-                showExtension(isDisplayPlugin);
-
-                isShowExtension = isDisplayPlugin;
+//              mIsDisplayEmoji = false;
+                if (mIsDisplayPlugin) {
+                    mExtension.setVisibility(View.GONE);
+                    mIsDisplayPlugin = false;
+                } else {
+                    mIsDisplayPlugin = true;
+                    if (mIsDisplayInputMethod) {
+                        Utils.dismissInputMethod(this, textMessage);
+                    } else {
+                        mOnKeyHideListener.onKeyBoardHide();
+                    }
+                }
+//                isDisplayEmoji = false;
+//                isDisplayPlugin = !isDisplayPlugin;
+//                showExtension(isDisplayPlugin);
+//
+//                isShowExtension = isDisplayPlugin;
                 break;
             case R.id.chat_container_text_ed:
-                isDisplayPlugin = false;
-                isDisplayEmoji = false;
+//                isDisplayPlugin = false;
+//                isDisplayEmoji = false;
                 textMessage.setFocusable(true);
-                showExtension(false);
-                isShowExtension = false;
+//                showExtension(false);
+//                isShowExtension = false;
                 break;
             case R.id.chat_container_send_btn:
 //                sendMessage();
@@ -759,9 +826,12 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
-                if (isShowExtension) {
-                    isShowExtension = false;
-                    showExtension(isShowExtension);
+                if (mIsDisplayEmoji) {
+                    mEmotionToggle.setVisibility(View.GONE);
+                    mIsDisplayEmoji = false;
+                } else if (mIsDisplayPlugin) {
+                    mExtension.setVisibility(View.GONE);
+                    mIsDisplayInputMethod = false;
                 } else {
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);

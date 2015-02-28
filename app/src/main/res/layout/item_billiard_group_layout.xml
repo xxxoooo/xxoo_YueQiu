@@ -7,8 +7,8 @@
     android:padding="10dp">
     <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/group_item_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/listview_item_user_photo_width"
+        android:layout_height="@dimen/listview_item_user_photo_height"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:layout_alignParentLeft="true"

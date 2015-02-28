@@ -154,6 +154,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
         (mView.findViewById(R.id.btn_room_distance)).setOnClickListener(mClickListener);
         (mView.findViewById(R.id.btn_room_price)).setOnClickListener(mClickListener);
         (mView.findViewById(R.id.btn_room_apprisal)).setOnClickListener(mClickListener);
+        mEmptyView = new TextView(getActivity());
 
         mCallback = mClickListener;
 
@@ -541,6 +542,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
+
             if (mRoomListView.isRefreshing())
             {
                 mRoomListView.onRefreshComplete();
@@ -550,17 +552,16 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 case UI_SHOW_DIALOG:
                     Log.d(TAG_1, " hide empty view 1 ");
                     showProgress();
-                    setEmptyViewGone();
+                    if(mEmptyView.getVisibility() == View.VISIBLE){
+                        mRoomListView.setEmptyView(null);
+                        mEmptyView.setVisibility(View.GONE);
+                    }
                     break;
 
                 case UI_HIDE_DIALOG:
                     // 此时数据已经加载完毕，我们需要通知List的Adpter数据源已经发生改变
                     mSearchRoomAdapter.notifyDataSetChanged();
                     hideProgress();
-                    if (mRoomListView.isRefreshing())
-                    {
-                        mRoomListView.onRefreshComplete();
-                    }
                     break;
 
                 case STATE_FETCH_DATA_FAILED:
@@ -607,9 +608,11 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     mAfterCount = mRoomList.size();
                     if (mRoomList.isEmpty())
                     {
+                        Log.d(TAG, " inside the room fragment UIEventsHandler --> have send the message to load the Empty TextView ");
+
                         Log.d(TAG_1, " load empty view 1");
                         final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
-                        loadEmptyTv(range);
+                        setEmptyViewVisible(range);
                     } else
                     {
                         if (mRefresh)
@@ -702,20 +705,23 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
                     if (mRoomList.isEmpty())
                     {
+                        Log.d(TAG, " the room list we get are : " + mRoomList.size());
+
                         Log.d(TAG_1, " load empty view 2");
                         final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
-                        loadEmptyTv(range);
+                        setEmptyViewVisible(range);
                     }
 
                     break;
                 case PublicConstant.NO_NETWORK:
                     hideProgress();
+
                     Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     if (mRoomList.isEmpty())
                     {
                         Log.d(TAG_1, " load empty view 3");
                         final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
-                        loadEmptyTv(range);
+                        setEmptyViewVisible(range);
                     }
                     break;
 
@@ -723,9 +729,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     setEmptyViewGone();
                     if (mRoomList.isEmpty())
                     {
-                        Log.d(TAG_1, " load empty view 4");
                         final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
-                        loadEmptyTv(range);
+                        setEmptyViewVisible(range);
+                        Log.d(TAG_1, " load empty view 4");
+
                     } else
                     {
                         if (mLoadMore)
@@ -744,8 +751,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private TextView mEmptyView;
     // 我们通过将disable的值设置为false来进行加载EmptyView
     // 通过将disable的值设置为true来隐藏emptyView
-    private void loadEmptyTv(final int rangeNum)
+    private void setEmptyViewVisible(final int rangeNum)
     {
+
         Log.d("scguo_empty", " enable empty view ");
         mEmptyView = new TextView(mContext);
         mEmptyView.setGravity(Gravity.CENTER);
@@ -761,6 +769,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
         {
             Log.d("scguo_empty", " disable empty view ");
             mEmptyView.setVisibility(View.GONE);
+            mRoomListView.setEmptyView(null);
         }
     }
 
@@ -987,7 +996,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     mWorkerThread.fetchRoomData(1);
                 }
                 Log.d(TAG_1, " on pull down to refresh --> hide empty view ");
-                setEmptyViewGone();
             } else
             {
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
@@ -1010,8 +1018,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
             if (mBeforeCount != mAfterCount && !mRefresh)
                 mPage += 1;
             mRefresh = false;
-            Log.d(TAG_1, " on pull up to load more --> hide empty view ");
-            setEmptyViewGone();
             if (Utils.networkAvaiable(mContext))
             {
                 // TODO: 我们在这里进行网络更新的请求
@@ -1027,27 +1033,4 @@ public class BilliardsNearbyRoomFragment extends Fragment
             }
         }
     };
-
-
-    // TODO: ------------------------- DELETE THE FOLLOWING CODE ON RELEASE -----------------------------------------
-    // TODO: 以下仅仅是测试数据，在项目最终通过测试之后再删除下面的静态数据部分
-    // use the static data to init the BilliardsNearbyRoomFragment
-    private void initListStaticTestData()
-    {
-        Resources mRes = mContext.getResources();
-        String roomName = mRes.getString(R.string.search_room_sub_fragment_listitem_roomname);
-        float level = 3.5f;
-        double price = 36;
-        String distance = mRes.getString(R.string.search_room_sub_fragment_listitem_roomdistance);
-        String address = mRes.getString(R.string.search_room_sub_fragment_listitem_roomaddress);
-
-        String roomPhoneNum = "110-120-119";
-        String roomTag = "西城区 五道口 清华大学旁边厕所附近";
-        String roomDetailedInfo = "办会员卡，容声VIP会员。我是屌丝，我为屌丝代言";
-        int i;
-        for (i = 0; i < 100; ++i)
-        {
-            mRoomList.add(new NearbyRoomSubFragmentRoomBean("", "", roomName, level, price, address, distance, roomPhoneNum, roomTag, roomDetailedInfo, ""));
-        }
-    }
 }

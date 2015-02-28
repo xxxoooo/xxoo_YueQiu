@@ -1,6 +1,7 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,6 +61,7 @@ public class NearbyPopupBaseAdapter extends BaseAdapter
             holder = (ViewHolder) convertView.getTag();
         }
         holder.tv.setText(mList.get(position));
+
         return convertView;
     }
 

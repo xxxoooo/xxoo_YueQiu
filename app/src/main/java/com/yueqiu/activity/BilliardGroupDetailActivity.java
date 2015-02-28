@@ -54,8 +54,9 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
     private TextView mTvYueqiu, mTvYueqiuCircle, mTvFriendCircle,
             mTvWeichat, mTvQQZone, mTvTencentWeibo, mTvSinaWeibo, mTvRenren;
     private NetworkImageView mOwnerImg;
-    private TextView mOwnerTv,mOwnerSexTv,mReadCountTv,mCreateTimeTv,mPaiseCountTv,mReplyCountTv;
-    private ListView mListView;
+    private TextView mOwnerTv,mOwnerSexTv,mReadCountTv,mCreateTimeTv,mPaiseCountTv,
+            mReplyCountTv,mTitleTv,mContentTv;
+    private LinearLayout mContentContainer;
     private Button mBtnCancel;
     private Dialog mShareDlg;
     private int mNoteId,mReplyCount;
@@ -101,8 +102,10 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
         mCreateTimeTv = (TextView) findViewById(R.id.billiard_group_detail_publish_time);
         mPaiseCountTv = (TextView) findViewById(R.id.billiard_group_detail_praise_count_tv);
         mReplyCountTv = (TextView) findViewById(R.id.billiard_group_detail_reply_count_tv);
+        mTitleTv = (TextView) findViewById(R.id.group_detail_title);
+        mContentTv = (TextView) findViewById(R.id.group_detail_content);
+        mContentContainer = (LinearLayout) findViewById(R.id.group_detail_content_container);
 
-        mListView = (ListView) findViewById(R.id.billiard_group_detail_listview);
         mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
         mPreTextView = (TextView) findViewById(R.id.pre_text);
 
@@ -189,6 +192,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
     }
 
     private void updateUI(GroupNoteInfo info){
+        //TODO:由于服务器那边目前没有传img_url，等传了，修正
         if (! TextUtils.isEmpty(info.getImg_url()))
         {
             mOwnerImg.setImageUrl(info.getImg_url(), mImageLoader);
@@ -204,6 +208,9 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
         mCreateTimeTv.setText(info.getIssueTime());
         mPaiseCountTv.setText(getString(R.string.praise,info.getLoveNums()));
         mReplyCountTv.setText(getString(R.string.reply,mReplyCount));
+        mTitleTv.setText(info.getTitle());
+        mContentTv.setText(info.getContent());
+        //TODO:在发布台球圈话题时，要上传图片，这里要根据返回的图片数，动态添加imageview，活动详情也一样是这个逻辑
     }
 
     private Handler mHandler = new Handler(){

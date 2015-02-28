@@ -509,6 +509,20 @@ public class HttpConstants
         public static final String ACTION_TYPE = "action_type";
     }
 
+    public static class ChangePhoto{
+
+        //TODO:服务端接口还没定
+        public static final String URL = "/user/";
+
+        //TODO:服务端要穿的参数也没定,要根据服务器那边确定参数名称
+        public static final String IMG_STREAM = "img_stream";
+
+        //TODO:应该有user_id
+        public static final String USER_ID = "user_id";
+
+
+    }
+
 
     // 这是SearchActivity当中的球厅Fragment当中的请求数据的过程
     // 因为服务器端使用的是大众点评的SDK，所以我们的请求地址是以大众点评为基础的

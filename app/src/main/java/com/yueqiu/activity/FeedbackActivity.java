@@ -73,6 +73,7 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
     private EditText mEtFeedbackTitle;
     private EmojiconEditText mEtFeedbackContent;
     private ImageView mEmotionView,mBackupEmotionView;
+    private TextView mDeletePhoto;
     private LinearLayout mAddImgContainer;
     private RelativeLayout mRootView,mExpressRelative;
     private IssueImageView mAddImg;
@@ -195,6 +196,41 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
         mAddImg.setOnClickListener(this);
         mEmotionView.setOnClickListener(this);
         mBackupEmotionView.setOnClickListener(this);
+
+        mAddImg.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mDlgBuilder = CustomDialogBuilder.getsInstance(FeedbackActivity.this);
+                mDlgBuilder.withTitle(getString(R.string.select_photo))
+                        .withTitleColor(Color.WHITE)
+                        .withDividerColor(getResources().getColor(R.color.search_distance_color))
+                        .withMessage(null)
+                        .isCancelableOnTouchOutside(true)
+                        .isCancelable(true)
+                        .withDialogColor(R.color.actionbar_color)
+                        .withDuration(700)
+                        .withEffect(EffectsType.SlideLeft)
+                        .setSureButtonVisible(false)
+                        .withCancelButtonText(getString(R.string.btn_message_cancel))
+                        .setCustomView(R.layout.dialog_long_click_view, v.getContext())
+                        .setCancelButtonClick(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                mDlgBuilder.dismiss();
+                            }
+                        })
+                        .show();
+
+                mTakePhoto = (TextView) mDlgBuilder.findViewById(R.id.take_photo_now);
+                mSelectPhoto = (TextView) mDlgBuilder.findViewById(R.id.select_photo_from_album);
+                mDeletePhoto = (TextView) mDlgBuilder.findViewById(R.id.delete_photo);
+                mTakePhoto.setOnClickListener(FeedbackActivity.this);
+                mSelectPhoto.setOnClickListener(FeedbackActivity.this);
+                mDeletePhoto.setOnClickListener(FeedbackActivity.this);
+                return true;
+            }
+        });
+
 
 
     }
@@ -408,6 +444,17 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
                     mTakePhoto.setOnClickListener(this);
                     mSelectPhoto.setOnClickListener(this);
                 }
+                break;
+            case R.id.delete_photo:
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth,mAddViewHeight);
+                params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
+                params.gravity = Gravity.CENTER_VERTICAL;
+                mAddImg.setLayoutParams(params);
+                mAddImg.setBitmapBean(null);
+                mAddImg.setImageResource(R.drawable.add_img_bg);
+                mAddImg.setBackgroundColor(getResources().getColor(android.R.color.white));
+                if(mDlgBuilder != null)
+                    mDlgBuilder.dismiss();
                 break;
             case R.id.take_photo_now:
                 Uri imageFileUri = null;

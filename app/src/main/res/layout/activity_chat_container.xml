@@ -5,7 +5,8 @@
                 android:layout_height="match_parent"
                 xmlns:tools="http://schemas.android.com/tools"
                 xmlns:emojicon="http://schemas.android.com/apk/res-auto"
-                tools:context="com.rockerhieu.emojicon.example.MainActivity$PlaceholderFragment">
+                tools:context="com.rockerhieu.emojicon.example.MainActivity$PlaceholderFragment"
+                android:id="@+id/chat_root_view">
 
     <RelativeLayout
         android:id="@+id/chat_container_extension_toggle"

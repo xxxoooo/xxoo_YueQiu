@@ -46,12 +46,12 @@ public class ProfileSetupActivity extends SingleFragmentActivity implements MyPr
             case android.R.id.home:
                 finish();
                 break;
-            case R.id.setup_confirm:
-                updateProfile();
-                finish();
-                break;
+//            case R.id.setup_confirm:
+//                updateProfile();
+//                finish();
+//                break;
         }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     private void updateProfile() {

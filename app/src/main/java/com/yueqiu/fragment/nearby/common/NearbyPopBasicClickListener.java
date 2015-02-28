@@ -227,6 +227,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
 
                 mPopupTitleView.setText(R.string.search_mate_popupmenu_item_filter_str);
                 mPopupListView.setAdapter(new NearbyPopupBaseAdapter(mContext, Arrays.asList(mate_distance)));
+
                 mPopupWindow = getFilterPopupWindow(mContext, view, mPopupBaseView);
                 Log.d(TAG_1, " the popupWindow are --> " + (mPopupWindow != null) + ", and the base view are : " + (mPopupBaseView != null));
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener()

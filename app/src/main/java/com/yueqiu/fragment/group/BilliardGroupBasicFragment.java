@@ -349,6 +349,9 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
                     setmEmptyViewGone();
                     List<GroupNoteInfo> cacheList = (List<GroupNoteInfo>) msg.obj;
                     mList.addAll(cacheList);
+                    if(mList.isEmpty()){
+                        setEmptyViewVisible();
+                    }
                     break;
                 case PublicConstant.GET_SUCCESS:
                     setmEmptyViewGone();
@@ -358,7 +361,6 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
                     mBeforeCount = mList.size();
                     mIsListEmpty = mList.isEmpty();
                     List<GroupNoteInfo> list = (List<GroupNoteInfo>) msg.obj;
-                    Log.d("wy","mRefresh - >" + mRefresh);
                     for(GroupNoteInfo info : list){
                         /**
                          * UI list与数据库无关

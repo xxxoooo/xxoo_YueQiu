@@ -97,6 +97,8 @@ public class NearbyFragmentsCommonUtils{
                 DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
     }
 
+//    public static void setFragmentEmptyTextView(Context context, final PullToRefreshListView listView, TextView emptyView,final String emptyText, boolean disable)
+//    {
     // TODO: 以下这种办法有点不灵活，虽然可以减少代码量，但是会每次都引入一个新创建的TextView实例，这样会导致系统内存紧张
     // TODO: 所以我们还是决定采用最笨的办法，即每一个Fragment当这种都采用一个setEmptyView()的实现。希望以后有机会能找到更好的重构方法
 //    public static void setFragmentEmptyTextView(Context context, final PullToRefreshListView listView, final String emptyText, boolean disable)
@@ -106,16 +108,13 @@ public class NearbyFragmentsCommonUtils{
 //        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
 //        emptyView.setTextColor(context.getResources().getColor(R.color.md__defaultBackground));
 //        emptyView.setText(emptyText);
-//        listView.setEmptyView(emptyView);
 //        if (disable)
 //        {
-//            Log.d(TAG_1, " hide the EmptyView ");
 //            emptyView.setVisibility(View.GONE);
 //        } else
 //        {
-//            Log.d(TAG_1, " show the EmptyView ");
-//            emptyView.setVisibility(View.VISIBLE);
-//        }
+//            listView.setEmptyView(emptyView);
+//        listView.setEmptyView(emptyView);
 //    }
 
     public static PopupWindow getFilterPopupWindow(Context context, View anchorView, View popupLayoutView)
