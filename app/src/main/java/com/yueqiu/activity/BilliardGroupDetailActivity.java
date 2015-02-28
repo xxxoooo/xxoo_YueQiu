@@ -81,7 +81,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
         mImageLoader = VolleySingleton.getInstance().getImgLoader();
         Bundle args = getIntent().getExtras();
         mNoteId = args.getInt(DatabaseConstant.GroupInfo.NOTE_ID);
-        mReplyCount = args.getInt(DatabaseConstant.GroupInfo.COMMENT_COUNT);
+//        mReplyCount = args.getInt(DatabaseConstant.GroupInfo.COMMENT_COUNT);
 
         if(Utils.networkAvaiable(this)){
             requestDetail();
@@ -140,8 +140,8 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
             info.setContent(result.getString("content"));
             info.setLoveNums(result.getInt("number"));
             //TODO:服务器那边傻×，commentCount没有，img_url也没有
-//            info.setCommentCount(result.getInt("comment_count"));
-//            info.setImg_url(result.getString("img_url"));
+            info.setCommentCount(result.getInt("comment_count"));
+            info.setImg_url(result.getString("img_url"));
         }catch(JSONException e){
             e.printStackTrace();
         }
@@ -207,7 +207,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
         mReadCountTv.setText(String.valueOf(info.getBrowseCount()));
         mCreateTimeTv.setText(info.getIssueTime());
         mPaiseCountTv.setText(getString(R.string.praise,info.getLoveNums()));
-        mReplyCountTv.setText(getString(R.string.reply,mReplyCount));
+        mReplyCountTv.setText(getString(R.string.reply,info.getCommentCount()));
         mTitleTv.setText(info.getTitle());
         mContentTv.setText(info.getContent());
         //TODO:在发布台球圈话题时，要上传图片，这里要根据返回的图片数，动态添加imageview，活动详情也一样是这个逻辑

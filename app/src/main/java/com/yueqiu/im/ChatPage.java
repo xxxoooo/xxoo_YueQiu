@@ -215,7 +215,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         mMessageMore = $(R.id.chat_container_message_more);
         mSendFromePic = $(R.id.to_gallery);
         mSendfromCamera = $(R.id.to_camera);
-
+        mRootView = $(R.id.chat_root_view);
 
         if (user != null) {
             chatType = 0;

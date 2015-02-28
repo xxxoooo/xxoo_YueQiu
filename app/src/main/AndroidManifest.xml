@@ -131,7 +131,6 @@
         <activity
             android:name=".activity.NearbyBilliardsDatingActivity"
             android:label="@string/title_activity_billiards_dating"
-            android:parentActivityName=".BilliardNearbyActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".PlayMainActivity"

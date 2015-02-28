@@ -87,7 +87,7 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         Bundle args = getIntent().getExtras();
         mTableId = args.getInt(DatabaseConstant.PlayTable.TABLE_ID);
         mCreateTime = args.getString(DatabaseConstant.PlayTable.CREATE_TIME);
-        mInfoType = Integer.parseInt(args.getString(DatabaseConstant.PlayTable.TYPE));
+//        mInfoType = Integer.parseInt(args.getString(DatabaseConstant.PlayTable.TYPE));
         mFavorDao = DaoFactory.getFavor(this);
         mPlayDao = DaoFactory.getPlay(this);
         //////////////////////////////////////////////////////////////////////

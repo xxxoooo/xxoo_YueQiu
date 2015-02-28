@@ -37,6 +37,9 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.MyProfileActivity;
@@ -56,10 +59,17 @@ import com.yueqiu.view.IssueImageView;
 import com.yueqiu.view.dlgeffect.EffectsType;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
+import org.apache.http.Header;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -326,6 +336,46 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
             if(imgUri != null){
                 mUploadBitmap = ImgUtil.getOriginBitmapByUri(mActivity,imgUri);
             }
+
+            File file = new File(bean.imgFilePath);
+            FileInputStream in = null;
+            byte[] buffer = new byte[(int) file.length()];
+            try {
+                in = new FileInputStream(file);
+                in.read(buffer);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            AsyncHttpClient client = new AsyncHttpClient();
+            RequestParams params = new RequestParams();
+            params.put(HttpConstants.ChangePhoto.IMG_DATA,new ByteArrayInputStream(buffer));
+            params.put(HttpConstants.ChangePhoto.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+            params.put(HttpConstants.ChangePhoto.IMG_SUFFIX,"jpg");
+
+            client.post("http://hxu0480201.my3w.com/index.php/v1" + HttpConstants.ChangePhoto.URL,params,new JsonHttpResponseHandler(){
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    Log.d("wy","response is -> " + response);
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    super.onFailure(statusCode, headers, responseString, throwable);
+                    Log.d("wy","cacaca");
+                }
+            });
+
             //TODO:现在不知道是到底传什么？
 //            if(bitmapStr != null){
 //                mParamMap.put(HttpConstants.ChangePhoto.IMG_STREAM,bitmapStr);

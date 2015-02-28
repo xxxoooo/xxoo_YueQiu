@@ -8,9 +8,12 @@ import android.widget.BaseAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.ISlideMenuBasic;
+import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;
 
@@ -21,11 +24,13 @@ public class FavorBasicAdapter extends BaseAdapter {
     private List<ISlideMenuBasic> mList;
     private Context mContext;
     private LayoutInflater mInflater;
+    private ImageLoader mImgLoader;
 
     public FavorBasicAdapter(Context context,List<ISlideMenuBasic> list){
         this.mContext = context;
         this.mList = list;
-        mInflater = LayoutInflater.from(mContext);
+        this.mInflater = LayoutInflater.from(mContext);
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
     }
 
     @Override
@@ -49,6 +54,7 @@ public class FavorBasicAdapter extends BaseAdapter {
         if(convertView == null){
             convertView = mInflater.inflate(R.layout.item_favor_layout,null);
             holder = new ViewHolder();
+            holder.imageView = (NetworkImageView) convertView.findViewById(R.id.favor_item_image);
             holder.title = (TextView) convertView.findViewById(R.id.favor_title);
             holder.content = (TextView) convertView.findViewById(R.id.favor_content);
             holder.dateTime = (TextView) convertView.findViewById(R.id.favor_time);
@@ -63,6 +69,8 @@ public class FavorBasicAdapter extends BaseAdapter {
         }else{
             holder.whole_bg.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.published_item_bg));
         }
+        holder.imageView.setDefaultImageResId(R.drawable.default_head);
+        holder.imageView.setImageUrl(((FavorInfo)mList.get(position)).getImg_url(),mImgLoader);
         holder.title.setText(((FavorInfo)mList.get(position)).getTitle());
         holder.content.setText(((FavorInfo)mList.get(position)).getContent());
         holder.dateTime.setText(((FavorInfo)mList.get(position)).getCreateTime());
@@ -70,6 +78,7 @@ public class FavorBasicAdapter extends BaseAdapter {
     }
 
     class ViewHolder{
+        NetworkImageView imageView;
         TextView  title;
         TextView  content;
         TextView  dateTime;

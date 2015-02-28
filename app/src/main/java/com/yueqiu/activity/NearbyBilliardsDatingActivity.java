@@ -79,7 +79,7 @@ public class NearbyBilliardsDatingActivity extends Activity
         mImgLoader = VolleySingleton.getInstance().getImgLoader();
 
         Intent datingIntent = getIntent();
-        Bundle receivedData = datingIntent.getBundleExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_DATING_FRAGMENT);
+        Bundle receivedData = datingIntent.getExtras();
         sNodeId = receivedData.getInt(NearbyFragmentsCommonUtils.KEY_DATING_TABLE_ID, -1);
         String userPhotoUrl = receivedData.getString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO, "");
         String userName = receivedData.getString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME, "");

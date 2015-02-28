@@ -12,6 +12,8 @@ import android.widget.AdapterView;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.activity.BilliardGroupDetailActivity;
+import com.yueqiu.activity.NearbyBilliardsDatingActivity;
 import com.yueqiu.activity.PlayDetailActivity;
 import com.yueqiu.adapter.FavorBasicAdapter;
 import com.yueqiu.bean.FavorInfo;
@@ -21,6 +23,7 @@ import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.FavorDao;
+import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.Utils;
 
 import org.json.JSONArray;
@@ -163,8 +166,9 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                 for (int i = 0; i < list_data.length(); i++) {
                     FavorInfo itemInfo = new FavorInfo();
                     itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
+                    itemInfo.setRid(list_data.getJSONObject(i).getInt("rid"));
                     itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
-
+                    itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
                     itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
                     itemInfo.setCreateTime(list_data.getJSONObject(i).getString("create_time"));
                     itemInfo.setUserName(list_data.getJSONObject(i).getString("username"));
@@ -315,24 +319,43 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
         FavorInfo info = (FavorInfo) mAdapter.getItem(position-1);
         //TODO:不做缓存，所以这个字段先不要
 //        int subType = info.getSubType();
-        String tableId = info.getTable_id();
-        String createTime = info.getCreateTime();
-        Bundle args = new Bundle();
-        args.putInt(DatabaseConstant.PlayTable.TABLE_ID,Integer.parseInt(tableId));
-        args.putString(DatabaseConstant.PlayTable.CREATE_TIME,createTime);
-//        args.putString(DatabaseConstant.PlayTable.TYPE,String.valueOf(subType));
+        int table_id = Integer.valueOf(info.getRid());
+        String username = info.getUserName();
+        String img_url = info.getImg_url();
+
+        String create_time = info.getCreateTime();
+
         switch(mType){
             case PublicConstant.FAVOR_GROUP_TYPR:
                 break;
             case PublicConstant.FAVPR_ROOM_TYPE:
+                //TODO:由于先不做球厅，所以这里实际是PLAY
+                Bundle playArg = new Bundle();
+                playArg.putInt(DatabaseConstant.PlayTable.TABLE_ID,table_id);
+                playArg.putString(DatabaseConstant.PlayTable.CREATE_TIME,create_time);
+
+                intent = new Intent(mActivity, PlayDetailActivity.class);
+                intent.putExtras(playArg);
+                startActivity(intent);
                 break;
-            case PublicConstant.PUBLISHED_DATE_TYPE:
+            case PublicConstant.FAVOR_DATE_TYPE:
+                Bundle dateArg = new Bundle();
+                dateArg.putInt(NearbyFragmentsCommonUtils.KEY_DATING_TABLE_ID,table_id);
+                dateArg.putString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO,img_url);
+                dateArg.putString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME,username);
+
+                intent = new Intent(mActivity, NearbyBilliardsDatingActivity.class);
+                intent.putExtras(dateArg);
+                startActivity(intent);
                 break;
             case PublicConstant.FAVOR_PLAY_TYPE:
-                intent = new Intent(mActivity, PlayDetailActivity.class);
-                intent.putExtras(args);
+                //TODO:由于先不做球厅，所以这里实际是GROUP
+                Bundle groupArg = new Bundle();
+                groupArg.putInt(DatabaseConstant.GroupInfo.NOTE_ID,table_id);
+
+                intent = new Intent(mActivity, BilliardGroupDetailActivity.class);
+                intent.putExtras(groupArg);
                 startActivity(intent);
-                mActivity.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
                 break;
         }
     }

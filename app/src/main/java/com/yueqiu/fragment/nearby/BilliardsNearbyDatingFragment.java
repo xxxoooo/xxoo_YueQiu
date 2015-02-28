@@ -166,7 +166,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 args.putInt(NearbyFragmentsCommonUtils.KEY_DATING_TABLE_ID, Integer.parseInt(bean.getId()));
                 args.putString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME, bean.getUserName());
                 Intent intent = new Intent(mContext, NearbyBilliardsDatingActivity.class);
-                intent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_DATING_FRAGMENT, args);
+                intent.putExtras(args);
                 Log.d(TAG, " the current dating info table id we get are : " + bean.getId());
                 mContext.startActivity(intent);
             }

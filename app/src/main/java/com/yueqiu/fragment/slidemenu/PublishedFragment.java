@@ -1,13 +1,19 @@
 package com.yueqiu.fragment.slidemenu;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.activity.BilliardGroupDetailActivity;
+import com.yueqiu.activity.NearbyBilliardsDatingActivity;
+import com.yueqiu.activity.PlayDetailActivity;
 import com.yueqiu.adapter.PublishedBasicAdapter;
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.bean.Identity;
@@ -17,6 +23,7 @@ import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.PublishedDao;
+import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,7 +35,7 @@ import java.util.List;
 /**
  * Created by wangyun on 15/1/15.
  */
-public class PublishedFragment extends SlideMenuBasicFragment {
+public class PublishedFragment extends SlideMenuBasicFragment implements AdapterView.OnItemClickListener{
     private static final String SAVE_PUBLISH_KEY = "save_publish";
     private static final String SAVE_PUBLISH_REFRESH = "save_refresh";
     private static final String SAVE_PUBLISH_LOAD_MORE = "save_load_more";
@@ -94,6 +101,8 @@ public class PublishedFragment extends SlideMenuBasicFragment {
             mHandler.obtainMessage(PublicConstant.NO_NETWORK).sendToTarget();
 
         }
+
+        mListView.setOnItemClickListener(this);
         return view;
     }
 
@@ -297,4 +306,45 @@ public class PublishedFragment extends SlideMenuBasicFragment {
     };
 
 
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent;
+        PublishedInfo info = (PublishedInfo) mPublishedAdapter.getItem(position-1);
+        int table_id = Integer.valueOf(info.getTable_id());
+        String username = YueQiuApp.sUserInfo.getUsername();
+        String img_url = YueQiuApp.sUserInfo.getImg_url();
+
+        String create_time = info.getDateTime();
+
+        switch (mType){
+            case PublicConstant.PUBLISHED_ACTIVITY_TYPE:
+                Bundle playArg = new Bundle();
+                playArg.putInt(DatabaseConstant.PlayTable.TABLE_ID,table_id);
+                playArg.putString(DatabaseConstant.PlayTable.CREATE_TIME,create_time);
+
+                intent = new Intent(mActivity, PlayDetailActivity.class);
+                intent.putExtras(playArg);
+                startActivity(intent);
+                break;
+            case PublicConstant.PUBLISHED_DATE_TYPE:
+                Bundle dateArg = new Bundle();
+                dateArg.putInt(NearbyFragmentsCommonUtils.KEY_DATING_TABLE_ID,table_id);
+                dateArg.putString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO,img_url);
+                dateArg.putString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME,username);
+
+                intent = new Intent(mActivity, NearbyBilliardsDatingActivity.class);
+                intent.putExtras(dateArg);
+                startActivity(intent);
+                break;
+            case PublicConstant.PUBLISHED_GROUP_TYPE:
+                Bundle groupArg = new Bundle();
+                groupArg.putInt(DatabaseConstant.GroupInfo.NOTE_ID,table_id);
+
+                intent = new Intent(mActivity, BilliardGroupDetailActivity.class);
+                intent.putExtras(groupArg);
+                startActivity(intent);
+                break;
+        }
+    }
 }
