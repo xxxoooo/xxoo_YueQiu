@@ -533,5 +533,14 @@ public class HttpConstants
     public static final String DP_APP_KEY = "0786070696";
     public static final String DP_APP_SECRET = "f3e6c9dbe811446884f9a5010b8729f4";
 
+    // 球厅Activity当中用于实现台球厅信息分享的AppId信息
+    public static final String WEIXIN_APP_ID = "wx54ce5d6762a720da";
+    public static final String WEIXIN_APP_SECRET = "864c7254c6cfb0dfcb7bce4fae475eeb";
+
+    // 球厅Activity当中用于实现球厅信息分享的AppId信息
+    public static final String WEIBO_APP_KEY = "539638208";
+    public static final String WEIBO_APP_SECRET = "b72217374751952a8b4f97dbc1dc876c";
+
+
 
 }

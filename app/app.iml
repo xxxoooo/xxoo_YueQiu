@@ -85,10 +85,12 @@
     <orderEntry type="jdk" jdkName="Android API 19 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-v13-21.0.3" level="project" />
+    <orderEntry type="library" exported="" name="libammsdk" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="commons-codec-1.6" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="android-async-http-1.4.5-20140608.155257-10" level="project" />
+    <orderEntry type="library" exported="" name="weibosdkcore_v3.0.1" level="project" />
     <orderEntry type="library" exported="" name="library-1.0.10" level="project" />
     <orderEntry type="module" module-name="datetimepicker-library" exported="" />
     <orderEntry type="module" module-name="emoji-library" exported="" />

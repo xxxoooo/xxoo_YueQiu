@@ -64,6 +64,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private static final String TAG = "BilliardsNearbyRoomFragment";
     private static final String TAG_1 = "emptyview__debug";
     private static final String TAG_2 = "room_data_retrieve_debug";
+    private static final String TAG_3 = "filter_test";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -754,7 +755,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private void setEmptyViewVisible(final int rangeNum)
     {
 
-        Log.d("scguo_empty", " enable empty view ");
+        Log.d(TAG_3, " enable empty view ");
         mEmptyView = new TextView(mContext);
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
@@ -767,7 +768,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     {
         if (null != mEmptyView)
         {
-            Log.d("scguo_empty", " disable empty view ");
+            Log.d(TAG_3, " disable empty view ");
             mEmptyView.setVisibility(View.GONE);
             mRoomListView.setEmptyView(null);
         }
@@ -826,17 +827,19 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             String cachedApprisal = sParamsPreference.getRoomApprisal(mContext);
                             String cachedPrice = sParamsPreference.getRoomPrice(mContext);
                             String sortFilterVal = TextUtils.isEmpty(cachedApprisal) ? cachedPrice : cachedApprisal;
+
                             retrieveRoomListInfo("北京", cachedRegion, cachedRange, sortFilterVal, 20, pageNum);
                             break;
                         case REQUEST_ROOM_INFO_APPRISAL_FILTERED:
                             if (!mRoomList.isEmpty())
                             {
+                                Log.d(TAG_3, " apprisal filtering --> clear the current list ");
                                 mRoomList.clear();
                                 mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                             }
                             // 得到好评度
                             String apprisalStr = (String) msg.obj;
-                            Log.d(TAG, " in the internal mWorkThread --> the data we received to fetch the data based on the apprisal rule are : " + apprisalStr);
+                            Log.d(TAG_3, " in the internal mWorkThread --> the data we received to fetch the data based on the apprisal rule are : " + apprisalStr);
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
                             // 由于大众点评的所有的参数都是可选的，所以我们将所有的判断参数的可行性的过程都放到具体的请求方法当中
                             // 由于价格和好评度只能选一个，所以这里由于我们是按好评度来选择的话，就把价格的筛选因素干脆不予考虑
@@ -855,11 +858,12 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         case REQUEST_ROOM_INFO_PRICE_FILTERED:
                             if (!mRoomList.isEmpty())
                             {
+                                Log.d(TAG_3, " price filtering --> clear the current list ");
                                 mRoomList.clear();
                                 mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                             }
                             String priceStr = (String) msg.obj;
-                            Log.d(TAG, "in the internal mWorkThread --> the price data we get are : " + priceStr);
+                            Log.d(TAG_3, "in the internal mWorkThread --> the price data we get are : " + priceStr);
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
                             // 由于价格和好评度每次只能选择一个，这里按用户的要求是进行价格的筛选，所以我们干脆就把好评度不管了
                             // 首先将好评度在ParamsPreference当中的值清空
@@ -873,11 +877,12 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         case REQUEST_ROOM_INFO_RANGE_FILTERED:
                             if (!mRoomList.isEmpty())
                             {
+                                Log.d(TAG_3, " range filtering --> clear the current list ");
                                 mRoomList.clear();
                                 mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                             }
                             String rangeStr = (String) msg.obj;
-                            Log.d(TAG, " in the internal mWorkThread --> the range string we get are : " + rangeStr);
+                            Log.d(TAG_3, " in the internal mWorkThread --> the range string we get are : " + rangeStr);
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
                             String rangePriceStr = sParamsPreference.getRoomPrice(mContext);
                             String rangeApprisalStr = sParamsPreference.getRoomApprisal(mContext);
@@ -892,12 +897,13 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             // 在筛选之前，我们需要首先将我们已经获得到的roomList清空
                             if (!mRoomList.isEmpty())
                             {
+                                Log.d(TAG_3, " region filtered --> clear the current list ");
                                 mRoomList.clear();
                                 mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                             }
-                            Log.d(TAG, " In the mWorkerHandler : we have received the message to handle the task of region filtering ");
+                            Log.d(TAG_3, " In the mWorkerHandler : we have received the message to handle the task of region filtering ");
                             String regionStr = (String) msg.obj;
-                            Log.d(TAG, " we have received the string to send the message, and the string are : " + regionStr);
+                            Log.d(TAG_3, " we have received the string to send the message, and the string are : " + regionStr);
                             // 我们在这里开始真正的请求过程(即进行网络请求，请求参数即为我们这里获取到的region字符串)
                             mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
                             String regionPriceStr = sParamsPreference.getRoomPrice(mContext);

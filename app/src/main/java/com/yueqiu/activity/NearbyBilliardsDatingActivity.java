@@ -566,7 +566,7 @@ public class NearbyBilliardsDatingActivity extends Activity
         int i;
         for (i = 0; i < 5; ++i)
         {
-            mFollowList.add(new NearbyDatingDetailedAlreadyBean("", "", "温柔的语"));
+            mFollowList.add(new NearbyDatingDetailedAlreadyBean("", "", "温柔的语-11111"));
         }
     }
 
