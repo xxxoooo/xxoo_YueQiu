@@ -190,6 +190,9 @@
     <string name="search_room_null"></string>
     <string name="search_room_collect_success_indicator">您已经成功的收集了该球厅的信息</string>
 
+    <string name="weibo_share_fail">分享到微博失败</string>
+    <string name="weibo_share_success">成功分享到微博</string>
+
     <!-- 球厅Activity当中的一些关键字段 -->
     <string name="search_room_detailedactivity_detailed_info_separator">详细信息</string>
     <string name="search_room_detailedactivity_price_indi">人均:</string>

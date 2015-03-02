@@ -162,7 +162,16 @@
         <activity
             android:name=".activity.NearbyBilliardRoomActivity"
             android:parentActivityName=".BilliardNearbyActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+
+            <!-- 添加对于新浪微博返回值的监听 -->
+            <intent-filter>
+                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+
+        </activity>
+
         <activity
             android:name=".im.ChatPage"
             android:screenOrientation="portrait"

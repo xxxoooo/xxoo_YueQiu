@@ -242,7 +242,6 @@ public class WeChatShareManager implements IWXAPIEventHandler
 //            req.scene = shareType;
             Log.d(TAG, " sending message here ... ");
             mWXApi.sendReq(req);
-            Log.d(TAG, " fuck goes here ... ");
         } else
         {
             Log.d(TAG, " the content you share must not be null ");
@@ -289,12 +288,11 @@ public class WeChatShareManager implements IWXAPIEventHandler
         }
     }
 
+    // 用于获取一个我们所分享的信息的唯一的标示符，所以结合当前的时间值来保证唯一性
     private String buildTransaction(final String type)
     {
         return TextUtils.isEmpty(type) ? String.valueOf(System.currentTimeMillis()) : type + System.currentTimeMillis();
     }
-
-
 }
 
 
