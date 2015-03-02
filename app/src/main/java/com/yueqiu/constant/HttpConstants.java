@@ -512,13 +512,15 @@ public class HttpConstants
     public static class ChangePhoto{
 
         //TODO:服务端接口还没定
-        public static final String URL = "/user/";
+        public static final String URL = "/user/ImgUp";
 
         //TODO:服务端要穿的参数也没定,要根据服务器那边确定参数名称
-        public static final String IMG_STREAM = "img_stream";
+        public static final String IMG_DATA = "img_data";
 
         //TODO:应该有user_id
         public static final String USER_ID = "user_id";
+
+        public static final String IMG_SUFFIX = "img_suffix";
 
 
     }

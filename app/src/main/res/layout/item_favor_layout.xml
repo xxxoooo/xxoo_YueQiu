@@ -9,11 +9,23 @@
     android:padding="10dp"
     android:background="@drawable/published_item_bg"
     android:layout_weight="4">
+
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/favor_item_image"
+        android:layout_width="@dimen/listview_item_user_photo_width"
+        android:layout_height="@dimen/listview_item_user_photo_height"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/default_head"/>
     <TextView
         android:id="@+id/favor_title"
         style="@style/ListItemTvStyle"
         android:layout_marginLeft="10dp"
         android:textSize="18sp"
+        android:layout_toRightOf="@+id/favor_item_image"
+        android:layout_alignTop="@+id/favor_item_image"
         />
     <TextView
         android:id="@+id/favor_content"
@@ -24,7 +36,8 @@
         style="@style/TimeTextStyle"
         android:singleLine="true"
         android:layout_marginTop="5dp"
-
+        android:layout_alignBottom="@+id/favor_item_image"
+        android:layout_toRightOf="@+id/favor_item_image"
         />
     <TextView
         android:id="@+id/favor_time"

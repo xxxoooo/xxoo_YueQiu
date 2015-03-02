@@ -15,11 +15,13 @@ public class FavorInfo implements ISlideMenuBasic{
 
     private int user_id;
     private String table_id;
+    private int rid;
     private int type;
     private String title;
     private String content;
     private String createTime;
     private String userName;
+    private String img_url;
     //TODO:不做缓存的话，不需要这个字段，现在先不做缓存，所以去掉
 //    private int subType;
     private boolean checked;
@@ -78,6 +80,22 @@ public class FavorInfo implements ISlideMenuBasic{
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public int getRid() {
+        return rid;
+    }
+
+    public void setRid(int rid) {
+        this.rid = rid;
+    }
+
+    public String getImg_url() {
+        return img_url;
+    }
+
+    public void setImg_url(String img_url) {
+        this.img_url = img_url;
     }
 
     public boolean isChecked() {
@@ -139,11 +157,13 @@ public class FavorInfo implements ISlideMenuBasic{
 
         dest.writeInt(user_id);
         dest.writeString(table_id);
+        dest.writeInt(rid);
         dest.writeInt(type);
         dest.writeString(title);
         dest.writeString(content);
         dest.writeString(createTime);
         dest.writeString(userName);
+        dest.writeString(img_url);
         Bundle arg = new Bundle();
         arg.putBoolean("checked",checked);
         dest.writeBundle(arg);
@@ -164,11 +184,13 @@ public class FavorInfo implements ISlideMenuBasic{
     public FavorInfo(Parcel in) {
         user_id = in.readInt();
         table_id = in.readString();
+        rid = in.readInt();
         type = in.readInt();
         title = in.readString();
         content = in.readString();
         createTime = in.readString();
         userName = in.readString();
+        img_url = in.readString();
         checked = in.readBundle().getBoolean("checked");
     }
 

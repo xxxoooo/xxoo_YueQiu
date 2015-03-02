@@ -1,5 +1,6 @@
 package com.yueqiu.fragment.slidemenu;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -7,15 +8,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.activity.NearbyBilliardsDatingActivity;
+import com.yueqiu.activity.PlayDetailActivity;
 import com.yueqiu.adapter.PartInAdapter;
 import com.yueqiu.bean.PartInInfo;
 import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.Utils;
 
 import org.json.JSONArray;
@@ -28,7 +33,7 @@ import java.util.List;
 /**
  * Created by wangyun on 15/2/7.
  */
-public class PartInFragment extends SlideMenuBasicFragment{
+public class PartInFragment extends SlideMenuBasicFragment implements AdapterView.OnItemClickListener{
     private static final String SAVE_PARTIN_KEY = "save_publish";
     private static final String SAVE_PARTIN_REFRESH = "save_refresh";
     private static final String SAVE_PARTIN_LOAD_MORE = "save_load_more";
@@ -67,6 +72,8 @@ public class PartInFragment extends SlideMenuBasicFragment{
             mHandler.obtainMessage(PublicConstant.NO_NETWORK).sendToTarget();
 
         }
+
+        mListView.setOnItemClickListener(this);
         return view;
     }
 
@@ -207,5 +214,41 @@ public class PartInFragment extends SlideMenuBasicFragment{
     @Override
     protected void onPullUpWhenNetNotAvailable() {
         mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
+    }
+
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent;
+        PartInInfo info = (PartInInfo) mPartInAdapter.getItem(position - 1);
+
+        int table_id = Integer.valueOf(info.getTable_id());
+        String username = info.getUsername();
+        String img_url = info.getImg_url();
+
+        String create_time = info.getDateTime();
+
+        switch (mType){
+            case PublicConstant.PART_IN_DATE_TYPE:
+                Bundle dateArg = new Bundle();
+                dateArg.putInt(NearbyFragmentsCommonUtils.KEY_DATING_TABLE_ID,table_id);
+                dateArg.putString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO,img_url);
+                dateArg.putString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME,username);
+
+                intent = new Intent(mActivity, NearbyBilliardsDatingActivity.class);
+                intent.putExtras(dateArg);
+                startActivity(intent);
+                break;
+            case PublicConstant.PART_IN_PLAY_TYPE:
+                Bundle playArg = new Bundle();
+                playArg.putInt(DatabaseConstant.PlayTable.TABLE_ID,table_id);
+                playArg.putString(DatabaseConstant.PlayTable.CREATE_TIME,create_time);
+
+                intent = new Intent(mActivity, PlayDetailActivity.class);
+                intent.putExtras(playArg);
+                startActivity(intent);
+                break;
+        }
+
     }
 }

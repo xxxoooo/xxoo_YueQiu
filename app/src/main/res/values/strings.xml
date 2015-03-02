@@ -84,7 +84,7 @@
 
     <!-- 用于SearchActivity当中的各个Fragment为空时，显示的TextView -->
     <string name="search_activity_subfragment_empty_tv_str">抱歉，暂时没有加载到任何数据</string>
-    <string name="search_activity_roomfragment_empty_tv_str">抱歉，您现在搜索的是距离您<xliff:g id="number" example="1000">%1$s</xliff:g>米以内的球厅列表暂时没有获取到符合您需要的球厅的信息</string>
+    <string name="search_activity_roomfragment_empty_tv_str">抱歉，<xliff:g id="number" example="1000">%1$s</xliff:g>米以内暂时没有球厅信息</string>
     <!-- 以下是位于SearchActivity当中的各个子Fragment当中的不同的listView展示的title -->
     <!-- 1.球友子Fragment中的title -->
     <string name="search_mate_subfragment_title_distance">距离</string>

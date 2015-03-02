@@ -45,6 +45,7 @@ android {
         pkgTask.jniFolders.add(new File(projectDir, 'build/native-libs'))
         println pkgTask.jniFolders
     }
+
 //    task nativeLibsToJar(type: Jar, description: 'create a jar archive of the native libs') {
 //        destinationDir file("$buildDir/native-libs")
 //        baseName 'native-libs'
