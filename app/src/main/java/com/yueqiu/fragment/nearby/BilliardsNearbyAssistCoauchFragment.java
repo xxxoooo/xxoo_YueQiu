@@ -277,7 +277,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             {
                 JSONObject initialResultJsonObj = new JSONObject(rawResult);
 
-                if (! initialResultJsonObj.isNull("code"))
+//                if (! initialResultJsonObj.isNull("code"))
+                if (! TextUtils.isEmpty(initialResultJsonObj.get("code").toString()))
                 {
                     final int status = initialResultJsonObj.getInt("code");
                     if (status == HttpConstants.ResponseCode.NORMAL)

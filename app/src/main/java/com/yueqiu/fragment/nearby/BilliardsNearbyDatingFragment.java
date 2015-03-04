@@ -321,7 +321,8 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 Log.d(TAG, " the rawJson object we get are : " + rawJsonObj);
                 if (!TextUtils.isEmpty(rawJsonObj.toString()))
                 {
-                    if (!rawJsonObj.isNull("code"))
+//                    if (!rawJsonObj.isNull("code"))
+                    if (! TextUtils.isEmpty(rawJsonObj.get("code").toString()))
                     {
                         final int statusCode = rawJsonObj.getInt("code");
                         if (statusCode == HttpConstants.ResponseCode.NORMAL)

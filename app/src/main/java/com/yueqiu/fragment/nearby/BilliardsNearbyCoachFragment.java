@@ -260,7 +260,8 @@ public class BilliardsNearbyCoachFragment extends Fragment
             try
             {
                 JSONObject initialResultJson = new JSONObject(rawResult);
-                if (! initialResultJson.isNull("code"))
+//                if (! initialResultJson.isNull("code"))
+                if (!TextUtils.isEmpty(initialResultJson.get("code").toString()))
                 {
                     final int status = initialResultJson.getInt("code");
                     if (status == HttpConstants.ResponseCode.NORMAL)

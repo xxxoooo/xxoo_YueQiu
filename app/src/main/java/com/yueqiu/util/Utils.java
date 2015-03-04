@@ -6,6 +6,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -43,7 +45,6 @@ import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -382,10 +383,12 @@ public class Utils {
      * @param context
      * @return
      */
-    public static Dialog showSheet(Context context, Intent intent)
+    public static Dialog showSheet(final Context context, Intent intent)
     {
         // 创建用于实现微信分享的实例
         final WeChatShareManager weChatShareManager = WeChatShareManager.getInstance(context, intent);
+//        final WeiboShareManager weiboShareManager = WeiboShareManager.getInstance(context, intent);
+        final RenRenShareManager renRenShareManager = RenRenShareManager.getInstance(context);
 
         final Dialog dlg = new Dialog(context, R.style.ActionSheet);
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -412,8 +415,9 @@ public class Utils {
         dlg.setContentView(layout);
         dlg.getWindow().setLayout(width, height/2);
 
-        TextView tvYueqiu = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_yuqeiufirend);
-        TextView tvYueqiuCircle = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_yueqiucircle);
+//        TextView tvYueqiu = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_yuqeiufirend);
+//        TextView tvYueqiuCircle = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_yueqiucircle);
+
         TextView tvFriendCircle = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_friendcircle);
         TextView tvWeichat = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_weichat);
         TextView tvQQZone = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_qqzone);
@@ -429,10 +433,11 @@ public class Utils {
                     case R.id.btn_search_dating_detailed_cancel:
                         dlg.dismiss();
                         break;
-                    case R.id.img_search_dating_detail_share_yuqeiufirend:
-                        break;
-                    case R.id.img_search_dating_detail_share_yueqiucircle:
-                        break;
+//                    case R.id.img_search_dating_detail_share_yuqeiufirend:
+//                        break;
+//                    case R.id.img_search_dating_detail_share_yueqiucircle:
+//                        break;
+
                     case R.id.img_search_dating_detail_share_weichat:
                         // TODO: 实现分享到微信的处理过程
                         // 我们需要分享的内容包括球厅的图片，球厅的价格以及球厅的活动信息说明
@@ -443,7 +448,7 @@ public class Utils {
 //                                    WeChatShareManager.WECHAT_SHARE_WAY_PIC);
 
                             weChatShareManager.shareByWeChat(weChatShareManager.new ShareTextContent("以下内容来自微信SDK测试，与本人立场有关，十分TMD有关"),
-                                    WeChatShareManager.WECHAT_SHARE_WAY_TEXT);
+                                    false);
                         }
                         break;
                     case R.id.img_search_dating_detail_share_qqzone:
@@ -451,14 +456,30 @@ public class Utils {
                     case R.id.img_search_dating_detail_share_qqweibo:
                         break;
                     case R.id.img_search_dating_detail_share_sinaweibo:
+                        // 我们现在将微博分享的所有逻辑已经移到了BilliardsRoomDetailActivity，因为微博分享需要一个回调Activity，所以我们将RoomActivity作为
+                        // 我们的回调Activity
+//                        if (null != weiboShareManager)
+//                        {
+//                            Log.d("weibo_share", "Share to Sina Weibo");
+//                            Bitmap sharedBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+//                            weiboShareManager.shareWeiboMsg(" share to wei bo ", sharedBitmap);
+//                        }
                         break;
                     case R.id.img_search_dating_detail_share_renren:
+                        if (null != renRenShareManager)
+                        {
+                            // 以下我们采用分享的是测试图片
+                            Bitmap sharedBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+                            Log.d("renren_share", "Share to renren site ");
+                            renRenShareManager.shareToRenren("分享到人人的测试信息", sharedBitmap);
+                        }
                         break;
                 }
             }
         };
-        tvYueqiu.setOnClickListener(listener);
-        tvYueqiuCircle.setOnClickListener(listener);
+//        tvYueqiu.setOnClickListener(listener);
+//        tvYueqiuCircle.setOnClickListener(listener);
+
         tvFriendCircle.setOnClickListener(listener);
         tvFriendCircle.setOnClickListener(listener);
         tvWeichat.setOnClickListener(listener);
@@ -467,7 +488,6 @@ public class Utils {
         tvSinaWeibo.setOnClickListener(listener);
         tvTencentWeibo.setOnClickListener(listener);
         btnCancel.setOnClickListener(listener);
-
         return dlg;
     }
 

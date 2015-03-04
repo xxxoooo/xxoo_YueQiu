@@ -541,6 +541,15 @@ public class HttpConstants
     public static final String WEIBO_APP_KEY = "539638208";
     public static final String WEIBO_APP_SECRET = "b72217374751952a8b4f97dbc1dc876c";
 
+    // 球厅Activity当中用于实现分享球厅信息到RenRen的AppID
+    public static final String RENREN_APP_ID = "475119";
+    public static final String RENREN_APP_KEY = "6258359513124f9797f799e1c8b7efb7";
+    public static final String RENREN_SECRET_KEY = "6b6b310a0e1749f1a2742d7705e027ca";
+
+    // 球厅Activity当中qq分享的账号(腾讯微博和qq空间公用一个APP_KEY)
+    public static final String QQ_ZONE_APP_KEY = "1104270786";
+    public static final String QQ_ZONE_APP_SECRET = "5rSgvhoqBRb2FpKt";
 
 
+    public static final String DEFAULT_DIRECT_URL = "http://www.pinruiwenhua.com";
 }

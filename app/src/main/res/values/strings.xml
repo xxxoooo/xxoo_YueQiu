@@ -192,6 +192,10 @@
 
     <string name="weibo_share_fail">分享到微博失败</string>
     <string name="weibo_share_success">成功分享到微博</string>
+    <string name="weibo_share_cancelled">分享微博被取消</string>
+    <string name="weibo_need_to_install_first">您需要首先安装新浪微博客户端</string>
+
+    <string name="weixin_need_to_install_first">您需要首先安装微信Android客户端</string>
 
     <!-- 球厅Activity当中的一些关键字段 -->
     <string name="search_room_detailedactivity_detailed_info_separator">详细信息</string>

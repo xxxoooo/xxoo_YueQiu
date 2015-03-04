@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="weibosdkcore_v3.0.1">
+  <library name="mta-sdk-1.6.2">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/weibosdkcore_v3.0.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/libs/mta-sdk-1.6.2.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

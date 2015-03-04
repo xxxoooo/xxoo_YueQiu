@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="commons-codec-1.6">
+  <library name="open_sdk_r4547">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/commons-codec-1.6.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/libs/open_sdk_r4547.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
