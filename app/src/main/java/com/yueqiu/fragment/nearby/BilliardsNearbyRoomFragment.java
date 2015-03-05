@@ -30,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yueqiu.R;
+import com.yueqiu.activity.BilliardsRoomWebViewActivity;
 import com.yueqiu.activity.NearbyBilliardRoomActivity;
 import com.yueqiu.adapter.NearbyRoomSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
@@ -180,21 +181,27 @@ public class BilliardsNearbyRoomFragment extends Fragment
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id)
             {
+                // TODO: 以下的这种点击处理策略不再使用，我们改用WebView来展示球厅详情页面，所以我们现在
+                // TODO: 只传递一个用于展示球厅详情的url就可以了
+                // TODO: 但是这个页面现在还是不要删除，因为制定需求的傻逼随时有可能要求改回来
                 NearbyRoomSubFragmentRoomBean bean = mRoomList.get(position - 1);
-                Bundle bundle = new Bundle();
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getRoomPhotoUrl());
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getRoomName());
-                bundle.putFloat(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, bean.getLevel());
-                bundle.putDouble(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, bean.getPrice());
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_TAG, bean.getRoomTag());
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, bean.getDetailedAddress());
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO, bean.getRoomInfo());
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, bean.getRoomPhone());
-
-                // set the arguments into the bundle, and transferred into the RoomDetailedActivity
-                Intent intent = new Intent(mContext, NearbyBilliardRoomActivity.class);
-                intent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, bundle);
-
+//                Bundle bundle = new Bundle();
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getRoomPhotoUrl());
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getRoomName());
+//                bundle.putFloat(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, bean.getLevel());
+//                bundle.putDouble(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, bean.getPrice());
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_TAG, bean.getRoomTag());
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, bean.getDetailedAddress());
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO, bean.getRoomInfo());
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, bean.getRoomPhone());
+//
+//                // set the arguments into the bundle, and transferred into the RoomDetailedActivity
+//                Intent intent = new Intent(mContext, NearbyBilliardRoomActivity.class);
+//                intent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, bundle);
+//
+//                mContext.startActivity(intent);
+                Intent intent = new Intent(mContext, BilliardsRoomWebViewActivity.class);
+                intent.putExtra(NearbyFragmentsCommonUtils.KEY_ROOM_WEBVIEW_PAGE_URL, bean.getRoomDetailPageUrl());
                 mContext.startActivity(intent);
             }
         });
@@ -363,7 +370,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                         final int count = resultJsonObj.getInt("total_count");
                         JSONArray businessJsonArr = resultJsonObj.getJSONArray("businesses");
                         final int size = businessJsonArr.length();
-                        Log.d(TAG, " the total json objects we get are : " + size);
+                        Log.d(TAG_1, " the total json objects we get are : " + size);
                         int i;
                         for (i = 0; i < size; ++i)
                         {
@@ -376,6 +383,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             String address = businessObj.getString("address");
                             String distance = String.valueOf(businessObj.getInt("distance"));
                             String roomPhoto = businessObj.getString("s_photo_url");
+                            String roomDetailPageUrl = businessObj.getString("business_url");
+                            Log.d(TAG_1, " the room detailed page url are : " + roomDetailPageUrl);
                             Log.d(TAG, " inside the room info retrieved part --> the room url we get for the room list are : " + roomPhoto);
                             // TODO: 我们以下解析的数据全部都是为下一个即RoomDetailedActivity当中的数据(这些数据都是需要传动到球厅详情Activity当中的)
                             String roomPhoneNum = businessObj.getString("telephone");
@@ -392,7 +401,19 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             Log.d(TAG, " after totally parsed this json obj : " + businessId + " , " + roomName + " , " + level + " , " + price + " , " + distance + " , " + roomPhoto + " , " + address);
                             // String roomPhoto, String roomName, float level, double price, String address, String distance
                             // TODO: 我们在这里最新增加了一个字段就是shop hours(在我们自己提供的接口当中我们已经添加了，但是大众点评的接口当中没有看到这个field的提供信息，先空着，到以后优化时再修改)
-                            NearbyRoomSubFragmentRoomBean roomBean = new NearbyRoomSubFragmentRoomBean(String.valueOf(businessId), roomPhoto, roomName, level, price, address, distance, roomPhoneNum, roomTag, detailedRoomInfo, "");
+                            NearbyRoomSubFragmentRoomBean roomBean = new NearbyRoomSubFragmentRoomBean(
+                                                        String.valueOf(businessId),
+                                                        roomPhoto,
+                                                        roomName,
+                                                        level,
+                                                        price,
+                                                        address,
+                                                        distance,
+                                                        roomPhoneNum,
+                                                        roomTag,
+                                                        detailedRoomInfo,
+                                                        "", // 营业时间
+                                                        roomDetailPageUrl);
                             // TODO: 将这条数据加入到roomList当中(现在由于数据不完整，所以暂时不添加，等数据完整性已经比较好的时候再进行添加)
                             cacheRoomList.add(roomBean);
                         }

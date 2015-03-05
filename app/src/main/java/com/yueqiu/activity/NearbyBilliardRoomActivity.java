@@ -70,6 +70,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *         当我们点击球厅子Fragment(BilliardsNearbyRoomFragment)当中的ListView的任何的一个item，就会
  *         跳转到当前的这个Fragment当中
  */
+// TODO: NearbyBilliardRoomActivity 当中包含了很多关于分享的原始实现代码，我们在后期测试当中完全通过之后，需要
+// TODO: 将这部分代码删除掉
 public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandler.Response, IUiListener
 {
     private static final String TAG = "NearbyBilliardRoomActivity";
@@ -317,17 +319,16 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
                 // 我们需要传入Intent来进行微信分享请求的结果监听
                 // 我们可以在这个Intent当中传递我们需要的分享的具体数据
                 // 我们目前需要分享包括基本的球厅的信息，球厅图片(Bitmap),球厅活动说明
-//                Dialog dlg = Utils.showSheet(this, getIntent());
-//                dlg.show();
+                Dialog dlg = Utils.showSheet(this, getIntent());
+                dlg.show();
                 // TODO: 以下是测试代码，我们暂时将所有的涉及到分享的代码移动到当前的Activity当中，因为关于分享的部分会涉及到一些关于
                 // TODO: Activity生命周期的控制方法
-                Dialog dlg = showSheet(this, getIntent());
-                dlg.show();
+//                Dialog dlg = showSheet(this, getIntent());
+//                dlg.show();
                 break;
             case android.R.id.home:
                 finish();
                 overridePendingTransition(R.anim.top_in, R.anim.top_out);
-                ;
                 break;
         }
 
@@ -529,18 +530,19 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
 //                            weiboShareManager.shareWeiboMsg(" share to wei bo ", sharedBitmap);
 //                        }
                         // 2. 以下是添加了分享结果的监听回调方法，我们可以监听分享的结果，但是无法正确的获取微博的验证
-                        if (null != mWeiboShareApi)
-                        {
-                            if (mWeiboShareApi.isWeiboAppInstalled())
-                            {
-                                Bitmap sharedBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
-                                shareWeiboMsg("share to weibo", sharedBitmap);
-                            } else
-                            {
-                                // 我们需要先提醒用户首先将微博的客户端安装上才可以进行以后的分享操作
-                                Toast.makeText(NearbyBilliardRoomActivity.this, getString(R.string.weibo_need_to_install_first), Toast.LENGTH_SHORT).show();
-                            }
-                        }
+//                        if (null != mWeiboShareApi)
+//                        {
+//                            if (mWeiboShareApi.isWeiboAppInstalled())
+//                            {
+//                                Bitmap sharedBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+//                                shareWeiboMsg("share to weibo", sharedBitmap);
+//                            } else
+//                            {
+//                                // 我们需要先提醒用户首先将微博的客户端安装上才可以进行以后的分享操作
+//                                Toast.makeText(NearbyBilliardRoomActivity.this, getString(R.string.weibo_need_to_install_first), Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+                        startActivity(new Intent(NearbyBilliardRoomActivity.this, WeiboShareActionCompleteActivity.class));
 
                         break;
                     case R.id.img_search_dating_detail_share_renren:

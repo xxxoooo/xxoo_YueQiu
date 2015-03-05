@@ -67,6 +67,7 @@ public class NearbyFragmentsCommonUtils{
     public static final String KEY_ROOM_FRAGMENT_SHOP_HOURS = "roomShopHours"; // 球厅的营业时间
     public static final String KEY_ROOM_FRAGMENT_LAT = "roomLatitude"; // 球厅的纬度
     public static final String KEY_ROOM_FRAGMENT_LNG = "roomLongtitude"; // 球厅的经度
+    public static final String KEY_ROOM_WEBVIEW_PAGE_URL = "room_webview_page_url"; // 用于展示球厅详情的Url
 
     // 以下是用于球友Fragment当中需要传输的数据的详细的key值
     public static final String KEY_BUNDLE_SEARCH_MATE_FRAGMENT = "searchMateFragment";
@@ -148,7 +149,7 @@ public class NearbyFragmentsCommonUtils{
     {
         Log.d(TAG, " start retrieving the recommendation image gallery info ... ");
         String rawResult = HttpUtil.urlClient(HttpConstants.NearbyRoomRecommendation.URL, null, HttpConstants.RequestMethod.GET);
-        Log.d(TAG, " the recommendation info we get are : " + rawResult);
+        Log.d(TAG_1, " the recommendation info we get are : " + rawResult);
 
         List<NearbyRoomSubFragmentRoomBean> cacheRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
 
@@ -178,7 +179,6 @@ public class NearbyFragmentsCommonUtils{
                             // TODO: 所以我们暂时先不管这两个字段了
                             String roomLongitude = dataUnit.getString("lng");
                             String roomLatitude = dataUnit.getString("lat");
-
                             int roomLevelVal = 0;
                             double roomPriceVal = 0;
                             try {
