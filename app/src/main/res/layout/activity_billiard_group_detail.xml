@@ -27,8 +27,11 @@
             android:textColor="@color/md__defaultBackground"
             android:layout_alignTop="@+id/billiard_group_detail_img"
             android:layout_toRightOf="@+id/billiard_group_detail_img"
+            android:layout_toLeftOf="@+id/billiard_group_detail_publish_time"
+            android:layout_marginRight="3dp"
             android:layout_marginLeft="10dp"
-            android:textSize="16sp"/>
+            android:textSize="16sp"
+            android:ellipsize="marquee"/>
         <TextView
             android:id="@+id/billiard_group_detail_ower_sex"
             style="@style/TimeTextStyle"
@@ -67,38 +70,55 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="@color/devide_line"/>
-    <ScrollView
-        android:id="@+id/billiard_group_detail_scroll_view"
+    <!--<ScrollView-->
+        <!--android:id="@+id/billiard_group_detail_scroll_view"-->
+        <!--android:layout_width="mamatch_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight="8.2"-->
+        <!--android:scrollbars="none"-->
+        <!-->-->
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:id="@+id/group_detail_content_container"-->
+            <!--android:orientation="vertical"-->
+            <!--android:padding="5dp"-->
+            <!-->-->
+            <!--<TextView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:id="@+id/group_detail_title"-->
+                <!--android:textSize="16sp"-->
+                <!--android:textColor="@color/md__defaultBackground"-->
+                <!--android:padding="3dp"-->
+                <!--/>-->
+            <!--<TextView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:id="@+id/group_detail_content"-->
+                <!--android:textSize="14sp"-->
+                <!--android:textColor="@color/search_distance_color"-->
+                <!--android:padding="3dp"/>-->
+            <!--<com.android.volley.toolbox.NetworkImageView-->
+                <!--android:id="@+id/group_detail_extra_img"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@+id/group_detail_content"-->
+                <!--android:layout_marginTop="3dp"-->
+                <!--/>-->
+
+        <!--</LinearLayout>-->
+
+     <!--</ScrollView>-->
+
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="8.2"
         android:scrollbars="none"
-        >
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/group_detail_content_container"
-            android:orientation="vertical"
-            android:padding="5dp"
-            >
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/group_detail_title"
-                android:textSize="16sp"
-                android:textColor="@color/md__defaultBackground"
-                android:padding="3dp"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/group_detail_content"
-                android:textSize="14sp"
-                android:textColor="@color/search_distance_color"
-                android:padding="3dp"/>
-
-        </LinearLayout>
-
-     </ScrollView>
+        android:divider="@color/devide_line"
+        android:dividerHeight="1.5dp"
+        android:id="@+id/group_detail_listview"/>
 
     <LinearLayout
         android:layout_width="match_parent"

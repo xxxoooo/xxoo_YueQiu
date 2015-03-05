@@ -54,6 +54,7 @@ public class FriendProfileFragment extends Fragment {
     public static final String GENDER_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.gender_key";
     public static final String DISTRICT_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.district_key";
     public static final String FRIEND_USER_ID = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.friend_user_id_key";
+    public static final String USER_NAME_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.username_key";
 
     private String img_path, account, gender, nick_name, district, level, ball_type, ball_arm, used_type, user_id;
     private ImageLoader mImageLoader;
@@ -187,7 +188,8 @@ public class FriendProfileFragment extends Fragment {
                 getString(R.string.habit_2) : getString(R.string.habit_3));
 
         mImageView.setDefaultImageResId(R.drawable.default_head);
-        mImageView.setImageUrl(img_url, mImageLoader);
+        mImageView.setErrorImageResId(R.drawable.default_head);
+        mImageView.setImageUrl(HttpConstants.IMG_BASE_URL + img_url, mImageLoader);
         mAccountTextView.setText(account);
         mGenderTextView.setText(gender);
         mNickNameTextView.setText(nick_name);

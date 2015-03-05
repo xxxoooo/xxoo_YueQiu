@@ -23,7 +23,9 @@
         android:textSize="18sp"
         android:textColor="@color/md__defaultBackground"
         android:ellipsize="end"
-        android:singleLine="true"/>
+        android:singleLine="true"
+        android:layout_toLeftOf="@+id/group_issue_time"
+        android:layout_marginRight="3dp"/>
     <com.rockerhieu.emojicon.EmojiconTextView
         android:id="@+id/group_content"
         android:layout_width="wrap_content"
@@ -35,6 +37,8 @@
         android:ellipsize="end"
         android:textColor="@color/md__defaultBackground"
         android:singleLine="true"
+        android:layout_toLeftOf="@+id/group_issue_time"
+        android:layout_marginRight="3dp"
         />
     <ImageView
         android:id="@+id/group_browse_count_img"

@@ -11,6 +11,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.NearbyCoauchSubFragmentCoauchBean;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.VolleySingleton;
 
@@ -87,7 +88,8 @@ public class NearbyCoauchSubFragmentListAdapter extends BaseAdapter
         viewHolder.mGender.setCompoundDrawablePadding(6);
         viewHolder.mName.setText(bean.getUserName());
         viewHolder.mPhoto.setDefaultImageResId(R.drawable.default_head);
-        viewHolder.mPhoto.setImageUrl(bean.getUserPhoto(), mImgLoader);
+        viewHolder.mPhoto.setErrorImageResId(R.drawable.default_head);
+        viewHolder.mPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + bean.getUserPhoto(), mImgLoader);
 
         return convertView;
     }

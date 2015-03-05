@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,11 +21,14 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.activity.LoginActivity;
 import com.yueqiu.bean.ISlideListItem;
 import com.yueqiu.bean.SlideAccountItemISlide;
 import com.yueqiu.bean.SlideOtherItemISlide;
+import com.yueqiu.util.BitmapUtil;
+import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;
@@ -92,24 +96,6 @@ public class SlideViewAdapter extends BaseAdapter {
     }
 
     private static final String TAG_1 = "bitmap_debug";
-    /**
-     * Get a View that displays the data at the specified position in the data set. You can either
-     * create a View manually or inflate it from an XML layout file. When the View is inflated, the
-     * parent View (GridView, ListView...) will apply default layout parameters unless you use
-     * {@link android.view.LayoutInflater#inflate(int, android.view.ViewGroup, boolean)}
-     * to specify a root view and to prevent attachment to the root.
-     *
-     * @param position    The position of the item within the adapter's data set of the item whose view
-     *                    we want.
-     * @param convertView The old view to reuse, if possible. Note: You should check that this view
-     *                    is non-null and of an appropriate type before using. If it is not possible to convert
-     *                    this view to display the correct data, this method can create a new view.
-     *                    Heterogeneous lists can specify their number of view types, so that this View is
-     *                    always of the right type (see {@link #getViewTypeCount()} and
-     *                    {@link #getItemViewType(int)}).
-     * @param parent      The parent that this view will eventually be attached to
-     * @return A View corresponding to the data at the specified position.
-     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ISlideListItem item = (ISlideListItem) getItem(position);
@@ -143,9 +129,8 @@ public class SlideViewAdapter extends BaseAdapter {
                     accountHolder.login.setVisibility(View.GONE);
                     accountHolder.name.setVisibility(View.VISIBLE);
                     accountHolder.name.setText(accountItem.getName());
-                    String img = accountItem.getImg();
+                    final String img = accountItem.getImg();
                     // the following are the source bitmap we need to get from network service
-                    final Bitmap source = null;
 //                   if(img.equals("")){
 //                       source = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.head_img);
 //                   }else {
@@ -158,46 +143,29 @@ public class SlideViewAdapter extends BaseAdapter {
 //                       }
 //                   }
 //                   String img_test = "http://byu1145240001.my3w.com/image/11.png";
-//                   if (! TextUtils.isEmpty(img_test))
-//                   {
-//                       Log.d(TAG_1, " fuck goes here .... ");
-//                       source = mImgLoader.get(
-//                               img_test, // the url to download the image
-//                               ImageLoader.getImageListener(accountHolder.image,
-//                                       R.drawable.head_img,
-//                                       R.drawable.ic_launcher), // the ImageListener
-//                               300, // the finally image width we need
-//                               300  // the finally image height we need
-//                       ).getBitmap();
-//                   }
-//                   if (null != source)
-//                   {
-//                       Log.d(TAG_1, " the source bitmap are : " + source);
-//                       Log.d(TAG_1, " the " + embedBitmap(mContext.getResources(),source,embedResId));
-//                       accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(),source,embedResId));
-//                   }
+//
+                    String img_url = "http://" + img;
                    final int finallyEmbedResId = embedResId;
                    if (! TextUtils.isEmpty(img))
                    {
-                       Log.d(TAG_1, " we are entering image loading process ");
                        mImgLoader.get(
-                               img, // pass this as test
+                               img_url, // pass this as test
                                new ImageLoader.ImageListener()
                                {
                                    @Override
                                    public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate)
                                    {
-                                        Log.d(TAG_1, " we are getting the right result here ");
                                        Bitmap sourceBitmap = response.getBitmap();
-                                       Log.d(TAG_1, " we have get the source bitmap finally ");
                                        if (null != sourceBitmap)
                                        {
+                                           Log.d("wy","bitmap is not null");
                                            Log.d(TAG_1, " the embeded resource id : " + finallyEmbedResId + ", and the source are: " + sourceBitmap);
-                                           accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), sourceBitmap, finallyEmbedResId));
+                                           accountHolder.image.setImageBitmap(ImgUtil.embedBitmap(mContext.getResources(), sourceBitmap, finallyEmbedResId));
                                        } else
                                        {
+                                           Log.d("wy","bitmap is null");
                                            Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
-                                           accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
+                                           accountHolder.image.setImageBitmap(ImgUtil.embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
                                        }
                                    }
 
@@ -212,14 +180,14 @@ public class SlideViewAdapter extends BaseAdapter {
 
                                    }
                                },
-                               300,
-                               300
+                               400,
+                               400
                        );
                    } else
                    {
                        // 现在是没有Url的情况，即服务器端传递到的url为空的情况，我们需要在这里直接加载我们的默认图片
                        Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
-                       accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
+                       accountHolder.image.setImageBitmap(ImgUtil.embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
                    }
 
                } else {
@@ -280,41 +248,6 @@ public class SlideViewAdapter extends BaseAdapter {
         View bottom;
     }
 
-    private Bitmap embedBitmap(Resources resources,Bitmap source,int embedImgId){
-//        BitmapFactory.Options options = new BitmapFactory.Options();
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-//            options.inMutable = true;
-//        }
-        //options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        //Bitmap source = BitmapFactory.decodeResource(resources,sourceId,options);
-        Bitmap embedded;
-        if(source.isMutable()){
-            embedded = source;
-        }else{
-            embedded = source.copy(Bitmap.Config.ARGB_8888,true);
-            // TODO: 以下的是之前的实现，移除之后可以结合Volley当中的ImageLoader 使用，但是不移除的
-            // TODO: 话，暂时还不确定是否会影响内存资源的回收问题
-            // TODO: 关于source.recycle()内部的具体操作还不确定。需要参考StackOverflow上面的分析理解
-//            source.recycle();
-        }
 
-        embedded.setHasAlpha(true);
-
-        final int srcWidth = embedded.getWidth();
-        final int srcHeight = embedded.getHeight();
-
-        Canvas canvas = new Canvas(embedded);
-        Bitmap mask = BitmapFactory.decodeResource(resources,embedImgId);
-        final int maskWidth = mask.getWidth();
-        final int maskHeight = mask.getHeight();
-
-        Paint paint = new Paint();
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
-        canvas.drawBitmap(mask,srcWidth-maskWidth,srcHeight-maskHeight,paint);
-
-        mask.recycle();
-
-        return embedded;
-    }
 
 }

@@ -13,6 +13,7 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.ISlideMenuBasic;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;
@@ -70,7 +71,8 @@ public class FavorBasicAdapter extends BaseAdapter {
             holder.whole_bg.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.published_item_bg));
         }
         holder.imageView.setDefaultImageResId(R.drawable.default_head);
-        holder.imageView.setImageUrl(((FavorInfo)mList.get(position)).getImg_url(),mImgLoader);
+        holder.imageView.setErrorImageResId(R.drawable.default_head);
+        holder.imageView.setImageUrl(HttpConstants.IMG_BASE_URL + ((FavorInfo) mList.get(position)).getImg_url(),mImgLoader);
         holder.title.setText(((FavorInfo)mList.get(position)).getTitle());
         holder.content.setText(((FavorInfo)mList.get(position)).getContent());
         holder.dateTime.setText(((FavorInfo)mList.get(position)).getCreateTime());

@@ -35,6 +35,8 @@
         android:textSize="16sp"
         style="@style/TimeTextStyle"
         android:singleLine="true"
+        android:layout_toLeftOf="@+id/published_time"
+        android:layout_marginRight="3dp"
         />
     <TextView
         android:id="@+id/published_time"

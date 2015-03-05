@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.BilliardGroupDetailActivity;
@@ -18,14 +19,18 @@ import com.yueqiu.activity.PlayDetailActivity;
 import com.yueqiu.adapter.FavorBasicAdapter;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.Identity;
+import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.FavorDao;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -98,6 +103,13 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
 //
 //        }
 
+
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
@@ -105,7 +117,6 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
         }else{
             mHandler.obtainMessage(PublicConstant.NO_NETWORK).sendToTarget();
         }
-        return view;
     }
 
     @Override
@@ -144,39 +155,47 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
 
     @Override
     protected void requestResult() {
+
+        mPreProgress.setVisibility(View.VISIBLE);
+        mPreText.setVisibility(View.VISIBLE);
+
         mParamsMap.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
         mParamsMap.put(HttpConstants.Favor.TYPE,mType == 1 ? 1 : mType + 1);
         mParamsMap.put(HttpConstants.Favor.START_NO,mStart_no);
         mParamsMap.put(HttpConstants.Favor.END_NO, mEnd_no);
 
-        mUrlAndMethodMap.put(PublicConstant.URL, HttpConstants.Favor.URL);
-        mUrlAndMethodMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.GET);
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
 
-        new RequestAsyncTask<FavorInfo>(mParamsMap).execute(mUrlAndMethodMap);
+        HttpUtil.requestHttp(HttpConstants.Favor.URL,mParamsMap,HttpConstants.RequestMethod.GET,new ResponseHandler<FavorInfo>());
+
     }
 
     @Override
     protected List<FavorInfo> setBeanByJSON(JSONObject jsonResult) {
         List<FavorInfo> list = new ArrayList<FavorInfo>();
         try {
-            JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
-            if(list_data.length() < 1){
+            if(jsonResult.getJSONObject("result").get("list_data").equals("null")){
                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-            }else{
-                for (int i = 0; i < list_data.length(); i++) {
-                    FavorInfo itemInfo = new FavorInfo();
-                    itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
-                    itemInfo.setRid(list_data.getJSONObject(i).getInt("rid"));
-                    itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
-                    itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                    itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
-                    itemInfo.setCreateTime(list_data.getJSONObject(i).getString("create_time"));
-                    itemInfo.setUserName(list_data.getJSONObject(i).getString("username"));
-                    itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type")));
-                    //TODO:根据服务器确定的字段,如果不做缓存这个字段不需要，但是如果后期要加缓存，这个字段必须有
+            }else {
+                JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
+                if (list_data.length() < 1) {
+                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                } else {
+                    for (int i = 0; i < list_data.length(); i++) {
+                        FavorInfo itemInfo = new FavorInfo();
+                        itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
+                        itemInfo.setRid(list_data.getJSONObject(i).getInt("rid"));
+                        itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
+                        itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
+                        itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
+                        itemInfo.setCreateTime(list_data.getJSONObject(i).getString("create_time"));
+                        itemInfo.setUserName(list_data.getJSONObject(i).getString("username"));
+                        itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type")));
+                        //TODO:根据服务器确定的字段,如果不做缓存这个字段不需要，但是如果后期要加缓存，这个字段必须有
 //                    itemInfo.setSubType(list_data.getJSONObject(i).getInt("subtype"));
-                    itemInfo.setChecked(false);
-                    list.add(itemInfo);
+                        itemInfo.setChecked(false);
+                        list.add(itemInfo);
+                    }
                 }
             }
         } catch (JSONException e) {
@@ -246,14 +265,10 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                     for(FavorInfo info : list){
                         if (!mList.contains(info)) {
 
-                            if(mRefresh && !mIsListEmpty) {
+                            if(!mIsListEmpty && Integer.valueOf(((FavorInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
                                 mList.add(0,info);
-                            }else{
-                                if(mIsSavedInstance){
-                                    mList.add(0,info);
-                                }else{
-                                    mList.add(info);
-                                }
+                            }else {
+                                mList.add(info);
                             }
                         }
                         //////////////////////////////////////////////////////

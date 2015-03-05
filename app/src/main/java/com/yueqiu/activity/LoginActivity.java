@@ -23,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.DatabaseConstant;
@@ -31,8 +32,11 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.UserDao;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
+
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -61,6 +65,8 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgress.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
             switch (msg.what) {
                 case PublicConstant.REQUEST_ERROR:
                     if(msg.obj == null){
@@ -74,6 +80,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                 case PublicConstant.GET_SUCCESS:
                     Toast.makeText(LoginActivity.this, getString(R.string.login_success),Toast.LENGTH_SHORT).show();
                     Map<String,String> map = (Map<String, String>) msg.obj;
+                    //TODO:用来更新全局userinfo
                     Utils.getOrUpdateUserBaseInfo(LoginActivity.this,map);
                     Intent intent = new Intent(PublicConstant.SLIDE_ACCOUNT_ACTION);
                     sendBroadcast(intent);
@@ -142,8 +149,6 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                 mRootView.getRootView().getWindowVisibleDisplayFrame(rect);
                 int screenHeight = mRootView.getRootView().getHeight();
                 int keyboardHeight = screenHeight - (rect.bottom - rect.top);
-                Log.d("wy", "keyboard height is ->" + keyboardHeight);
-                Log.d("wy","rect.top is ->" + rect.top);
                 if(keyboardHeight != rect.top){
                     YueQiuApp.sKeyboardHeight = keyboardHeight;
                 }
@@ -170,15 +175,8 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                     return;
                 }
 
-                Map<String, String> requestMap = new HashMap<String, String>();
-                requestMap.put(HttpConstants.LoginConstant.USERNAME, mUserName);
-                requestMap.put(HttpConstants.LoginConstant.PASSWORD, mPwd);
-
-                Map<String,String> paramMap = new HashMap<String, String>();
-                paramMap.put(PublicConstant.URL,HttpConstants.LoginConstant.URL);
-                paramMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
                 if(Utils.networkAvaiable(LoginActivity.this)) {
-                    new LoginAsyncTask(requestMap).execute(paramMap);
+                    login();
                 }else{
                     Toast.makeText(LoginActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
                 }
@@ -193,6 +191,62 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
     }
 
+
+    private void login(){
+
+        mPreProgress.setVisibility(View.VISIBLE);
+        mPreText.setVisibility(View.VISIBLE);
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put(HttpConstants.LoginConstant.USERNAME, mUserName);
+        params.put(HttpConstants.LoginConstant.PASSWORD, mPwd);
+
+        HttpUtil.requestHttp(HttpConstants.LoginConstant.URL,params,HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","login response ->" + response);
+                try {
+                    if (!response.isNull("code")){
+                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                            Map<String, String> successObj = new HashMap<String, String>();
+                            successObj.put(DatabaseConstant.UserTable.USERNAME, response.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.USERNAME));
+                            successObj.put(DatabaseConstant.UserTable.PASSWORD, mPwd);
+                            successObj.put(DatabaseConstant.UserTable.USER_ID, response.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.USER_ID));
+                            successObj.put(DatabaseConstant.UserTable.LOGIN_TIME, response.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.LOGIN_TIME));
+                            successObj.put(DatabaseConstant.UserTable.PHONE, response.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.PHONE));
+                            successObj.put(DatabaseConstant.UserTable.IMG_URL, response.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.IMG_URL));
+                            successObj.put(DatabaseConstant.UserTable.TITLE,response.getJSONObject("result").getString("title"));
+                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS,successObj).sendToTarget();
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.REQUEST_ERROR){
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                        }
+                        else {
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                        }
+                    }else{
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
 //    @Override
 //    public void onLogout(int code) {
 //
@@ -237,60 +291,6 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         return user;
     }
 
-
-    private class LoginAsyncTask extends AsyncTaskUtil<String>{
-
-        public LoginAsyncTask(Map<String, String> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgress.setVisibility(View.VISIBLE);
-            mPreText.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject object) {
-            super.onPostExecute(object);
-
-            try {
-                if (!object.isNull("code")){
-                    if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                        Map<String, String> successObj = new HashMap<String, String>();
-                        successObj.put(DatabaseConstant.UserTable.USERNAME, object.getJSONObject("result").
-                                getString(DatabaseConstant.UserTable.USERNAME));
-                        successObj.put(DatabaseConstant.UserTable.PASSWORD, mPwd);
-                        successObj.put(DatabaseConstant.UserTable.USER_ID, object.getJSONObject("result").
-                                getString(DatabaseConstant.UserTable.USER_ID));
-                        successObj.put(DatabaseConstant.UserTable.LOGIN_TIME, object.getJSONObject("result").
-                                getString(DatabaseConstant.UserTable.LOGIN_TIME));
-                        successObj.put(DatabaseConstant.UserTable.PHONE, object.getJSONObject("result").
-                                getString(DatabaseConstant.UserTable.PHONE));
-                        successObj.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
-                                getString(DatabaseConstant.UserTable.IMG_URL));
-                        mHandler.obtainMessage(PublicConstant.GET_SUCCESS,successObj).sendToTarget();
-                    }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
-                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                    }else if(object.getInt("code") == HttpConstants.ResponseCode.REQUEST_ERROR){
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
-                    }
-                    else {
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,object.getString("msg")).sendToTarget();
-                    }
-                }else{
-                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }finally {
-                mPreProgress.setVisibility(View.GONE);
-                mPreText.setVisibility(View.GONE);
-            }
-        }
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

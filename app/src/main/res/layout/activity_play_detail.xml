@@ -32,6 +32,9 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="4dp"
             android:textSize="18sp"
+            android:layout_toLeftOf="@+id/play_create_time_tv"
+            android:layout_marginRight="3dp"
+            android:ellipsize="marquee"
             />
 
         <!-- 用于显示用户的性别 -->
@@ -214,6 +217,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
+                />
+            <com.android.volley.toolbox.NetworkImageView
+                android:id="@+id/play_detail_extra_img"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/play_detail_illustration_info"
+                android:layout_marginLeft="5dp"
                 />
         </RelativeLayout>
     </ScrollView>

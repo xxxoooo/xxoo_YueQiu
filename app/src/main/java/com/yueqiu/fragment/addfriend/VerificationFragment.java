@@ -113,7 +113,9 @@ public class VerificationFragment extends Fragment {
         mAccountTextView.setText(mAccount);
         mGenderTextView.setText(mGender);
         mDistrictTextView.setText(mDistrict);
-        mPhoto.setImageUrl(mPhotoUrl, mImageLoader);
+        mPhoto.setDefaultImageResId(R.drawable.default_head);
+        mPhoto.setErrorImageResId(R.drawable.default_head);
+        mPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + mPhotoUrl, mImageLoader);
     }
 
     @Override

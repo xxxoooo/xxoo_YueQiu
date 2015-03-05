@@ -100,6 +100,16 @@ public class YueQiuApp extends Application implements LoginListener {
         YueQiuApp.sUserInfo.setUsername(getAppContext().getString(R.string.guest));
         YueQiuApp.sUserInfo.setUser_id(0);
         YueQiuApp.sUserInfo.setPhone("");
+        YueQiuApp.sUserInfo.setNick("");
+        YueQiuApp.sUserInfo.setDistrict("");
+        YueQiuApp.sUserInfo.setLevel(-1);
+        YueQiuApp.sUserInfo.setBall_type(-1);
+        YueQiuApp.sUserInfo.setBallArm(-1);
+        YueQiuApp.sUserInfo.setUsedType(-1);
+        YueQiuApp.sUserInfo.setBallAge("");
+        YueQiuApp.sUserInfo.setIdol("");
+        YueQiuApp.sUserInfo.setIdol_name("");
+
     }
 
     private void jumpToIndexPage() {

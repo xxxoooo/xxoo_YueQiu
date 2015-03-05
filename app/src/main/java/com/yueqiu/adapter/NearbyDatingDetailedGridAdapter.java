@@ -11,6 +11,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.NearbyDatingDetailedAlreadyBean;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
 
 import java.util.ArrayList;
@@ -75,7 +76,8 @@ public class NearbyDatingDetailedGridAdapter extends BaseAdapter
 
         // 在这里，我们经所有用户的头像采用VolleyNetworkImageView来代替，用于加速用户头像的加载速度
         viewHolder.mPhoto.setDefaultImageResId(R.drawable.default_head);
-        viewHolder.mPhoto.setImageUrl(bean.getUserPhoto(), mImgLoader);
+        viewHolder.mPhoto.setErrorImageResId(R.drawable.default_head);
+        viewHolder.mPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + bean.getUserPhoto(), mImgLoader);
 
         viewHolder.mName.setText(bean.getUserName());
 

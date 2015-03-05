@@ -98,37 +98,6 @@ public class ImageFragment extends DialogFragment {
         return view;
     }
 
-//    @NonNull
-//    @Override
-//    public Dialog onCreateDialog(Bundle savedInstanceState) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-//        // Get the layout inflater
-//        LayoutInflater inflater = getActivity().getLayoutInflater();
-//        View view = inflater.inflate(R.layout.fragment_image_fragment, null);
-//
-//        mImageView = (ImageView) view.findViewById(R.id.dialog_image);
-//        BitmapDrawable image = null;
-//        if(null != mImagePath) {
-//            image = ImgUtil.getLargeScaledBitmap(getActivity(), mImagePath);
-//        }
-//        if(null != mImgUri){
-//            image = ImgUtil.getLargeScaleBitmapFromUri(getActivity(),mImgUri);
-//        }
-//        mImageView.setImageDrawable(image);
-//        // Inflate and set the layout for the dialog
-//        // Pass null as the parent view because its going in the dialog layout
-//        builder.setView(view);
-//                // Add action buttons
-////                .setPositiveButton("Sign in",
-////                        new DialogInterface.OnClickListener()
-////                        {
-////                            @Override
-////                            public void onClick(DialogInterface dialog, int id)
-////                            {
-////                            }
-////                        }).setNegativeButton("Cancel", null);
-//        return builder.create();
-//    }
 
     @Override
     public void onDestroyView() {

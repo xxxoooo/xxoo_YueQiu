@@ -35,18 +35,21 @@ import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.RequestAddFriendActivity;
 import com.yueqiu.bean.NearbyPeopleInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -61,8 +64,6 @@ import java.util.Map;
  */
 public class AddPersonFragment extends Fragment {
     private static final String TAG = "AddPersonFragment";
-    //    private static final int GET_SUCCESS = 0;
-//    private static final int GET_FAIL = 1;
     private ActionBar mActionBar;
     private LinearLayout mLinearLayout;
     private ProgressBar mProgressBar;
@@ -186,18 +187,12 @@ public class AddPersonFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
         final SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         //get friend by phone number or account number
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        searchFriendsByKeyWords(searchView.getQuery().toString());
-                    }
-                }).start();
+                searchFriendsByKeyWords(searchView.getQuery().toString());
                 if (null != mList && 0 != mList.size()) {
                     mList.clear();
                     mListView.deferNotifyDataSetChanged();
@@ -271,6 +266,7 @@ public class AddPersonFragment extends Fragment {
         map.put(HttpConstants.SearchPeopleByNearby.USER_ID, Double.parseDouble(String.valueOf(YueQiuApp.sUserInfo.getUser_id())));
         map.put(HttpConstants.SearchPeopleByNearby.LAT, latitude);
         map.put(HttpConstants.SearchPeopleByNearby.LNG, longitude);
+
         String result = HttpUtil.urlClient(HttpConstants.SearchPeopleByNearby.URL, map, HttpConstants.RequestMethod.GET);
         try {
             JSONObject jsonResult = new JSONObject(result);
@@ -321,44 +317,57 @@ public class AddPersonFragment extends Fragment {
         Map<String, String> map = new HashMap<String, String>();
         map.put(HttpConstants.SearchPeopleByKeyword.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));//
         map.put(HttpConstants.SearchPeopleByKeyword.KEYWORDS, keyWords);
-        String result = HttpUtil.urlClient(HttpConstants.SearchPeopleByKeyword.URL, map, HttpConstants.RequestMethod.GET);
-        try {
-            JSONObject jsonResult = new JSONObject(result);
-            if (!jsonResult.isNull("code")) {
-                if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                    NearbyPeopleInfo searchPeople = new NearbyPeopleInfo();
+
+
+        HttpUtil.requestHttp(HttpConstants.SearchPeopleByKeyword.URL, map, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d(TAG,"add friend response ->" + response);
+                try{
+                    if (!response.isNull("code")) {
+                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                            NearbyPeopleInfo searchPeople = new NearbyPeopleInfo();
 //                searchPeople.setCount(jsonResult.getJSONObject("result").getInt("count"));
-                    JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
-                    for (int i = 0; i < list_data.length(); i++) {
-                        NearbyPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
-                        itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
-                        itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
-                        itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                        itemInfo.setSex(list_data.getJSONObject(i).getInt("sex"));
-                        itemInfo.setDistrict(list_data.getJSONObject(i).getString("district"));
-                        searchPeople.mList.add(itemInfo);
+                            JSONArray list_data = response.getJSONObject("result").getJSONArray("list_data");
+                            for (int i = 0; i < list_data.length(); i++) {
+                                NearbyPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
+                                itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
+                                itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
+                                itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
+                                itemInfo.setSex(list_data.getJSONObject(i).getInt("sex"));
+                                itemInfo.setDistrict(list_data.getJSONObject(i).getString("district"));
+                                searchPeople.mList.add(itemInfo);
+                            }
+                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, searchPeople).sendToTarget();
+                        } else if (response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                        } else if (response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT) {
+                            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                        } else {
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, response.getString("msg")).sendToTarget();
+                        }
+                    } else {
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                     }
-                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS, searchPeople).sendToTarget();
-                } else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
-                    mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                } else if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT) {
-                    mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-                } else {
-                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, jsonResult.getString("msg")).sendToTarget();
+                }catch (JSONException e){
+                    e.printStackTrace();
+                    mHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            stopViewSearch();
+                        }
+                    }, 100);
+                    Log.e(TAG, "JSONException>>" + e.toString());
                 }
-            } else {
-                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
             }
 
-        } catch (JSONException e) {
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    stopViewSearch();
-                }
-            }, 100);
-            Log.e(TAG, "JSONException>>" + e.toString());
-        }
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+            }
+        });
     }
 
     private void stopViewSearch() {
@@ -410,9 +419,11 @@ public class AddPersonFragment extends Fragment {
             }
             Log.e(TAG, String.valueOf(convertView));
             viewHolder.mImageView.setDefaultImageResId(R.drawable.default_head);
-            viewHolder.mImageView.setImageUrl(mList.get(position).getImg_url(), mImageLoader);
+            viewHolder.mImageView.setErrorImageResId(R.drawable.default_head);
+            viewHolder.mImageView.setImageUrl(HttpConstants.IMG_BASE_URL + mList.get(position).getImg_url(), mImageLoader);
             viewHolder.mNickName.setText(mList.get(position).getUsername());
             viewHolder.mGender.setText(mList.get(position).getSex() == 1 ? getString(R.string.man) : getString(R.string.woman));
+            viewHolder.mGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, NearbyFragmentsCommonUtils.parseGenderDrawable(mList.get(position).getSex() == 1 ? "男" : "女"), 0);
             String district = mList.get(position).getDistrict();
             viewHolder.mDistrict.setText("".equals(district) ? getActivity().getString(R.string.unknown) : district);
             return convertView;

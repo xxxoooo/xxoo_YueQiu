@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.activity.NearbyBilliardRoomActivity;
 import com.yueqiu.adapter.NearbyRoomSubFragmentListAdapter;
@@ -44,6 +45,7 @@ import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -315,7 +317,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
             mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
         }
 
-        List<NearbyRoomSubFragmentRoomBean> cacheRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
+        final List<NearbyRoomSubFragmentRoomBean> cacheRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
 
         requestParams.put("keyword", REQUEST_KEYWORD);
@@ -347,97 +349,104 @@ public class BilliardsNearbyRoomFragment extends Fragment
         requestParams.put("page", page + "");
         Log.d(TAG_2, " the request params are : " + requestParams.toString());
 
-        String rawResult = HttpUtil.dpUrlClient(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams);
-        Log.d(TAG_2, " the raw result we get are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult))
-        {
-            try
-            {
-                JSONObject resultJsonObj = new JSONObject(rawResult);
-                Log.d(TAG, " the initial json data of the room fragment we get are : " + resultJsonObj.toString());
-                if (!resultJsonObj.isNull("status"))
+        mRoomListView.setMode(PullToRefreshBase.Mode.DISABLED);
+
+        HttpUtil.dpRequestHttp(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","room response->" + response);
+                try
                 {
-                    String status = resultJsonObj.getString("status");
-                    if (status.equals("OK"))
+                    if (!response.isNull("status"))
                     {
-                        // TODO: 现阶段，由于返回的原始的Json包含了两个int值，一个是total_count,一个是count
-                        // TODO: 但是我们不确定究竟是哪一个代表的是我们获得的数据的条数，我们暂时先使用total_count这个值作为数据的条数
-                        final int count = resultJsonObj.getInt("total_count");
-                        JSONArray businessJsonArr = resultJsonObj.getJSONArray("businesses");
-                        final int size = businessJsonArr.length();
-                        Log.d(TAG, " the total json objects we get are : " + size);
-                        int i;
-                        for (i = 0; i < size; ++i)
+                        String status = response.getString("status");
+                        if (status.equals("OK"))
                         {
-                            JSONObject businessObj = (JSONObject) businessJsonArr.get(i);
-                            Log.d(TAG, " the sub json object we parsed out are : " + businessObj.toString());
-                            final long businessId = businessObj.getLong("business_id");
-                            String roomName = businessObj.getString("name");
-                            float level = businessObj.getInt("service_score");
-                            double price = businessObj.getDouble("avg_price");
-                            String address = businessObj.getString("address");
-                            String distance = String.valueOf(businessObj.getInt("distance"));
-                            String roomPhoto = businessObj.getString("s_photo_url");
-                            Log.d(TAG, " inside the room info retrieved part --> the room url we get for the room list are : " + roomPhoto);
-                            // TODO: 我们以下解析的数据全部都是为下一个即RoomDetailedActivity当中的数据(这些数据都是需要传动到球厅详情Activity当中的)
-                            String roomPhoneNum = businessObj.getString("telephone");
+                            // TODO: 现阶段，由于返回的原始的Json包含了两个int值，一个是total_count,一个是count
+                            // TODO: 但是我们不确定究竟是哪一个代表的是我们获得的数据的条数，我们暂时先使用total_count这个值作为数据的条数
+                            final int count = response.getInt("total_count");
+                            JSONArray businessJsonArr = response.getJSONArray("businesses");
+                            final int size = businessJsonArr.length();
+                            Log.d(TAG, " the total json objects we get are : " + size);
+                            int i;
+                            for (i = 0; i < size; ++i)
+                            {
+                                JSONObject businessObj = (JSONObject) businessJsonArr.get(i);
+                                Log.d(TAG, " the sub json object we parsed out are : " + businessObj.toString());
+                                final long businessId = businessObj.getLong("business_id");
+                                String roomName = businessObj.getString("name");
+                                float level = businessObj.getInt("service_score");
+                                double price = businessObj.getDouble("avg_price");
+                                String address = businessObj.getString("address");
+                                String distance = String.valueOf(businessObj.getInt("distance"));
+                                String roomPhoto = businessObj.getString("s_photo_url");
+                                Log.d(TAG, " inside the room info retrieved part --> the room url we get for the room list are : " + roomPhoto);
+                                // TODO: 我们以下解析的数据全部都是为下一个即RoomDetailedActivity当中的数据(这些数据都是需要传动到球厅详情Activity当中的)
+                                String roomPhoneNum = businessObj.getString("telephone");
 
-                            // 我们从一个jsonArray当中解析出球厅详情Activity当中需要的关于球厅的tag
-                            JSONArray regionJsonArr = businessObj.getJSONArray("regions");
-                            Log.d(TAG, " the sub-sub json object we get are : " + regionJsonArr.toString());
-                            String roomTag = parseRoomTag(regionJsonArr);
-                            Log.d(TAG, " the tag we get for the room are : " + roomTag);
-                            JSONArray roomDetailedInfoArr = businessObj.getJSONArray("deals");
-                            String detailedRoomInfo = parseRoomDetailedInfo(roomDetailedInfoArr);
-                            Log.d(TAG, " the room detailed info we get are : " + detailedRoomInfo);
+                                // 我们从一个jsonArray当中解析出球厅详情Activity当中需要的关于球厅的tag
+                                JSONArray regionJsonArr = businessObj.getJSONArray("regions");
+                                Log.d(TAG, " the sub-sub json object we get are : " + regionJsonArr.toString());
+                                String roomTag = parseRoomTag(regionJsonArr);
+                                Log.d(TAG, " the tag we get for the room are : " + roomTag);
+                                JSONArray roomDetailedInfoArr = businessObj.getJSONArray("deals");
+                                String detailedRoomInfo = parseRoomDetailedInfo(roomDetailedInfoArr);
+                                Log.d(TAG, " the room detailed info we get are : " + detailedRoomInfo);
 
-                            Log.d(TAG, " after totally parsed this json obj : " + businessId + " , " + roomName + " , " + level + " , " + price + " , " + distance + " , " + roomPhoto + " , " + address);
-                            // String roomPhoto, String roomName, float level, double price, String address, String distance
-                            // TODO: 我们在这里最新增加了一个字段就是shop hours(在我们自己提供的接口当中我们已经添加了，但是大众点评的接口当中没有看到这个field的提供信息，先空着，到以后优化时再修改)
-                            NearbyRoomSubFragmentRoomBean roomBean = new NearbyRoomSubFragmentRoomBean(String.valueOf(businessId), roomPhoto, roomName, level, price, address, distance, roomPhoneNum, roomTag, detailedRoomInfo, "");
-                            // TODO: 将这条数据加入到roomList当中(现在由于数据不完整，所以暂时不添加，等数据完整性已经比较好的时候再进行添加)
-                            cacheRoomList.add(roomBean);
-                        }
-                        if (cacheRoomList.isEmpty())
+                                Log.d(TAG, " after totally parsed this json obj : " + businessId + " , " + roomName + " , " + level + " , " + price + " , " + distance + " , " + roomPhoto + " , " + address);
+                                // String roomPhoto, String roomName, float level, double price, String address, String distance
+                                // TODO: 我们在这里最新增加了一个字段就是shop hours(在我们自己提供的接口当中我们已经添加了，但是大众点评的接口当中没有看到这个field的提供信息，先空着，到以后优化时再修改)
+                                NearbyRoomSubFragmentRoomBean roomBean = new NearbyRoomSubFragmentRoomBean(String.valueOf(businessId), roomPhoto, roomName, level, price, address, distance, roomPhoneNum, roomTag, detailedRoomInfo, "");
+                                // TODO: 将这条数据加入到roomList当中(现在由于数据不完整，所以暂时不添加，等数据完整性已经比较好的时候再进行添加)
+                                cacheRoomList.add(roomBean);
+                            }
+                            if (cacheRoomList.isEmpty())
+                            {
+                                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            } else
+                            {
+                                mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheRoomList).sendToTarget();
+                                // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
+                                mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                            }
+                        } else if (status.equals("ERROR"))
                         {
-                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                        } else
-                        {
-                            mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheRoomList).sendToTarget();
-                            // 进行到这里，我们基本上也已经把所有的数据都解析完并且也加载完了。现在我们可以通过UI线程停止显示Dialog了
+                            JSONObject errorObj = response.getJSONObject("error");
+                            int errorCode = errorObj.getInt("errorCode");
+                            String errorMsgStr = errorObj.getString("errorMessage");
+                            StringBuilder errorInfo = new StringBuilder();
+                            errorInfo.append("Error Code : ").append(errorCode).append("; Error Info : ").append(errorMsgStr);
+                            Message errorHandlerMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                            Bundle errorHandlerData = new Bundle();
+                            errorHandlerData.putString(KEY_REQUEST_ERROR_MSG_ROOM, errorInfo.toString());
+                            mUIEventsHandler.sendMessage(errorHandlerMsg);
                             mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                         }
-                    } else if (status.equals("ERROR"))
+                    } else
                     {
-                        JSONObject errorObj = resultJsonObj.getJSONObject("error");
-                        int errorCode = errorObj.getInt("errorCode");
-                        String errorMsgStr = errorObj.getString("errorMessage");
-                        StringBuilder errorInfo = new StringBuilder();
-                        errorInfo.append("Error Code : ").append(errorCode).append("; Error Info : ").append(errorMsgStr);
-                        Message errorHandlerMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
-                        Bundle errorHandlerData = new Bundle();
-                        errorHandlerData.putString(KEY_REQUEST_ERROR_MSG_ROOM, errorInfo.toString());
-                        mUIEventsHandler.sendMessage(errorHandlerMsg);
+                        // 什么错误信息都没有获取到，甚至连error都没有
+                        mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                         mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                     }
-                } else
+
+                } catch (JSONException e)
                 {
-                    // 什么错误信息都没有获取到，甚至连error都没有
+                    e.printStackTrace();
                     mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                     mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                    Log.d(TAG, " Exception happened in parsing the resulted json object we get, and the detailed reason are : " + e.toString());
                 }
+            }
 
-            } catch (JSONException e)
-            {
-                e.printStackTrace();
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                 mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
-                Log.d(TAG, " Exception happened in parsing the resulted json object we get, and the detailed reason are : " + e.toString());
             }
-        }else
-        {
-            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-        }
+        });
+
     }
 
     private static String parseRoomTag(JSONArray srcArr)
@@ -542,7 +551,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
-
+            if(mRoomListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mRoomListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
             if (mRoomListView.isRefreshing())
             {
                 mRoomListView.onRefreshComplete();
@@ -579,6 +590,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     break;
                 case STATE_FETCH_DATA_SUCCESS:
                     // 依然是首先将我们的EmpttyView隐藏掉
+                    Log.d("wy","success");
                     setEmptyViewGone();
                     Log.d(TAG_1, " hide empty view 3 ");
 
@@ -641,6 +653,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     // 我们现在的策略是当用户点击了popupWindow上的选项之后，我们并不是直接开始进行数据请求，
                     // 而是首先开始打开位置获取服务，然后直到位置获取成功之后通过广播通知到我们，然后我们再在
                     // 收到通知的广播内通过Handler发送Event通知我们现在才是可以真正的进行数据请求工作了
+
+                    setEmptyViewGone();
                     getActivity().startService(new Intent(getActivity(), LocationUtil.class));
                     showProgress();
 
@@ -726,6 +740,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     break;
 
                 case PublicConstant.NO_RESULT:
+                    Log.d("wy","no result");
                     setEmptyViewGone();
                     if (mRoomList.isEmpty())
                     {
@@ -993,7 +1008,13 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 // 因为第一页当中的数据总是最新的
                 if (mWorkerThread != null)
                 {
-                    mWorkerThread.fetchRoomData(1);
+                    mUIEventsHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mWorkerThread.fetchRoomData(1);
+                        }
+                    },300);
+
                 }
                 Log.d(TAG_1, " on pull down to refresh --> hide empty view ");
             } else
@@ -1026,7 +1047,13 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 if (null != mWorkerThread)
                 {
                     Log.d(TAG, "PullToRefresh --> have touched the end of the list, and the pageNum we need to request are : " + mPage);
-                    mWorkerThread.fetchRoomData(mPage);
+                    mUIEventsHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mWorkerThread.fetchRoomData(mPage);
+                        }
+                    },300);
+
                 }
             }else{
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);

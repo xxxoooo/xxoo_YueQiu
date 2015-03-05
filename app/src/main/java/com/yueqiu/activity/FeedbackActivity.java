@@ -31,6 +31,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.rockerhieu.emojicon.EmojiconEditText;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
@@ -44,6 +45,7 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.group.ImageFragment;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.FileUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.CustomDialogBuilder;
@@ -52,6 +54,7 @@ import com.yueqiu.view.IssueImageView;
 import com.yueqiu.view.dlgeffect.EffectsType;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -251,53 +254,47 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
         mParamsMap.put(HttpConstants.FeedBack.TITLE,title);
         mParamsMap.put(HttpConstants.FeedBack.CONTENT,content);
 
-        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.FeedBack.URL);
-        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
+        mPreProgress.setVisibility(View.VISIBLE);
+        mPreTextView.setVisibility(View.VISIBLE);
 
-        new FeedBackTask(mParamsMap).execute(mUrlAndMethodMap);
-
-    }
-
-    private class FeedBackTask extends AsyncTaskUtil<String>{
-
-        public FeedBackTask(Map<String, String> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgress.setVisibility(View.VISIBLE);
-            mPreTextView.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            mPreProgress.setVisibility(View.GONE);
-            mPreTextView.setVisibility(View.GONE);
-            try {
-                if(!jsonObject.isNull("code")){
-                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                        mHandler.obtainMessage(PublicConstant.GET_SUCCESS).sendToTarget();
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
-                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+        HttpUtil.requestHttp(HttpConstants.FeedBack.URL,mParamsMap,HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","feedback response is ->" + response);
+                try {
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS).sendToTarget();
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                        }
                     }else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonObject.getString("msg")).sendToTarget();
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                     }
-                }else{
-                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
-        }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+            }
+        });
+
     }
+
 
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgress.setVisibility(View.GONE);
+            mPreTextView.setVisibility(View.GONE);
             switch(msg.what){
                 case PublicConstant.GET_SUCCESS:
                     Utils.showToast(FeedbackActivity.this,getString(R.string.feed_back_success));
@@ -358,7 +355,11 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
                 overridePendingTransition(R.anim.top_in,R.anim.top_out);
                 break;
             case R.id.feed_back_submit:
-                submitFeedBack();
+                if(Utils.networkAvaiable(this)) {
+                    submitFeedBack();
+                }else{
+                    Utils.showToast(this,getString(R.string.network_not_available));
+                }
                 break;
         }
         return true;

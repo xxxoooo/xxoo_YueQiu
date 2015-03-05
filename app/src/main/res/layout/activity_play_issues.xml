@@ -67,7 +67,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:id="@+id/date_type_view">
                     <TextView
                         style="@style/ListItemTvStyle"
                         android:layout_marginLeft="10dp"
@@ -405,6 +406,23 @@
                     android:src="@drawable/add_img_bg"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"/>
+                <TextView
+                    android:id="@+id/play_issue_upload_photo_fail_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/md__defaultBackground"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    android:layout_marginLeft="5dp"/>
+                <ProgressBar
+                    android:id="@+id/play_upload_photo_progress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminate="false"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="5dp"
+                    android:visibility="gone"
+                    />
             </LinearLayout>
             <!--<GridView-->
                 <!--android:id="@+id/play_topic_grid_view"-->

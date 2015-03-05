@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.yueqiu" >
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.GET_TASKS" />
-
 
     <application
         android:name=".YueQiuApp"
@@ -24,22 +24,20 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
 
-        <!--程序初始启动时显示的SplashScreen-->
+        <!-- 程序初始启动时显示的SplashScreen -->
         <activity
             android:name=".YueQiuSplashScreen"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".BilliardNearbyActivity"
-            android:screenOrientation="portrait">
-
+            android:screenOrientation="portrait" >
         </activity>
-
         <activity
             android:name=".activity.SearchResultActivity"
             android:launchMode="singleTop"
@@ -58,8 +56,9 @@
         <!-- 聊吧Activity -->
         <activity
             android:name=".ChatBarActivity"
-            android:screenOrientation="portrait"
-            android:parentActivityName=".BilliardNearbyActivity" >
+            android:parentActivityName=".BilliardNearbyActivity"
+            android:screenOrientation="portrait" >
+
             <!-- 4.1 以下的版本需要使用meta-data元素 -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -88,8 +87,8 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".activity.FeedbackActivity"
-            android:windowSoftInputMode="adjustResize|stateHidden"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".activity.UpgradeAssistantActivity"
             android:screenOrientation="portrait" />
@@ -120,9 +119,6 @@
             android:name=".activity.SelectChargeModuleActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.RegisterActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".activity.LoginActivity"
             android:screenOrientation="portrait" />
         <activity
@@ -139,7 +135,7 @@
             android:name=".activity.GroupIssueTopic"
             android:label="@string/billiard_group_issue_article"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateHidden"/>
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".activity.GroupSelectTopicTypeActivity"
             android:parentActivityName=".activity.GroupIssueTopic"
@@ -150,34 +146,33 @@
         <activity
             android:name=".activity.Register1Activity"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.ArticleReadActivity"
-            android:screenOrientation="portrait">
+        <activity
+            android:name=".activity.ArticleReadActivity"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <data android:scheme="file" />
-
             </intent-filter>
         </activity>
         <activity
             android:name=".activity.NearbyBilliardRoomActivity"
-            android:screenOrientation="portrait"
             android:parentActivityName=".BilliardNearbyActivity"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".im.ChatPage"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize|stateHidden"/>
+            android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".im.ShowBigImage"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait" />
 
         <!-- 服务组件 -->
-        <service android:name=".util.LocationUtil"/>
-        <service android:name=".im.GotyeService"/>
+        <service android:name=".util.LocationUtil" />
+        <service android:name=".im.GotyeService" />
 
-        <!--开机启动IM服务-->
+        <!-- 开机启动IM服务 -->
         <receiver android:name=".im.StartServiceReceiver" >
             <intent-filter android:priority="1000" >
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -189,9 +184,16 @@
 
         <activity
             android:name=".activity.BilliardGroupDetailActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait" >
         </activity>
-
+        <activity
+            android:name=".activity.DateIssueActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+        <activity
+            android:name=".activity.GroupDetailReplyActivity"
+            android:label="@string/title_activity_group_detail_reply" >
+        </activity>
     </application>
 
 </manifest>

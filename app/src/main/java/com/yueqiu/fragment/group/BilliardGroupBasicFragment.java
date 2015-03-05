@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -22,6 +23,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.BilliardGroupDetailActivity;
@@ -35,11 +37,13 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.GroupInfoDao;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -144,6 +148,14 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
 //
 //        }
 
+
+
+        return mView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
@@ -151,10 +163,7 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
         }else{
             mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
         }
-
-        return mView;
     }
-
 
     private void initView(){
 
@@ -233,36 +242,88 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
     }
 
     private void requestGroup(){
+
+
         if(mGroupType != PublicConstant.GROUP_ALL) {
             mParamMap.put(HttpConstants.GroupList.TYPE, mGroupType);
         }
         mParamMap.put(HttpConstants.GroupList.STAR_NO,mStart_no);
         mParamMap.put(HttpConstants.GroupList.END_NO,mEnd_no);
 
-        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.GroupList.URL);
-        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.GET);
+        mPreProgress.setVisibility(View.VISIBLE);
+        mPreText.setVisibility(View.VISIBLE);
 
-        new RequestGroupTask(mParamMap).execute(mUrlAndMethodMap);
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
+
+        HttpUtil.requestHttp(HttpConstants.GroupList.URL,mParamMap,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","group response ->" + response);
+                try {
+                    if (!response.isNull("code")) {
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            if(response.getJSONObject("result") != null){
+                                List<GroupNoteInfo> list = setGroupInfoByJSON(response);
+                                if(list.isEmpty()){
+                                    mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                                }else {
+                                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS, list).sendToTarget();
+                                }
+                            }else{
+                                mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                            }
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                        }
+                    } else {
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                    }
+                }catch(JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+            }
+        });
     }
 
     private List<GroupNoteInfo> setGroupInfoByJSON(JSONObject object){
         List<GroupNoteInfo> infos = new ArrayList<GroupNoteInfo>();
         try {
-            JSONArray list_data = object.getJSONObject("result").getJSONArray("list_data");
-             for (int i = 0; i < list_data.length(); i++) {
-                 GroupNoteInfo info = new GroupNoteInfo();
-                 info.setNoteId(Integer.parseInt(list_data.getJSONObject(i).getString("id")));
-                 info.setUserName(list_data.getJSONObject(i).getString("username"));
-                 info.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                 info.setTitle(list_data.getJSONObject(i).getString("title"));
-                 info.setContent(list_data.getJSONObject(i).getString("content"));
-                 info.setIssueTime(list_data.getJSONObject(i).getString("create_time"));
-                 info.setCommentCount(list_data.getJSONObject(i).getInt("comment_num"));
-                 info.setBrowseCount(list_data.getJSONObject(i).getInt("look_number"));
-                 if (mGroupType != PublicConstant.GROUP_ALL) {
-                     info.setType(mGroupType);
-                 }
-                 infos.add(info);
+            if(object.getJSONObject("result").get("list_data").equals("null")){
+                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+            }
+            else {
+                JSONArray list_data = object.getJSONObject("result").getJSONArray("list_data");
+                if(list_data.length() < 1){
+                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                }else {
+                    for (int i = 0; i < list_data.length(); i++) {
+                        GroupNoteInfo info = new GroupNoteInfo();
+                        info.setNoteId(Integer.parseInt(list_data.getJSONObject(i).getString("id")));
+                        info.setUserName(list_data.getJSONObject(i).getString("username"));
+                        info.setImg_url(list_data.getJSONObject(i).getString("u_img_url"));
+                        info.setTitle(list_data.getJSONObject(i).getString("title"));
+                        info.setContent(list_data.getJSONObject(i).getString("content"));
+                        info.setIssueTime(list_data.getJSONObject(i).getString("create_time"));
+                        info.setCommentCount(list_data.getJSONObject(i).getInt("comment_num"));
+                        info.setBrowseCount(list_data.getJSONObject(i).getInt("look_number"));
+                        info.setExtra_img_url(list_data.getJSONObject(i).getString("img_url"));
+                        if (mGroupType != PublicConstant.GROUP_ALL) {
+                            info.setType(mGroupType);
+                        }
+                        infos.add(info);
+                    }
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -283,62 +344,15 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
         mActivity.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
     }
 
-    private class RequestGroupTask extends AsyncTaskUtil<Integer>{
-
-        public RequestGroupTask(Map<String, Integer> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgress.setVisibility(View.VISIBLE);
-            mPreText.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            Log.d("wy","jsonObject->" + jsonObject);
-            mPreProgress.setVisibility(View.GONE);
-            mPreText.setVisibility(View.GONE);
-
-            if(mPullToRefreshListView.isRefreshing())
-                mPullToRefreshListView.onRefreshComplete();
-            try {
-                if (!jsonObject.isNull("code")) {
-                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                        if(jsonObject.getJSONObject("result") != null){
-                            List<GroupNoteInfo> list = setGroupInfoByJSON(jsonObject);
-                            if(list.isEmpty()){
-                                mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-                            }else {
-                                mHandler.obtainMessage(PublicConstant.GET_SUCCESS, list).sendToTarget();
-                            }
-                        }else{
-                            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-                        }
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
-                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
-                        mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-                    }else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonObject.getString("msg")).sendToTarget();
-                    }
-                } else {
-                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
-                }
-            }catch(JSONException e){
-                e.printStackTrace();
-            }
-        }
-    }
-
-
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgress.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
+            if(mPullToRefreshListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
             /**
              * 统一停止PullToRefreshView的刷新动作
              */
@@ -369,14 +383,10 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
                         //TODO:需要再加一定的逻辑判断，如果发生这样的情况，该如何处理
                          if (!mList.contains(info)) {
 
-                             if(mRefresh && !mIsListEmpty) {
-                                mList.add(0,info);
-                             }else{
-                                 if(mIsSavedInstance){
-                                     mList.add(0,info);
-                                 }else{
-                                     mList.add(info);
-                                 }
+                             if(!mIsListEmpty && mList.get(0).getNoteId() < info.getNoteId()){
+                                 mList.add(0,info);
+                             }else {
+                                 mList.add(info);
                              }
                          }
                         //TODO:目前不需要缓存，所以这块先不需要操作数据库

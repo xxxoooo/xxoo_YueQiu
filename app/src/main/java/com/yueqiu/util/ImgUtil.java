@@ -1,6 +1,7 @@
 package com.yueqiu.util;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
@@ -242,5 +243,49 @@ public class ImgUtil {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
         return output;
+    }
+
+    /**
+     * 嵌入图片
+     * @param resources
+     * @param source
+     * @param embedImgId
+     * @return
+     */
+    public static Bitmap embedBitmap(Resources resources,Bitmap source,int embedImgId){
+//        BitmapFactory.Options options = new BitmapFactory.Options();
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
+//            options.inMutable = true;
+//        }
+        //options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        //Bitmap source = BitmapFactory.decodeResource(resources,sourceId,options);
+        Bitmap embedded;
+        if(source.isMutable()){
+            embedded = source;
+        }else{
+            embedded = source.copy(Bitmap.Config.ARGB_8888,true);
+            // TODO: 以下的是之前的实现，移除之后可以结合Volley当中的ImageLoader 使用，但是不移除的
+            // TODO: 话，暂时还不确定是否会影响内存资源的回收问题
+            // TODO: 关于source.recycle()内部的具体操作还不确定。需要参考StackOverflow上面的分析理解
+//            source.recycle();
+        }
+
+        embedded.setHasAlpha(true);
+
+        final int srcWidth = embedded.getWidth();
+        final int srcHeight = embedded.getHeight();
+
+        Canvas canvas = new Canvas(embedded);
+        Bitmap mask = BitmapFactory.decodeResource(resources,embedImgId);
+        final int maskWidth = mask.getWidth();
+        final int maskHeight = mask.getHeight();
+
+        Paint paint = new Paint();
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
+        canvas.drawBitmap(mask,srcWidth-maskWidth,srcHeight-maskHeight,paint);
+
+        mask.recycle();
+
+        return embedded;
     }
 }

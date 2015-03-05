@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.HttpConstants;
@@ -32,6 +33,7 @@ import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -116,6 +118,7 @@ public class NearbyBilliardRoomActivity extends Activity
 
             Log.d(TAG, " the room photo url we get are : " + photoUrl);
             mRoomPhoto.setDefaultImageResId(R.drawable.default_reommend_img);
+            mRoomPhoto.setErrorImageResId(R.drawable.default_reommend_img);
             mRoomPhoto.setImageUrl(photoUrl, mImgLoader);
         }
     }
@@ -273,31 +276,41 @@ public class NearbyBilliardRoomActivity extends Activity
     // 将当前的球厅加入我们收藏当中
     private void addRoomToFavor()
     {
-        boolean resultStatus = false;
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
         requestParams.put("user_id", YueQiuApp.sUserInfo.getUser_id() + "");
         requestParams.put("type", "2");
         requestParams.put("id", "");
 
-        String rawResult = HttpUtil.urlClient(HttpConstants.Favor.STORE_URL, requestParams, HttpConstants.RequestMethod.POST);
-        Log.d(TAG, " the raw result we get for the add the room to favor are : " + rawResult);
-        try
-        {
-            JSONObject resultJson = new JSONObject(rawResult);
-            final int code = resultJson.getInt("code");
-            resultStatus = code == 1001 ? true : false;
-        } catch (JSONException e)
-        {
-            e.printStackTrace();
-        }
+        HttpUtil.requestHttp(HttpConstants.Favor.STORE_URL, requestParams, HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                try
+                {
+                    if(response.isNull("code")) {
+                        final int code = response.getInt("code");
+                        if (code == HttpConstants.ResponseCode.NORMAL) {
+                            mUIEventsHandler.sendEmptyMessage(FAVOR_SUCCESS);
+                        } else {
+                            mUIEventsHandler.obtainMessage(FAVOR_FAILURE,response.getString("msg")).sendToTarget();
+                        }
+                    }else{
+                        mUIEventsHandler.sendEmptyMessage(FAVOR_FAILURE);
+                    }
+                } catch (JSONException e)
+                {
+                    e.printStackTrace();
+                }
+            }
 
-        if (resultStatus)
-        {
-            mUIEventsHandler.sendEmptyMessage(FAVOR_SUCCESS);
-        } else
-        {
-            mUIEventsHandler.sendEmptyMessage(FAVOR_FAILURE);
-        }
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mUIEventsHandler.sendEmptyMessage(FAVOR_FAILURE);
+            }
+        });
+
+
     }
 
     private static final int FAVOR_SUCCESS = 1 << 1;
@@ -317,17 +330,18 @@ public class NearbyBilliardRoomActivity extends Activity
                     Utils.showToast(NearbyBilliardRoomActivity.this, getString(R.string.store_success));
                     break;
                 case FAVOR_FAILURE:
-                    Utils.showToast(NearbyBilliardRoomActivity.this, getString(R.string.store_failure));
+                    if(null == msg.obj){
+                        Utils.showToast(NearbyBilliardRoomActivity.this,getString(R.string.http_request_error));
+                    }else{
+                        Utils.showToast(NearbyBilliardRoomActivity.this, (String) msg.obj);
+                    }
                     break;
                 case ADD_TO_FAVOR:
-                    new Thread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            addRoomToFavor();
-                        }
-                    }).start();
+                    if(Utils.networkAvaiable(NearbyBilliardRoomActivity.this)) {
+                        addRoomToFavor();
+                    }else{
+                        Utils.showToast(NearbyBilliardRoomActivity.this,getString(R.string.network_not_available));
+                    }
                     break;
             }
         }

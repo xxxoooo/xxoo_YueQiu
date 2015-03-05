@@ -26,6 +26,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.adapter.NearbyMateSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyDatingDetailedAlreadyBean;
@@ -42,6 +43,7 @@ import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -301,101 +303,114 @@ public class BilliardsNearbyMateFragment extends Fragment
         {
             requestParams.put("gender", gender);
         }
-        List<NearbyMateSubFragmentUserBean> cacheMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
-        String rawResult = HttpUtil.urlClient(HttpConstants.NearbyMate.URL, requestParams, HttpConstants.RequestMethod.GET);
-        Log.d(TAG_2, " the initial result we get are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult))
-        {
-            try
-            {
-                // initialObj当中包含的是最原始的JSON data，这个Json对象当中还包含了一些包含我们的请求状态的字段值
-                // 我们还需要从initialObj当中解析出我们真正需要的Json对象
-//                JSONObject initialObj = Utils.parseJson(rawResult);
-                JSONObject initialObj = new JSONObject(rawResult);
-                if (! TextUtils.isEmpty(initialObj.get("code").toString()))
-                {
-                    final int statusCode = initialObj.getInt("code");
-                    JSONObject resultJson = initialObj.getJSONObject("result");
-                    Log.d(TAG, " the initial json object we get are : " + initialObj + " ; and the result are : " + resultJson);
-                    if (statusCode == HttpConstants.ResponseCode.NORMAL)
-                    {
-                        if(resultJson != null)
-                        {
-                            Log.d(TAG, " all are ok in for now ");
-                            final int dataCount = resultJson.getInt("count");
-                            Log.d(TAG, " the dataCount we get are : " + dataCount);
-                            JSONArray dataList = resultJson.getJSONArray("list_data");
-                            int i;
-                            for (i = 0; i < dataList.length(); ++i) {
-                                JSONObject dataObj = (JSONObject) dataList.get(i);
-                                String imgUrl = dataObj.getString("img_url");
-                                String sex = dataObj.getString("sex");
-                                String userName = dataObj.getString("username");
-                                String userId = dataObj.getString("user_id");
-                                int range = dataObj.getInt("range");
-                                String district = dataObj.getString("district");
-                                NearbyMateSubFragmentUserBean mateUserBean = new NearbyMateSubFragmentUserBean(userId, imgUrl, userName, NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex), district, String.valueOf(range));
+        final List<NearbyMateSubFragmentUserBean> cacheMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
 
-                                cacheMateList.add(mateUserBean);
-                            }
-                            // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
-                            if (cacheMateList.isEmpty())
+        mSubFragmentListView.setMode(PullToRefreshBase.Mode.DISABLED);
+
+        HttpUtil.requestHttp(HttpConstants.NearbyMate.URL, requestParams, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy"," mate response -> "  + response);
+                try
+                {
+                    if (! TextUtils.isEmpty(response.get("code").toString()))
+                    {
+                        final int code = response.getInt("code");
+                        JSONObject resultJson = response.getJSONObject("result");
+                        Log.d(TAG, " the initial json object we get are : " + response + " ; and the result are : " + resultJson);
+                        if (code == HttpConstants.ResponseCode.NORMAL)
+                        {
+                            if(resultJson != null)
                             {
-                                Log.d(TAG_2, " before 5, bugs here ");
-                                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                Log.d(TAG, " all are ok in for now ");
+                                final int dataCount = resultJson.getInt("count");
+                                Log.d(TAG, " the dataCount we get are : " + dataCount);
+                                if(response.getJSONObject("result").get("list_data").equals("null")){
+                                    mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                }else{
+                                    JSONArray dataList = resultJson.getJSONArray("list_data");
+                                    if(dataList.length() < 1){
+                                        mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                    }else {
+                                        for (int i = 0; i < dataList.length(); ++i) {
+                                            JSONObject dataObj = (JSONObject) dataList.get(i);
+                                            String imgUrl = dataObj.getString("img_url");
+                                            String sex = dataObj.getString("sex");
+                                            String userName = dataObj.getString("username");
+                                            String userId = dataObj.getString("user_id");
+                                            int range = dataObj.getInt("range");
+                                            String district = dataObj.getString("district");
+                                            NearbyMateSubFragmentUserBean mateUserBean = new NearbyMateSubFragmentUserBean(userId, imgUrl, userName, NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex), district, String.valueOf(range));
+
+                                            cacheMateList.add(mateUserBean);
+                                        }
+                                        // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
+                                        if (cacheMateList.isEmpty()) {
+                                            Log.d(TAG_2, " before 5, bugs here ");
+                                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+
+                                        } else {
+                                            Log.d(TAG_2, " 5. we have get all the data ");
+                                            mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
+                                            mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                                        }
+                                    }
+                                }
 
                             } else
                             {
-                                Log.d(TAG_2, " 5. we have get all the data ");
-                                mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
+                                Log.d(TAG_2, " 5.1 bug report 1 ");
+                                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                                 mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                             }
-                        } else
+                        } else if (code == HttpConstants.ResponseCode.TIME_OUT)
                         {
-                            Log.d(TAG_2, " 5.1 bug report 1 ");
+                            Log.d(TAG_2, "5.2 bug report 2 ");
+                            mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                            mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                        } else if (code == HttpConstants.ResponseCode.NO_RESULT)
+                        {
+                            Log.d(TAG_2, "5.3 bug report 3 ");
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                             mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                        } else
+                        {
+                            Log.d(TAG_2, "5.4 bug report 4 ");
+                            String errorStr = response.getString("msg");
+                            Log.d(TAG, " inside the initial mate data request method, and the error info we get are : " + errorStr);
+                            Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                            Bundle data = new Bundle();
+                            if (! TextUtils.isEmpty(errorStr))
+                            {
+                                data.putString(KEY_REQUEST_ERROR_MSG, errorStr);
+                            }
+                            errorMsg.setData(data);
+                            mUIEventsHandler.sendMessage(errorMsg);
                         }
-                    } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
-                    {
-                        Log.d(TAG_2, "5.2 bug report 2 ");
-                        mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-                        mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
-                    } else if (statusCode == HttpConstants.ResponseCode.NO_RESULT)
-                    {
-                        Log.d(TAG_2, "5.3 bug report 3 ");
-                        mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                        mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                     } else
                     {
-                        Log.d(TAG_2, "5.4 bug report 4 ");
-                        String errorStr = initialObj.getString("msg");
-                        Log.d(TAG, " inside the initial mate data request method, and the error info we get are : " + errorStr);
-                        Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
-                        Bundle data = new Bundle();
-                        if (! TextUtils.isEmpty(errorStr))
-                        {
-                            data.putString(KEY_REQUEST_ERROR_MSG, errorStr);
-                        }
-                        errorMsg.setData(data);
-                        mUIEventsHandler.sendMessage(errorMsg);
+                        Log.d(TAG_2, " bug report 5 ");
+                        mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                        mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                     }
-                } else
+                } catch (JSONException e)
                 {
-                    Log.d(TAG_2, " bug report 5 ");
+                    Log.d(TAG_2, " bug report 6, exception happened in parsing json , reason are : " + e.toString());
+                    // 一旦异常发生，我们应该停止数据的加载工作了，而不是继续的加载
+                    e.printStackTrace();
+                    Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
                     mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                     mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                 }
-            } catch (JSONException e)
-            {
-                Log.d(TAG_2, " bug report 6, exception happened in parsing json , reason are : " + e.toString());
-                // 一旦异常发生，我们应该停止数据的加载工作了，而不是继续的加载
-                e.printStackTrace();
-                Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
-                mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-                mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
             }
-        }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+        });
+
     }
 
     private static final String KEY_REQUEST_ERROR_MSG = "keyRequestErrorMsg";
@@ -432,6 +447,10 @@ public class BilliardsNearbyMateFragment extends Fragment
         public void handleMessage(Message msg)
         {
 
+            if(mSubFragmentListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mSubFragmentListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
+            
             if (mSubFragmentListView.isRefreshing())
             {
                 mSubFragmentListView.onRefreshComplete();
@@ -469,19 +488,25 @@ public class BilliardsNearbyMateFragment extends Fragment
                     {
                         if (!mUserList.contains(mateBean))
                         {
-                            if (mRefresh && !mIsListEmpty)
-                            {
-                                mUserList.add(0, mateBean);
-                            } else
-                            {
-                                if (mIsSavedInstance)
-                                {
-                                    mUserList.add(0, mateBean);
-                                } else
-                                {
-                                    mUserList.add(mateBean);
-                                }
+                            if(!mIsListEmpty && Integer.valueOf(mUserList.get(0).getUserId()) < Integer.valueOf(mateBean.getUserId())){
+                                mUserList.add(0,mateBean);
+                            }else {
+                                mUserList.add(mateBean);
                             }
+
+//                            if (mRefresh && !mIsListEmpty)
+//                            {
+//                                mUserList.add(0, mateBean);
+//                            } else
+//                            {
+//                                if (mIsSavedInstance)
+//                                {
+//                                    mUserList.add(0, mateBean);
+//                                } else
+//                                {
+//                                    mUserList.add(mateBean);
+//                                }
+//                            }
                         }
                         // TODO: ------------------------UNCOMMENT LATER------------------------------------------
 //                        if (!mDBList.isEmpty())
@@ -887,7 +912,13 @@ public class BilliardsNearbyMateFragment extends Fragment
                     // 跟分析球厅RoomFragment当中请求最新数据的原理一样，当用户进行下拉刷新
                     // 的时候，一定是再要求最新的数据，那么我们一定是要从第0条开始加载，一次加载10条，
                     // 即从0到9
-                    mWorker.fetchAllData(0, 9);
+                    mUIEventsHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mWorker.fetchAllData(0, 9);
+                        }
+                    },300);
+
                 }
             } else
             {
@@ -934,7 +965,13 @@ public class BilliardsNearbyMateFragment extends Fragment
                 // 会接受筛选的参数，然后直接根据加载的开始条数和结束条数就可以了
                 if (null != mWorker)
                 {
-                    mWorker.fetchAllData(mStartNum, mEndNum);
+                    mUIEventsHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mWorker.fetchAllData(mStartNum, mEndNum);
+                        }
+                    },300);
+
                 }
             } else
             {

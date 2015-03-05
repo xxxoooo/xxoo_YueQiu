@@ -14,6 +14,8 @@ public class PublicConstant {
     public static final String SLIDE_PUBLISH_ACTION = "com.yueqiu.slide.publish.update";
     public static final String SLIDE_ACCOUNT_ACTION = "com.yueqiu.slide.account.update";
 
+    public static final String IMG_URL = "img_url";
+
 
     public static final int GET_SUCCESS   = 0;
     public static final int NO_RESULT     = -1;
@@ -58,6 +60,15 @@ public class PublicConstant {
     public static final int JOIN_TYPE_PLAY          = 2;
     public static final int JOIN_TYPE_DATE          = 1;
 
+    public static final int UPGRADE_ASSITANT        = 2;
+    public static final int UPGRADE_COACH           = 3;
+
+    public static final int LOVELY_TYPE             = 1;
+    public static final int MATURE_TYPE             = 2;
+    public static final int GODNESS_TYPE            = 3;
+    public static final int CHARMING_TYPE           = 4;
+    public static final int STRENGTH_TYPE           = 5;
+    public static final int HANDSOME_TYPE           = 6;
 
 
 }

@@ -24,6 +24,7 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.PublishedDao;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -93,6 +94,15 @@ public class PublishedFragment extends SlideMenuBasicFragment implements Adapter
 //
 //        }
         
+
+
+        mListView.setOnItemClickListener(this);
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
@@ -101,9 +111,6 @@ public class PublishedFragment extends SlideMenuBasicFragment implements Adapter
             mHandler.obtainMessage(PublicConstant.NO_NETWORK).sendToTarget();
 
         }
-
-        mListView.setOnItemClickListener(this);
-        return view;
     }
 
     protected void setEmptyViewText(){
@@ -123,37 +130,43 @@ public class PublishedFragment extends SlideMenuBasicFragment implements Adapter
 
     @Override
     protected void requestResult() {
+
+        mPreProgress.setVisibility(View.VISIBLE);
+        mPreText.setVisibility(View.VISIBLE);
+
         mParamsMap.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
         mParamsMap.put(HttpConstants.Published.TYPE,mType);
         mParamsMap.put(HttpConstants.Published.START_NO,mStart_no);
         mParamsMap.put(HttpConstants.Published.END_NO, mEnd_no);
 
-        mUrlAndMethodMap.put(PublicConstant.URL, HttpConstants.Published.URL);
-        mUrlAndMethodMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.GET);
+        HttpUtil.requestHttp(HttpConstants.Published.URL,mParamsMap,HttpConstants.RequestMethod.GET,new ResponseHandler<PublishedInfo>());
 
-        new RequestAsyncTask<PublishedInfo>(mParamsMap).execute(mUrlAndMethodMap);
     }
 
     @Override
     protected List<PublishedInfo> setBeanByJSON(JSONObject jsonResult) {
         List<PublishedInfo> list = new ArrayList<PublishedInfo>();
         try {
-            JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
-            if(list_data.length() < 1){
+            if(jsonResult.getJSONObject("result").get("list_data").equals("null")){
                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
             }else {
-                for (int i = 0; i < list_data.length(); i++) {
-                    PublishedInfo itemInfo = new PublishedInfo();
-                    itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
-                    itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
-                    itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
-                    itemInfo.setDateTime(list_data.getJSONObject(i).getString("create_time"));
-                    itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type_id")));
-                    //TODO:根据服务器确定的字段,如果需要缓存应该再加一个字段subtype,代表这条数据是type中的那个子类型
-                    //TODO:不过目前服务器那边说不传，不做缓存的话，倒是用不到这个字段
-                    //itemInfo.setSubType(list_data.getJSONObject(i).getInt("subtype"));
-                    itemInfo.setChecked(false);
-                    list.add(itemInfo);
+                JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
+                if (list_data.length() < 1) {
+                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                } else {
+                    for (int i = 0; i < list_data.length(); i++) {
+                        PublishedInfo itemInfo = new PublishedInfo();
+                        itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
+                        itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
+                        itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
+                        itemInfo.setDateTime(list_data.getJSONObject(i).getString("create_time"));
+                        itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type_id")));
+                        //TODO:根据服务器确定的字段,如果需要缓存应该再加一个字段subtype,代表这条数据是type中的那个子类型
+                        //TODO:不过目前服务器那边说不传，不做缓存的话，倒是用不到这个字段
+                        //itemInfo.setSubType(list_data.getJSONObject(i).getInt("subtype"));
+                        itemInfo.setChecked(false);
+                        list.add(itemInfo);
+                    }
                 }
             }
         } catch (JSONException e) {
@@ -236,14 +249,10 @@ public class PublishedFragment extends SlideMenuBasicFragment implements Adapter
                     List<PublishedInfo> list = (List<PublishedInfo>) msg.obj;
                     for(PublishedInfo info : list){
                         if (!mList.contains(info)) {
-                            if(mRefresh && !mIsListEmpty) {
+                            if(!mIsListEmpty && Integer.valueOf(((PublishedInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
                                 mList.add(0,info);
-                            }else{
-                                if(mIsSavedInstance){
-                                    mList.add(0,info);
-                                }else{
-                                    mList.add(info);
-                                }
+                            }else {
+                                mList.add(info);
                             }
                         }
                         //////////////////////////////////////////////////

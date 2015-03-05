@@ -24,6 +24,7 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.adapter.PlayListViewAdapter;
 import com.yueqiu.bean.PlayInfo;
@@ -33,11 +34,13 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.PlayDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -143,10 +146,50 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         mParamMap.put(HttpConstants.Play.START_NO,mStart);
         mParamMap.put(HttpConstants.Play.END_NO,mEnd);
 
-        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Play.GETLISTEE);
-        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.GET);
+        mPreProgressBar.setVisibility(View.VISIBLE);
+        mPreTextView.setVisibility(View.VISIBLE);
 
-        new RequestPlayTask(mParamMap).execute(mUrlAndMethodMap);
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
+
+        HttpUtil.requestHttp(HttpConstants.Play.GETLISTEE,mParamMap,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                try{
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            if(response.getString("result") != null){
+                                List<PlayInfo> list = setPlayByJSON(response);
+                                if(list.isEmpty()){
+                                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                }else{
+                                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list).sendToTarget();
+                                }
+                            }else{
+                                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            }
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                            mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                        }
+                    }else{
+                        mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            }
+        });
+
     }
 
 
@@ -162,52 +205,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         startActivity(intent);
     }
 
-    private class RequestPlayTask extends AsyncTaskUtil<Integer>{
 
-        public RequestPlayTask(Map<String, Integer> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgressBar.setVisibility(View.VISIBLE);
-            mPreTextView.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            mPreProgressBar.setVisibility(View.GONE);
-            mPreTextView.setVisibility(View.GONE);
-            try{
-                if(!jsonObject.isNull("code")){
-                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                        if(jsonObject.getString("result") != null){
-                            List<PlayInfo> list = setPlayByJSON(jsonObject);
-                            if(list.isEmpty()){
-                                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                            }else{
-                                mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list).sendToTarget();
-                            }
-                        }else{
-                            mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                        }
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
-                        mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
-                        mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                    }else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
-                    }
-                }else{
-                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-                }
-            }catch (JSONException e){
-                e.printStackTrace();
-            }
-        }
-    }
 
     private List<PlayInfo> setPlayByJSON(JSONObject object){
         List<PlayInfo> list = new ArrayList<PlayInfo>();
@@ -232,6 +230,11 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgressBar.setVisibility(View.GONE);
+            mPreTextView.setVisibility(View.GONE);
+            if(mPullToRefreshListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
             if(mPullToRefreshListView.isRefreshing())
                 mPullToRefreshListView.onRefreshComplete();
             switch (msg.what){

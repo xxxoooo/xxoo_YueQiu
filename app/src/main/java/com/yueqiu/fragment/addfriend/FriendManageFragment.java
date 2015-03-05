@@ -5,9 +5,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.FriendSetGroupActivity;
@@ -30,8 +34,10 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.ApplicationDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,10 +60,11 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
     private int mLabel;//标签:1师傅2徒弟3高手4菜鸟
     private static final int REQUEST_CODE = 0;
     private String mFriendUserId;//处理好友申请时该字段为申请id;发送好友验证下一步时该字段为ask_id被请求添加的好友id
+    private String mFriendUsername;
     private View mMasterIndicator, mStudentIndicator, mExpertIndicator, mBeginnerIndicator,
             mMaster, mStudent, mExpert, mBeginner;
 
-    private ApplicationDao mApplicationDao;
+//    private ApplicationDao mApplicationDao;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,8 +75,9 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
         mFragmentManager = getActivity().getSupportFragmentManager();
         whoCreate = getArguments().getInt(VerificationFragment.ARGUMENTS_KEY);
         mFriendUserId = getArguments().getString(FriendProfileFragment.FRIEND_USER_ID);
-        if (whoCreate == 0)
-            mApplicationDao = DaoFactory.getApplication(getActivity());
+        mFriendUsername = getArguments().getString(FriendProfileFragment.USER_NAME_KEY);
+//        if (whoCreate == 0)
+//            mApplicationDao = DaoFactory.getApplication(getActivity());
     }
 
     @Override
@@ -83,21 +91,21 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
         View view = inflater.inflate(R.layout.fragment_manage_friend, container, false);
         initView(view);
 
-        mEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                Log.d(TAG, "s = " + s);
-                mComment = s.toString();
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
+//        mEditText.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                Log.d(TAG, "s = " + s);
+//                mComment = s.toString();
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//            }
+//        });
         view.findViewById(R.id.friend_manage_set_group).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,11 +178,11 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
                 return true;
             case R.id.qiuyou_manage_finish:
                 //TODO:
-                mApplicationDao.updateFriendsApplication(mFriendUserId, 1);
-                mFragmentManager.beginTransaction()
-                        .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
-                        .replace(R.id.fragment_container, new FriendsApplicationFragment())
-                        .commit();
+//                mApplicationDao.updateFriendsApplication(mFriendUserId, 1);
+//                mFragmentManager.beginTransaction()
+//                        .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
+//                        .replace(R.id.fragment_container, new FriendsApplicationFragment())
+//                        .commit();
                 //处理好友请求
                 handleRequest();
                 Utils.dismissInputMethod(getActivity(), mEditText);
@@ -217,20 +225,54 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
      * post请求
      */
     private void handleRequest() {
+
+        mComment = mEditText.getText().toString();
+        if(TextUtils.isEmpty(mComment)){
+            Utils.showToast(getActivity(),getString(R.string.please_write_comment));
+            return;
+        }
+
+        if(mLabel == 0){
+            Utils.showToast(getActivity(),getString(R.string.please_select_group));
+            return;
+        }
+
         Map<String, String> requestMap = new HashMap<String, String>();
         requestMap.put(HttpConstants.AskManage.ASK_ID, mFriendUserId);
         requestMap.put(HttpConstants.AskManage.GROUP_ID, String.valueOf(mGroupId + 1));
         requestMap.put(HttpConstants.AskManage.REMARK, mComment);
         requestMap.put(HttpConstants.AskManage.TAG, String.valueOf(mLabel));
 
-        Map<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put(PublicConstant.URL, HttpConstants.AskManage.URL);
-        paramMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.POST);
-        if (Utils.networkAvaiable(getActivity())) {
-            new FriendManageAsyncTask(requestMap, null, null).execute(paramMap);
-        } else {
+        if(Utils.networkAvaiable(getActivity())) {
+            HttpUtil.requestHttp(HttpConstants.AskManage.URL, requestMap, HttpConstants.RequestMethod.POST, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    Log.d("wy","friends manager response ->" + response);
+                    try{
+                        if(!response.isNull("code")){
+                            if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                                mHandler.sendEmptyMessage(PublicConstant.GET_SUCCESS);
+                            }else{
+                                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                            }
+                        }else{
+                            mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                        }
+                    }catch(JSONException e){
+                        e.printStackTrace();
+                    }
+                }
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    super.onFailure(statusCode, headers, responseString, throwable);
+                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                }
+            });
+        }else{
             Toast.makeText(getActivity(), getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
         }
+
     }
 
     @Override
@@ -297,4 +339,31 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
             }
         }
     }
+
+    private Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch(msg.what){
+                case PublicConstant.GET_SUCCESS:
+                    Utils.showToast(getActivity(),getString(R.string.you_are_friends));
+                    FriendsApplicationFragment applicationFragment = new FriendsApplicationFragment();
+                    Bundle args = new Bundle();
+                    args.putString(FriendProfileFragment.USER_NAME_KEY,mFriendUsername);
+                    applicationFragment.setArguments(args);
+                    mFragmentManager.beginTransaction()
+                        .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
+                        .replace(R.id.fragment_container, applicationFragment)
+                        .commit();
+                    break;
+                case PublicConstant.REQUEST_ERROR:
+                    if (null == msg.obj) {
+                        Utils.showToast(getActivity(), getString(R.string.http_request_error));
+                    } else {
+                        Utils.showToast(getActivity(), (String) msg.obj);
+                    }
+                    break;
+            }
+        }
+    };
 }

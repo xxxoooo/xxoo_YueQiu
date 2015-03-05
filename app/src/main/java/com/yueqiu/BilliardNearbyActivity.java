@@ -36,6 +36,7 @@ import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeStatusCode;
 import com.gotye.api.GotyeUser;
 import com.gotye.api.listener.LoginListener;
+import com.yueqiu.activity.DateIssueActivity;
 import com.yueqiu.activity.FavorActivity;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.activity.PlayIssueActivity;
@@ -467,6 +468,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private void initDrawer() {
 
         //mItemList.clear();
+        Log.d("wy","YueQiu img_url ->" + YueQiuApp.sUserInfo.getImg_url());
         SlideAccountItemISlide accountItem = new SlideAccountItemISlide(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
                 100, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(accountItem);
@@ -476,7 +478,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                 getString(R.string.search_my_participation_str),
                 getString(R.string.search_my_favor_collection_str),
                 getString(R.string.search_my_published_info_str),
-                getString(R.string.search_publishing_dating_billiards_info_str),
+                getString(R.string.issue_date),
                 getString(R.string.search_feed_back_str),
                 getString(R.string.search_logout_str)
         };
@@ -585,7 +587,8 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                         break;
                     case 5:
                         if (checkUserId()) {
-                            intent.setClass(BilliardNearbyActivity.this, PlayIssueActivity.class);
+                            //TODO:不是PlayIssueActivity
+                            intent.setClass(BilliardNearbyActivity.this, DateIssueActivity.class);
                             startActivity(intent);
                             overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
                         } else {
@@ -669,9 +672,20 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         YueQiuApp.sUserInfo.setPhone("");
 
         mEditor.putString(DatabaseConstant.UserTable.USERNAME, getString(R.string.guest));
+        mEditor.putString(DatabaseConstant.UserTable.IMG_URL,"");
+        mEditor.putInt(DatabaseConstant.UserTable.SEX,-1);
         mEditor.putString(DatabaseConstant.UserTable.USER_ID, "0");
         mEditor.putString(DatabaseConstant.UserTable.IMG_URL, "");
+        mEditor.putString(DatabaseConstant.UserTable.NICK,"");
         mEditor.putString(DatabaseConstant.UserTable.PHONE, "");
+        mEditor.putString(DatabaseConstant.UserTable.DISTRICT,"");
+        mEditor.putInt(DatabaseConstant.UserTable.LEVEL,-1);
+        mEditor.putInt(DatabaseConstant.UserTable.BALL_TYPE,-1);
+        mEditor.putInt(DatabaseConstant.UserTable.BALLARM,-1);
+        mEditor.putInt(DatabaseConstant.UserTable.USERDTYPE,-1);
+        mEditor.putString(DatabaseConstant.UserTable.BALLAGE,"");
+        mEditor.putString(DatabaseConstant.UserTable.IDOL,"");
+        mEditor.putString(DatabaseConstant.UserTable.IDOL_NAME,"");
         mEditor.apply();
 
 

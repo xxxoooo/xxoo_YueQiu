@@ -4,6 +4,9 @@ package com.yueqiu.bean;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by wangyun on 14/12/30.
  */
@@ -24,6 +27,9 @@ public class GroupNoteInfo implements Parcelable{
 //    private String snippet;//内容的片段摘要
 //    private String attachMent;//附件流
     private String img_url;
+    private String extra_img_url;
+
+    public List<UserInfo> mCommentList = new ArrayList<UserInfo>();
 
     public int getType() {
         return type;
@@ -115,7 +121,15 @@ public class GroupNoteInfo implements Parcelable{
             this.commentCount = commentCount;
         }
 
-//    public String getSnippet() {
+    public String getExtra_img_url() {
+        return extra_img_url;
+    }
+
+    public void setExtra_img_url(String extra_img_url) {
+        this.extra_img_url = extra_img_url;
+    }
+
+    //    public String getSnippet() {
 //            return snippet;
 //        }
 //
@@ -151,6 +165,7 @@ public class GroupNoteInfo implements Parcelable{
         loveNums = in.readInt();
         commentCount = in.readInt();
         img_url = in.readString();
+        extra_img_url = in.readString();
     }
 
     public GroupNoteInfo() {
@@ -209,6 +224,7 @@ public class GroupNoteInfo implements Parcelable{
         dest.writeInt(loveNums);
         dest.writeInt(commentCount);
         dest.writeString(img_url);
+        dest.writeString(extra_img_url);
     }
     public static final Creator<GroupNoteInfo> CREATOR = new Creator<GroupNoteInfo>() {
         @Override

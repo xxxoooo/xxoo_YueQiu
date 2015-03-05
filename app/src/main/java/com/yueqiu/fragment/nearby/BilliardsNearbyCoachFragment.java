@@ -24,6 +24,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.adapter.NearbyCoauchSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyCoauchSubFragmentCoauchBean;
@@ -38,6 +39,7 @@ import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -251,106 +253,108 @@ public class BilliardsNearbyCoachFragment extends Fragment
         requestParams.put("start_no", startNo + "");
         requestParams.put("end_no", endNo + "");
 
-        List<NearbyCoauchSubFragmentCoauchBean> cacheCoauchList = new ArrayList<NearbyCoauchSubFragmentCoauchBean>();
+        final List<NearbyCoauchSubFragmentCoauchBean> cacheCoauchList = new ArrayList<NearbyCoauchSubFragmentCoauchBean>();
 
-        String rawResult = HttpUtil.urlClient(HttpConstants.NearbyCoauch.URL, requestParams, HttpConstants.RequestMethod.GET);
-        Log.d(TAG, " the raw result we get for the Coauch are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult))
-        {
-            try
-            {
-                JSONObject initialResultJson = new JSONObject(rawResult);
-                if (! initialResultJson.isNull("code"))
+        mCoauchListView.setMode(PullToRefreshBase.Mode.DISABLED);
+        
+        HttpUtil.requestHttp(HttpConstants.NearbyCoauch.URL, requestParams, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","coach response ->" + response);
+                try
                 {
-                    final int status = initialResultJson.getInt("code");
-                    if (status == HttpConstants.ResponseCode.NORMAL)
+                    if (! response.isNull("code"))
                     {
-                        JSONObject resultJsonObj = initialResultJson.getJSONObject("result");
-                        if (null != resultJsonObj)
+                        final int status = response.getInt("code");
+                        if (status == HttpConstants.ResponseCode.NORMAL)
                         {
-                            JSONArray dataArr = resultJsonObj.getJSONArray("list_data");
-                            final int len = dataArr.length();
-                            int i;
-                            for (i = 0; i < len; ++i)
+                            JSONObject resultJsonObj = response.getJSONObject("result");
+                            if (null != resultJsonObj)
                             {
-                                JSONObject dataUnit = dataArr.getJSONObject(i);
+                                if(resultJsonObj.get("list_data").equals("null")){
+                                    mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                }else {
+                                    JSONArray dataArr = resultJsonObj.getJSONArray("list_data");
+                                    if(dataArr.length() < 1){
+                                        mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                    }else {
+                                        final int len = dataArr.length();
+                                        for (int i = 0; i < len; ++i) {
+                                            JSONObject dataUnit = dataArr.getJSONObject(i);
 
-                                // TODO: 部分字段的值还需要进一步的确认
-                                String userId = dataUnit.getString("user_id");
-                                String photoUrl = dataUnit.getString("img_url");
-                                String userName = dataUnit.getString("username");
-                                // TODO: 这里需要注意的是我们得到的关于资质的字段值是一个数字，我们还需要进一步同服务器端确定以下这几个数字分别代表的具体的含义
-                                String level = dataUnit.getString("zizhi");
-                                String sex = dataUnit.getString("sex");
-                                String kinds = dataUnit.getString("class");
-                                String district = dataUnit.getString("district");
-                                long range = dataUnit.getLong("range");
+                                            // TODO: 部分字段的值还需要进一步的确认
+                                            String userId = dataUnit.getString("user_id");
+                                            String photoUrl = dataUnit.getString("img_url");
+                                            String userName = dataUnit.getString("username");
+                                            // TODO: 这里需要注意的是我们得到的关于资质的字段值是一个数字，我们还需要进一步同服务器端确定以下这几个数字分别代表的具体的含义
+                                            String level = dataUnit.getString("zizhi");
+                                            String sex = dataUnit.getString("sex");
+                                            String kinds = dataUnit.getString("class");
+                                            String district = dataUnit.getString("district");
+                                            long range = dataUnit.getLong("range");
 
-                                NearbyCoauchSubFragmentCoauchBean coauchBean = new NearbyCoauchSubFragmentCoauchBean(
-                                        userId,
-                                        photoUrl,
-                                        userName,
-                                        NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex),
-                                        String.valueOf(range),
-                                        NearbyFragmentsCommonUtils.parseCoauchLevel(mContext, level),
-                                        NearbyFragmentsCommonUtils.parseBilliardsKinds(mContext, kinds));
+                                            NearbyCoauchSubFragmentCoauchBean coauchBean = new NearbyCoauchSubFragmentCoauchBean(
+                                                    userId,
+                                                    photoUrl,
+                                                    userName,
+                                                    NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex),
+                                                    String.valueOf(range),
+                                                    NearbyFragmentsCommonUtils.parseCoauchLevel(mContext, level),
+                                                    NearbyFragmentsCommonUtils.parseBilliardsKinds(mContext, kinds));
 
-                                cacheCoauchList.add(coauchBean);
-                            }
+                                            cacheCoauchList.clear();
+                                            cacheCoauchList.add(coauchBean);
+                                        }
 
-                            if (cacheCoauchList.isEmpty())
-                            {
-                                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                        if (cacheCoauchList.isEmpty()) {
+                                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                        } else {
+                                            mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheCoauchList).sendToTarget();
+                                        }
+                                    }
+                                }
                             } else
                             {
-                                mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheCoauchList).sendToTarget();
-//                                mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
+                                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                             }
-
+                        } else if (status == HttpConstants.ResponseCode.TIME_OUT)
+                        {
+                            mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                        } else if (status == HttpConstants.ResponseCode.NO_RESULT)
+                        {
+                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                         } else
                         {
-//                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
-                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                            Bundle errorData = new Bundle();
+                            String errorStr = response.getString("msg");
+                            Log.d(TAG, "inside the couach list, and the error info we get are : " + errorStr);
+                            if (! TextUtils.isEmpty(errorStr))
+                            {
+                                errorData.putString(KEY_REQUEST_ERROR_MSG, errorStr);
+                            }
+                            errorMsg.setData(errorData);
+                            mUIEventsHandler.sendMessage(errorMsg);
                         }
-                    } else if (status == HttpConstants.ResponseCode.TIME_OUT)
-                    {
-                        mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-//                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
-                    } else if (status == HttpConstants.ResponseCode.NO_RESULT)
-                    {
-                        mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-//                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
                     } else
                     {
-                        Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
-                        Bundle errorData = new Bundle();
-                        String errorStr = initialResultJson.getString("msg");
-                        Log.d(TAG, "inside the couach list, and the error info we get are : " + errorStr);
-                        if (! TextUtils.isEmpty(errorStr))
-                        {
-                            errorData.putString(KEY_REQUEST_ERROR_MSG, errorStr);
-                        }
-                        errorMsg.setData(errorData);
-                        mUIEventsHandler.sendMessage(errorMsg);
-//                        mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
+                        mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                     }
-                } else
+                } catch (JSONException e)
                 {
+                    e.printStackTrace();
                     mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-//                    mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
+                    Log.d(TAG, " exception happened while we parsing the json object we retrieved, and the reason are : " + e.toString());
                 }
-            } catch (JSONException e)
-            {
-                e.printStackTrace();
-                mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-//                mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
-                Log.d(TAG, " exception happened while we parsing the json object we retrieved, and the reason are : " + e.toString());
             }
-        } else
-        {
-            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-//            mUIEventsHandler.sendEmptyMessage(UI_HIDE_PROGRESS);
-        }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            }
+        });
     }
 
     private static final String KEY_REQUEST_ERROR_MSG = "requestErrorMsg";
@@ -379,6 +383,9 @@ public class BilliardsNearbyCoachFragment extends Fragment
         @Override
         public void handleMessage(Message msg)
         {
+            if(mCoauchListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mCoauchListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
             if (mCoauchListView.isRefreshing())
             {
                 mCoauchListView.onRefreshComplete();
@@ -429,22 +436,16 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     mBeforeCount = mCoauchList.size();
                     mIsListEmpty = mCoauchList.isEmpty();
                     List<NearbyCoauchSubFragmentCoauchBean> coauchList = (ArrayList<NearbyCoauchSubFragmentCoauchBean>) msg.obj;
-                    for (NearbyCoauchSubFragmentCoauchBean bean : coauchList)
+                    Log.d("wy","coach list size ->" + coauchList.size());
+                    for (int i=0;i<coauchList.size();i++)
                     {
+                        NearbyCoauchSubFragmentCoauchBean bean = coauchList.get(i);
                         if (! mCoauchList.contains(bean))
                         {
-                            if (mRefresh && !mIsListEmpty)
-                            {
-                                mCoauchList.add(0, bean);
-                            } else
-                            {
-                                if (mIsSavedInstance)
-                                {
-                                    mCoauchList.add(0, bean);
-                                } else
-                                {
-                                    mCoauchList.add(bean);
-                                }
+                            if(!mIsListEmpty && Integer.valueOf(coauchList.get(0).getId()) < Integer.valueOf(bean.getId())){
+                                coauchList.add(0,bean);
+                            }else {
+                                coauchList.add(bean);
                             }
                         }
                     }
@@ -697,7 +698,13 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 if (null != mWorker)
                 {
                     // 每一次的下拉刷新我们都是要从0开始请求最新的数据
-                    mWorker.fetchAllData(0, 9);
+                    mUIEventsHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mWorker.fetchAllData(0, 9);
+                        }
+                    },300);
+
                 }
             } else
             {
@@ -727,7 +734,13 @@ public class BilliardsNearbyCoachFragment extends Fragment
             {
                 if (null != mWorker)
                 {
-                    mWorker.fetchAllData(mStartNum, mEndNum);
+                    mUIEventsHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mWorker.fetchAllData(mStartNum, mEndNum);
+                        }
+                    },300);
+
                 }
 
             } else

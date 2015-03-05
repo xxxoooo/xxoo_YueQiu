@@ -21,6 +21,7 @@ import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 
 import org.json.JSONArray;
@@ -64,6 +65,15 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
             mHandler.obtainMessage(PublicConstant.USE_CACHE,mCacheList).sendToTarget();
         }
 
+
+
+        mListView.setOnItemClickListener(this);
+        return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
@@ -72,9 +82,6 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
             mHandler.obtainMessage(PublicConstant.NO_NETWORK).sendToTarget();
 
         }
-
-        mListView.setOnItemClickListener(this);
-        return view;
     }
 
     private BasicHandler mHandler = new BasicHandler(){
@@ -96,14 +103,10 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
                     List<PartInInfo> list = (List<PartInInfo>) msg.obj;
                     for(PartInInfo info : list){
                         if(!mList.contains(info)){
-                            if(mRefresh && !mIsListEmpty){
+                            if(!mIsListEmpty && Integer.valueOf(((PartInInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
                                 mList.add(0,info);
-                            }else{
-                                if(mIsSavedInstance ){
-                                    mList.add(0,info);
-                                }else{
-                                    mList.add(info);
-                                }
+                            }else {
+                                mList.add(info);
                             }
                         }
                     }
@@ -157,39 +160,44 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
 
     @Override
     protected void requestResult() {
+
+        mPreProgress.setVisibility(View.VISIBLE);
+        mPreText.setVisibility(View.VISIBLE);
+
         mParamsMap.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
         mParamsMap.put(HttpConstants.Published.TYPE,mType);
         mParamsMap.put(HttpConstants.Published.START_NO,mStart_no);
         mParamsMap.put(HttpConstants.Published.END_NO, mEnd_no);
 
-        mUrlAndMethodMap.put(PublicConstant.URL, HttpConstants.PartIn.URL);
-        mUrlAndMethodMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.GET);
-
-        new RequestAsyncTask<PublishedInfo>(mParamsMap).execute(mUrlAndMethodMap);
+        HttpUtil.requestHttp(HttpConstants.PartIn.URL,mParamsMap,HttpConstants.RequestMethod.GET,new ResponseHandler<PartInInfo>());
     }
 
     @Override
     protected List<PartInInfo> setBeanByJSON(JSONObject jsonResult) {
         List<PartInInfo> list = new ArrayList<PartInInfo>();
         try {
-            JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
-            if(list_data.length() < 1){
+            if(jsonResult.getJSONObject("result").get("list_data").equals("null")){
                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
             }else {
-                for (int i = 0; i < list_data.length(); i++) {
-                    PartInInfo itemInfo = new PartInInfo();
-                    itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
-                    itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
-                    itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
-                    itemInfo.setDateTime(list_data.getJSONObject(i).getString("create_time"));
-                    itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                    itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type")));
-                    itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
-                    //TODO:根据服务器确定的字段,如果需要缓存应该再加一个字段subtype,代表这条数据是type中的那个子类型
-                    //TODO:不过目前服务器那边说不传，不做缓存的话，倒是用不到这个字段
-                    //itemInfo.setSubType(list_data.getJSONObject(i).getInt("subtype"));
-                    itemInfo.setChecked(false);
-                    list.add(itemInfo);
+                JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
+                if (list_data.length() < 1) {
+                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                } else {
+                    for (int i = 0; i < list_data.length(); i++) {
+                        PartInInfo itemInfo = new PartInInfo();
+                        itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
+                        itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
+                        itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
+                        itemInfo.setDateTime(list_data.getJSONObject(i).getString("create_time"));
+                        itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
+                        itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type")));
+                        itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
+                        //TODO:根据服务器确定的字段,如果需要缓存应该再加一个字段subtype,代表这条数据是type中的那个子类型
+                        //TODO:不过目前服务器那边说不传，不做缓存的话，倒是用不到这个字段
+                        //itemInfo.setSubType(list_data.getJSONObject(i).getInt("subtype"));
+                        itemInfo.setChecked(false);
+                        list.add(itemInfo);
+                    }
                 }
             }
         } catch (JSONException e) {
