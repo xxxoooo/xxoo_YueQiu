@@ -831,7 +831,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                     mIsDisplayEmoji = false;
                 } else if (mIsDisplayPlugin) {
                     mExtension.setVisibility(View.GONE);
-                    mIsDisplayInputMethod = false;
+                    mIsDisplayPlugin = false;
                 } else {
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
