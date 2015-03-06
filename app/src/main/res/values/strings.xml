@@ -198,6 +198,11 @@
 
     <string name="renren_share_content">来自约球的用户的信息分享</string>
 
+    <string name="renren_need_to_install_first">您需要先安装人人客户端才能完成分享</string>
+    <string name="renren_share_success">成功分享到人人</string>
+    <string name="renren_share_failed">分享到人人失败</string>
+    <string name="renren_share_cancelld">您取消了将信息分享到人人</string>
+
     <!-- 球厅Activity当中的一些关键字段 -->
     <string name="search_room_detailedactivity_detailed_info_separator">详细信息</string>
     <string name="search_room_detailedactivity_price_indi">人均:</string>
