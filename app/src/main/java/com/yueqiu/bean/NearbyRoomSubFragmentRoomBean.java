@@ -32,9 +32,15 @@ public class NearbyRoomSubFragmentRoomBean implements Parcelable
     private String mRoomInfo;
     private String mShopHours;
 
+    // 用于展示球厅详情的url,我们需要通过这个url来加载一个WebView
+    private String mRoomDetailePageUrl;
+
     public NearbyRoomSubFragmentRoomBean(){}
 
-    public NearbyRoomSubFragmentRoomBean(String roomId, String roomPhoto, String roomName, float level, double price, String address, String distance, String roomPhone, String roomTag, String roomInfo, String shopHours)
+    public NearbyRoomSubFragmentRoomBean(String roomId, String roomPhoto, String roomName,
+                                         float level, double price, String address, String distance,
+                                         String roomPhone, String roomTag, String roomInfo,
+                                         String shopHours, String roomDetailPageUrl)
     {
         this.mRoomId = roomId;
         this.mDetailedAddress = address;
@@ -47,7 +53,33 @@ public class NearbyRoomSubFragmentRoomBean implements Parcelable
         this.mRoomTag = roomTag;
         this.mRoomInfo = roomInfo;
         this.mShopHours = shopHours;
+        this.mRoomDetailePageUrl = roomDetailPageUrl;
+    }
 
+    /**
+     * 这个构造方法用于商家推荐的球厅信息的点击反馈事件，可以看到比上面的那个构造方法少了一个参数，即少了用于
+     * 展示球厅详情的WebView的url
+     *
+     */
+    public NearbyRoomSubFragmentRoomBean(String roomId, String roomPhoto, String roomName,
+                                         float level, double price, String address, String distance,
+                                         String roomPhone, String roomTag, String roomInfo,
+                                         String shopHours)
+    {
+        new NearbyRoomSubFragmentRoomBean(roomId, roomPhoto, roomName,
+            level, price, address, distance,
+            roomPhone, roomTag, roomInfo,
+            shopHours, "");
+    }
+
+    public String getRoomDetailPageUrl()
+    {
+        return this.mRoomDetailePageUrl;
+    }
+
+    public void setRoomDetailPageUrl(String url)
+    {
+        this.mRoomDetailePageUrl = url;
     }
 
 

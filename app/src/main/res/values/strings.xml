@@ -36,7 +36,6 @@
     <string name="select_photo_from_album">选择相册图片</string>
     <string name="delete_this_photo">删除图片</string>
 
-
     <!-- 登录注册 -->
     <string name="login_without_phone_or_account">请输入手机号或账号</string>
     <string name="login_without_pasword">请输入密码</string>
@@ -189,6 +188,15 @@
     <string name="search_room_popupwindow_region_shijingshan">石景山区</string>
     <string name="search_room_null"></string>
     <string name="search_room_collect_success_indicator">您已经成功的收集了该球厅的信息</string>
+    <string name="weibo_share_fail">分享到微博失败</string>
+    <string name="weibo_share_success">成功分享到微博</string>
+    <string name="weibo_share_cancelled">分享微博被取消</string>
+    <string name="weibo_need_to_install_first">您需要首先安装新浪微博客户端</string>
+    <string name="weixin_need_to_install_first">您需要首先安装微信Android客户端</string>
+    <string name="need_to_login_first">请您先登录之后再进行分享</string>
+    <string name="tencent_weibo_share_success">成功分享到腾讯微博</string>
+
+    <string name="renren_share_content">来自约球的用户的信息分享</string>
 
     <!-- 球厅Activity当中的一些关键字段 -->
     <string name="search_room_detailedactivity_detailed_info_separator">详细信息</string>
@@ -478,8 +486,11 @@
     <string name="title_activity_article_read">ArticleReadActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-
-    <!--IM-->
+    <!-- IM -->
     <string name="im_login_other_device">您的账号在另外一台设备上登录了！</string>
     <string name="im_user_offline">您的账号掉线了！</string>
+    <string name="title_activity_we_chat_share_callback">WeChatShareCallbackActivity</string>
+    <string name="title_activity_weibo_share_action_complete">WeiboShareActionCompleteActivity</string>
+    <string name="title_activity_billiards_room_web_view">商户详情</string>
+
 </resources>

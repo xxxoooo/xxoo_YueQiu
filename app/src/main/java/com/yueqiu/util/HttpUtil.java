@@ -135,7 +135,7 @@ public class HttpUtil
         if (flag) {
             sb.append("?");
             sb.append(getQueryString(appKey, appSecret, (Map<String, String>) map));
-            Log.d(TAG, " dp request --> the finally request url are : " + sb.toString());
+            Log.d("filter_param_test", " dp request --> the finally request url are : " + sb.toString());
         }
 
         HttpClient client = new DefaultHttpClient();
