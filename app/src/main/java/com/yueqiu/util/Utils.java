@@ -525,9 +525,13 @@ public class Utils
                             Log.d("wechat_share", " share to we chat ");
 //                            weChatShareManager.shareByWeChat(weChatShareManager.new SharePicContent(R.drawable.ic_launcher),
 //                                    WeChatShareManager.WECHAT_SHARE_WAY_PIC);
-
-                            weChatShareManager.shareByWeChat(
-                                    weChatShareManager.new ShareTextContent(context.getString(R.string.renren_share_content)),
+                            // 如果我们这里只是单纯的分享文字的话，那么分先的这段文字是无法编辑的，我们希望的是用户可以定制自己所发送的内容的
+                            // 所以我们选择发送图片，因为发送图片的话，用户还可以编辑自己所发送的文本
+                            // TODO: 但是可惜的是用户无法编辑自己所发送的图片了，因为图片是我们这里写死的,如果需要改进，就在这里改进一下
+//                            weChatShareManager.shareByWeChat(
+//                                    weChatShareManager.new ShareTextContent(context.getString(R.string.renren_share_content)),
+//                                    true);
+                            weChatShareManager.shareByWeChat(weChatShareManager.new SharePicContent(R.drawable.ic_launcher),
                                     true);
                         }
                         break;
@@ -608,11 +612,16 @@ public class Utils
                         ((Activity) context).startActivity(new Intent((Activity) context, WeiboShareActionCompleteActivity.class));
                         break;
                     case R.id.img_search_dating_detail_share_renren:
-                        if (null != renRenShareManager) {
+                        if (null != renRenShareManager && renRenShareManager.isRenrenClientInstalled())
+                        {
                             // 以下我们采用分享的是测试图片
                             Bitmap sharedBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
                             Log.d("renren_share", "Share to renren site ");
                             renRenShareManager.shareToRenren(context.getString(R.string.renren_share_content), sharedBitmap);
+                        } else
+                        {
+                            // 人人客户端在没有安装时是无法支持正常分享的
+                            Toast.makeText(context, context.getString(R.string.renren_need_to_install_first), Toast.LENGTH_SHORT).show();
                         }
                         break;
                 }

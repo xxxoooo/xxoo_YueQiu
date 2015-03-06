@@ -1,6 +1,7 @@
 package com.yueqiu.util;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +11,7 @@ import com.renn.sharecomponent.MessageTarget;
 import com.renn.sharecomponent.RennShareComponent;
 import com.renn.sharecomponent.ShareMessageError;
 import com.renn.sharecomponent.message.RennImgTextMessage;
+import com.yueqiu.R;
 import com.yueqiu.constant.HttpConstants;
 
 
@@ -45,6 +47,21 @@ public class RenRenShareManager
         return null == sInstance ? new RenRenShareManager(context) : sInstance;
     }
 
+    private static final String RENREN_PKG_NAME = "com.renren.mobile.android";
+
+    public boolean isRenrenClientInstalled()
+    {
+        PackageManager pm = mContext.getPackageManager();
+        try
+        {
+            pm.getPackageInfo(RENREN_PKG_NAME, PackageManager.GET_ACTIVITIES);
+            return true;
+        } catch (PackageManager.NameNotFoundException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     /**
      * 我们分享到人人的信息采用文字和图片都进行分享
@@ -67,19 +84,24 @@ public class RenRenShareManager
             public void onSendMessageSuccess(String s, Bundle bundle)
             {
                 Log.d(TAG, " share success here ");
-                Toast.makeText(mContext, " share success ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getString(R.string.renren_share_success), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onSendMessageFailed(String s, ShareMessageError shareMessageError)
             {
-                Toast.makeText(mContext, " share failed ", Toast.LENGTH_SHORT).show();
+                if (isRenrenClientInstalled())
+                {
+                    // 如果在人人安装的情况下仍然分享失败，我们就弹出分享失败的Toast，关于提醒用户先安装人人客户端的操作
+                    // 我们在其他的Utils.showSheet()当中已经完成了
+                    Toast.makeText(mContext, mContext.getString(R.string.renren_share_failed) + s, Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onSendMessageCanceled(String s)
             {
-                Toast.makeText(mContext, " share cancelled ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, mContext.getString(R.string.renren_share_cancelld), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -88,13 +110,4 @@ public class RenRenShareManager
         // 我们在这里进行我们创建的Bitmap回收
 
     }
-
-
-
-
-
-
-
-
-
 }

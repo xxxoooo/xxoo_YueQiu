@@ -29,7 +29,7 @@ public class HttpUtil
 
     private static final int READLENGTH = 1024;
 
-    private static final String HTTP = "http://hxu0480201.my3w.com/index.php/v1";
+    private static final String HTTP = "http://app.chuangyezheluntan.com/index.php/v1";
 
     private static final String CHARSET = "utf-8";
 
