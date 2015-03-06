@@ -115,18 +115,25 @@ public class WeiboShareActionCompleteActivity extends Activity implements IWeibo
     protected void onResume()
     {
         super.onResume();
-        // 2. 以下是添加了分享结果的监听回调方法，我们可以监听分享的结果，但是无法正确的获取微博的验证
-        if (null != mWeiboShareApi)
+        if (mWeiboShareApi.isWeiboAppInstalled())
         {
-            if (mWeiboShareApi.isWeiboAppInstalled())
+            // 2. 以下是添加了分享结果的监听回调方法，我们可以监听分享的结果，但是无法正确的获取微博的验证
+            if (null != mWeiboShareApi)
             {
-                Bitmap sharedBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_launcher);
-                shareWeiboMsg("share to weibo", sharedBitmap);
-            } else
-            {
-                // 我们需要先提醒用户首先将微博的客户端安装上才可以进行以后的分享操作
-                Toast.makeText(WeiboShareActionCompleteActivity.this, getString(R.string.weibo_need_to_install_first), Toast.LENGTH_SHORT).show();
+                if (mWeiboShareApi.isWeiboAppInstalled())
+                {
+                    Bitmap sharedBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_launcher);
+                    shareWeiboMsg("share to weibo", sharedBitmap);
+                } else
+                {
+                    // 我们需要先提醒用户首先将微博的客户端安装上才可以进行以后的分享操作
+                    Toast.makeText(WeiboShareActionCompleteActivity.this, getString(R.string.weibo_need_to_install_first), Toast.LENGTH_SHORT).show();
+                }
             }
+        } else
+        {
+            Toast.makeText(this, getString(R.string.weibo_need_to_install_first), Toast.LENGTH_SHORT).show();
+            this.finish();
         }
     }
 

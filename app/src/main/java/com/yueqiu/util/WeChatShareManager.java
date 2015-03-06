@@ -255,7 +255,8 @@ public class WeChatShareManager implements IWXAPIEventHandler
             req.scene = visibleToTimeLine ? SendMessageToWX.Req.WXSceneTimeline : SendMessageToWX.Req.WXSceneSession;
             Log.d(TAG, " sending message here ... ");
             mWXApi.sendReq(req);
-        } else
+        }
+        else
         {
             Log.d(TAG, " the content you share must not be null ");
         }
