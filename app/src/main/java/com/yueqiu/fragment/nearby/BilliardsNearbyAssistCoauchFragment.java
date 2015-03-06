@@ -271,16 +271,16 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         requestParams.put("start_no", startNo + "");
         requestParams.put("end_no", endNo + "");
 
-        mListView.setMode(PullToRefreshBase.Mode.DISABLED);
-
+        mUIEventsHandler.sendEmptyMessage(SET_PULLREFRESH_DISABLE);
+        
         HttpUtil.requestHttp(HttpConstants.NearbyAssistCoauch.URL, requestParams, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                Log.d("wy","assistant response ->" + response);
+
                 try
                 {
-                    if (! response.isNull("code"))
+                    if (! TextUtils.isEmpty(response.get("code").toString()))
                     {
                         final int status = response.getInt("code");
                         if (status == HttpConstants.ResponseCode.NORMAL)
@@ -290,10 +290,10 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                             }else {
                                 JSONArray resultArr = resultJsonObj.getJSONArray("list_data");
-                                if(resultArr.length() < 1){
+                                final int count = resultArr.length();
+                                if(count < 1){
                                     mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                                 }else {
-                                    final int count = resultArr.length();
                                     for (int i = 0; i < count; ++i) {
                                         JSONObject dataUnit = resultArr.getJSONObject(i);
 
@@ -341,7 +341,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                             // 这里需要注意的是，服务器端可能会把msg内容置为null，即错误了，但是没有返回任何内容
                             // 如果我们采用下面的方法，空的bundle会被传输，然后就显示一个空的Toast
 //                        mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR,
-//                                initialResultJsonObj.getString("msg")).sendToTarget();
+//                                response.getString("msg")).sendToTarget();
                             Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
                             Bundle errorData = new Bundle();
                             String errorStr = response.getString("msg");
@@ -367,7 +367,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
             }
         });
-
+             
     }
 
 
@@ -414,10 +414,12 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
     private static final int NETWORK_UNAVAILABLE = 1 << 11;
 
+    private static final int SET_PULLREFRESH_DISABLE = 42;
+
     private Handler mUIEventsHandler = new Handler()
     {
         @Override
-        public void handleMessage(Message msg)           
+        public void handleMessage(Message msg)
         {
             if(mListView.getMode() == PullToRefreshBase.Mode.DISABLED){
                 mListView.setMode(PullToRefreshBase.Mode.BOTH);
@@ -476,6 +478,19 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                             }else {
                                 mAssistCoauchList.add(asBean);
                             }
+//                            if (mRefresh && !isListEmpty)
+//                            {
+//                                mAssistCoauchList.add(0, asBean);
+//                            } else
+//                            {
+//                                if (mIsSavedInstance)
+//                                {
+//                                    mAssistCoauchList.add(0, asBean);
+//                                } else
+//                                {
+//                                    mAssistCoauchList.add(asBean);
+//                                }
+//                            }
                         }
                     }
                     mAfterCount = mAssistCoauchList.size();
@@ -564,7 +579,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     {
                         if (mLoadMore)
                         {
-                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.search_billiard_assist_coauch_str)));
+                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.nearby_billiard_assist_coauch_str)));
                         }
                     }
                     hideProgress();
@@ -586,6 +601,9 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     }
 
                     hideProgress();
+                    break;
+                case SET_PULLREFRESH_DISABLE:
+                    mListView.setMode(PullToRefreshBase.Mode.DISABLED);
                     break;
             }
 
@@ -778,13 +796,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                 mRefresh = true;
                 if (mWorker != null)
                 {
-                    mUIEventsHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mWorker.fetchAllData(0, 9);
-                        }
-                    },300);
-
+                    mWorker.fetchAllData(0, 9);
                 }
             } else
             {
@@ -816,13 +828,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             {
                 if (null != mWorker)
                 {
-                    mUIEventsHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            mWorker.fetchAllData(mStartNum, mEndNum);
-                        }
-                    },300);
-
+                    mWorker.fetchAllData(mStartNum, mEndNum);
                 }
             } else
             {

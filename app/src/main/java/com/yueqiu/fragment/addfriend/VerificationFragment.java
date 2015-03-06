@@ -3,6 +3,8 @@ package com.yueqiu.fragment.addfriend;
 import android.app.ActionBar;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -23,14 +25,18 @@ import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.tencent.open.utils.HttpUtils;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -162,38 +168,53 @@ public class VerificationFragment extends Fragment {
         requestMap.put(HttpConstants.FriendSendAsk.ASK_ID, mFriendUserId);
         requestMap.put(HttpConstants.FriendSendAsk.NEWS, mNews);
 
-        Map<String, String> paramMap = new HashMap<String, String>();
-        paramMap.put(PublicConstant.URL, HttpConstants.FriendSendAsk.URL);
-        paramMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.POST);
-        if (Utils.networkAvaiable(getActivity())) {
-            new VerificationAsyncTask(requestMap, null, null).execute(paramMap);
-        } else {
+        if(Utils.networkAvaiable(getActivity())) {
+            HttpUtil.requestHttp(HttpConstants.FriendSendAsk.URL, requestMap, HttpConstants.RequestMethod.POST, new JsonHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    try {
+                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+
+                            Log.d(TAG, "好友请求发送失败！->" + response.getString("msg"));
+                        } else {
+                            mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    super.onFailure(statusCode, headers, responseString, throwable);
+                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                }
+            });
+        }else{
             Toast.makeText(getActivity(), getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
         }
+
+
     }
 
-    private class VerificationAsyncTask extends AsyncTaskUtil<String> {
-
-        public VerificationAsyncTask(Map<String, String> map, ProgressBar progressBar, TextView textView) {
-            super(map);
-        }
-
+    private Handler mHandler = new Handler(){
         @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            try {
-                if (jsonObject.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
-                    Log.d(TAG, "好友请求发送失败！->" + jsonObject.getString("msg"));
-                } else {
-                    Log.d(TAG, "好友请求发送成功");
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch(msg.what){
+                case PublicConstant.GET_SUCCESS:
+                    break;
+                case PublicConstant.REQUEST_ERROR:
+                    if(null == msg.obj){
+                        Utils.showToast(getActivity(),getActivity().getString(R.string.http_request_error));
+                    }else{
+                        Utils.showToast(getActivity(), (String) msg.obj);
+                    }
+                    break;
             }
         }
-    }
+    };
+
 
 }

@@ -6,6 +6,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -19,6 +20,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -45,6 +48,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -139,10 +143,10 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
     private void initActionBar(){
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle(getString(R.string.tab_title_activity));
+        mActionBar.setTitle(getString(R.string.business_play));
     }
     private void requestPlay(){
-        mParamMap.put(HttpConstants.Play.TYPE, PublicConstant.PLAY_BUSSINESS);
+//        mParamMap.put(HttpConstants.Play.TYPE, PublicConstant.PLAY_BUSSINESS);
         mParamMap.put(HttpConstants.Play.START_NO,mStart);
         mParamMap.put(HttpConstants.Play.END_NO,mEnd);
 
@@ -151,7 +155,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
 
         mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
 
-        HttpUtil.requestHttp(HttpConstants.Play.GETLISTEE,mParamMap,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+        HttpUtil.requestHttp(HttpConstants.Play.BUSINESS,mParamMap,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -198,6 +202,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         PlayInfo info = (PlayInfo) mAdapter.getItem(position-1);
         Intent intent = new Intent(this, PlayDetailActivity.class);
         Bundle args = new Bundle();
+        args.putInt(PublicConstant.PLAY_TYPE,PublicConstant.PLAY_BUSSINESS);
         args.putInt(DatabaseConstant.PlayTable.TABLE_ID,Integer.parseInt(info.getTable_id()));
         args.putString(DatabaseConstant.PlayTable.CREATE_TIME,info.getCreate_time());
         args.putString(DatabaseConstant.PlayTable.TYPE,info.getType());
@@ -377,7 +382,47 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
+        EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
+        searchEditText.setTextColor(Color.WHITE);
+        searchEditText.setHintTextColor(Color.LTGRAY);
+
+        // 用于改变SearchView当中的icon
+        searchView.setIconifiedByDefault(false);
+        try {
+            Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
+            searchField.setAccessible(true);
+            ImageView searchHintIcon = (ImageView) searchField.get(searchView);
+            searchHintIcon.setImageResource(R.drawable.search);
+        } catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(PlayBusinessActivity.this)) {
+                    Intent intent = new Intent(PlayBusinessActivity.this, SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_BUSINESS_PLAY);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    intent.putExtras(args);
+                    startActivity(intent);
+                }else{
+                    Utils.showToast(PlayBusinessActivity.this,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
         return true;
     }
 

@@ -6,9 +6,12 @@ import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.SearchView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
@@ -16,6 +19,7 @@ import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.BilliardGroupDetailActivity;
 import com.yueqiu.activity.NearbyBilliardsDatingActivity;
 import com.yueqiu.activity.PlayDetailActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.FavorBasicAdapter;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.Identity;
@@ -68,6 +72,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = super.onCreateView(inflater,container,savedInstanceState);
+        setHasOptionsMenu(true);
         mFavorDao = DaoFactory.getFavor(mActivity);
         mAdapter = new FavorBasicAdapter(mActivity,mList);
         mListView.setOnItemClickListener(this);
@@ -134,11 +139,11 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
     protected void setEmptyViewText(){
         switch(mType){
             case PublicConstant.FAVOR_DATE_TYPE:
-                mEmptyTypeStr = mActivity.getString(R.string.search_billiard_dating_str);
+                mEmptyTypeStr = mActivity.getString(R.string.nearby_billiard_dating_str);
                 break;
             case PublicConstant.FAVPR_ROOM_TYPE:
                 //TODO:由于球厅先不做，所以改变一下
-                //mEmptyTypeStr = mActivity.getString(R.string.search_billiard_room_str);
+                //mEmptyTypeStr = mActivity.getString(R.string.nearby_billiard_coauch_str);
                 mEmptyTypeStr = mActivity.getString(R.string.tab_title_activity);
                 break;
             case PublicConstant.FAVOR_PLAY_TYPE:
@@ -163,7 +168,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
         mParamsMap.put(HttpConstants.Favor.TYPE,mType == 1 ? 1 : mType + 1);
         mParamsMap.put(HttpConstants.Favor.START_NO,mStart_no);
         mParamsMap.put(HttpConstants.Favor.END_NO, mEnd_no);
-
+        Log.d("wy","favor params ->" + mParamsMap);
         mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
 
         HttpUtil.requestHttp(HttpConstants.Favor.URL,mParamsMap,HttpConstants.RequestMethod.GET,new ResponseHandler<FavorInfo>());
@@ -265,10 +270,19 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                     for(FavorInfo info : list){
                         if (!mList.contains(info)) {
 
-                            if(!mIsListEmpty && Integer.valueOf(((FavorInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
+//                            if(!mIsListEmpty && Integer.valueOf(((FavorInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
+//                                mList.add(0,info);
+//                            }else {
+//                                mList.add(info);
+//                            }
+                            if(mRefresh && !mIsListEmpty) {
                                 mList.add(0,info);
-                            }else {
-                                mList.add(info);
+                            }else{
+                                if(mIsSavedInstance){
+                                    mList.add(0,info);
+                                }else{
+                                    mList.add(info);
+                                }
                             }
                         }
                         //////////////////////////////////////////////////////
@@ -373,5 +387,35 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                 startActivity(intent);
                 break;
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(mActivity)) {
+                    Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_FAVOR);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    args.putInt(PublicConstant.TYPE,mType);
+                    intent.putExtras(args);
+                    startActivity(intent);
+
+                }else{
+                    Utils.showToast(mActivity,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 }

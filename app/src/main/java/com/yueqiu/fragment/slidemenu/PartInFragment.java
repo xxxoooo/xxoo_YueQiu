@@ -6,17 +6,21 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.SearchView;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.NearbyBilliardsDatingActivity;
 import com.yueqiu.activity.PlayDetailActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.PartInAdapter;
+import com.yueqiu.bean.ISlideMenuBasic;
 import com.yueqiu.bean.PartInInfo;
-import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -29,6 +33,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -55,6 +61,7 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater,container,savedInstanceState);
+        setHasOptionsMenu(true);
         mPartInAdapter = new PartInAdapter(mActivity,mList);
 
         if(savedInstanceState != null){
@@ -102,15 +109,24 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
                     mIsListEmpty = mList.isEmpty();
                     List<PartInInfo> list = (List<PartInInfo>) msg.obj;
                     for(PartInInfo info : list){
-                        if(!mList.contains(info)){
-                            if(!mIsListEmpty && Integer.valueOf(((PartInInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
+//                        if(!mList.contains(info)){
+//                            if(!mIsListEmpty && Integer.valueOf(((PartInInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
+//                                mList.add(0,info);
+//                            }else {
+//                                mList.add(info);
+//                            }
+//                        }
+                        if(mRefresh && !mIsListEmpty) {
+                            mList.add(0,info);
+                        }else{
+                            if(mIsSavedInstance){
                                 mList.add(0,info);
-                            }else {
+                            }else{
                                 mList.add(info);
                             }
                         }
                     }
-
+//                    Collections.sort(mList,new DescComparator());
                     mAfterCount = mList.size();
                     if(mList.isEmpty()){
                         setEmptyViewVisible(mActivity.getString(R.string.no_part_in_info,mEmptyTypeStr));
@@ -149,7 +165,7 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
     protected void setEmptyViewText() {
         switch(mType){
             case PublicConstant.PART_IN_DATE_TYPE:
-                mEmptyTypeStr = getString(R.string.search_billiard_dating_str);
+                mEmptyTypeStr = getString(R.string.nearby_billiard_dating_str);
                 break;
             case PublicConstant.PART_IN_PLAY_TYPE:
                 mEmptyTypeStr = getString(R.string.tab_title_activity);
@@ -258,5 +274,47 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
                 break;
         }
 
+    }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(mActivity)) {
+                    Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_JOIN);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    args.putInt(PublicConstant.TYPE,mType);
+                    intent.putExtras(args);
+                    startActivity(intent);
+
+                }else{
+                    Utils.showToast(mActivity,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
+    /**
+     * 由于服务器是按降序排序，但是从网络获取到的json却是升序，所以重新排序一下
+     */
+    private class DescComparator implements Comparator<ISlideMenuBasic> {
+
+        @Override
+        public int compare(ISlideMenuBasic lhs, ISlideMenuBasic rhs) {
+            int lhsUserId = Integer.valueOf(((PartInInfo)lhs).getTable_id());
+            int rhsUserId = Integer.valueOf(((PartInInfo)rhs).getTable_id());
+            return lhsUserId > rhsUserId ? -1 : 1;
+        }
     }
 }

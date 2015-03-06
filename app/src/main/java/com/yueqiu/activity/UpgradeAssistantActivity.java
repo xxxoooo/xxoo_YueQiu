@@ -174,10 +174,10 @@ public class UpgradeAssistantActivity extends Activity {
 
         Map<String,String> params = new HashMap<String, String>();
         params.put(HttpConstants.SetUserUp.USER_ID,String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
-        if(mTag.equals(getString(R.string.search_billiard_assist_coauch_str))) {
+        if(mTag.equals(getString(R.string.nearby_billiard_assist_coauch_str))) {
             params.put(HttpConstants.SetUserUp.USER_TYPE, String.valueOf(PublicConstant.UPGRADE_ASSITANT));
         }
-        else if(mTag.equals(getString(R.string.search_billiard_coauch_str))){
+        else if(mTag.equals(getString(R.string.nearby_billiard_coauch_str))){
             params.put(HttpConstants.SetUserUp.USER_TYPE,String.valueOf(PublicConstant.UPGRADE_COACH));
         }
 
@@ -219,13 +219,13 @@ public class UpgradeAssistantActivity extends Activity {
             mPreText.setVisibility(View.GONE);
             switch(msg.what){
                 case PublicConstant.GET_SUCCESS:
-                    if(mTag.equals(getString(R.string.search_billiard_assist_coauch_str))) {
-                        mEditor.putString(DatabaseConstant.UserTable.TITLE,getString(R.string.search_billiard_assist_coauch_str));
-                        YueQiuApp.sUserInfo.setTitle(getString(R.string.search_billiard_assist_coauch_str));
+                    if(mTag.equals(getString(R.string.nearby_billiard_assist_coauch_str))) {
+                        mEditor.putString(DatabaseConstant.UserTable.TITLE,getString(R.string.nearby_billiard_assist_coauch_str));
+                        YueQiuApp.sUserInfo.setTitle(getString(R.string.nearby_billiard_assist_coauch_str));
                     }
-                    else if(mTag.equals(getString(R.string.search_billiard_coauch_str))){
-                        mEditor.putString(DatabaseConstant.UserTable.TITLE, getString(R.string.search_billiard_coauch_str));
-                        YueQiuApp.sUserInfo.setTitle(getString(R.string.search_billiard_coauch_str));
+                    else if(mTag.equals(getString(R.string.nearby_billiard_coauch_str))){
+                        mEditor.putString(DatabaseConstant.UserTable.TITLE, getString(R.string.nearby_billiard_coauch_str));
+                        YueQiuApp.sUserInfo.setTitle(getString(R.string.nearby_billiard_coauch_str));
                     }
 
                     mEditor.apply();

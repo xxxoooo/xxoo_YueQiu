@@ -109,6 +109,8 @@ public class HttpConstants
         public static final String START_NO = "start_no";
 
         public static final String END_NO = "end_no";
+
+        public static final String KEYWORD = "keyword";
     }
 
     /**
@@ -124,6 +126,8 @@ public class HttpConstants
         public static final String START_NO = "start_no";
 
         public static final String END_NO = "end_no";
+
+        public static final String KEYWORD = "keyword";
     }
 
     /*
@@ -373,7 +377,11 @@ public class HttpConstants
 
         public static final String GETLISTEE = "/play/getList";
 
+        public static final String BUSINESS = "/play/getBusinessList";
+
         public static final String GETDETAIL = "/play/deatil";
+
+        public static final String BUSINESS_DETAIL = "/play/getBusinessDeatil";
 
         public static final String TYPE = "type";
 
@@ -406,6 +414,8 @@ public class HttpConstants
         public static final String PHONE = "phone";
 
         public static final String IMG_URL = "img_url";
+
+        public static final String KEYWORD = "keyword";
     }
 
     /**
@@ -438,6 +448,8 @@ public class HttpConstants
         public static final String STAR_NO  = "start_no";
 
         public static final String END_NO   = "end_no";
+
+        public static final String KEYWORD = "keyword";
 
 
     }
@@ -662,5 +674,23 @@ public class HttpConstants
     public static final String DP_APP_KEY = "0786070696";
     public static final String DP_APP_SECRET = "f3e6c9dbe811446884f9a5010b8729f4";
 
+    // 球厅Activity当中用于实现台球厅信息分享的AppId信息
+    public static final String WEIXIN_APP_ID = "wx54ce5d6762a720da";
+    public static final String WEIXIN_APP_SECRET = "864c7254c6cfb0dfcb7bce4fae475eeb";
 
+    // 球厅Activity当中用于实现球厅信息分享的AppId信息
+    public static final String WEIBO_APP_KEY = "539638208";
+    public static final String WEIBO_APP_SECRET = "b72217374751952a8b4f97dbc1dc876c";
+
+    // 球厅Activity当中用于实现分享球厅信息到RenRen的AppID
+    public static final String RENREN_APP_ID = "475119";
+    public static final String RENREN_APP_KEY = "6258359513124f9797f799e1c8b7efb7";
+    public static final String RENREN_SECRET_KEY = "6b6b310a0e1749f1a2742d7705e027ca";
+
+    // 球厅Activity当中qq分享的账号(腾讯微博和qq空间公用一个APP_KEY)
+    public static final String QQ_ZONE_APP_KEY = "1104270786";
+    public static final String QQ_ZONE_APP_SECRET = "5rSgvhoqBRb2FpKt";
+
+
+    public static final String DEFAULT_DIRECT_URL = "http://www.pinruiwenhua.com";
 }

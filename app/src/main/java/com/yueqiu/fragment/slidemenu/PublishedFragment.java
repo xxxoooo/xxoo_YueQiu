@@ -5,15 +5,19 @@ import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.SearchView;
 
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.BilliardGroupDetailActivity;
 import com.yueqiu.activity.NearbyBilliardsDatingActivity;
 import com.yueqiu.activity.PlayDetailActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.PublishedBasicAdapter;
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.bean.Identity;
@@ -60,6 +64,7 @@ public class PublishedFragment extends SlideMenuBasicFragment implements Adapter
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater,container,savedInstanceState);
+        setHasOptionsMenu(true);
         mPublishedAdapter = new PublishedBasicAdapter(mActivity,mList);
         mPublishedDao = DaoFactory.getPublished(mActivity);
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +121,7 @@ public class PublishedFragment extends SlideMenuBasicFragment implements Adapter
     protected void setEmptyViewText(){
         switch(mType){
             case PublicConstant.PUBLISHED_DATE_TYPE:
-                mEmptyTypeStr = getString(R.string.search_billiard_dating_str);
+                mEmptyTypeStr = getString(R.string.nearby_billiard_dating_str);
                 break;
             case PublicConstant.PUBLISHED_ACTIVITY_TYPE:
                 mEmptyTypeStr = getString(R.string.tab_title_activity);
@@ -355,5 +360,35 @@ public class PublishedFragment extends SlideMenuBasicFragment implements Adapter
                 startActivity(intent);
                 break;
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(mActivity)) {
+                    Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_PUBLISH);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    args.putInt(PublicConstant.TYPE,mType);
+                    intent.putExtras(args);
+                    startActivity(intent);
+
+                }else{
+                    Utils.showToast(mActivity,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 }

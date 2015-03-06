@@ -12,10 +12,10 @@
                 android:id="@+id/account_iv"
                 android:layout_alignParentLeft="true"
                 android:layout_marginRight="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:layout_centerInParent="true"
-                android:src="@drawable/default_head"/>
+                />
 
             <LinearLayout
                 android:layout_toRightOf="@id/account_iv"

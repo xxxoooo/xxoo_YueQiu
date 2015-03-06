@@ -116,11 +116,11 @@ public class SlideViewAdapter extends BaseAdapter {
                 }
                 SlideAccountItemISlide accountItem = (SlideAccountItemISlide) item;
                 int embedResId = R.drawable.lable_friend;
-                if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_assist_coauch_str))){
+                if(accountItem.getTitle().equals(mContext.getString(R.string.nearby_billiard_assist_coauch_str))){
                     embedResId = R.drawable.lable_assistant;
-                }else if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_mate_str))){
+                }else if(accountItem.getTitle().equals(mContext.getString(R.string.nearby_billiard_mate_str))){
                     embedResId = R.drawable.lable_friend;
-                }else if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_coauch_str))){
+                }else if(accountItem.getTitle().equals(mContext.getString(R.string.nearby_billiard_coauch_str))){
                     embedResId = R.drawable.lable_coach;
                 }
 

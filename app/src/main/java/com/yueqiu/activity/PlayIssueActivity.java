@@ -506,6 +506,8 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         map.put(HttpConstants.Play.LAT,  0);
         map.put(HttpConstants.Play.LNG, 0);
 
+        Log.d("wy","play issue ->" + map);
+
         if(mIvAddImg.getBitmapBean() != null) {
             if (mUploadProgress.getVisibility() == View.VISIBLE) {
                 Utils.showToast(PlayIssueActivity.this, getString(R.string.uploading_image));

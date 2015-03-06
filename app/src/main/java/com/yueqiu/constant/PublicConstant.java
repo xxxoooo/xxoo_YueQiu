@@ -15,6 +15,10 @@ public class PublicConstant {
     public static final String SLIDE_ACCOUNT_ACTION = "com.yueqiu.slide.account.update";
 
     public static final String IMG_URL = "img_url";
+    public static final String PLAY_TYPE = "play_type";
+    public static final String SEARCH_TYPE = "search_type";
+    public static final String SEARCH_KEYWORD = "search_keyword";
+    public static final String TYPE = "type";
 
 
     public static final int GET_SUCCESS   = 0;
@@ -69,6 +73,19 @@ public class PublicConstant {
     public static final int CHARMING_TYPE           = 4;
     public static final int STRENGTH_TYPE           = 5;
     public static final int HANDSOME_TYPE           = 6;
+
+    public static final int SEARCH_NEARBY_MATE      = 1;
+    public static final int SEARCH_NEARBY_DATE      = 2;
+    public static final int SEARCH_NEARBY_ASSITANT  = 3;
+    public static final int SEARCH_NEARBY_COACH     = 4;
+    public static final int SEARCH_NEARBY_ROOM        = 5;
+
+    public static final int SEARCH_PLAY             = 6;
+    public static final int SEARCH_GROUP            = 7;
+    public static final int SEARCH_FAVOR            = 8;
+    public static final int SEARCH_PUBLISH          = 9;
+    public static final int SEARCH_JOIN             = 10;
+    public static final int SEARCH_BUSINESS_PLAY    = 11;
 
 
 }

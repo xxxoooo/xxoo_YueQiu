@@ -198,8 +198,8 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
         {
             e.printStackTrace();
         }
-
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        //TODO:底下这句是发送系统定义好的搜索Intent.ACTION_SEARCH
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
 

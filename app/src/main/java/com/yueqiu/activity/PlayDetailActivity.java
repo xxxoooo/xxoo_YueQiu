@@ -81,6 +81,7 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
     private PlayInfo mCachePlayInfo,mPlayInfo;
     private FavorDao mFavorDao;
+    private int mPlayType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +91,8 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         initView();
         mImgLoader = VolleySingleton.getInstance().getImgLoader();
         Bundle args = getIntent().getExtras();
+        mPlayType = args.getInt(PublicConstant.PLAY_TYPE);
+        Log.d("wy","play_type ->" + mPlayType);
         mTableId = args.getInt(DatabaseConstant.PlayTable.TABLE_ID);
         mCreateTime = args.getString(DatabaseConstant.PlayTable.CREATE_TIME);
 //        mInfoType = Integer.parseInt(args.getString(DatabaseConstant.PlayTable.TYPE));
@@ -153,6 +156,10 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         mPreProgressBar.setIndeterminateDrawable(mProgressDrawable);
         mPreProgressBar.getIndeterminateDrawable().setBounds(bounds);
 
+        if(mPlayType == PublicConstant.PLAY_BUSSINESS){
+            mSexTv.setVisibility(View.VISIBLE);
+        }
+
         mJoin.setOnClickListener(this);
     }
 
@@ -164,7 +171,17 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         mParamMap.clear();
         mParamMap.put(HttpConstants.Play.ID, mTableId);
 
-        HttpUtil.requestHttp(HttpConstants.Play.GETDETAIL,mParamMap,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+        String url;
+        switch(mPlayType){
+            case PublicConstant.PLAY_BUSSINESS:
+                url = HttpConstants.Play.BUSINESS_DETAIL;
+                break;
+            default:
+                url = HttpConstants.Play.GETDETAIL;
+                break;
+        }
+
+        HttpUtil.requestHttp(url,mParamMap,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
@@ -216,23 +233,23 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
             info.setEnd_time(result.getString("end_time"));
             info.setModel(result.getString("model"));
             info.setContent(result.getString("content"));
-            info.setLook_num(result.getInt("look_num"));
             info.setAddress(result.getString("address"));
-            info.setSex(result.getString("sex"));
             info.setContact(result.getString("name"));
             info.setPhone(result.getString("phone"));
             //TODO:img_url是上传的图片
             info.setExtra_img(result.getString("img_url"));
-
-            JSONArray join_list = result.getJSONArray("join_list");
-            for(int i=0;i<join_list.length();i++){
-                UserInfo user = new UserInfo();
-                user.setUsername(join_list.getJSONObject(i).getString("username"));
-                user.setImg_url(join_list.getJSONObject(i).getString("img_url"));
-                user.setUser_id(Integer.parseInt(join_list.getJSONObject(i).getString("user_id")));
-                info.mJoinList.add(user);
+            if(mPlayType != PublicConstant.PLAY_BUSSINESS) {
+                info.setSex(result.getString("sex"));
+                info.setLook_num(result.getInt("look_num"));
+                JSONArray join_list = result.getJSONArray("join_list");
+                for (int i = 0; i < join_list.length(); i++) {
+                    UserInfo user = new UserInfo();
+                    user.setUsername(join_list.getJSONObject(i).getString("username"));
+                    user.setImg_url(join_list.getJSONObject(i).getString("img_url"));
+                    user.setUser_id(Integer.parseInt(join_list.getJSONObject(i).getString("user_id")));
+                    info.mJoinList.add(user);
+                }
             }
-
         }catch(JSONException e){
             e.printStackTrace();
         }
@@ -248,13 +265,6 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
             mHeadImgIv.setImageUrl("http://"+ info.getImg_url(), mImgLoader);
         }
         mUserNameTv.setText(info.getUsername());
-        mSexTv.setText(info.getSex().equals("1") ? getString(R.string.man) : getString(R.string.woman));
-        if(info.getSex().equals("1")){
-            mSexTv.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.male,0);
-        }else{
-            mSexTv.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.female,0);
-        }
-        mBrowseCountTv.setText(info.getLook_num() + "");
         mCreateTimeTv.setText(mCreateTime);
         mTitleTv.setText(info.getTitle());
         mTypeTv.setText(getDetailTypeStr(info.getType()));
@@ -265,9 +275,20 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         mContentTv.setText(info.getContent());
         mContactTv.setText(info.getContact());
         mPhoneTv.setText(info.getPhone());
+        mBrowseCountTv.setText(info.getLook_num() + "");
+        mBrowseCountTv.setText(info.getLook_num() + "");
 
-        mJoinAdapter = new JoinListAdapter(this,info.mJoinList);
-        mPartInGridView.setAdapter(mJoinAdapter);
+        if(mPlayType != PublicConstant.PLAY_BUSSINESS) {
+
+            mSexTv.setText(info.getSex().equals("1") ? getString(R.string.man) : getString(R.string.woman));
+            if (info.getSex().equals("1")) {
+                mSexTv.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.male, 0);
+            } else {
+                mSexTv.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.female, 0);
+            }
+            mJoinAdapter = new JoinListAdapter(this, info.mJoinList);
+            mPartInGridView.setAdapter(mJoinAdapter);
+        }
 
         if(! TextUtils.isEmpty(info.getExtra_img())){
             mExtraImage.setImageUrl("http://" + info.getExtra_img(),mImgLoader);
@@ -389,7 +410,7 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
                 finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
-            case R.id.menu_activities_collect:
+            case R.id.menu_store_to_favor:
                 //TODO:收藏完后要更新数据库
                 int user_id = YueQiuApp.sUserInfo.getUser_id();
                 if(user_id < 1) {

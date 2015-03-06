@@ -39,6 +39,7 @@
     <string name="delete_this_photo">删除图片</string>
     <string name="reply_content_can_not_empty">回复内容为空，说点什么吧</string>
 
+
     <!-- 登录注册 -->
     <string name="login_without_phone_or_account">请输入手机号或账号</string>
     <string name="login_without_pasword">请输入密码</string>
@@ -78,11 +79,11 @@
     <string name="search_logout_str">退出账户</string>
 
     <!-- 位于顶部的标题栏的Title -->
-    <string name="search_billiard_mate_str">球友</string>
-    <string name="search_billiard_assist_coauch_str">助教</string>
-    <string name="search_billiard_coauch_str">教练</string>
-    <string name="search_billiard_room_str">球厅</string>
-    <string name="search_billiard_dating_str">约球</string>
+    <string name="nearby_billiard_mate_str">球友</string>
+    <string name="nearby_billiard_assist_coauch_str">助教</string>
+    <string name="nearby_billiard_coauch_str">教练</string>
+    <string name="nearby_billiard_room_str">球厅</string>
+    <string name="nearby_billiard_dating_str">约球</string>
 
     <!-- 用于SearchActivity当中的各个Fragment为空时，显示的TextView -->
     <string name="search_activity_subfragment_empty_tv_str">抱歉，暂时没有加载到任何数据</string>
@@ -188,6 +189,15 @@
     <string name="search_room_popupwindow_region_shijingshan">石景山区</string>
     <string name="search_room_null"></string>
     <string name="search_room_collect_success_indicator">您已经成功的收集了该球厅的信息</string>
+    <string name="weibo_share_fail">分享到微博失败</string>
+    <string name="weibo_share_success">成功分享到微博</string>
+    <string name="weibo_share_cancelled">分享微博被取消</string>
+    <string name="weibo_need_to_install_first">您需要首先安装新浪微博客户端</string>
+    <string name="weixin_need_to_install_first">您需要首先安装微信Android客户端</string>
+    <string name="need_to_login_first">请您先登录之后再进行分享</string>
+    <string name="tencent_weibo_share_success">成功分享到腾讯微博</string>
+
+    <string name="renren_share_content">来自约球的用户的信息分享</string>
 
     <!-- 球厅Activity当中的一些关键字段 -->
     <string name="search_room_detailedactivity_detailed_info_separator">详细信息</string>
@@ -305,7 +315,7 @@
     <string name="ed_add_persion_by_phone_or_account">请输入手机号/账号</string>
     <string name="mentioned_me">提到我的</string>
     <string name="billiard_dating">约球</string>
-    <string name="participation_activities">活动</string>
+    <string name="play">活动</string>
     <string name="comment">备注</string>
     <string name="group">分组</string>
     <string name="set_tag">给他贴个标签吧</string>
@@ -366,7 +376,7 @@
     <string name="time">时间</string>
     <string name="distance">距离</string>
     <string name="four_to_thirty_words">4~30个汉字</string>
-    <string name="issueactivities">发布</string>
+    <string name="issue">发布</string>
     <string name="activities_title">活动主题</string>
     <string name="activities_site">活动地点</string>
     <string name="activities_start_time">开始时间</string>
@@ -380,7 +390,7 @@
     <string name="activities_send">发布</string>
     <string name="activities_sendinfo">发布约球信息</string>
     <string name="issue_date">发布约球</string>
-    <string name="activities">商家活动</string>
+    <string name="business_play">商家活动</string>
     <string name="login">登录</string>
     <string name="commit">提交</string>
     <string name="forgetpwd">忘记密码 ?</string>
@@ -475,7 +485,7 @@
     <string name="title_activity_group_select_topic_type">GroupSelectTopicTypeActivity</string>
     <string name="title_activity_group_topic_detail">GroupTopicDetailActivity</string>
     <string name="activities_detail">活动详情</string>
-    <string name="activities_collect">收藏</string>
+    <string name="store_to_favor">收藏</string>
     <string name="activities_share">分享</string>
     <string name="activities_type">活动类型</string>
     <string name="groupactivity">群活动</string>
@@ -500,6 +510,7 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_article_read">ArticleReadActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string name="lovely_type">可爱范儿</string>
     <string name="mature_type">成熟范儿</string>
     <string name="godness_type">女神范儿</string>
@@ -507,9 +518,23 @@
     <string name="strength_type">实力范儿</string>
     <string name="handsome_type">帅气范儿</string>
 
+
     <!-- IM -->
     <string name="im_login_other_device">您的账号在另外一台设备上登录了！</string>
     <string name="im_user_offline">您的账号掉线了！</string>
+
     <string name="title_activity_group_detail_reply">GroupDetailReplyActivity</string>
+
+    <string name="title_activity_we_chat_share_callback">WeChatShareCallbackActivity</string>
+    <string name="title_activity_weibo_share_action_complete">WeiboShareActionCompleteActivity</string>
+    <string name="title_activity_billiards_room_web_view">商户详情</string>
+
+    <string name="join_str">参与</string>
+    <string name="searching">正在搜索</string>
+    <string name="no_search_info">未查询到相关<xliff:g id="number" example="15">%1$s</xliff:g></string>
+    <string name="of">的</string>
+    <string name="info">信息</string>
+
+
 
 </resources>

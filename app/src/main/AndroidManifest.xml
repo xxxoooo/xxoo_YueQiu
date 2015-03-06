@@ -13,6 +13,10 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.GET_TASKS" />
 
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
     <application
         android:name=".YueQiuApp"
         android:allowBackup="true"
@@ -41,16 +45,17 @@
         <activity
             android:name=".activity.SearchResultActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait" >
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
+            android:screenOrientation="portrait"
+            android:noHistory="true">
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.SEARCH" />-->
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+            <!--</intent-filter>-->
 
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searchable" />
+            <!--<meta-data-->
+                <!--android:name="android.app.searchable"-->
+                <!--android:resource="@xml/searchable" />-->
         </activity>
 
         <!-- 聊吧Activity -->
@@ -192,8 +197,64 @@
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity
             android:name=".activity.GroupDetailReplyActivity"
-            android:label="@string/title_activity_group_detail_reply" >
+            android:screenOrientation="portrait" >
         </activity>
+
+            <!--
+                 添加对于新浪微博返回值的监听, 当我们使用新浪微博官方提供的
+                 API进行分享请求时，我们就需要添加以下的intent-filter用于监听分享的
+                 回调情况
+            -->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" /> -->
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- </intent-filter> -->
+
+        <!-- 这是我们用于调用的新浪微博的Activity -->
+        <activity
+            android:name="com.sina.weibo.sdk.component.WeiboSdkBrowser"
+            android:configChanges="keyboardHidden|orientation"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" >
+        </activity>
+
+        <!-- 用于腾讯微博的分享的Activity注册 -->
+        <activity
+            android:name="com.tencent.tauth.AuthActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="tencent1104270786" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.tencent.connect.common.AssistActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <activity
+            android:name=".activity.WeiboShareActionCompleteActivity"
+            android:label="@string/title_activity_weibo_share_action_complete" >
+            <intent-filter>
+                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.BilliardsRoomWebViewActivity"
+            android:label="@string/title_activity_billiards_room_web_view"
+            android:parentActivityName=".BilliardNearbyActivity"
+            android:screenOrientation="portrait">
+        </activity>
+
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="9cd1c44517aceb04470883494cae2546" />
     </application>
 
 </manifest>

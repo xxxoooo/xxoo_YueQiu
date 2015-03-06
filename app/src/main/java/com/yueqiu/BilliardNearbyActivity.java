@@ -121,11 +121,11 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
         mActionBar = getActionBar();
-        mTitles = new String[]{getString(R.string.search_billiard_mate_str),
-                getString(R.string.search_billiard_dating_str),
-                getString(R.string.search_billiard_assist_coauch_str),
-                getString(R.string.search_billiard_coauch_str),
-                getString(R.string.search_billiard_room_str)};
+        mTitles = new String[]{getString(R.string.nearby_billiard_mate_str),
+                getString(R.string.nearby_billiard_dating_str),
+                getString(R.string.nearby_billiard_assist_coauch_str),
+                getString(R.string.nearby_billiard_coauch_str),
+                getString(R.string.nearby_billiard_coauch_str)};
         mMenuDrawer = MenuDrawer.attach(this, MenuDrawer.Type.BEHIND, Position.LEFT, MenuDrawer.MENU_DRAG_WINDOW);
         mMenuDrawer.setContentView(R.layout.activity_nearby_billiard);
         mMenuDrawer.setMenuView(R.layout.slide_drawer_layout);

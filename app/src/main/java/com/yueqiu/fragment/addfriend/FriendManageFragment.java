@@ -142,8 +142,8 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
         }
         if (requestCode == REQUEST_CODE) {
             mGroupId = data.getIntExtra(FriendSetGroupFragment.RESULT_KEY, -1);
-            mTextView.setText(mGroupId == 0 ? R.string.search_billiard_mate_str : (mGroupId == 1)
-                    ? R.string.search_billiard_assist_coauch_str : R.string.search_billiard_coauch_str);
+            mTextView.setText(mGroupId == 0 ? R.string.nearby_billiard_mate_str : (mGroupId == 1)
+                    ? R.string.nearby_billiard_assist_coauch_str : R.string.nearby_billiard_coauch_str);
         }
 
     }

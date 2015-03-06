@@ -14,17 +14,21 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.PlayDetailActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.PlayListViewAdapter;
 import com.yueqiu.bean.PlayIdentity;
 import com.yueqiu.bean.PlayInfo;
@@ -96,6 +100,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.activity_play_bussiness,null);
+        setHasOptionsMenu(true);
         mPlayType = getArguments().getInt("type");
         mPlayDao = DaoFactory.getPlay(mActivity);
         mAdapter = new PlayListViewAdapter(mActivity,mList);
@@ -223,6 +228,8 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         mParamMap.put(HttpConstants.Play.TYPE, mPlayType);
         mParamMap.put(HttpConstants.Play.START_NO,mStart);
         mParamMap.put(HttpConstants.Play.END_NO,mEnd);
+
+        Log.d("wy","play params ->" + mParamMap);
 
         mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
 
@@ -540,5 +547,36 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
 
         }
     };
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(mActivity)) {
+                    Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_PLAY);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    intent.putExtras(args);
+                    startActivity(intent);
+
+
+                }else{
+                    Utils.showToast(mActivity,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
 
 }

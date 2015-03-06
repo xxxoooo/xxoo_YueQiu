@@ -152,17 +152,17 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
     protected void onResume() {
         super.onResume();
 
-//        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.search_billiard_coauch_str))){
+//        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_coauch_str))){
 //            mAssistant.setVisibility(View.GONE);
 //            mCoach.setVisibility(View.GONE);
 //        }
         initData();
-        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.search_billiard_mate_str))){
+        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_mate_str))){
             mAfterUpgradeAssitantView.setVisibility(View.GONE);
         }
 
-        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.search_billiard_assist_coauch_str)) ||
-                YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.search_billiard_coauch_str))){
+        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_assist_coauch_str)) ||
+                YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_coauch_str))){
             mAssistant.setVisibility(View.GONE);
             mCoach.setVisibility(View.GONE);
             mAfterUpgradeAssitantView.setVisibility(View.VISIBLE);
@@ -450,14 +450,14 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
             case R.id.update_assistant_btn:
                 //TODO:升级助教界面
                 Intent assitant = new Intent(this, UpgradeAssistantActivity.class);
-                assitant.putExtra(DatabaseConstant.UserTable.TITLE,getString(R.string.search_billiard_assist_coauch_str));
+                assitant.putExtra(DatabaseConstant.UserTable.TITLE,getString(R.string.nearby_billiard_assist_coauch_str));
                 startActivity(assitant);
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case R.id.update_coach_btn:
                 //TODO:升级教练界面
                 Intent coach = new Intent(this, UpgradeAssistantActivity.class);
-                coach.putExtra(DatabaseConstant.UserTable.TITLE,getString(R.string.search_billiard_coauch_str));
+                coach.putExtra(DatabaseConstant.UserTable.TITLE,getString(R.string.nearby_billiard_coauch_str));
                 startActivity(coach);
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;

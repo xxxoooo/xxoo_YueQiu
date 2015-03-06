@@ -324,7 +324,8 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
         if (id == android.R.id.home) {
             finish();
             overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
-        }else if(id == R.id.billiard_detail_action_share){
+        }else if(id == R.id.billiard_detail_action_share)
+        {
             mShareDlg = Utils.showSheet(this);
             mShareDlg.show();
 
