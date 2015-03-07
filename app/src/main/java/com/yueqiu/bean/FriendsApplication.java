@@ -73,4 +73,21 @@ public class FriendsApplication {
     public String getImg_url() {
         return img_url;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        FriendsApplication info = (FriendsApplication) o;
+        if(this.username.equals(info.getUsername())){
+            return true;
+        }
+        return super.equals(o);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 37 * result + username.hashCode();
+        return result;
+    }
 }

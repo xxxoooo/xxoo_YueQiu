@@ -14,16 +14,21 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.PlayDetailActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.PlayListViewAdapter;
 import com.yueqiu.bean.PlayIdentity;
 import com.yueqiu.bean.PlayInfo;
@@ -33,11 +38,13 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.PlayDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,6 +100,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,  Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.activity_play_bussiness,null);
+        setHasOptionsMenu(true);
         mPlayType = getArguments().getInt("type");
         mPlayDao = DaoFactory.getPlay(mActivity);
         mAdapter = new PlayListViewAdapter(mActivity,mList);
@@ -130,6 +138,14 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
 //        }
 
 
+
+
+        return mView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         /**
          * 如果网络正常，就向网络请求数据
          */
@@ -140,10 +156,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         }else{
             mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
         }
-
-        return mView;
     }
-
 
     private void initView()
     {
@@ -208,14 +221,58 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
      * 请求的url和method
      */
     private void requestPlay(){
+
+        mPreProgressBar.setVisibility(View.VISIBLE);
+        mPreTextView.setVisibility(View.VISIBLE);
+
         mParamMap.put(HttpConstants.Play.TYPE, mPlayType);
         mParamMap.put(HttpConstants.Play.START_NO,mStart);
         mParamMap.put(HttpConstants.Play.END_NO,mEnd);
 
-        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Play.GETLISTEE);
-        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.GET);
+        Log.d("wy","play params ->" + mParamMap);
 
-        new RequestPlayTask(mParamMap).execute(mUrlAndMethodMap);
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
+
+        HttpUtil.requestHttp(HttpConstants.Play.GETLISTEE, mParamMap, HttpConstants.RequestMethod.GET, new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","play basic response ->" + response);
+                try{
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            if(response.getString("result") != null){
+                                List<PlayInfo> list = setPlayByJSON(response);
+                                if(list.isEmpty()){
+                                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                }else{
+                                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list).sendToTarget();
+                                }
+                            }else{
+                                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            }
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                            mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                        }
+                    }else{
+                        mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            }
+        });
+
     }
 
     @Override
@@ -231,66 +288,28 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         mActivity.overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
     }
 
-    private class RequestPlayTask extends AsyncTaskUtil<Integer>{
-
-        public RequestPlayTask(Map<String, Integer> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgressBar.setVisibility(View.VISIBLE);
-            mPreTextView.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            mPreProgressBar.setVisibility(View.GONE);
-            mPreTextView.setVisibility(View.GONE);
-            try{
-                if(!jsonObject.isNull("code")){
-                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                        if(jsonObject.getString("result") != null){
-                            List<PlayInfo> list = setPlayByJSON(jsonObject);
-                            if(list.isEmpty()){
-                                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                            }else{
-                                mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list).sendToTarget();
-                            }
-                        }else{
-                            mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                        }
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
-                        mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
-                        mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                    }else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
-                    }
-                }else{
-                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-                }
-            }catch (JSONException e){
-                e.printStackTrace();
-            }
-        }
-    }
 
     private List<PlayInfo> setPlayByJSON(JSONObject object){
         List<PlayInfo> list = new ArrayList<PlayInfo>();
         try{
             JSONArray list_data = object.getJSONObject("result").getJSONArray("list_data");
-            for(int i=0;i<list_data.length();i++){
-                PlayInfo info = new PlayInfo();
-                info.setTable_id(list_data.getJSONObject(i).getString("id"));
-                info.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                info.setTitle(list_data.getJSONObject(i).getString("title"));
-                info.setContent(list_data.getJSONObject(i).getString("content"));
-                info.setCreate_time(list_data.getJSONObject(i).getString("create_time"));
-                info.setType(String.valueOf(mPlayType));
-                list.add(info);
+            if(object.getJSONObject("result").get("list_data").equals("null")){
+                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+            }else {
+                if (list_data.length() < 1) {
+                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                } else {
+                    for (int i = 0; i < list_data.length(); i++) {
+                        PlayInfo info = new PlayInfo();
+                        info.setTable_id(list_data.getJSONObject(i).getString("id"));
+                        info.setImg_url(list_data.getJSONObject(i).getString("img_url"));
+                        info.setTitle(list_data.getJSONObject(i).getString("title"));
+                        info.setContent(list_data.getJSONObject(i).getString("content"));
+                        info.setCreate_time(list_data.getJSONObject(i).getString("create_time"));
+                        info.setType(String.valueOf(mPlayType));
+                        list.add(info);
+                    }
+                }
             }
         }catch(JSONException e){
             e.printStackTrace();
@@ -302,6 +321,11 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgressBar.setVisibility(View.GONE);
+            mPreTextView.setVisibility(View.GONE);
+            if(mPullToRefreshListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
             if(mPullToRefreshListView.isRefreshing())
                 mPullToRefreshListView.onRefreshComplete();
             switch (msg.what){
@@ -326,14 +350,10 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                     for(PlayInfo info : list){
                         if (!mList.contains(info)) {
 
-                            if(mRefresh && !mIsListEmpty) {
+                            if(!mIsListEmpty && Integer.valueOf(mList.get(0).getTable_id()) < Integer.valueOf(info.getTable_id())){
                                 mList.add(0,info);
-                            }else{
-                                if(mIsSavedInstance){
-                                    mList.add(0,info);
-                                }else{
-                                    mList.add(info);
-                                }
+                            }else {
+                                mList.add(info);
                             }
                         }
 
@@ -527,5 +547,36 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
 
         }
     };
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(mActivity)) {
+                    Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_PLAY);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    intent.putExtras(args);
+                    startActivity(intent);
+
+
+                }else{
+                    Utils.showToast(mActivity,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
 
 }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp">
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/group_detail_comment_img"
+            android:layout_width="@dimen/listview_item_user_photo_width"
+            android:layout_height="@dimen/listview_item_user_photo_height"
+            />
+        <TextView
+            android:id="@+id/group_detail_comment_owner"
+            style="@style/ListItemTvStyle"
+            android:textColor="@color/md__defaultBackground"
+            android:layout_alignTop="@+id/group_detail_comment_img"
+            android:layout_toRightOf="@+id/group_detail_comment_img"
+            android:layout_marginRight="3dp"
+            android:layout_marginLeft="10dp"
+            android:textSize="16sp"
+            android:ellipsize="marquee"
+            android:text="name"/>
+        <TextView
+            android:id="@+id/group_detail_comment_time"
+            style="@style/TimeTextStyle"
+            android:layout_below="@+id/group_detail_comment_owner"
+            android:layout_toRightOf="@+id/group_detail_comment_img"
+            android:text="12-11 21:25"
+            android:layout_alignLeft="@+id/group_detail_comment_owner"
+            android:layout_marginTop="3dp"/>
+
+        <TextView
+            android:id="@+id/group_detail_comment_str"
+            style="@style/TimeTextStyle"
+            android:textColor="@color/search_distance_color"
+            android:layout_toRightOf="@+id/group_detail_comment_img"
+            android:layout_alignLeft="@+id/group_detail_comment_owner"
+            android:layout_below="@+id/group_detail_comment_time"
+            android:text="大力支持"
+            android:textSize="16sp"
+            android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:layout_toLeftOf="@+id/help_text"
+            />
+        <TextView
+            android:id="@+id/help_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/group_detail_comment_str"
+            android:text="help_text_view"
+            android:visibility="invisible"/>
+    </RelativeLayout>

@@ -15,6 +15,7 @@ import com.yueqiu.R;
 import com.yueqiu.bean.ISlideMenuBasic;
 import com.yueqiu.bean.PartInInfo;
 import com.yueqiu.bean.PublishedInfo;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;
@@ -76,7 +77,8 @@ public class PartInAdapter extends BaseAdapter{
             holder.whole_bg.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.published_item_bg));
         }
         holder.image.setDefaultImageResId(R.drawable.default_head);
-        holder.image.setImageUrl(((PartInInfo)mList.get(position)).getImg_url(),mImgLoader);
+        holder.image.setErrorImageResId(R.drawable.default_head);
+        holder.image.setImageUrl(HttpConstants.IMG_BASE_URL + ((PartInInfo) mList.get(position)).getImg_url(),mImgLoader);
         holder.title.setText(((PartInInfo) mList.get(position)).getTitle());
         holder.content.setText(((PartInInfo) mList.get(position)).getContent());
         holder.dateTime.setText(((PartInInfo) mList.get(position)).getDateTime());

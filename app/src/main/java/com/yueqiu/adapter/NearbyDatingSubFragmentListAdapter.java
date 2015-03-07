@@ -11,6 +11,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.NearbyDatingSubFragmentDatingBean;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
 
 import java.util.ArrayList;
@@ -81,7 +82,8 @@ public class NearbyDatingSubFragmentListAdapter extends BaseAdapter
         if (bean != null)
         {
             viewHolder.mUserPhoto.setDefaultImageResId(R.drawable.default_head);
-            viewHolder.mUserPhoto.setImageUrl(bean.getUserPhoto(), mImgLoader);
+            viewHolder.mUserPhoto.setErrorImageResId(R.drawable.default_head);
+            viewHolder.mUserPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + bean.getUserPhoto(), mImgLoader);
 
             viewHolder.mUserNickname.setText(bean.getUserName());
             viewHolder.mUserDistance.setText(bean.getUserDistance());

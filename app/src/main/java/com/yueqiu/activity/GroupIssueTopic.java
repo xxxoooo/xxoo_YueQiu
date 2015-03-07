@@ -2,12 +2,14 @@ package com.yueqiu.activity;
 
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.nfc.Tag;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -39,6 +41,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.SyncHttpClient;
 import com.rockerhieu.emojicon.EmojiconEditText;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
@@ -53,6 +58,7 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.group.ImageFragment;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.FileUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.CustomDialogBuilder;
@@ -61,10 +67,15 @@ import com.yueqiu.view.IssueImageView;
 import com.yueqiu.view.dlgeffect.EffectsType;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
+import org.apache.commons.codec.binary.Hex;
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +91,9 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
     private static final int CAMERA_REQUEST = 1;
     private static final int ALBUM_REQUEST = 2;
 
+    private static final int UPLOAD_SUCCESS = 42;
+    private static final int UPLOAD_FAILED = 43;
+
     private EditText    mTitleEdit;
     private EmojiconEditText mContentEdit;
     private TextView    mTopicTypeTv,mTakePhoto,mSelectPhoto,mDeletePhoto;
@@ -92,7 +106,7 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
     private FrameLayout mEmotionContainer;
     private LinearLayout mAddImgContainer;
 
-    private ProgressBar mPreProgress;
+    private ProgressBar mPreProgress,mUploadProgress;
     private TextView mPreText;
     private Drawable mProgressDrawable;
 
@@ -116,7 +130,9 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
     private Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
     private List<IssueImageView> mAddViewList = new ArrayList<IssueImageView>();
 //    private List<BitmapBean> mBitmapBeanList = new ArrayList<BitmapBean>();
-
+    private String mImg_url;
+    private TextView mUploadFailedTv;
+    private AsyncTask<Void,Void,Void> mUploadTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -226,9 +242,9 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
         mPreProgress.getIndeterminateDrawable().setBounds(bounds);
         mPreText.setText(getString(R.string.activity_issuing));
 
-//        mImgAdapter = new TopicImgAdapter();
-//        mGridView.setAdapter(mImgAdapter);
-//        mGridView.setOnItemClickListener(this);
+        mUploadFailedTv = (TextView) findViewById(R.id.group_issue_upload_photo_fail_tv);
+        mUploadProgress = (ProgressBar) findViewById(R.id.group_upload_photo_progress);
+
 
         mLinearType.setOnClickListener(this);
         mIvAddImg.setOnClickListener(this);
@@ -301,57 +317,62 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
             mTopicType = GroupSelectTopicTypeActivity.OTHER;
         }
 
+        if(mIvAddImg.getBitmapBean() != null) {
+            if (mUploadProgress.getVisibility() == View.VISIBLE) {
+                Utils.showToast(GroupIssueTopic.this, getString(R.string.uploading_image));
+                return;
+            }else{
+                Log.d("wy", "group img_url ->" + mImg_url);
+                mParamsMap.put(HttpConstants.GroupIssue.IMG_URL,mImg_url);
+            }
+        }
+
         mParamsMap.put(HttpConstants.GroupIssue.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
         mParamsMap.put(HttpConstants.GroupIssue.TYPE,String.valueOf(mTopicType));
         mParamsMap.put(HttpConstants.GroupIssue.TITLE,mTitle);
         mParamsMap.put(HttpConstants.GroupIssue.CONTENT,mContent);
 
-        mUrlAndMethodMap.put(PublicConstant.URL, HttpConstants.GroupIssue.URL);
-        mUrlAndMethodMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.POST);
+        mPreProgress.setVisibility(View.VISIBLE);
+        mPreText.setVisibility(View.VISIBLE);
 
-        new IssueTopicTask(mParamsMap).execute(mUrlAndMethodMap);
-    }
-
-
-    private class IssueTopicTask extends AsyncTaskUtil<String> {
-
-        public IssueTopicTask(Map<String, String> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgress.setVisibility(View.VISIBLE);
-            mPreText.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            mPreProgress.setVisibility(View.GONE);
-            mPreText.setVisibility(View.GONE);
-            try {
-                if(!jsonObject.isNull("code")){
-                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                         mHandler.obtainMessage(PublicConstant.GET_SUCCESS).sendToTarget();
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
-                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+        HttpUtil.requestHttp(HttpConstants.GroupIssue.URL,mParamsMap,HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                try {
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS).sendToTarget();
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                        }
                     }else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonObject.getString("msg")).sendToTarget();
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                     }
-                }else{
-                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
-        }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+            }
+        });
+
     }
+
+
+
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgress.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
             switch(msg.what){
                 case PublicConstant.GET_SUCCESS:
                     //TODO:如果后期需要缓存的话，这里还需要多做几步操作，向group表插入缓存数据同时还得向publish表插入数据
@@ -370,6 +391,17 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
                     break;
                 case PublicConstant.TIME_OUT:
                     Utils.showToast(GroupIssueTopic.this,getString(R.string.http_request_time_out));
+                    break;
+                case UPLOAD_SUCCESS:
+                    mUploadProgress.setVisibility(View.GONE);
+                    mUploadFailedTv.setVisibility(View.GONE);
+                    break;
+                case UPLOAD_FAILED:
+                    mUploadProgress.setVisibility(View.GONE);
+                    mIvAddImg.setImageResource(R.drawable.add_img_bg);
+                    mIvAddImg.setBitmapBean(null);
+                    mUploadFailedTv.setVisibility(View.VISIBLE);
+                    mUploadFailedTv.setText(getString(R.string.upload_image_fail));
                     break;
             }
         }
@@ -483,6 +515,10 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
                 }
                 break;
             case R.id.delete_photo:
+                mUploadProgress.setVisibility(View.GONE);
+                if(mUploadTask != null){
+                    mUploadTask.cancel(true);
+                }
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth,mAddViewHeight);
                 params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
                 params.gravity = Gravity.CENTER_VERTICAL;
@@ -580,12 +616,6 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
         //capture photo from camera
         else if(requestCode == CAMERA_REQUEST && resultCode == RESULT_OK){
             Log.d(TAG,"camera request and result is ok");
-//            ImageView photoView = new ImageView(this);
-//            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(mAddViewWidth, mAddViewHeight);
-//            params.gravity = Gravity.CENTER_VERTICAL;
-//            int leftMargin = Utils.dip2px(this,10);
-//            params.setMargins(leftMargin,0,0,0);
-//            photoView.setLayoutParams(params);
             Log.d(TAG,"addViewWidth->" + mAddViewWidth );
             Log.d(TAG,"addViewHeight->" + mAddViewHeight );
             BitmapDrawable bitmap = ImgUtil.getThumbnailScaledBitmap(this, mImgFilePath, mAddViewWidth, mAddViewHeight);
@@ -600,16 +630,25 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
             mIvAddImg.setBitmapBean(bmpBean);
             mIvAddImg.setImageDrawable(bmpBean.bitmapDrawable);
             mAddViewList.add(mIvAddImg);
-//            mBitmapBeanList.add(bmpBean);
-//            mImgAdapter.notifyDataSetChanged();
-//            mGridView.setVisibility(View.VISIBLE);
-//            photoView.setImageDrawable(bitmap);
-//            photoView.setScaleType(ImageView.ScaleType.FIT_XY);
-//            mPhotoContainer.addView(photoView);
-//            mAddViewList.add(photoView);
+
+            mUploadTask = new AsyncTask<Void,Void,Void>(){
+
+                @Override
+                protected Void doInBackground(Void... params) {
+                    uploadPhotoByPath(mImgFilePath);
+                    return null;
+                }
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mUploadProgress.setVisibility(View.VISIBLE);
+                }
+            };
+            mUploadTask.execute();
+
         }
         else if(requestCode == ALBUM_REQUEST && resultCode == RESULT_OK){
-            Uri imageFileUri = data.getData();
+            final Uri imageFileUri = data.getData();
             BitmapDrawable drawable = ImgUtil.getThumbnailScaleBitmapByUri(this,imageFileUri,mAddViewWidth,mAddViewHeight);
             BitmapBean bmpBean = new BitmapBean();
             bmpBean.bitmapDrawable = drawable;
@@ -623,24 +662,148 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
             mIvAddImg.setImageDrawable(bmpBean.bitmapDrawable);
             mIvAddImg.setBackgroundColor(getResources().getColor(android.R.color.black));
             mAddViewList.add(mIvAddImg);
-//            mBitmapBeanList.add(bmpBean);
-//            mImgAdapter.notifyDataSetChanged();
-//            mGridView.setVisibility(View.VISIBLE);
+
+            mUploadTask = new AsyncTask<Void,Void,Void>(){
+
+                @Override
+                protected Void doInBackground(Void... params) {
+                    uploadByUri(imageFileUri);
+                    return null;
+                }
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mUploadProgress.setVisibility(View.VISIBLE);
+                }
+            };
+            mUploadTask.execute();
         }
     }
 
-//    @Override
-//    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//        BitmapBean bean = mBitmapBeanList.get(position);
-//        if(bean == null)
-//            return ;
-//
-//        FragmentManager fm = getSupportFragmentManager();
-//        String imgPath = bean.imgFilePath;
-//        Uri imgUri = bean.imgUri;
-//        ImageFragment.newInstance(imgPath,imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
-//    }
+    private void uploadPhotoByPath(String path){
+        File file = new File(path);
+        FileInputStream in = null;
+        byte[] buffer = new byte[(int) file.length()];
+        StringBuilder imageStr = new StringBuilder();
+        try {
+            in = new FileInputStream(file);
+            in.read(buffer);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
+        char[] hex = Hex.encodeHex(buffer);
+        for(char c : hex){
+            imageStr.append(c);
+        }
+
+        SyncHttpClient client = new SyncHttpClient();
+        RequestParams params = new RequestParams();
+        params .put(HttpConstants.ChangePhoto.IMG_DATA, imageStr.toString());
+        params .put(HttpConstants.ChangePhoto.IMG_SUFFIX, "jpg");
+        client.post("http://app.chuangyezheluntan.com/index.php/v1" + HttpConstants.ChangePhoto.URL,params,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","group upload response ->" + response);
+                try{
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            if(response.getJSONObject("result") != null) {
+                                mImg_url = response.getJSONObject("result").getString("img_url");
+                                mHandler.sendEmptyMessage(UPLOAD_SUCCESS);
+                            }
+                        }else{
+                            mHandler.obtainMessage(UPLOAD_FAILED).sendToTarget();
+                        }
+                    }else{
+                        mHandler.obtainMessage(UPLOAD_FAILED).sendToTarget();
+                    }
+                }catch(JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.obtainMessage(UPLOAD_FAILED).sendToTarget();
+            }
+        });
+    }
+
+    private void uploadByUri(Uri uri){
+        String [] proj={MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri,
+                proj,                 // Which columns to return
+                null,       // WHERE clause; which rows to return (all rows)
+                null,       // WHERE clause selection arguments (none)
+                null);                 // Order-by clause (ascending by name)
+
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+
+        StringBuilder bitmapStr = new StringBuilder();
+        File file = new File(cursor.getString(column_index));
+        byte[] buffer = new byte[(int) file.length()];
+        try {
+            FileInputStream in = new FileInputStream(file);
+            in.read(buffer);
+            in.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        char[] hex = Hex.encodeHex(buffer);
+        for(int i=0;i<hex.length;i++) {
+            bitmapStr.append(hex[i]);
+        }
+        SyncHttpClient client = new SyncHttpClient();
+        RequestParams requestParams = new RequestParams();
+        requestParams .put(HttpConstants.ChangePhoto.IMG_DATA, bitmapStr.toString());
+        requestParams .put(HttpConstants.ChangePhoto.IMG_SUFFIX, "jpg");
+
+        client.post("http://app.chuangyezheluntan.com/index.php/v1" + HttpConstants.ChangePhoto.URL,requestParams,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Log.d("wy","group upload response ->" + response);
+                try{
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            if(response.getJSONObject("result") != null) {
+                                mImg_url = response.getJSONObject("result").getString("img_url");
+                                mHandler.sendEmptyMessage(UPLOAD_SUCCESS);
+                            }
+                        }else{
+                            mHandler.obtainMessage(UPLOAD_FAILED).sendToTarget();
+                        }
+                    }else{
+                        mHandler.obtainMessage(UPLOAD_FAILED).sendToTarget();
+                    }
+                }catch(JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+
+            }
+        });
+    }
 
     @Override
     public void onEmojiconBackspaceClicked(View v) {
@@ -666,49 +829,6 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
         }
     }
 
-//    private class TopicImgAdapter extends BaseAdapter{
-//
-//
-//        @Override
-//        public int getCount() {
-//            return mBitmapBeanList.size();
-//        }
-//
-//
-//        @Override
-//        public Object getItem(int position) {
-//            return mBitmapBeanList.get(position);
-//        }
-//
-//
-//        @Override
-//        public long getItemId(int position) {
-//            return position;
-//        }
-//
-//
-//        @Override
-//        public View getView(int position, View convertView, ViewGroup parent) {
-//            ViewHolder holder;
-//            if(convertView == null){
-//                convertView = LayoutInflater.from(GroupIssueTopic.this).inflate(R.layout.item_topic_grid_view,null);
-//                holder = new ViewHolder();
-//                holder.imageView = (ImageView) convertView.findViewById(R.id.item_topic_imageview);
-//                convertView.setTag(holder);
-//            }else{
-//                holder = (ViewHolder) convertView.getTag();
-//            }
-//            holder.imageView.setLayoutParams(new GridView.LayoutParams(mAddViewWidth,mAddViewHeight));
-//            holder.imageView.getRootView().setBackgroundColor(getResources().getColor(android.R.color.black));
-//            holder.imageView.setImageDrawable(mBitmapBeanList.get(position).bitmapDrawable);
-//            mAddViewList.add(holder.imageView);
-//            return convertView;
-//        }
-//
-//        private class ViewHolder{
-//            ImageView imageView;
-//        }
-//    }
 
     private OnKeyboardHideListener mOnKeyboardHideListener = new OnKeyboardHideListener() {
         @Override
@@ -716,15 +836,10 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
             if(mIsEmotionShow){
                 mEmotionContainer.setVisibility(View.VISIBLE);
                 mAddImgContainer.setVisibility(View.GONE);
-//                mGridView.setVisibility(View.GONE);
             }else{
                 mEmotionContainer.setVisibility(View.GONE);
                 mAddImgContainer.setVisibility(View.VISIBLE);
-//                if(mBitmapBeanList.isEmpty()){
-//                    mGridView.setVisibility(View.GONE);
-//                }else{
-//                    mGridView.setVisibility(View.VISIBLE);
-//                }
+
             }
         }
     };

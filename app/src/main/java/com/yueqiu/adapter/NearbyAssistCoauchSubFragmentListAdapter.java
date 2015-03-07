@@ -11,6 +11,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.NearbyAssistCoauchSubFragmentBean;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.VolleySingleton;
 
@@ -85,7 +86,8 @@ public class NearbyAssistCoauchSubFragmentListAdapter extends BaseAdapter
         // the user photo should be the image resource that can be retrieved from the network dynamically
         // here we set it as static data
         viewHolder.mPhoto.setDefaultImageResId(R.drawable.default_head);
-        viewHolder.mPhoto.setImageUrl(bean.getPhoto(), mImgLoader);
+        viewHolder.mPhoto.setErrorImageResId(R.drawable.default_head);
+        viewHolder.mPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + bean.getPhoto(), mImgLoader);
 
         viewHolder.mNickname.setText(bean.getName());
         viewHolder.mGender.setText(bean.getGender());

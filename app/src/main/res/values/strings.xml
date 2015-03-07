@@ -31,10 +31,14 @@
     <string name="no_group_detail_info">未获取详情信息</string>
     <string name="praise">赞 <xliff:g id="count">%1$s</xliff:g></string>
     <string name="reply">回复 <xliff:g id="reply">%1$s</xliff:g></string>
+    <string name="reply1">回复</string>
+    <string name="say_something">说点什么吧</string>
     <string name="select_photo">选择照片</string>
     <string name="take_photo_now">现在拍摄</string>
     <string name="select_photo_from_album">选择相册图片</string>
     <string name="delete_this_photo">删除图片</string>
+    <string name="reply_content_can_not_empty">回复内容为空，说点什么吧</string>
+
 
     <!-- 登录注册 -->
     <string name="login_without_phone_or_account">请输入手机号或账号</string>
@@ -75,11 +79,11 @@
     <string name="search_logout_str">退出账户</string>
 
     <!-- 位于顶部的标题栏的Title -->
-    <string name="search_billiard_mate_str">球友</string>
-    <string name="search_billiard_assist_coauch_str">助教</string>
-    <string name="search_billiard_coauch_str">教练</string>
-    <string name="search_billiard_room_str">球厅</string>
-    <string name="search_billiard_dating_str">约球</string>
+    <string name="nearby_billiard_mate_str">球友</string>
+    <string name="nearby_billiard_assist_coauch_str">助教</string>
+    <string name="nearby_billiard_coauch_str">教练</string>
+    <string name="nearby_billiard_room_str">球厅</string>
+    <string name="nearby_billiard_dating_str">约球</string>
 
     <!-- 用于SearchActivity当中的各个Fragment为空时，显示的TextView -->
     <string name="search_activity_subfragment_empty_tv_str">抱歉，暂时没有加载到任何数据</string>
@@ -91,10 +95,7 @@
     <!-- 2.约球子Fragment的title -->
     <string name="search_dating_subfragment_title_publishdata">发布时间</string>
     <string name="search_dating_detailed_btn_i_want_in">我要参加</string>
-    <string name="search_dating_detailed_btn_i_want_in_success">您已成功提交请求</string>
-    <string name="search_dating_detailed_btn_i_want_in_failed">抱歉，您的请求失败了</string>
     <string name="search_dating_detailed_tv_already_in">已参加人员</string>
-    <string name="search_dating_login_first">请您先登录，登录之后查看专属您个人的约球信息</string>
 
     <!-- 约球当中的popupWindow中的string资源 -->
     <string name="search_dating_popupwindow_no_filter">约球时间(智能排序)</string>
@@ -319,7 +320,7 @@
     <string name="ed_add_persion_by_phone_or_account">请输入手机号/账号</string>
     <string name="mentioned_me">提到我的</string>
     <string name="billiard_dating">约球</string>
-    <string name="participation_activities">活动</string>
+    <string name="play">活动</string>
     <string name="comment">备注</string>
     <string name="group">分组</string>
     <string name="set_tag">给他贴个标签吧</string>
@@ -344,6 +345,25 @@
     <string name="unknown">未知</string>
     <string name="text_ack_msg">已读</string>
     <string name="text_delivered_msg">送达</string>
+    <string name="no_friend_apply_info">暂无好友申请信息</string>
+    <string name="already_agreed">已同意</string>
+    <string name="no_sdcard_cannot_photo">SD卡不存在，不能拍照</string>
+    <string name="no_history">没有历史记录</string>
+    <string name="group_owner_dismiss_group">群主解散了该群,会话结束</string>
+    <string name="you_are_out_group">你被踢出了群,会话结束</string>
+    <string name="report_success">举报成功</string>
+    <string name="report_fail">举报失败</string>
+    <string name="chat_room">聊天室：</string>
+    <string name="report">举报</string>
+    <string name="report_content">举报的说明</string>
+    <string name="no_more_history_info">没有更多的历史信息</string>
+    <string name="and">和 </string>
+    <string name="chat"> 聊天</string>
+    <string name="crowed">群：</string>
+    <string name="entering_room">正在进入房间...</string>
+    <string name="please_write_comment">请填写备注信息</string>
+    <string name="please_select_group">请选择分组</string>
+    <string name="you_are_friends">你们已经是好友了</string>
 
     <!-- 活动 -->
     <string name="xlistview_header_hint_normal">下拉刷新</string>
@@ -352,12 +372,16 @@
     <string name="xlistview_header_last_time">上次更新时间：</string>
     <string name="xlistview_footer_hint_normal">加载更多</string>
     <string name="xlistview_footer_hint_ready">松开载入更多</string>
-    <string name="no_contact_info">没有联系人信息</string>
+    <string name="no_contact_info">没有好友信息</string>
+    <string name="upload_image_fail">上传图片失败</string>
+    <string name="uploading_image">正在上传图片，请稍等</string>
+    <string name="please_write_name">请填写联系人</string>
+    <string name="please_write_phone">请填写联系电话</string>
     <!-- 活动 -->
     <string name="time">时间</string>
     <string name="distance">距离</string>
     <string name="four_to_thirty_words">4~30个汉字</string>
-    <string name="issueactivities">发布</string>
+    <string name="issue">发布</string>
     <string name="activities_title">活动主题</string>
     <string name="activities_site">活动地点</string>
     <string name="activities_start_time">开始时间</string>
@@ -370,7 +394,8 @@
     <string name="can_empty">可不填</string>
     <string name="activities_send">发布</string>
     <string name="activities_sendinfo">发布约球信息</string>
-    <string name="activities">商家活动</string>
+    <string name="issue_date">发布约球</string>
+    <string name="business_play">商家活动</string>
     <string name="login">登录</string>
     <string name="commit">提交</string>
     <string name="forgetpwd">忘记密码 ?</string>
@@ -465,7 +490,7 @@
     <string name="title_activity_group_select_topic_type">GroupSelectTopicTypeActivity</string>
     <string name="title_activity_group_topic_detail">GroupTopicDetailActivity</string>
     <string name="activities_detail">活动详情</string>
-    <string name="activities_collect">收藏</string>
+    <string name="store_to_favor">收藏</string>
     <string name="activities_share">分享</string>
     <string name="activities_type">活动类型</string>
     <string name="groupactivity">群活动</string>
@@ -491,11 +516,30 @@
     <string name="title_activity_article_read">ArticleReadActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="lovely_type">可爱范儿</string>
+    <string name="mature_type">成熟范儿</string>
+    <string name="godness_type">女神范儿</string>
+    <string name="charming_type">妩媚范儿</string>
+    <string name="strength_type">实力范儿</string>
+    <string name="handsome_type">帅气范儿</string>
+
+
     <!-- IM -->
     <string name="im_login_other_device">您的账号在另外一台设备上登录了！</string>
     <string name="im_user_offline">您的账号掉线了！</string>
+
+    <string name="title_activity_group_detail_reply">GroupDetailReplyActivity</string>
+
     <string name="title_activity_we_chat_share_callback">WeChatShareCallbackActivity</string>
     <string name="title_activity_weibo_share_action_complete">WeiboShareActionCompleteActivity</string>
     <string name="title_activity_billiards_room_web_view">商户详情</string>
+
+    <string name="join_str">参与</string>
+    <string name="searching">正在搜索</string>
+    <string name="no_search_info">未查询到相关<xliff:g id="number" example="15">%1$s</xliff:g></string>
+    <string name="of">的</string>
+    <string name="info">信息</string>
+
+
 
 </resources>

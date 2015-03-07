@@ -31,10 +31,6 @@ import com.yueqiu.util.Utils;
 import java.lang.reflect.Field;
 import java.util.List;
 
-
-/**
- * Created by yinfeng on 15/1/12.
- */
 public class PlayMainActivity extends FragmentActivity implements ActionBar.TabListener {
     private ViewPager mViewPager;
     private String[] mTitles;
@@ -202,8 +198,8 @@ public class PlayMainActivity extends FragmentActivity implements ActionBar.TabL
         {
             e.printStackTrace();
         }
-
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        //TODO:底下这句是发送系统定义好的搜索Intent.ACTION_SEARCH
+//        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
         return true;
     }
 

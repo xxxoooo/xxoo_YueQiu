@@ -38,6 +38,8 @@
         android:layout_marginTop="5dp"
         android:layout_alignBottom="@+id/favor_item_image"
         android:layout_toRightOf="@+id/favor_item_image"
+        android:layout_toLeftOf="@+id/favor_time"
+        android:layout_marginRight="3dp"
         />
     <TextView
         android:id="@+id/favor_time"

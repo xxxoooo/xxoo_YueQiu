@@ -7,6 +7,10 @@ package com.yueqiu.constant;
 public class HttpConstants
 {
 
+    public static final String BASE_URL = "http://app.chuangyezheluntan.com/index.php/v1";
+
+    public static final String IMG_BASE_URL = "http://app.chuangyezheluntan.com/index.php/v1/system/getImg/img_url/";
+
     /**
      * 请求方式
      */
@@ -105,6 +109,8 @@ public class HttpConstants
         public static final String START_NO = "start_no";
 
         public static final String END_NO = "end_no";
+
+        public static final String KEYWORD = "keyword";
     }
 
     /**
@@ -120,6 +126,8 @@ public class HttpConstants
         public static final String START_NO = "start_no";
 
         public static final String END_NO = "end_no";
+
+        public static final String KEYWORD = "keyword";
     }
 
     /*
@@ -369,7 +377,11 @@ public class HttpConstants
 
         public static final String GETLISTEE = "/play/getList";
 
+        public static final String BUSINESS = "/play/getBusinessList";
+
         public static final String GETDETAIL = "/play/deatil";
+
+        public static final String BUSINESS_DETAIL = "/play/getBusinessDeatil";
 
         public static final String TYPE = "type";
 
@@ -380,6 +392,30 @@ public class HttpConstants
         public static final String END_NO = "end_no";
 
         public static final String USER_ID = "user_id";
+
+        public static final String TITLE = "title";
+
+        public static final String ADDRESS = "address";
+
+        public static final String BEGIN_TIME = "begin_time";
+
+        public static final String END_TIME = "end_time";
+
+        public static final String MODEL = "model";
+
+        public static final String CONTENT = "content";
+
+        public static final String LAT = "lat";
+
+        public static final String LNG = "lng";
+
+        public static final String NAME = "name";
+
+        public static final String PHONE = "phone";
+
+        public static final String IMG_URL = "img_url";
+
+        public static final String KEYWORD = "keyword";
     }
 
     /**
@@ -396,6 +432,8 @@ public class HttpConstants
         public static final String TITLE    = "title";
 
         public static final String CONTENT  = "content";
+
+        public static final String IMG_URL = "img_url";
     }
 
     /**
@@ -410,6 +448,8 @@ public class HttpConstants
         public static final String STAR_NO  = "start_no";
 
         public static final String END_NO   = "end_no";
+
+        public static final String KEYWORD = "keyword";
 
 
     }
@@ -525,6 +565,107 @@ public class HttpConstants
 
     }
 
+    public static class SetNickName{
+
+        public static final String URL = "/user/setNickName";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String NICKNAME = "nickname";
+    }
+
+    public static class SetAttr{
+
+        public static final String URL = "/system/setAttri";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String CLASS = "class";//球种
+
+        public static final String MONEYS = "moneys";
+
+        public static final String AGE = "age";
+
+        public static final String MYTYPE = "mytype";
+
+        public static final String USER_TYPE = "user_type";
+
+        public static final String LEVELS = "levels";
+
+        public static final String ZIZHI = "zizhi";
+
+        public static final String BALLARM = "ballArm";
+
+        public static final String USED_TYPE = "usedType";
+
+        public static final String DISTRICT = "district";
+
+        public static final String SEX = "sex";
+
+        public static final String IDOL = "idol";
+
+        public static final String IDOL_NAME = "idol_name";
+
+        public static final String APPOINT_DATE = "appoint_date";
+
+        public static final String WORK_LIVE = "work_live";
+    }
+
+    public static class SetUserUp{
+
+        public static final String URL = "/user/setUserUp";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String USER_TYPE = "user_type";
+
+    }
+
+    public static class DateIssue{
+
+        public static final String URL = "/center/publish";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String TITLE = "title";
+
+        public static final String ADDRESS = "address";
+
+        public static final String BEGIN_TIME = "begin_time";
+
+        public static final String END_TIME = "end_time";
+
+        public static final String MODEL = "model";
+
+        public static final String CONTENT = "content";
+
+        public static final String NAME = "name";
+
+        public static final String PHONE = "phone";
+
+        public static final String IMG_URL = "img_url";
+
+    }
+
+    public static class Praise{
+
+        public static final String URL = "/laud/addOne";
+
+        public static final String ID = "id";
+    }
+
+    public static class Reply{
+
+        public static final String URL = "/cricle/comment";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String TID = "tid";
+
+        public static final String CONTENT = "content";
+
+
+    }
 
     // 这是SearchActivity当中的球厅Fragment当中的请求数据的过程
     // 因为服务器端使用的是大众点评的SDK，所以我们的请求地址是以大众点评为基础的

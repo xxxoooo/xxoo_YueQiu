@@ -4,10 +4,7 @@ package com.yueqiu.bean;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * 用户基本信息实体类
- * Created by yinfeng on 14/12/23.
- */
+
 public class UserInfo {
     private int id;
     private String img_url;//头像在网络中的地址
@@ -31,11 +28,17 @@ public class UserInfo {
     private String ball_class;
 
 
-
     private String ball_type;
     private String token;
     private String user_id;
     private String login_time;//登录时间
+
+    private String cost;
+    private String my_type;
+    private String work_live;
+
+    private String comment_time;
+    private String content;
 
     private static final String JSON_USER_ID = "user_id";
     private static final String JSON_IMGREAL = "img_url";
@@ -52,6 +55,10 @@ public class UserInfo {
     private static final String JSON_NEW_IMG = "new_img";
     private static final String JSON_CLASS = "class";
     private static final String JSON_APPOINT_DATE = "appoint_date";
+    //TODO
+    private static final String JSON_COST = "moneys";
+    private static final String JSON_WORK_LIVE = "work_live";
+    private static final String JSON_MY_TYPE = "mytype";
 
     public void setBall_type(int ball_type) {
         this.ball_type = String.valueOf(ball_type);
@@ -249,6 +256,46 @@ public class UserInfo {
         this.ball_class = ball_class;
     }
 
+
+    public String getCost() {
+        return cost;
+    }
+
+    public void setCost(String cost) {
+        this.cost = cost;
+    }
+
+    public int getMy_type() {
+        return Integer.valueOf(my_type);
+    }
+
+    public void setMy_type(int my_type) {
+        this.my_type = String.valueOf(my_type);
+    }
+
+    public String getWork_live() {
+        return work_live;
+    }
+
+    public void setWork_live(String work_live) {
+        this.work_live = work_live;
+    }
+
+    public String getComment_time() {
+        return comment_time;
+    }
+
+    public void setComment_time(String comment_time) {
+        this.comment_time = comment_time;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();

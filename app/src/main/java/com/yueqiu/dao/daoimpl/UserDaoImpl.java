@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.text.TextUtils;
 
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
@@ -37,7 +38,7 @@ public class UserDaoImpl implements UserDao{
         values.put(DatabaseConstant.UserTable.USERNAME,map.get(DatabaseConstant.UserTable.USERNAME));
         values.put(DatabaseConstant.UserTable.PHONE, map.get(DatabaseConstant.UserTable.PHONE));
         String password = map.get(DatabaseConstant.UserTable.PASSWORD);
-        String sign = new String(Hex.encodeHex(DigestUtils.sha(password))).toUpperCase();
+        String sign = TextUtils.isEmpty(password) ? "" : new String(Hex.encodeHex(DigestUtils.sha(password))).toUpperCase();
         values.put(DatabaseConstant.UserTable.PASSWORD,sign);
         values.put(DatabaseConstant.UserTable.SEX,map.get(DatabaseConstant.UserTable.SEX) == null ?
                 "" : map.get(DatabaseConstant.UserTable.SEX));
@@ -72,6 +73,12 @@ public class UserDaoImpl implements UserDao{
                 "" : map.get(DatabaseConstant.UserTable.NEW_IMG_REAL));
         values.put(DatabaseConstant.UserTable.LOGIN_TIME,map.get(DatabaseConstant.UserTable.LOGIN_TIME) == null ?
                 "" : map.get(DatabaseConstant.UserTable.LOGIN_TIME));
+        values.put(DatabaseConstant.UserTable.COST,map.get(DatabaseConstant.UserTable.COST) == null ?
+                "" : map.get(DatabaseConstant.UserTable.COST));
+        values.put(DatabaseConstant.UserTable.MY_TYPE,map.get(DatabaseConstant.UserTable.MY_TYPE) == null ?
+                "" : map.get(DatabaseConstant.UserTable.MY_TYPE));
+        values.put(DatabaseConstant.UserTable.WORK_LIVE,map.get(DatabaseConstant.UserTable.WORK_LIVE) == null ?
+                "" : map.get(DatabaseConstant.UserTable.WORK_LIVE));
 
         SQLiteDatabase db = mDBUtils.getWritableDatabase();
         long result = -1;
@@ -150,6 +157,9 @@ public class UserDaoImpl implements UserDao{
             info.setIdol_name(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.IDOL_NAME)));
             info.setNew_img(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.NEW_IMG)));
             info.setLogin_time(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.LOGIN_TIME)));
+            info.setCost(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.COST)));
+            info.setMy_type(Integer.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.MY_TYPE))));
+            info.setWork_live(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.WORK_LIVE)));
         }
         cursor.close();
         return info;

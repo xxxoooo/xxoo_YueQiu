@@ -86,6 +86,8 @@ public class Utils
         YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.USERNAME));
         YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(DatabaseConstant.UserTable.USER_ID)));
         YueQiuApp.sUserInfo.setPhone(map.get(DatabaseConstant.UserTable.PHONE));
+        YueQiuApp.sUserInfo.setTitle(map.get(DatabaseConstant.UserTable.TITLE));
+        YueQiuApp.sUserInfo.setLogin_time(map.get(DatabaseConstant.UserTable.LOGIN_TIME));
 
     }
 
@@ -775,13 +777,30 @@ public class Utils
 
     /**
      * 隐藏软键盘
-     *
      * @param context
      * @param ed
      */
-    public static void dismissInputMethod(Context context, EditText ed)
-    {
-        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+    public static void dismissInputMethod(Context context, EditText ed) {
+        InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(ed.getWindowToken(), 0);
+    }
+
+    public static byte[] hex2byte(String str) { // 字符串转二进制
+        if (str == null)
+            return null;
+        str = str.trim();
+        int len = str.length();
+        if (len == 0 || len % 2 == 1)
+            return null;
+        byte[] b = new byte[len / 2];
+        try {
+            for (int i = 0; i < str.length(); i += 2) {
+                b[i / 2] = (byte) Integer
+                        .decode("0X" + str.substring(i, i + 2)).intValue();
+            }
+            return b;
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

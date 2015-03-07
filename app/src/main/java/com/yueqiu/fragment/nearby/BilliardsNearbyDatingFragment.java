@@ -25,6 +25,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.NearbyBilliardsDatingActivity;
@@ -41,6 +42,7 @@ import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -310,76 +312,81 @@ public class BilliardsNearbyDatingFragment extends Fragment
         requestParams.put("start_no", startNum + "");
         requestParams.put("end_no", endNum + "");
 
-        List<NearbyDatingSubFragmentDatingBean> cacheDatingList = new ArrayList<NearbyDatingSubFragmentDatingBean>();
+        final List<NearbyDatingSubFragmentDatingBean> cacheDatingList = new ArrayList<NearbyDatingSubFragmentDatingBean>();
 
-        String rawResult = HttpUtil.urlClient(HttpConstants.NearbyDating.URL, requestParams, HttpConstants.RequestMethod.GET);
-        Log.d(TAG, " the raw result we get for the dating info are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult))
-        {
-            try {
-                JSONObject rawJsonObj = new JSONObject(rawResult);
-                Log.d(TAG, " the rawJson object we get are : " + rawJsonObj);
-                if (!TextUtils.isEmpty(rawJsonObj.toString()))
-                {
-//                    if (!rawJsonObj.isNull("code"))
-                    if (! TextUtils.isEmpty(rawJsonObj.get("code").toString()))
+        mUIEventsHandler.sendEmptyMessage(SET_PULLREFRESH_DISABLE);
+        
+        HttpUtil.requestHttp(HttpConstants.NearbyDating.URL, requestParams, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","date response ->" + response);
+                try {
+                    if (!TextUtils.isEmpty(response.toString()))
                     {
-                        final int statusCode = rawJsonObj.getInt("code");
-                        if (statusCode == HttpConstants.ResponseCode.NORMAL)
+//                    if (!response.isNull("code"))
+                        if (! TextUtils.isEmpty(response.get("code").toString()))
                         {
-                            if (! "null".equals(rawJsonObj.get("result").toString()))
+                            final int code = response.getInt("code");
+                            if (code == HttpConstants.ResponseCode.NORMAL)
                             {
-                                JSONArray resultJsonArr = rawJsonObj.getJSONArray("result");
-                                final int size = resultJsonArr.length();
-                                Log.d("wy","size->" + size);
-                                int i;
-                                for (i = 0; i < size; ++i)
+                                if (! "null".equals(response.get("result").toString()))
                                 {
-                                    JSONObject subJsonObj = (JSONObject) resultJsonArr.get(i);
-                                    String imgUrl = subJsonObj.getString("img_url");
-                                    String datingId = subJsonObj.getString("id");
-                                    String title = subJsonObj.getString("title");
-                                    String userName = subJsonObj.getString("username");
-                                    long distance = subJsonObj.getLong("range");
-                                    NearbyDatingSubFragmentDatingBean datingBean = new NearbyDatingSubFragmentDatingBean(datingId, imgUrl, userName, title, String.valueOf(distance));
+                                    JSONArray resultJsonArr = response.getJSONArray("result");
+                                    final int size = resultJsonArr.length();
+                                    if(size < 1){
+                                        mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                    }else {
+                                        for (int i = 0; i < size; ++i) {
+                                            JSONObject subJsonObj = (JSONObject) resultJsonArr.get(i);
+                                            String imgUrl = subJsonObj.getString("img_url");
+                                            String datingId = subJsonObj.getString("id");
+                                            String title = subJsonObj.getString("title");
+                                            String userName = subJsonObj.getString("username");
+                                            long distance = subJsonObj.getLong("range");
+                                            NearbyDatingSubFragmentDatingBean datingBean = new NearbyDatingSubFragmentDatingBean(datingId, imgUrl, userName, title, String.valueOf(distance));
 
-                                    // 将我们解析得到的datingBean插入到我们创建的数据库当中
-                                    cacheDatingList.add(datingBean);
-                                }
-                                if (cacheDatingList.isEmpty())
-                                {
-                                    mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                            // 将我们解析得到的datingBean插入到我们创建的数据库当中
+                                            cacheDatingList.add(datingBean);
+                                        }
+                                        if (cacheDatingList.isEmpty()) {
+                                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
 
+                                        } else {
+                                            // TODO: 我们应该在这里通知UI主线程数据请求工作已经全部完成了，停止显示ProgressBar或者显示一个Toast全部数据已经加载完的提示
+                                            mUIEventsHandler.obtainMessage(FETCH_DATA_SUCCESSED, cacheDatingList).sendToTarget();
+//                                    mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                                        }
+                                    }
                                 } else
                                 {
-                                    // TODO: 我们应该在这里通知UI主线程数据请求工作已经全部完成了，停止显示ProgressBar或者显示一个Toast全部数据已经加载完的提示
-                                    mUIEventsHandler.obtainMessage(FETCH_DATA_SUCCESSED, cacheDatingList).sendToTarget();
-//                                    mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                                    mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                    //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                                 }
-                            } else
+                            } else if (code == HttpConstants.ResponseCode.TIME_OUT)
+                            {
+                                mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                                //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                            } else if (code == HttpConstants.ResponseCode.NO_RESULT)
                             {
                                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                                 //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                            } else
+                            {
+                                Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                                Bundle errorData = new Bundle();
+                                String errorStr = response.getString("msg");
+                                if (! TextUtils.isEmpty(errorStr))
+                                {
+                                    errorData.putString(KEY_REQUEST_ERROR_DATING, errorStr);
+                                }
+                                errorMsg.setData(errorData);
+                                mUIEventsHandler.sendMessage(errorMsg);
+                                //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                             }
-                        } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
-                        {
-                            mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-                            //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
-                        } else if (statusCode == HttpConstants.ResponseCode.NO_RESULT)
-                        {
-                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                            //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                         } else
                         {
-                            Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
-                            Bundle errorData = new Bundle();
-                            String errorStr = rawJsonObj.getString("msg");
-                            if (! TextUtils.isEmpty(errorStr))
-                            {
-                                errorData.putString(KEY_REQUEST_ERROR_DATING, errorStr);
-                            }
-                            errorMsg.setData(errorData);
-                            mUIEventsHandler.sendMessage(errorMsg);
+                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                             //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                         }
                     } else
@@ -387,23 +394,22 @@ public class BilliardsNearbyDatingFragment extends Fragment
                         mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                         //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                     }
-                } else
+                } catch (JSONException e)
                 {
-                    mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                    e.printStackTrace();
+                    // 发生异常了之后，我们应该准确的通知UIHandler没有获取到任何的数据
+                    mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                     //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
                 }
-            } catch (JSONException e)
-            {
-                e.printStackTrace();
-                // 发生异常了之后，我们应该准确的通知UIHandler没有获取到任何的数据
-                mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-                //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
             }
-        } else
-        {
-            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-            //mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
-        }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            }
+        });
+
     }
 
     private static final String KEY_REQUEST_ERROR_DATING = "keyRequestErrorDating";
@@ -428,12 +434,17 @@ public class BilliardsNearbyDatingFragment extends Fragment
     private static final int NETWORK_UNAVAILABLE = 1 << 9;
     private static final int USER_HAS_NOT_LOGIN = 1 << 10;
 
+    private static final int SET_PULLREFRESH_DISABLE = 42;
+
     private Handler mUIEventsHandler = new Handler()
     {
         @Override
         public void handleMessage(Message msg)
         {
 
+            if(mDatingListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mDatingListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
             if (mDatingListView.isRefreshing())
             {
                 mDatingListView.onRefreshComplete();
@@ -491,19 +502,24 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     {
                         if (! mDatingList.contains(datingBean))
                         {
-                            if (mRefresh && !mIsListEmpty)
-                            {
-                                mDatingList.add(0, datingBean);
-                            } else
-                            {
-                                if (mIsSavedInstance)
-                                {
-                                    mDatingList.add(0, datingBean);
-                                } else
-                                {
-                                    mDatingList.add(datingBean);
-                                }
+                            if(!mIsListEmpty && Integer.valueOf(mDatingList.get(0).getId()) < Integer.valueOf(datingBean.getId())){
+                                mDatingList.add(0,datingBean);
+                            }else {
+                                mDatingList.add(datingBean);
                             }
+//                            if (mRefresh && !mIsListEmpty)
+//                            {
+//                                mDatingList.add(0, datingBean);
+//                            } else
+//                            {
+//                                if (mIsSavedInstance)
+//                                {
+//                                    mDatingList.add(0, datingBean);
+//                                } else
+//                                {
+//                                    mDatingList.add(datingBean);
+//                                }
+//                            }
                         }
                     }
                     mAfterCount = mDatingList.size();
@@ -568,7 +584,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     } else {
                         if (mLoadMore)
                         {
-                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.search_billiard_dating_str)));
+                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.nearby_billiard_dating_str)));
                         }
                     }
                     hideProgress();
@@ -601,6 +617,9 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     {
                         setEmptyViewVisible();
                     }
+                    break;
+                case SET_PULLREFRESH_DISABLE:
+                    mDatingListView.setMode(PullToRefreshBase.Mode.DISABLED);
                     break;
             }
             mDatingListAdapter.notifyDataSetChanged();

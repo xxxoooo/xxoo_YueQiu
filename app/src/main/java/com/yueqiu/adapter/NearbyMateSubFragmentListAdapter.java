@@ -11,6 +11,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.VolleySingleton;
 
@@ -96,7 +97,8 @@ public class NearbyMateSubFragmentListAdapter extends BaseAdapter
         // TODO: 现在的我们的JSon数据返回的关于用户头像的图片仍然都是一些空值，我们需要在正式数据完成的时候，继续深入的检测以下
         // TODO: 我们在Layout文件当中已经设置关于UserPhoto的默认图片，我们在这里重新加载以下
         viewHolder.mUserPhoto.setDefaultImageResId(R.drawable.default_head);
-        viewHolder.mUserPhoto.setImageUrl(userInsta.getUserPhotoUrl(), mImgLoader);
+        viewHolder.mUserPhoto.setErrorImageResId(R.drawable.default_head);
+        viewHolder.mUserPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + userInsta.getUserPhotoUrl(), mImgLoader);
         viewHolder.mUserGender.setText(userInsta.getUserGender());
         viewHolder.mUserGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, NearbyFragmentsCommonUtils.parseGenderDrawable(userInsta.getUserGender()), 0);
         viewHolder.mUserGender.setCompoundDrawablePadding(6);

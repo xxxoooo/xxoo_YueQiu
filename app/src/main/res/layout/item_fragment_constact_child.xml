@@ -6,14 +6,13 @@
     android:paddingTop="10dp"
     android:background="@drawable/list_group_item_background">
 
-    <ImageView
+    <com.android.volley.toolbox.NetworkImageView
         android:id="@+id/icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="62dp"
+        android:layout_height="62dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_marginLeft="10.0dip"
-        android:src="@drawable/default_head"
         android:contentDescription="@string/app_name" 
         android:scaleType="fitXY"/>
 

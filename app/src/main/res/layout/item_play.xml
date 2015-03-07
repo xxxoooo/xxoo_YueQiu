@@ -23,6 +23,8 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/activities_lv_item_iv_head"
             android:layout_toEndOf="@+id/activities_lv_item_iv_head"
+            android:layout_toLeftOf="@+id/activities_lv_item_tv_time_hour"
+            android:layout_marginRight="3dp"
             android:id="@+id/linearLayout2">
             <TextView
                 android:id="@+id/activities_lv_item_tv_title"
@@ -39,6 +41,7 @@
                 android:textSize="14sp"
                 android:singleLine="true"
                 style="@style/TimeTextStyle"
+
                />
         </LinearLayout>
 

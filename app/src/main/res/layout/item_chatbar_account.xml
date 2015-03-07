@@ -11,18 +11,16 @@
         android:id="@+id/chatbar_item_account_iv"
         android:layout_alignParentLeft="true"
         android:layout_marginRight="8dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:src="@drawable/default_head"/>
+        android:layout_width="62dp"
+        android:layout_height="62dp"
+        android:layout_centerInParent="true"/>
 
     <TextView
         android:id="@+id/chatbar_item_account_tv"
         android:layout_toRightOf="@+id/chatbar_item_account_iv"
         android:layout_alignTop="@+id/chatbar_item_account_iv"
         android:textSize="18sp"
-        style="@style/ListItemTvStyle"
-        android:text="雪花飘落"/>
+        style="@style/ListItemTvStyle"/>
 
     <TextView
         style="@style/TimeTextStyle"
@@ -32,7 +30,6 @@
         android:id="@+id/chatbar_item_gender_tv"
         android:drawablePadding="2dp"
         android:padding="2dp"
-        android:text="男"
         android:drawableRight="@drawable/male"
         android:background="@color/devide_line"
         android:textSize="14sp"/>
@@ -41,7 +38,6 @@
         style="@style/TimeTextStyle"
         android:layout_margin="4dp"
         android:padding="2dp"
-        android:text="海淀区"
         android:textSize="14sp"
         android:layout_toRightOf="@+id/chatbar_item_gender_tv"
         android:layout_below="@+id/chatbar_item_account_tv"
@@ -63,6 +59,6 @@
         android:textColor="@color/search_distance_color"
         android:textSize="12sp"
         style="@style/TimeTextStyle"
-        android:text="12-19 12:12"/>
+        />
 
 </RelativeLayout>

@@ -15,6 +15,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.PlayInfo;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.VolleySingleton;
 
@@ -71,7 +72,8 @@ public class PlayListViewAdapter extends BaseAdapter {
         holder.tv_title.setText(mList.get(i).getTitle().toString().trim());
         holder.tv_content.setText(mList.get(i).getContent().toString().trim());
         holder.photo.setDefaultImageResId(R.drawable.default_head);
-        holder.photo.setImageUrl(mList.get(i).getImg_url(), mImgLoader);
+        holder.photo.setErrorImageResId(R.drawable.default_head);
+        holder.photo.setImageUrl(HttpConstants.IMG_BASE_URL + mList.get(i).getImg_url(), mImgLoader);
         String times[] = mList.get(i).getCreate_time().split(" ");
 
 

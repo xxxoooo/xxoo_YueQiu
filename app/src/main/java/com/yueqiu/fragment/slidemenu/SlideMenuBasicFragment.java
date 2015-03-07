@@ -26,6 +26,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.ISlideMenuBasic;
@@ -39,6 +40,7 @@ import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -97,8 +99,8 @@ public abstract class SlideMenuBasicFragment extends Fragment {
         mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
         mPullToRefreshListView.setOnRefreshListener(mOnRefreshListener);
         mListView = mPullToRefreshListView.getRefreshableView();
-        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        mListView.setMultiChoiceModeListener(new ActionModeCallback());
+//        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+//        mListView.setMultiChoiceModeListener(new ActionModeCallback());
         mEmptyView = new TextView(mActivity);
 
 
@@ -135,36 +137,16 @@ public abstract class SlideMenuBasicFragment extends Fragment {
     }
 
 
-    protected class RequestAsyncTask<T> extends AsyncTaskUtil<Integer> {
-
-        public RequestAsyncTask(Map<String, Integer> map) {
-            super(map);
-        }
-
+    protected class ResponseHandler<T> extends JsonHttpResponseHandler{
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            if(!mLoadMore && !mRefresh) {
-                mPreProgress.setVisibility(View.VISIBLE);
-                mPreText.setVisibility(View.VISIBLE);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonResult) {
-            super.onPostExecute(jsonResult);
-
-            Log.d(TAG,"jsonResult is ->" + jsonResult);
-            mPreProgress.setVisibility(View.GONE);
-            mPreText.setVisibility(View.GONE);
-
-            if(mPullToRefreshListView.isRefreshing())
-                mPullToRefreshListView.onRefreshComplete();
+        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+            super.onSuccess(statusCode, headers, response);
+            Log.d("wy","response ->" + response);
             try {
-                if(!jsonResult.isNull("code")) {
-                    if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                        if (jsonResult.getJSONObject("result") != null) {
-                            List<T> list = setBeanByJSON(jsonResult);
+                if(!response.isNull("code")) {
+                    if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                        if (response.getJSONObject("result") != null) {
+                            List<T> list = setBeanByJSON(response);
                             if(list.isEmpty()){
                                 mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                             }else{
@@ -175,14 +157,14 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                             mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                         }
                     }
-                    else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                    else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
                         mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
                     }
-                    else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                    else if(response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
                         mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                     }
                     else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonResult.getString("msg")).sendToTarget();
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
                     }
                 }else{
                     mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
@@ -191,12 +173,24 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
+        @Override
+        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+            super.onFailure(statusCode, headers, responseString, throwable);
+            mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+        }
     }
+
 
     protected class BasicHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgress.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
+            if(mPullToRefreshListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
             if(mPullToRefreshListView.isRefreshing())
                 mPullToRefreshListView.onRefreshComplete();
             switch (msg.what){
