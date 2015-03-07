@@ -3,8 +3,10 @@ package com.yueqiu.fragment.nearby;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -16,16 +18,24 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationListener;
+import com.amap.api.location.LocationManagerProxy;
+import com.amap.api.location.LocationProviderProxy;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyCoauchSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyCoauchSubFragmentCoauchBean;
 import com.yueqiu.constant.HttpConstants;
@@ -33,6 +43,7 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
+import com.yueqiu.fragment.nearby.common.NearbySubFragmentConstants;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
@@ -105,8 +116,6 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
     }
 
-    private String mArgs;
-
     private ProgressBar mPreProgress;
     private TextView mPreTextView;
     private Drawable mProgressDrawable;
@@ -120,10 +129,16 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
     private NearbyFragmentsCommonUtils.ControlPopupWindowCallback mCallback;
 
+    private int mRequestFlag;
+    private String mArgs;
+
+    private float mLat, mLng;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         mView = inflater.inflate(R.layout.fragment_nearby_coauch_layout, container, false);
+        setHasOptionsMenu(true);
 
         NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
         commonUtils.initViewPager(mContext, mView);
@@ -147,7 +162,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
         mPreProgress.getIndeterminateDrawable().setBounds(bounds);
 
         Bundle args = getArguments();
-        mArgs = args.getString(PARAMS_KEY);
+        mArgs = args.getString(NearbySubFragmentConstants.BILLIARD_SEARCH_TAB_NAME);
 
         // TODO: 这里加载的是测试数据,暂时还不能删除这个方法，因为我们还要查看总的UI加载效果
 //        initListViewTestData();
@@ -231,7 +246,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
     private static NearbyParamsPreference sParamsPreference = NearbyParamsPreference.getInstance();
 
-    private void retrieveInitialCoauchInfo(final String clazzRequest, String levelRequest, final int startNo, final int endNo)
+    private void retrieveInitialCoauchInfo(final float lati, final float lng, final String clazzRequest, String levelRequest, final int startNo, final int endNo)
     {
         if (!Utils.networkAvaiable(getActivity()))
         {
@@ -240,7 +255,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
             return;
         }
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
-
+        // 我们直接在请求方法内部进行关于请求参数的可行性判断
         if (! TextUtils.isEmpty(clazzRequest))
         {
             requestParams.put("clazz", clazzRequest);
@@ -250,6 +265,9 @@ public class BilliardsNearbyCoachFragment extends Fragment
             requestParams.put("level", levelRequest);
         }
 
+        // 将经纬度作为参数添加上
+        requestParams.put("lat", String.valueOf(lati));
+        requestParams.put("lng", String.valueOf(lng));
         requestParams.put("start_no", startNo + "");
         requestParams.put("end_no", endNo + "");
 
@@ -387,6 +405,8 @@ public class BilliardsNearbyCoachFragment extends Fragment
     private static final int UI_SHOW_PROGRESS = 1 << 6;
 
     private static final int SET_PULLREFRESH_DISABLE = 42;
+    public static final int GET_LOCATION = 43;
+    public static final int LOCATION_HAS_GOT = 44;
 
     private  Handler mUIEventsHandler = new Handler()
     {
@@ -566,10 +586,64 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 case SET_PULLREFRESH_DISABLE:
                     mCoauchListView.setMode(PullToRefreshBase.Mode.DISABLED);
                     break;
+                case GET_LOCATION:
+                    showProgress();
+                    mCoauchListView.setMode(PullToRefreshBase.Mode.DISABLED);
+                    if (mCoauchListView.getVisibility() == View.VISIBLE)
+                    {
+                        mCoauchListView.setEmptyView(null);
+                        mEmptyView.setVisibility(View.GONE);
+                    }
+                    mRequestFlag = msg.arg1;
+                    mArgs = (String) msg.obj;
+
+                    getLocation();
+                    break;
+                case LOCATION_HAS_GOT:
+                    Bundle args = (Bundle) msg.obj;
+                    mLat = args.getFloat("lat");
+                    mLng = args.getFloat("lng");
+                    switch (mRequestFlag)
+                    {
+                        case RETRIEVE_ALL_COAUCH_INFO:
+                            String cacheClazz = sParamsPreference.getCouchClazz(mContext);
+                            String cacheLevel = sParamsPreference.getCouchLevel(mContext);
+                            retrieveInitialCoauchInfo(mLat, mLng, cacheClazz, cacheLevel, mStartNum, mEndNum);
+                            break;
+                        case RETRIEVE_COAUCH_WITH_CLASS_FILTERED:
+                            if (! mCoauchList.isEmpty())
+                            {
+                                mCoauchList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+                            String clazzL = mArgs;
+                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
+                            Log.d(TAG, " inside the BackgroundThread --> the clazz string we get in the CouachFragment are : " + clazzL);
+                            String clazzCacheLevel = sParamsPreference.getCouchLevel(mContext);
+                            // 我们每次的筛选都要从零开始请求最新的数据
+                            retrieveInitialCoauchInfo(mLat, mLng, clazzL, clazzCacheLevel, 0, 9);
+                            break;
+                        case RETRIEVE_COAUCH_WITH_LEVEL_FILTERED:
+                            if (! mCoauchList.isEmpty())
+                            {
+                                mCoauchList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+                            String levelL = mArgs;
+                            Log.d(TAG, " inside the BackgroundThread --> the level string we get in the CoauchFragment are : " + levelL);
+                            String levelCacheClazz = sParamsPreference.getCouchClazz(mContext);
+                            // 同样的道理，我们筛选的数据请求都要从零开始重新请求
+                            retrieveInitialCoauchInfo(mLat, mLng, levelCacheClazz, levelL, 0, 9);
+                            break;
+                    }
+                    break;
+
             }
             mCoauchListAdapter.notifyDataSetChanged();
         }
     };
+
+
 
     private TextView mEmptyView;
     // 我们通过将disable的值设置为false来进行加载EmptyView
@@ -628,33 +702,35 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 {
                     super.handleMessage(msg);
                     switch (msg.what) {
-                        case RETRIEVE_ALL_COAUCH_INFO:
-                            // 通知UIHandler开始显示Dialog
-                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
-                            Bundle numData = msg.getData();
-                            final int startNum = numData.getInt(KEY_REQUEST_START_NUM);
-                            final int endNum = numData.getInt(KEY_REQUEST_END_NUM);
-                            String cacheClazz = sParamsPreference.getCouchClazz(mContext);
-                            String cacheLevel = sParamsPreference.getCouchLevel(mContext);
-                            retrieveInitialCoauchInfo(cacheClazz, cacheLevel, startNum, endNum);
-
-                            break;
-                        case RETRIEVE_COAUCH_WITH_CLASS_FILTERED:
-                            String clazz = (String) msg.obj;
-                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
-                            Log.d(TAG, " inside the BackgroundThread --> the clazz string we get in the CouachFragment are : " + clazz);
-                            String clazzCacheLevel = sParamsPreference.getCouchLevel(mContext);
-                            // 我们每次的筛选都要从零开始请求最新的数据
-                            retrieveInitialCoauchInfo(clazz, clazzCacheLevel, 0, 9);
-
-                            break;
-                        case RETRIEVE_COAUCH_WITH_LEVEL_FILTERED:
-                            String level = (String) msg.obj;
-                            Log.d(TAG, " inside the BackgroundThread --> the level string we get in the CoauchFragment are : " + level);
-                            String levelCacheClazz = sParamsPreference.getCouchClazz(mContext);
-                            // 同样的道理，我们筛选的数据请求都要从零开始重新请求
-                            retrieveInitialCoauchInfo(levelCacheClazz, level, 0, 9);
-
+//                        case RETRIEVE_ALL_COAUCH_INFO:
+//                            // 通知UIHandler开始显示Dialog
+//                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
+//                            Bundle numData = msg.getData();
+//                            final int startNum = numData.getInt(KEY_REQUEST_START_NUM);
+//                            final int endNum = numData.getInt(KEY_REQUEST_END_NUM);
+//                            String cacheClazz = sParamsPreference.getCouchClazz(mContext);
+//                            String cacheLevel = sParamsPreference.getCouchLevel(mContext);
+//                            retrieveInitialCoauchInfo(cacheClazz, cacheLevel, startNum, endNum);
+//
+//                            break;
+//                        case RETRIEVE_COAUCH_WITH_CLASS_FILTERED:
+//                            String clazz = (String) msg.obj;
+//                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
+//                            Log.d(TAG, " inside the BackgroundThread --> the clazz string we get in the CouachFragment are : " + clazz);
+//                            String clazzCacheLevel = sParamsPreference.getCouchLevel(mContext);
+//                            // 我们每次的筛选都要从零开始请求最新的数据
+//                            retrieveInitialCoauchInfo(clazz, clazzCacheLevel, 0, 9);
+//
+//                            break;
+//                        case RETRIEVE_COAUCH_WITH_LEVEL_FILTERED:
+//                            String level = (String) msg.obj;
+//                            Log.d(TAG, " inside the BackgroundThread --> the level string we get in the CoauchFragment are : " + level);
+//                            String levelCacheClazz = sParamsPreference.getCouchClazz(mContext);
+//                            // 同样的道理，我们筛选的数据请求都要从零开始重新请求
+//                            retrieveInitialCoauchInfo(levelCacheClazz, level, 0, 9);
+//
+//                            break;
+                        default:
                             break;
                     }
                 }
@@ -670,12 +746,16 @@ public class BilliardsNearbyCoachFragment extends Fragment
         {
             if (null != mWorkerHandler)
             {
-                Message requestMsg = mWorkerHandler.obtainMessage(RETRIEVE_ALL_COAUCH_INFO);
-                Bundle requestData = new Bundle();
-                requestData.putInt(KEY_REQUEST_START_NUM, startNum);
-                requestData.putInt(KEY_REQUEST_END_NUM, endNum);
-                requestMsg.setData(requestData);
-                mWorkerHandler.sendMessage(requestMsg);
+//                Message requestMsg = mWorkerHandler.obtainMessage(RETRIEVE_ALL_COAUCH_INFO);
+//                Bundle requestData = new Bundle();
+//                requestData.putInt(KEY_REQUEST_START_NUM, startNum);
+//                requestData.putInt(KEY_REQUEST_END_NUM, endNum);
+//                requestMsg.setData(requestData);
+//                mWorkerHandler.sendMessage(requestMsg);
+                mUIEventsHandler.obtainMessage(
+                        GET_LOCATION,
+                        RETRIEVE_ALL_COAUCH_INFO,
+                        0).sendToTarget();
             }
         }
 
@@ -694,6 +774,36 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 mWorkerHandler.obtainMessage(RETRIEVE_COAUCH_WITH_LEVEL_FILTERED, level).sendToTarget();
             }
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+        super.onCreateOptionsMenu(menu, inflater);
+        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(mContext)) {
+                    Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_NEARBY_COACH);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    intent.putExtras(args);
+                    startActivity(intent);
+                }else{
+                    Utils.showToast(mContext,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 
     private boolean mLoadMore;
@@ -761,6 +871,69 @@ public class BilliardsNearbyCoachFragment extends Fragment
             }
         }
     };
+
+    private LocationManagerProxy mLocationManagerProxy;
+
+    /**
+     * 初始化定位,用高德SDK获取经纬度，准确率貌似更高点，
+     * 之后可能会加功能，会用到高德的SDK
+     */
+    private void getLocation() {
+
+        mLocationManagerProxy = LocationManagerProxy.getInstance(getActivity());
+
+        //此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
+        //注意设置合适的定位时间的间隔，并且在合适时间调用removeUpdates()方法来取消定位请求
+        //在定位结束后，在合适的生命周期调用destroy()方法
+        //其中如果间隔时间为-1，则定位只定一次
+        mLocationManagerProxy.requestLocationData(
+                LocationProviderProxy.AMapNetwork, -1, 15, new AMapLocationListener() {
+                    @Override
+                    public void onLocationChanged(AMapLocation aMapLocation) {
+                        if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
+                            //获取位置信息
+                            double latitude = aMapLocation.getLatitude();
+                            double longitude = aMapLocation.getLongitude();
+
+                            Log.d("wy","latitude ->" + latitude);
+                            Log.d("wy","longitude ->" + longitude);
+                            // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
+                            sParamsPreference.ensurePreference(mContext);
+                            sParamsPreference.setRoomLati(mContext, (float) latitude);
+                            sParamsPreference.setRoomLongi(mContext, (float) longitude);
+
+                            Bundle args = new Bundle();
+                            args.putFloat("lat", (float) latitude);
+                            args.putFloat("lng", (float) longitude);
+                            mUIEventsHandler.obtainMessage(LOCATION_HAS_GOT,args).sendToTarget();
+
+                        }
+                    }
+
+                    @Override
+                    public void onLocationChanged(Location location) {
+
+                    }
+
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                    }
+
+                    @Override
+                    public void onProviderEnabled(String provider) {
+
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String provider) {
+
+                    }
+                });
+
+        mLocationManagerProxy.setGpsEnable(false);
+    }
+
 
 }
 

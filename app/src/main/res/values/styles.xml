@@ -18,6 +18,9 @@
         <item name="android:textAppearanceLargePopupMenu">@style/CustomActionBarTextStyle</item>
     </style>
 
+    <style name="SplashScreenTheme" parent="android:Theme.NoTitleBar.Fullscreen">
+        <item name="android:windowBackground">@drawable/cab_background_top_example</item>
+    </style>
 
     <style name="Widget"/>
 

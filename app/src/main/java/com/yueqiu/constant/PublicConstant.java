@@ -20,6 +20,8 @@ public class PublicConstant {
     public static final String SEARCH_KEYWORD = "search_keyword";
     public static final String TYPE = "type";
 
+    // 用于分享到新浪微博的bitmap
+    public static final String SHARE_TO_SINA_BITMAP = "shareToSinaBitmap";
 
     public static final int GET_SUCCESS   = 0;
     public static final int NO_RESULT     = -1;

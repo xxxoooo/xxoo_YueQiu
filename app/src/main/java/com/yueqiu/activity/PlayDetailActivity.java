@@ -83,10 +83,14 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
     private FavorDao mFavorDao;
     private int mPlayType;
 
+    private View mRootView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_detail);
+        mRootView = getWindow().getDecorView().findViewById(android.R.id.content);
+
         initActionBar();
         initView();
         mImgLoader = VolleySingleton.getInstance().getImgLoader();
@@ -434,7 +438,7 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
                 }
                 break;
             case R.id.menu_activities_share:
-                Dialog dlg = Utils.showSheet(this);
+                Dialog dlg = Utils.showSheet(this, Utils.getCurrentScreenShot(mRootView));
                 dlg.show();
                 break;
         }

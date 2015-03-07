@@ -21,11 +21,14 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +36,7 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.activity.BilliardsRoomWebViewActivity;
 import com.yueqiu.activity.NearbyBilliardRoomActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyRoomSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
 import com.yueqiu.constant.HttpConstants;
@@ -140,6 +144,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                              Bundle savedInstanceState)
     {
         mView = inflater.inflate(R.layout.fragment_nearby_room_layout, container, false);
+        setHasOptionsMenu(true);
 
         NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
         commonUtils.initViewPager(mContext, mView);
@@ -360,7 +365,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
         HttpUtil.dpRequestHttp(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams,new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response)
+            {
                 super.onSuccess(statusCode, headers, response);
                 Log.d("wy","room response ->" + response);
                 try
@@ -1056,4 +1062,39 @@ public class BilliardsNearbyRoomFragment extends Fragment
             }
         }
     };
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+        super.onCreateOptionsMenu(menu, inflater);
+        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query)
+            {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(mContext)) {
+                    Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_NEARBY_ROOM);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+
+                    intent.putExtras(args);
+                    startActivity(intent);
+                } else
+                {
+                    Utils.showToast(mContext,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText)
+            {
+                return false;
+            }
+        });
+    }
+
 }

@@ -79,11 +79,14 @@ public class NearbyBilliardsDatingActivity extends Activity
     private ProgressBar mPreProgressBar;
     private Drawable mProgressDrawable;
 
+    private View mRoomView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_dating_detail);
+        mRoomView = getWindow().getDecorView().findViewById(android.R.id.content);
 
         mImgLoader = VolleySingleton.getInstance().getImgLoader();
 
@@ -579,7 +582,7 @@ public class NearbyBilliardsDatingActivity extends Activity
                 mHandler.sendEmptyMessage(ADD_TO_FAVOR);
                 return true;
             case R.id.search_room_action_share:
-                Dialog dlg = Utils.showSheet(this);
+                Dialog dlg = Utils.showSheet(this, Utils.getCurrentScreenShot(mRoomView));
                 dlg.show();
                 return true;
             case android.R.id.home:

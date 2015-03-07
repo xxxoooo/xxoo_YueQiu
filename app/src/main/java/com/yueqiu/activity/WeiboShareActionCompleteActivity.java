@@ -22,17 +22,20 @@ import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
 import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.yueqiu.R;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 
 public class WeiboShareActionCompleteActivity extends Activity implements IWeiboHandler.Response
 {
     private static final String TAG = "WeiboShareActionCompleteActivity";
 
     private IWeiboShareAPI mWeiboShareApi;
+    private Bitmap mSharedBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        mSharedBitmap = getIntent().getParcelableExtra(PublicConstant.SHARE_TO_SINA_BITMAP);
 
         // 初始化WeiboShareSDK
         this.mWeiboShareApi = WeiboShareSDK.createWeiboAPI(this, HttpConstants.WEIBO_APP_KEY);
@@ -122,8 +125,7 @@ public class WeiboShareActionCompleteActivity extends Activity implements IWeibo
             {
                 if (mWeiboShareApi.isWeiboAppInstalled())
                 {
-                    Bitmap sharedBitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.ic_launcher);
-                    shareWeiboMsg("share to weibo", sharedBitmap);
+                    shareWeiboMsg(getString(R.string.renren_share_content), mSharedBitmap);
                 } else
                 {
                     // 我们需要先提醒用户首先将微博的客户端安装上才可以进行以后的分享操作
