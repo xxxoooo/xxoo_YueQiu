@@ -1,6 +1,13 @@
 package com.yueqiu.util;
 
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+import com.loopj.android.http.SyncHttpClient;
+import com.yueqiu.constant.HttpConstants;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -9,6 +16,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -29,7 +37,7 @@ public class HttpUtil
 
     private static final int READLENGTH = 1024;
 
-    private static final String HTTP = "http://hxu0480201.my3w.com/index.php/v1";
+    private static final String HTTP = "http://app.chuangyezheluntan.com/index.php/v1";
 
     private static final String CHARSET = "utf-8";
 
@@ -110,6 +118,76 @@ public class HttpUtil
     }
 
 
+    public static <T> void requestHttp(String url,Map<String,T> map,String method,JsonHttpResponseHandler responseHandler){
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        if(map !=null ) {
+            Iterator iter = map.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<String, T> entry = (Map.Entry<String, T>) iter.next();
+                params.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        if(method.equals(HttpConstants.RequestMethod.GET) || TextUtils.isEmpty(method)){
+            client.setTimeout(6000);
+            client.get(HttpConstants.BASE_URL + url,params,responseHandler);
+
+        }
+        if(method.equals(HttpConstants.RequestMethod.POST)){
+            client.setTimeout(6000);
+            client.post(HttpConstants.BASE_URL + url,params,responseHandler);
+        }
+
+    }
+
+    //TODO:测试验证码的方法，等到所有接口地址都部署到新服务器地址上删去该方法
+    public static <T> void testHttp(String url,Map<String,T> map,String method,JsonHttpResponseHandler responseHandler){
+
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+        if(map !=null ) {
+            Iterator iter = map.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry<String, T> entry = (Map.Entry<String, T>) iter.next();
+                params.put(entry.getKey(), entry.getValue());
+            }
+        }
+
+        if(method.equals(HttpConstants.RequestMethod.GET) || TextUtils.isEmpty(method)){
+            client.get("http://www.pinruiwenhua.com/app/index.php/v1/" + url,params,responseHandler);
+
+        }
+        if(method.equals(HttpConstants.RequestMethod.POST)){
+            client.post("http://www.pinruiwenhua.com/app/index.php/v1/" + url,params,responseHandler);
+        }
+
+    }
+
+    public static  void dpRequestHttp(String baseUrl,String relativeUrl,String appKey,String appSecret,Map<String,String> map,JsonHttpResponseHandler responseHandler){
+        AsyncHttpClient client = new AsyncHttpClient();
+        RequestParams params = new RequestParams();
+
+        String sign = sign(appKey, appSecret, map);
+        try {
+            params.put("appkey",new String(appKey.getBytes(), "UTF-8"));
+            params.put("sign",new String(sign.getBytes(), "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        Iterator iter = map.entrySet().iterator();
+        while (iter.hasNext())
+        {
+            Map.Entry<String, String> entry = (Map.Entry<String, String>)iter.next();
+            try {
+                params.put(entry.getKey(),new String(entry.getValue().getBytes(),"UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+       client.get(baseUrl+relativeUrl,params,responseHandler);
+    }
 
     /**
      * 以下的这个方法是专为SearchActivity当中的SearchRoomFragment(即球厅Fragment)当中的列表,
@@ -135,7 +213,7 @@ public class HttpUtil
         if (flag) {
             sb.append("?");
             sb.append(getQueryString(appKey, appSecret, (Map<String, String>) map));
-            Log.d(TAG, " dp request --> the finally request url are : " + sb.toString());
+            Log.d("filter_param_test", " dp request --> the finally request url are : " + sb.toString());
         }
 
         HttpClient client = new DefaultHttpClient();

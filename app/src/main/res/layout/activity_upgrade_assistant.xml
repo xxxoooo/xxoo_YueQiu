@@ -394,28 +394,28 @@
                         android:layout_height="0.5dp"
                         android:background="@color/devide_line"/>
 
-                    <RelativeLayout
-                        android:clickable="true"
-                        android:background="@drawable/list_corner_round_mid2"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp">
+                    <!--<RelativeLayout-->
+                        <!--android:clickable="true"-->
+                        <!--android:background="@drawable/list_corner_round_mid2"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="44dp">-->
 
-                        <TextView
-                            android:textColor="@color/md__defaultBackground"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="10dp"
-                            android:layout_centerVertical="true"
-                            android:text="@string/the_new_post"/>
+                        <!--<TextView-->
+                            <!--android:textColor="@color/md__defaultBackground"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_marginLeft="10dp"-->
+                            <!--android:layout_centerVertical="true"-->
+                            <!--android:text="@string/the_new_post"/>-->
 
-                        <com.android.volley.toolbox.NetworkImageView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginRight="10dp"
-                            android:layout_centerVertical="true"
-                            android:layout_alignParentRight="true"
-                            android:id="@+id/upgrade_newer_photo"/>
-                    </RelativeLayout>
+                        <!--<com.android.volley.toolbox.NetworkImageView-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_marginRight="10dp"-->
+                            <!--android:layout_centerVertical="true"-->
+                            <!--android:layout_alignParentRight="true"-->
+                            <!--android:id="@+id/upgrade_newer_photo"/>-->
+                    <!--</RelativeLayout>-->
 
                 </LinearLayout>
 
@@ -520,6 +520,11 @@
         </com.yueqiu.view.CustomerScrollView>
 
     </LinearLayout>
-
+    <include
+        layout="@layout/pre_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        />
 
 </RelativeLayout>

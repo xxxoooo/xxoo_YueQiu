@@ -11,6 +11,7 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.UserInfo;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;
@@ -64,7 +65,8 @@ public class JoinListAdapter extends BaseAdapter{
         }
 
         holder.photo.setDefaultImageResId(R.drawable.default_head);
-        holder.photo.setImageUrl(mList.get(position).getImg_url(),mImgLoader);
+        holder.photo.setErrorImageResId(R.drawable.default_head);
+        holder.photo.setImageUrl(HttpConstants.IMG_BASE_URL + mList.get(position).getImg_url(),mImgLoader);
         holder.name.setText(mList.get(position).getUsername());
         return convertView;
     }

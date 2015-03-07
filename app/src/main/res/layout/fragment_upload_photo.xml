@@ -16,7 +16,6 @@
                 android:id="@+id/profile_photo_img"
                 android:layout_width="@dimen/listview_item_user_photo_width"
                 android:layout_height="@dimen/listview_item_user_photo_height"
-                android:src="@drawable/default_head"
                 />
             <!--<ImageView-->
                 <!--android:layout_width="wrap_content"-->

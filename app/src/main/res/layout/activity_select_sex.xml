@@ -6,7 +6,8 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="60dp"
-        android:id="@+id/activity_select_man">
+        android:id="@+id/activity_select_man"
+        android:background="@drawable/basic_textview_bg">
         <TextView
             android:text="@string/man"
             android:layout_centerVertical="true"
@@ -33,7 +34,8 @@
     <RelativeLayout
         android:id="@+id/activity_select_woman"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="60dp"
+        android:background="@drawable/basic_textview_bg">
         <TextView
             android:text="@string/woman"
             android:layout_centerVertical="true"

@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.adapter.JoinListAdapter;
@@ -41,6 +42,7 @@ import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +57,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by yinfeng on 15/1/6.
  */
 public class PlayDetailActivity extends Activity implements View.OnClickListener{
+
+
 
     private ActionBar mActionBar;
     private TextView mUserNameTv,mSexTv,mBrowseCountTv,mCreateTimeTv;
@@ -71,11 +75,13 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
     private boolean mStroe = false;
     private ImageLoader mImgLoader;
     private JoinListAdapter mJoinAdapter;
+    private NetworkImageView mExtraImage;
 
     private Map<String,Integer> mParamMap = new HashMap<String, Integer>();
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
     private PlayInfo mCachePlayInfo,mPlayInfo;
     private FavorDao mFavorDao;
+    private int mPlayType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +91,8 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         initView();
         mImgLoader = VolleySingleton.getInstance().getImgLoader();
         Bundle args = getIntent().getExtras();
+        mPlayType = args.getInt(PublicConstant.PLAY_TYPE);
+        Log.d("wy","play_type ->" + mPlayType);
         mTableId = args.getInt(DatabaseConstant.PlayTable.TABLE_ID);
         mCreateTime = args.getString(DatabaseConstant.PlayTable.CREATE_TIME);
 //        mInfoType = Integer.parseInt(args.getString(DatabaseConstant.PlayTable.TYPE));
@@ -123,6 +131,7 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
 
         mHeadImgIv = Utils.$(this,R.id.play_detail_img_iv);
         mHeadImgIv.setDefaultImageResId(R.drawable.default_head);
+        mHeadImgIv.setErrorImageResId(R.drawable.default_head);
         mUserNameTv = Utils.$(this,R.id.play_detail_name_tv);
         mSexTv = Utils.$(this,R.id.play_detail_gender);
         mBrowseCountTv = Utils.$(this,R.id.play_look_num);
@@ -138,6 +147,7 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         mContentTv = Utils.$(this,R.id.play_detail_illustration_info);
         mPartInGridView = Utils.$(this,R.id.play_detail_gridview);
         mJoin = Utils.$(this,R.id.btn_search_dating_detailed_join);
+        mExtraImage = Utils.$(this,R.id.play_detail_extra_img);
 
         mPreProgressBar = Utils.$(this,R.id.pre_progress);
         mPreText = Utils.$(this,R.id.pre_text);
@@ -146,17 +156,66 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         mPreProgressBar.setIndeterminateDrawable(mProgressDrawable);
         mPreProgressBar.getIndeterminateDrawable().setBounds(bounds);
 
+        if(mPlayType == PublicConstant.PLAY_BUSSINESS){
+            mSexTv.setVisibility(View.VISIBLE);
+        }
+
         mJoin.setOnClickListener(this);
     }
 
     private void requestDetail(){
+
+        mPreProgressBar.setVisibility(View.VISIBLE);
+        mPreText.setVisibility(View.VISIBLE);
+
         mParamMap.clear();
         mParamMap.put(HttpConstants.Play.ID, mTableId);
-        mUrlAndMethodMap.clear();
-        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Play.GETDETAIL);
-        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.GET);
 
-        new RequestDetailTask(mParamMap).execute(mUrlAndMethodMap);
+        String url;
+        switch(mPlayType){
+            case PublicConstant.PLAY_BUSSINESS:
+                url = HttpConstants.Play.BUSINESS_DETAIL;
+                break;
+            default:
+                url = HttpConstants.Play.GETDETAIL;
+                break;
+        }
+
+        HttpUtil.requestHttp(url,mParamMap,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","play detail response -> " + response);
+                try{
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            if(response.getString("result") != null){
+                                PlayInfo info = setDetailInfoByJSON(response);
+                                mHandler.obtainMessage(PublicConstant.GET_SUCCESS,info).sendToTarget();
+                            }else{
+                                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            }
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                            mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                        }
+                    }else{
+                        mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            }
+        });
     }
 
     private PlayInfo setDetailInfoByJSON(JSONObject object){
@@ -164,7 +223,8 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         try{
             JSONObject result = object.getJSONObject("result");
             info.setTable_id(result.getString("id"));
-            info.setImg_url(result.getString("img_url"));
+            //TODO:u_img_url是头像
+            info.setImg_url(result.getString("u_img_url"));
             info.setTitle(result.getString("title"));
             info.setUsername(result.getString("username"));
             info.setCreate_time(mCreateTime);
@@ -173,20 +233,23 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
             info.setEnd_time(result.getString("end_time"));
             info.setModel(result.getString("model"));
             info.setContent(result.getString("content"));
-            info.setLook_num(result.getInt("look_num"));
             info.setAddress(result.getString("address"));
-            info.setSex(result.getString("sex"));
             info.setContact(result.getString("name"));
             info.setPhone(result.getString("phone"));
-            JSONArray join_list = result.getJSONArray("join_list");
-            for(int i=0;i<join_list.length();i++){
-                UserInfo user = new UserInfo();
-                user.setUsername(join_list.getJSONObject(i).getString("username"));
-                user.setImg_url(join_list.getJSONObject(i).getString("img_url"));
-                user.setUser_id(Integer.parseInt(join_list.getJSONObject(i).getString("user_id")));
-                info.mJoinList.add(user);
+            //TODO:img_url是上传的图片
+            info.setExtra_img(result.getString("img_url"));
+            if(mPlayType != PublicConstant.PLAY_BUSSINESS) {
+                info.setSex(result.getString("sex"));
+                info.setLook_num(result.getInt("look_num"));
+                JSONArray join_list = result.getJSONArray("join_list");
+                for (int i = 0; i < join_list.length(); i++) {
+                    UserInfo user = new UserInfo();
+                    user.setUsername(join_list.getJSONObject(i).getString("username"));
+                    user.setImg_url(join_list.getJSONObject(i).getString("img_url"));
+                    user.setUser_id(Integer.parseInt(join_list.getJSONObject(i).getString("user_id")));
+                    info.mJoinList.add(user);
+                }
             }
-
         }catch(JSONException e){
             e.printStackTrace();
         }
@@ -195,61 +258,13 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
 
 
 
-    private class RequestDetailTask extends AsyncTaskUtil<Integer>{
 
-        public RequestDetailTask(Map<String, Integer> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgressBar.setVisibility(View.VISIBLE);
-            mPreText.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            mPreProgressBar.setVisibility(View.GONE);
-            mPreText.setVisibility(View.GONE);
-            try{
-                if(!jsonObject.isNull("code")){
-                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                        if(jsonObject.getString("result") != null){
-                            PlayInfo info = setDetailInfoByJSON(jsonObject);
-                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS,info).sendToTarget();
-                        }else{
-                            mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                        }
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
-                        mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
-                        mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                    }else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
-                    }
-                }else{
-                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-                }
-            }catch (JSONException e){
-                e.printStackTrace();
-            }
-        }
-    }
     private void updateUI(PlayInfo info){
         if (! TextUtils.isEmpty(info.getImg_url()))
         {
-            mHeadImgIv.setImageUrl(info.getImg_url(), mImgLoader);
+            mHeadImgIv.setImageUrl("http://"+ info.getImg_url(), mImgLoader);
         }
         mUserNameTv.setText(info.getUsername());
-        mSexTv.setText(info.getSex().equals("1") ? getString(R.string.man) : getString(R.string.woman));
-        if(info.getSex().equals("1")){
-            mSexTv.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.male,0);
-        }else{
-            mSexTv.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.female,0);
-        }
-        mBrowseCountTv.setText(info.getLook_num() + "");
         mCreateTimeTv.setText(mCreateTime);
         mTitleTv.setText(info.getTitle());
         mTypeTv.setText(getDetailTypeStr(info.getType()));
@@ -260,9 +275,24 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         mContentTv.setText(info.getContent());
         mContactTv.setText(info.getContact());
         mPhoneTv.setText(info.getPhone());
+        mBrowseCountTv.setText(info.getLook_num() + "");
+        mBrowseCountTv.setText(info.getLook_num() + "");
 
-        mJoinAdapter = new JoinListAdapter(this,info.mJoinList);
-        mPartInGridView.setAdapter(mJoinAdapter);
+        if(mPlayType != PublicConstant.PLAY_BUSSINESS) {
+
+            mSexTv.setText(info.getSex().equals("1") ? getString(R.string.man) : getString(R.string.woman));
+            if (info.getSex().equals("1")) {
+                mSexTv.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.male, 0);
+            } else {
+                mSexTv.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.female, 0);
+            }
+            mJoinAdapter = new JoinListAdapter(this, info.mJoinList);
+            mPartInGridView.setAdapter(mJoinAdapter);
+        }
+
+        if(! TextUtils.isEmpty(info.getExtra_img())){
+            mExtraImage.setImageUrl("http://" + info.getExtra_img(),mImgLoader);
+        }
     }
     private String getDetailTypeStr(String type){
         String typeStr;
@@ -307,6 +337,8 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
             @Override
             public void handleMessage(Message msg) {
                 super.handleMessage(msg);
+                mPreProgressBar.setVisibility(View.GONE);
+                mPreText.setVisibility(View.GONE);
                 switch (msg.what) {
                     case PublicConstant.USE_CACHE:
                         PlayInfo cacheInfo = (PlayInfo) msg.obj;
@@ -328,7 +360,11 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
                         Utils.showToast(PlayDetailActivity.this, getString(R.string.http_request_time_out));
                         break;
                     case PublicConstant.REQUEST_ERROR:
-                        Utils.showToast(PlayDetailActivity.this, getString(R.string.http_request_error));
+                        if(null == msg.obj){
+                            Utils.showToast(PlayDetailActivity.this,getString(R.string.http_request_error));
+                        }else{
+                            Utils.showToast(PlayDetailActivity.this, (String) msg.obj);
+                        }
                         break;
                     case PublicConstant.NO_RESULT:
                         Utils.showToast(PlayDetailActivity.this, getString(R.string.no_detail_info));
@@ -374,7 +410,7 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
                 finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
-            case R.id.menu_activities_collect:
+            case R.id.menu_store_to_favor:
                 //TODO:收藏完后要更新数据库
                 int user_id = YueQiuApp.sUserInfo.getUser_id();
                 if(user_id < 1) {
@@ -442,51 +478,40 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         mParamMap.put(HttpConstants.Play.ID,mTableId);
         mParamMap.put(HttpConstants.Play.USER_ID,YueQiuApp.sUserInfo.getUser_id());
 
-        mUrlAndMethodMap.clear();
-        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Favor.STORE_URL);
-        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
         mStroe = true;
+        mPreProgressBar.setVisibility(View.VISIBLE);
+        mPreText.setText(getString(R.string.storing));
+        mPreText.setVisibility(View.VISIBLE);
 
-        new StoreTask(mParamMap).execute(mUrlAndMethodMap);
-    }
-
-    private class StoreTask extends AsyncTaskUtil<Integer>{
-
-        public StoreTask(Map<String, Integer> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgressBar.setVisibility(View.VISIBLE);
-            mPreText.setText(getString(R.string.storing));
-            mPreText.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            mPreProgressBar.setVisibility(View.GONE);
-            mPreText.setVisibility(View.GONE);
-
-            try{
-                if(!jsonObject.isNull("code")){
-                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                        mHandler.sendEmptyMessage(PublicConstant.FAVOR_SUCCESS);
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
-                        mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+        HttpUtil.requestHttp(HttpConstants.Favor.STORE_URL,mParamMap,HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                try{
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            mHandler.sendEmptyMessage(PublicConstant.FAVOR_SUCCESS);
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                        }
                     }else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonObject.getString("msg")).sendToTarget();
+                        mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                     }
-                }else{
-                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                }catch(JSONException e){
+                    e.printStackTrace();
                 }
-            }catch(JSONException e){
-                e.printStackTrace();
             }
-        }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+            }
+        });
+
     }
+
 
 
     /**
@@ -496,7 +521,11 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
      */
     @Override
     public void onClick(View v) {
-        join();
+        if(Utils.networkAvaiable(this)) {
+            join();
+        }else{
+            Utils.showToast(this,getString(R.string.network_not_available));
+        }
     }
 
     private void join(){
@@ -505,51 +534,40 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         mParamMap.put(HttpConstants.NearbyDating.TYPE_ID, PublicConstant.JOIN_TYPE_PLAY);
         mParamMap.put(HttpConstants.NearbyDating.P_ID, mTableId);
 
-        mUrlAndMethodMap.clear();
-        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.NearbyDating.URL_JOIN_ACTIVITY);
-        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
+        mPreProgressBar.setVisibility(View.VISIBLE);
+        mPreText.setText(getString(R.string.joining));
+        mPreText.setVisibility(View.VISIBLE);
 
-        new JoinTask(mParamMap).execute(mUrlAndMethodMap);
-    }
-
-    private class JoinTask extends AsyncTaskUtil<Integer>{
-
-        public JoinTask(Map<String, Integer> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgressBar.setVisibility(View.VISIBLE);
-            mPreText.setText(getString(R.string.joining));
-            mPreText.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            mPreProgressBar.setVisibility(View.GONE);
-            mPreText.setVisibility(View.GONE);
-
-            try{
-                if(!jsonObject.isNull("code")){
-                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                        mHandler.sendEmptyMessage(PublicConstant.JOIN_SUCCESS);
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
-                        mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+        HttpUtil.requestHttp(HttpConstants.NearbyDating.URL_JOIN_ACTIVITY,mParamMap,HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                try{
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            mHandler.sendEmptyMessage(PublicConstant.JOIN_SUCCESS);
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                        }
                     }else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonObject.getString("msg")).sendToTarget();
+                        mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                     }
-                }else{
-                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                }catch(JSONException e){
+                    e.printStackTrace();
                 }
-            }catch(JSONException e){
-                e.printStackTrace();
             }
-        }
 
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            }
+        });
     }
+
+
 
 
 

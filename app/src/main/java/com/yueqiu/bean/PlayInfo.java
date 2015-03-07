@@ -22,6 +22,7 @@ public class PlayInfo implements Parcelable{
     private int look_num;
     private String contact;
     private String phone;
+    private String extra_img;
     //TODO:已参加人员的list
     public List<UserInfo> mJoinList = new ArrayList<UserInfo>();
 
@@ -146,6 +147,14 @@ public class PlayInfo implements Parcelable{
         this.contact = contact;
     }
 
+    public String getExtra_img() {
+        return extra_img;
+    }
+
+    public void setExtra_img(String extra_img) {
+        this.extra_img = extra_img;
+    }
+
     public PlayInfo() {
     }
 
@@ -165,6 +174,7 @@ public class PlayInfo implements Parcelable{
         look_num = in.readInt();
         contact = in.readString();
         phone = in.readString();
+        extra_img = in.readString();
     }
 
     @Override
@@ -238,6 +248,7 @@ public class PlayInfo implements Parcelable{
         dest.writeInt(look_num);
         dest.writeString(contact);
         dest.writeString(phone);
+        dest.writeString(extra_img);
     }
 
     public static final Parcelable.Creator<PlayInfo> CREATOR

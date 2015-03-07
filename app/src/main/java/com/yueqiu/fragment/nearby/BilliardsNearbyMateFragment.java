@@ -2,9 +2,13 @@ package com.yueqiu.fragment.nearby;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -12,6 +16,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -26,6 +31,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationListener;
+import com.amap.api.location.LocationManagerProxy;
+import com.amap.api.location.LocationProviderProxy;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.adapter.NearbyMateSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyDatingDetailedAlreadyBean;
@@ -37,17 +47,21 @@ import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
+import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -71,6 +85,12 @@ public class BilliardsNearbyMateFragment extends Fragment
     private View mView;
     private String mArgs;
     private Context mContext;
+
+    private int mRequestFlag;
+    private float mLat;
+    private float mLng;
+
+    private LocationManagerProxy mLocationManagerProxy;
 
     private PullToRefreshListView mSubFragmentListView;
 
@@ -235,6 +255,7 @@ public class BilliardsNearbyMateFragment extends Fragment
             // 我们的数据请求只是发生于网络可行的情况下
             mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
         }
+
         return mView;
     }
 
@@ -248,6 +269,7 @@ public class BilliardsNearbyMateFragment extends Fragment
     public void onResume()
     {
         super.onResume();
+
     }
 
     @Override
@@ -282,7 +304,7 @@ public class BilliardsNearbyMateFragment extends Fragment
      * @param distance 这个参数是可以为空的，当不为空的时候，就是我们进行筛选的时候
      * @param gender   这个参数是可以为空的，当不为空的时候，就是我们进行筛选的时候
      */
-    private void retrieveInitialMateInfoList(final int startNo, final int endNo, final String distance, final String gender)
+    private void retrieveInitialMateInfoList(final int startNo, final int endNo, final String distance, final String gender,float lat, float lng)
     {
         if (!Utils.networkAvaiable(mContext))
         {
@@ -293,109 +315,126 @@ public class BilliardsNearbyMateFragment extends Fragment
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
         requestParams.put("start_no", startNo + "");
         requestParams.put("end_no", endNo + "");
+        requestParams.put("lat",String.valueOf(lat));
+        requestParams.put("lng",String.valueOf(lng));
         if (!TextUtils.isEmpty(distance))
         {
             requestParams.put("range", distance);
         }
         if (!TextUtils.isEmpty(gender))
         {
-            requestParams.put("gender", gender);
+            requestParams.put("sex", gender);
         }
-        List<NearbyMateSubFragmentUserBean> cacheMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
-        String rawResult = HttpUtil.urlClient(HttpConstants.NearbyMate.URL, requestParams, HttpConstants.RequestMethod.GET);
-        Log.d(TAG_2, " the initial result we get are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult))
-        {
-            try
-            {
-                // initialObj当中包含的是最原始的JSON data，这个Json对象当中还包含了一些包含我们的请求状态的字段值
-                // 我们还需要从initialObj当中解析出我们真正需要的Json对象
-//                JSONObject initialObj = Utils.parseJson(rawResult);
-                JSONObject initialObj = new JSONObject(rawResult);
-                if (! TextUtils.isEmpty(initialObj.get("code").toString()))
+        Log.d("wy","mate params->" + requestParams);
+        final List<NearbyMateSubFragmentUserBean> cacheMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
+
+        mUIEventsHandler.sendEmptyMessage(SET_PULLREFRESH_DISABLE);
+        
+        HttpUtil.requestHttp(HttpConstants.NearbyMate.URL, requestParams, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","mate response ->" + response);
+                try
                 {
-                    final int statusCode = initialObj.getInt("code");
-                    JSONObject resultJson = initialObj.getJSONObject("result");
-                    Log.d(TAG, " the initial json object we get are : " + initialObj + " ; and the result are : " + resultJson);
-                    if (statusCode == HttpConstants.ResponseCode.NORMAL)
+                    if (! TextUtils.isEmpty(response.get("code").toString()))
                     {
-                        if(resultJson != null)
+                        final int code = response.getInt("code");
+                        JSONObject resultJson = response.getJSONObject("result");
+                        Log.d(TAG, " the initial json object we get are : " + response + " ; and the result are : " + resultJson);
+                        if (code == HttpConstants.ResponseCode.NORMAL)
                         {
-                            Log.d(TAG, " all are ok in for now ");
-                            final int dataCount = resultJson.getInt("count");
-                            Log.d(TAG, " the dataCount we get are : " + dataCount);
-                            JSONArray dataList = resultJson.getJSONArray("list_data");
-                            int i;
-                            for (i = 0; i < dataList.length(); ++i) {
-                                JSONObject dataObj = (JSONObject) dataList.get(i);
-                                String imgUrl = dataObj.getString("img_url");
-                                String sex = dataObj.getString("sex");
-                                String userName = dataObj.getString("username");
-                                String userId = dataObj.getString("user_id");
-                                int range = dataObj.getInt("range");
-                                String district = dataObj.getString("district");
-                                NearbyMateSubFragmentUserBean mateUserBean = new NearbyMateSubFragmentUserBean(userId, imgUrl, userName, NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex), district, String.valueOf(range));
-
-                                cacheMateList.add(mateUserBean);
-                            }
-                            // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
-                            if (cacheMateList.isEmpty())
+                            if(resultJson != null)
                             {
-                                Log.d(TAG_2, " before 5, bugs here ");
-                                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                Log.d(TAG, " all are ok in for now ");
+                                final int dataCount = resultJson.getInt("count");
+                                Log.d(TAG, " the dataCount we get are : " + dataCount);
+                                if(resultJson.get("list_data").equals("null")){
+                                    mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                }else {
+                                    JSONArray dataList = resultJson.getJSONArray("list_data");
+                                    if(dataList.length() < 1) {
+                                        mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                    }else{
+                                        int i;
+                                        for (i = 0; i < dataList.length(); ++i) {
+                                            JSONObject dataObj = (JSONObject) dataList.get(i);
+                                            String imgUrl = dataObj.getString("img_url");
+                                            String sex = dataObj.getString("sex");
+                                            String userName = dataObj.getString("username");
+                                            String userId = dataObj.getString("user_id");
+                                            int range = dataObj.getInt("range");
+                                            String district = dataObj.getString("district");
+                                            NearbyMateSubFragmentUserBean mateUserBean = new NearbyMateSubFragmentUserBean(userId, imgUrl, userName, NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex), district, String.valueOf(range));
 
+                                            cacheMateList.add(mateUserBean);
+                                        }
+                                        // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
+                                        if (cacheMateList.isEmpty()) {
+                                            Log.d(TAG_2, " before 5, bugs here ");
+                                            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+
+                                        } else {
+                                            Log.d(TAG_2, " 5. we have get all the data ");
+                                            mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
+                                            mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                                        }
+                                    }
+                                }
                             } else
                             {
-                                Log.d(TAG_2, " 5. we have get all the data ");
-                                mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
+                                Log.d(TAG_2, " 5.1 bug report 1 ");
+                                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                                 mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                             }
-                        } else
+                        } else if (code == HttpConstants.ResponseCode.TIME_OUT)
                         {
-                            Log.d(TAG_2, " 5.1 bug report 1 ");
+                            Log.d(TAG_2, "5.2 bug report 2 ");
+                            mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                            mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                        } else if (code == HttpConstants.ResponseCode.NO_RESULT)
+                        {
+                            Log.d(TAG_2, "5.3 bug report 3 ");
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                             mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
+                        } else
+                        {
+                            Log.d(TAG_2, "5.4 bug report 4 ");
+                            String errorStr = response.getString("msg");
+                            Log.d(TAG, " inside the initial mate data request method, and the error info we get are : " + errorStr);
+                            Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                            Bundle data = new Bundle();
+                            if (! TextUtils.isEmpty(errorStr))
+                            {
+                                data.putString(KEY_REQUEST_ERROR_MSG, errorStr);
+                            }
+                            errorMsg.setData(data);
+                            mUIEventsHandler.sendMessage(errorMsg);
                         }
-                    } else if (statusCode == HttpConstants.ResponseCode.TIME_OUT)
-                    {
-                        Log.d(TAG_2, "5.2 bug report 2 ");
-                        mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-                        mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
-                    } else if (statusCode == HttpConstants.ResponseCode.NO_RESULT)
-                    {
-                        Log.d(TAG_2, "5.3 bug report 3 ");
-                        mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                        mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                     } else
                     {
-                        Log.d(TAG_2, "5.4 bug report 4 ");
-                        String errorStr = initialObj.getString("msg");
-                        Log.d(TAG, " inside the initial mate data request method, and the error info we get are : " + errorStr);
-                        Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
-                        Bundle data = new Bundle();
-                        if (! TextUtils.isEmpty(errorStr))
-                        {
-                            data.putString(KEY_REQUEST_ERROR_MSG, errorStr);
-                        }
-                        errorMsg.setData(data);
-                        mUIEventsHandler.sendMessage(errorMsg);
+                        Log.d(TAG_2, " bug report 5 ");
+                        mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                        mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                     }
-                } else
+                } catch (JSONException e)
                 {
-                    Log.d(TAG_2, " bug report 5 ");
+                    Log.d(TAG_2, " bug report 6, exception happened in parsing json , reason are : " + e.toString());
+                    // 一旦异常发生，我们应该停止数据的加载工作了，而不是继续的加载
+                    e.printStackTrace();
+                    Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
                     mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                     mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                 }
-            } catch (JSONException e)
-            {
-                Log.d(TAG_2, " bug report 6, exception happened in parsing json , reason are : " + e.toString());
-                // 一旦异常发生，我们应该停止数据的加载工作了，而不是继续的加载
-                e.printStackTrace();
-                Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
                 mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                 mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
             }
-        }
+        });
     }
 
     private static final String KEY_REQUEST_ERROR_MSG = "keyRequestErrorMsg";
@@ -413,9 +452,14 @@ public class BilliardsNearbyMateFragment extends Fragment
     public static final int START_RETRIEVE_DATA_WITH_RANGE_FILTER = 10 << 4;
     public static final int START_RETRIEVE_DATA_WITH_GENDER_FILTER = 10 << 5;
 
+
     // 同UI相关的事件的两个消息
     private static final int SHOW_PROGRESSBAR = 1 << 6;
     private static final int HIDE_PROGRESSBAR = 1 << 7;
+
+    public static final int SET_PULLREFRESH_DISABLE = 42;
+    public static final int GET_LOCATION = 43;
+    public static final int LOCATION_HAS_GOT = 44;
 
 
     // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
@@ -432,6 +476,9 @@ public class BilliardsNearbyMateFragment extends Fragment
         public void handleMessage(Message msg)
         {
 
+            if(mSubFragmentListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mSubFragmentListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
             if (mSubFragmentListView.isRefreshing())
             {
                 mSubFragmentListView.onRefreshComplete();
@@ -469,18 +516,23 @@ public class BilliardsNearbyMateFragment extends Fragment
                     {
                         if (!mUserList.contains(mateBean))
                         {
-                            if (mRefresh && !mIsListEmpty)
-                            {
-                                mUserList.add(0, mateBean);
-                            } else
-                            {
-                                if (mIsSavedInstance)
-                                {
-                                    mUserList.add(0, mateBean);
-                                } else
-                                {
-                                    mUserList.add(mateBean);
-                                }
+//                            if (mRefresh && !mIsListEmpty)
+//                            {
+//                                mUserList.add(0, mateBean);
+//                            } else
+//                            {
+//                                if (mIsSavedInstance)
+//                                {
+//                                    mUserList.add(0, mateBean);
+//                                } else
+//                                {
+//                                    mUserList.add(mateBean);
+//                                }
+//                            }
+                            if(!mIsListEmpty && Integer.valueOf(mUserList.get(0).getUserId()) < Integer.valueOf(mateBean.getUserId())){
+                                mUserList.add(0,mateBean);
+                            }else {
+                                mUserList.add(mateBean);
                             }
                         }
                         // TODO: ------------------------UNCOMMENT LATER------------------------------------------
@@ -496,7 +548,7 @@ public class BilliardsNearbyMateFragment extends Fragment
 //                        }
                         // TODO: ------------------------UNCOMMENT LATER-------------------------------------------
                     }
-
+                    Collections.sort(mUserList,new DescComparator());
                     mAfterCount = mUserList.size();
                     Log.d(TAG_2, " 7. mUIEventsHandler --> the final user list size are : " + mAfterCount);
 
@@ -519,6 +571,9 @@ public class BilliardsNearbyMateFragment extends Fragment
                             }
                         }
                     }
+
+                    mRefresh = false;
+                    mLoadMore = false;
                     break;
                 // TODO: ------------------------UNCOMMENT LATER------------------------------------------
                 // TODO: 以下的代码是用于数据库的缓存处理过程
@@ -539,6 +594,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                         setEmptyVewVisible();
                     }
 
+                    mRefresh = false;
+                    mLoadMore = false;
                     break;
                 case SHOW_PROGRESSBAR:
                     showProgress();
@@ -567,22 +624,22 @@ public class BilliardsNearbyMateFragment extends Fragment
                     Log.d(TAG, " hiding the progress bar ");
 
                     break;
-                case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
-                    String gender = (String) msg.obj;
-                    if (null != mWorker)
-                    {
-                        mWorker.fetchDataWithGenderFiltered(gender);
-                    }
-
-                    break;
-
-                case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
-                    String range = (String) msg.obj;
-                    if (null != mWorker)
-                    {
-                        mWorker.fetchDataWithRangeFilter(range);
-                    }
-                    break;
+//                case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
+//                    String gender = (String) msg.obj;
+//                    if (null != mWorker)
+//                    {
+//                        mWorker.fetchDataWithGenderFiltered(gender);
+//                    }
+//
+//                    break;
+//
+//                case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
+//                    String range = (String) msg.obj;
+//                    if (null != mWorker)
+//                    {
+//                        mWorker.fetchDataWithRangeFilter(range);
+//                    }
+//                    break;
 
                 case DATA_HAS_BEEN_UPDATED:
                     mMateListAdapter.notifyDataSetChanged();
@@ -600,6 +657,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                         setEmptyVewVisible();
                     }
                     hideProgress();
+                    mRefresh = false;
+                    mLoadMore = false;
                     break;
 
                 case PublicConstant.NO_RESULT:
@@ -612,10 +671,13 @@ public class BilliardsNearbyMateFragment extends Fragment
                     {
                         if (mLoadMore)
                         {
-                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.search_billiard_mate_str)));
+                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.nearby_billiard_mate_str)));
                         }
                     }
                     hideProgress();
+
+                    mRefresh = false;
+                    mLoadMore = false;
                     break;
 
                 case PublicConstant.REQUEST_ERROR:
@@ -636,7 +698,70 @@ public class BilliardsNearbyMateFragment extends Fragment
                         Log.d("scguo_tag", " fuck goes here ! load emptyView 7");
                         setEmptyVewVisible();
                     }
+
+                    mRefresh = false;
+                    mLoadMore = false;
                     hideProgress();
+                    break;
+                case SET_PULLREFRESH_DISABLE:
+                    mSubFragmentListView.setMode(PullToRefreshBase.Mode.DISABLED);
+                    break;
+                case GET_LOCATION:
+//                    mPreTextView.setText("正在获取当前坐标");
+                    showProgress();
+                    mSubFragmentListView.setMode(PullToRefreshBase.Mode.DISABLED);
+                    if(mEmptyView.getVisibility() == View.VISIBLE){
+                        mSubFragmentListView.setEmptyView(null);
+                        mEmptyView.setVisibility(View.GONE);
+                    }
+                    mRequestFlag = msg.arg1;
+                    mArgs = (String) msg.obj;
+//                    getActivity().startService(new Intent(getActivity(), LocationUtil.class));
+                    getLocation();
+                    break;
+                case LOCATION_HAS_GOT:
+                    Bundle args = (Bundle) msg.obj;
+                    mLat = args.getFloat("lat");
+                    mLng = args.getFloat("lng");
+                    switch(mRequestFlag){
+
+                        case START_RETRIEVE_ALL_DATA:
+                            String rangeParams = mRequestParms.getMateRange(mContext);
+                            String genderParams = mRequestParms.getMateGender(mContext);
+//                            mPreTextView.setText(getString(R.string.pre_request_text));
+                            retrieveInitialMateInfoList(mStartNum, mEndNum, rangeParams, genderParams, mLat, mLng);
+                            break;
+                        case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
+                            if (!mUserList.isEmpty())
+                            {
+                                Log.d(TAG, "inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
+                                mUserList.clear();
+                                // 然后通知Adapter当中的数据源已经发生变化，所以更新Adapter
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+                            Log.d(TAG, " inside the workThread --> start filtering the mate list based on the range of the current user " + mArgs);
+                            // 每次筛选，都是从第0条开始请求最新的数据
+                            // 因为这相当于完全的重新开始了，所以我们需要将我们已经获得的UserList清空才可以
+                            if (sParamsPreference.getMateGender(mContext) != null) {
+                                retrieveInitialMateInfoList(0, 9, mArgs, sParamsPreference.getMateGender(mContext), mLat, mLng);
+                            }
+                            break;
+                        case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
+                            if (!mUserList.isEmpty())
+                            {
+                                Log.d(TAG, " inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
+                                mUserList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+                            Log.d(TAG, " inside the workThread --> start filtering the mate list based on the gender of the current user " + mArgs);
+                            if (sParamsPreference.getMateRange(mContext) != null) {
+                                // TODO: 现在我们正式完成了筛选的工作了，但是却还有一个问题，那就是我们
+                                // TODO: 确定所要加载的条目
+                                retrieveInitialMateInfoList(0, 9, sParamsPreference.getMateRange(mContext), mArgs,mLat,mLng);
+
+                            }
+                            break;
+                    }
                     break;
             }
             mMateListAdapter.notifyDataSetChanged();
@@ -709,56 +834,53 @@ public class BilliardsNearbyMateFragment extends Fragment
                 {
                     switch (msg.what)
                     {
-                        case START_RETRIEVE_ALL_DATA:
-                            Log.d(TAG_2, " 4. have received the message to retrieving all the list data  ");
-                            // 开始获取数据，我们首先将我们的ProgressBar显示出来
-                            mUIEventsHandler.sendEmptyMessage(SHOW_PROGRESSBAR);
-                            Bundle requestInfo = msg.getData();
-                            final int startNum = requestInfo.getInt(KEY_REQUEST_START_NUM);
-                            final int endNum = requestInfo.getInt(KEY_REQUEST_END_NUM);
-                            Log.d(TAG, "inside the mWorker event processing Looper, and the startNum : " + startNum + " , and the endNum are : " + endNum);
-                            String rangeParams = mRequestParms.getMateRange(mContext);
-                            String genderParams = mRequestParms.getMateGender(mContext);
-                            Log.d(TAG, " inside the mWorker event processing Looper --> And the request params that we stored in the SharedPreference : range : " + rangeParams + " , gender " + genderParams);
-                            retrieveInitialMateInfoList(startNum, endNum, rangeParams, genderParams);
-
-                            break;
-                        case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
-                            if (!mUserList.isEmpty())
-                            {
-                                Log.d(TAG, "inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
-                                mUserList.clear();
-                                // 然后通知Adapter当中的数据源已经发生变化，所以更新Adapter
-                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
-                            }
-                            String range = (String) msg.obj;
-                            Log.d(TAG, " inside the workThread --> start filtering the mate list based on the range of the current user " + range);
-                            mUIEventsHandler.sendEmptyMessage(SHOW_PROGRESSBAR);
-                            // 每次筛选，都是从第0条开始请求最新的数据
-                            // 因为这相当于完全的重新开始了，所以我们需要将我们已经获得的UserList清空才可以
-                            if (!TextUtils.isEmpty(sParamsPreference.getMateGender(mContext))) {
-                                retrieveInitialMateInfoList(0, 9, range, sParamsPreference.getMateGender(mContext));
-                            }
-
-                            break;
-                        case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
-                            if (!mUserList.isEmpty())
-                            {
-                                Log.d(TAG, " inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
-                                mUserList.clear();
-                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
-                            }
-                            String gender = (String) msg.obj;
-                            Log.d(TAG, " inside the workThread --> start filtering the mate list based on the gender of the current user " + gender);
-                            mUIEventsHandler.sendEmptyMessage(SHOW_PROGRESSBAR);
-
-                            if (!TextUtils.isEmpty(sParamsPreference.getMateRange(mContext))) {
-                                // TODO: 现在我们正式完成了筛选的工作了，但是却还有一个问题，那就是我们
-                                // TODO: 确定所要加载的条目
-                                retrieveInitialMateInfoList(0, 9, sParamsPreference.getMateRange(mContext), gender);
-                            }
-
-                            break;
+//                        case START_RETRIEVE_ALL_DATA:
+//                            Log.d(TAG_2, " 4. have received the message to retrieving all the list data  ");
+//                            Bundle requestInfo = msg.getData();
+//                            int startNum = requestInfo.getInt(KEY_REQUEST_START_NUM);
+//                            int endNum = requestInfo.getInt(KEY_REQUEST_END_NUM);
+//                            Log.d(TAG, "inside the mWorker event processing Looper, and the startNum : " + startNum + " , and the endNum are : " + endNum);
+//                            String rangeParams = mRequestParms.getMateRange(mContext);
+//                            String genderParams = mRequestParms.getMateGender(mContext);
+////                            Log.d(TAG, " inside the mWorker event processing Looper --> And the request params that we stored in the SharedPreference : range : " + rangeParams + " , gender " + genderParams);
+//
+//                            retrieveInitialMateInfoList(startNum, endNum, rangeParams, genderParams,mLat,mLng);
+//                            break;
+//                        case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
+//                            if (!mUserList.isEmpty())
+//                            {
+//                                Log.d(TAG, "inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
+//                                mUserList.clear();
+//                                // 然后通知Adapter当中的数据源已经发生变化，所以更新Adapter
+//                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+//                            }
+//                            String range = (String) msg.obj;
+//                            Log.d(TAG, " inside the workThread --> start filtering the mate list based on the range of the current user " + range);
+//                            mUIEventsHandler.obtainMessage(GET_LOCATION,START_RETRIEVE_DATA_WITH_RANGE_FILTER,0,range).sendToTarget();
+//                            // 每次筛选，都是从第0条开始请求最新的数据
+//                            // 因为这相当于完全的重新开始了，所以我们需要将我们已经获得的UserList清空才可以
+//                            if (sParamsPreference.getMateGender(mContext) != null) {
+//                                retrieveInitialMateInfoList(0, 9, range, sParamsPreference.getMateGender(mContext));
+//                            }
+//
+//                            break;
+//                        case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
+//                            if (!mUserList.isEmpty())
+//                            {
+//                                Log.d(TAG, " inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
+//                                mUserList.clear();
+//                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+//                            }
+//                            String gender = (String) msg.obj;
+//                            Log.d(TAG, " inside the workThread --> start filtering the mate list based on the gender of the current user " + gender);
+//                            if (sParamsPreference.getMateRange(mContext) != null) {
+//                                // TODO: 现在我们正式完成了筛选的工作了，但是却还有一个问题，那就是我们
+//                                // TODO: 确定所要加载的条目
+//                                retrieveInitialMateInfoList(0, 9, sParamsPreference.getMateRange(mContext), gender,mLat,mLng);
+//
+//                            }
+//
+//                            break;
 
                         // TODO: ------------------------UNCOMMENT LATER-------------------------------------------------------------
 //                        case UPDATE_LOCAL_MATE_TABLE:
@@ -800,12 +922,13 @@ public class BilliardsNearbyMateFragment extends Fragment
             if (null != mBackgroundHandler)
             {
                 Log.d(TAG_2, " 3. inside the workThread, and the startNum and the endNum we need to retrieve are : " + startNum + " , " + endNum);
-                Message requetMsg = mBackgroundHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
-                Bundle data = new Bundle();
-                data.putInt(KEY_REQUEST_START_NUM, startNum);
-                data.putInt(KEY_REQUEST_END_NUM, endNum);
-                requetMsg.setData(data);
-                mBackgroundHandler.sendMessage(requetMsg);
+//                Message requetMsg = mBackgroundHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
+//                Bundle data = new Bundle();
+//                data.putInt(KEY_REQUEST_START_NUM, startNum);
+//                data.putInt(KEY_REQUEST_END_NUM, endNum);
+//                requetMsg.setData(data);
+//                mBackgroundHandler.sendMessage(requetMsg);
+                mUIEventsHandler.obtainMessage(GET_LOCATION,START_RETRIEVE_ALL_DATA,0).sendToTarget();
             }
         }
 
@@ -871,6 +994,8 @@ public class BilliardsNearbyMateFragment extends Fragment
         outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_INSTANCE, true);
     }
 
+
+    //TODO:有问题
     private PullToRefreshBase.OnRefreshListener2<ListView> mOnRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>()
     {
         @Override
@@ -959,6 +1084,80 @@ public class BilliardsNearbyMateFragment extends Fragment
 //            }
         }
     };
+
+
+    /**
+     * 初始化定位,用高德SDK获取经纬度，准确率貌似更高点，
+     * 之后可能会加功能，会用到高德的SDK
+     */
+    private void getLocation() {
+
+        mLocationManagerProxy = LocationManagerProxy.getInstance(getActivity());
+
+        //此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
+        //注意设置合适的定位时间的间隔，并且在合适时间调用removeUpdates()方法来取消定位请求
+        //在定位结束后，在合适的生命周期调用destroy()方法
+        //其中如果间隔时间为-1，则定位只定一次
+        mLocationManagerProxy.requestLocationData(
+                LocationProviderProxy.AMapNetwork, -1, 15, new AMapLocationListener() {
+                    @Override
+                    public void onLocationChanged(AMapLocation aMapLocation) {
+                        if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
+                            //获取位置信息
+                            double latitude = aMapLocation.getLatitude();
+                            double longitude = aMapLocation.getLongitude();
+
+                            Log.d("wy","latitude ->" + latitude);
+                            Log.d("wy","longitude ->" + longitude);
+                            // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
+                            sParamsPreference.ensurePreference(mContext);
+                            sParamsPreference.setRoomLati(mContext, (float) latitude);
+                            sParamsPreference.setRoomLongi(mContext, (float) longitude);
+
+                            Bundle args = new Bundle();
+                            args.putFloat("lat", (float) latitude);
+                            args.putFloat("lng", (float) longitude);
+                            mUIEventsHandler.obtainMessage(LOCATION_HAS_GOT,args).sendToTarget();
+
+                        }
+                    }
+
+                    @Override
+                    public void onLocationChanged(Location location) {
+
+                    }
+
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                    }
+
+                    @Override
+                    public void onProviderEnabled(String provider) {
+
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String provider) {
+
+                    }
+                });
+
+        mLocationManagerProxy.setGpsEnable(false);
+    }
+
+    /**
+     * 由于服务器是按降序排序，但是从网络获取到的json却是升序，所以重新排序一下
+     */
+    private class DescComparator implements Comparator<NearbyMateSubFragmentUserBean> {
+
+        @Override
+        public int compare(NearbyMateSubFragmentUserBean lhs, NearbyMateSubFragmentUserBean rhs) {
+            int lhsUserId = Integer.valueOf(lhs.getUserId());
+            int rhsUserId = Integer.valueOf(rhs.getUserId());
+            return lhsUserId > rhsUserId ? -1 : 1;
+        }
+    }
 
 }
 

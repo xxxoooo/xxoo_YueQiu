@@ -87,6 +87,7 @@ public class NearbyRoomSubFragmentListAdapter extends BaseAdapter
 
         // then, init the elements in this layout
         viewHolder.mRoomPhoto.setDefaultImageResId(R.drawable.hall_default);
+        viewHolder.mRoomPhoto.setDefaultImageResId(R.drawable.hall_default);
         Log.d(TAG, " inside the room adapter --> and the url we get for the room thumb photo are : " + item.getRoomPhotoUrl());
         viewHolder.mRoomPhoto.setImageUrl(item.getRoomPhotoUrl(), mImgLoader);
         viewHolder.mRoomLevel.setRating(item.getLevel());

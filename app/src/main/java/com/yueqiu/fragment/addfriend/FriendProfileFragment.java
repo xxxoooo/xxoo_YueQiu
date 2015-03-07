@@ -20,14 +20,17 @@ import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,6 +57,7 @@ public class FriendProfileFragment extends Fragment {
     public static final String GENDER_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.gender_key";
     public static final String DISTRICT_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.district_key";
     public static final String FRIEND_USER_ID = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.friend_user_id_key";
+    public static final String USER_NAME_KEY = "com.yueqiu.fragment.requestaddfriend.FriendProfileFragment.username_key";
 
     private String img_path, account, gender, nick_name, district, level, ball_type, ball_arm, used_type, user_id;
     private ImageLoader mImageLoader;
@@ -124,28 +128,38 @@ public class FriendProfileFragment extends Fragment {
             return;
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Map<String, Integer> map = new HashMap<String, Integer>();
-                map.put(HttpConstants.GetMyInfo.USER_ID, mUserId);
+        Map<String, Integer> map = new HashMap<String, Integer>();
+        map.put(HttpConstants.GetMyInfo.USER_ID, mUserId);
 
-                String result = HttpUtil.urlClient(HttpConstants.GetMyInfo.URL,
-                        map, HttpConstants.RequestMethod.GET);
-                JSONObject object = Utils.parseJson(result);
+        HttpUtil.requestHttp(HttpConstants.GetMyInfo.URL,map, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
                 Message message = new Message();
                 try {
-                    if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                        mFriendInfo = Utils.mapingObject(UserInfo.class, object.getJSONObject("result"));
+                    if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                        mFriendInfo = Utils.mapingObject(UserInfo.class, response.getJSONObject("result"));
                         message.what = DATA_SUCCESS;
                         message.obj = mFriendInfo;
+
+                    }else{
+                        message.what = PublicConstant.REQUEST_ERROR;
+                        message.obj = response.getString("msg");
                     }
                     mHandler.sendMessage(message);
+                    //TODO:如果出现错误？
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-        }).start();
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            }
+        });
+
     }
 
     Handler mHandler = new Handler() {
@@ -155,6 +169,14 @@ public class FriendProfileFragment extends Fragment {
             switch (msg.what) {
                 case DATA_SUCCESS:
                     updateUI();
+                    break;
+                case PublicConstant.REQUEST_ERROR:
+                    mButton.setEnabled(false);
+                    if(null == msg.obj){
+                        Utils.showToast(getActivity(),getActivity().getString(R.string.http_request_error));
+                    }else{
+                        Utils.showToast(getActivity(), (String) msg.obj);
+                    }
                     break;
                 default:
                     toast();
@@ -187,7 +209,8 @@ public class FriendProfileFragment extends Fragment {
                 getString(R.string.habit_2) : getString(R.string.habit_3));
 
         mImageView.setDefaultImageResId(R.drawable.default_head);
-        mImageView.setImageUrl(img_url, mImageLoader);
+        mImageView.setErrorImageResId(R.drawable.default_head);
+        mImageView.setImageUrl(HttpConstants.IMG_BASE_URL + img_url, mImageLoader);
         mAccountTextView.setText(account);
         mGenderTextView.setText(gender);
         mNickNameTextView.setText(nick_name);

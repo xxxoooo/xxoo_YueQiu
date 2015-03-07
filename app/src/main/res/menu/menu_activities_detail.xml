@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:title="@string/activities_collect"
-        android:id="@+id/menu_activities_collect"
+        android:title="@string/store_to_favor"
+        android:id="@+id/menu_store_to_favor"
         android:orderInCategory="100"
         android:showAsAction="always"
         android:icon="@drawable/actionbar_title_collect"/>

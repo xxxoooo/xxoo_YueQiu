@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.adapter.NearbyAssistCoauchSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyAssistCoauchSubFragmentBean;
@@ -37,6 +38,7 @@ import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -244,7 +246,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             return;
         }
 
-        List<NearbyAssistCoauchSubFragmentBean> cacheASCoauchList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
+        final List<NearbyAssistCoauchSubFragmentBean> cacheASCoauchList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
 
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
         if (! TextUtils.isEmpty(rangeParam))
@@ -268,96 +270,104 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
         requestParams.put("start_no", startNo + "");
         requestParams.put("end_no", endNo + "");
-        String rawResult = HttpUtil.urlClient(HttpConstants.NearbyAssistCoauch.URL, requestParams, HttpConstants.RequestMethod.GET);
 
-        Log.d(TAG, " the raw result we get for the AssistCoauch info are : " + rawResult);
-        if (!TextUtils.isEmpty(rawResult))
-        {
-            try
-            {
-                JSONObject initialResultJsonObj = new JSONObject(rawResult);
+        mUIEventsHandler.sendEmptyMessage(SET_PULLREFRESH_DISABLE);
+        
+        HttpUtil.requestHttp(HttpConstants.NearbyAssistCoauch.URL, requestParams, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
 
-                if (! initialResultJsonObj.isNull("code"))
+                try
                 {
-                    final int status = initialResultJsonObj.getInt("code");
-                    if (status == HttpConstants.ResponseCode.NORMAL)
+                    if (! TextUtils.isEmpty(response.get("code").toString()))
                     {
-                        JSONObject resultJsonObj = initialResultJsonObj.getJSONObject("result");
-                        JSONArray resultArr = resultJsonObj.getJSONArray("list_data");
-                        final int count = resultArr.length();
-                        int i;
-                        for (i = 0; i < count; ++i)
+                        final int status = response.getInt("code");
+                        if (status == HttpConstants.ResponseCode.NORMAL)
                         {
-                            JSONObject dataUnit = resultArr.getJSONObject(i);
+                            JSONObject resultJsonObj = response.getJSONObject("result");
+                            if(resultJsonObj.get("list_data").equals("null")){
+                                mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            }else {
+                                JSONArray resultArr = resultJsonObj.getJSONArray("list_data");
+                                final int count = resultArr.length();
+                                if(count < 1){
+                                    mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                }else {
+                                    for (int i = 0; i < count; ++i) {
+                                        JSONObject dataUnit = resultArr.getJSONObject(i);
 
-                            // TODO: 现在服务器端还没有提供完整的数据，现在的字段都不是完整的(他返回的是球友列表的内容，我们暂时先这么做，等服务器那边改了以后再做修改)
-                            // TODO: ？？？另外就是有一个问题比较重要，那就是助教的demo当中是没有划分level的，即假设每一个助教的水平都是相同的？？？
-                            // TODO: ？？？但是在列表的筛选button当中却有一个一个按助教的水平来进行筛选的条件。这是一个很bug的地方。同Server端的同学进行协商？？？
-                            String userId = dataUnit.getString("user_id");
-                            String photoUrl = dataUnit.getString("img_url");
-                            String name = dataUnit.getString("username");
-                            String sex = dataUnit.getString("sex");
-                            String money = dataUnit.getString("money");
-                            long range = dataUnit.getLong("range");
-                            String kinds = dataUnit.getString("class");
-                            String district = dataUnit.getString("district");
+                                        // TODO: 现在服务器端还没有提供完整的数据，现在的字段都不是完整的(他返回的是球友列表的内容，我们暂时先这么做，等服务器那边改了以后再做修改)
+                                        // TODO: ？？？另外就是有一个问题比较重要，那就是助教的demo当中是没有划分level的，即假设每一个助教的水平都是相同的？？？
+                                        // TODO: ？？？但是在列表的筛选button当中却有一个一个按助教的水平来进行筛选的条件。这是一个很bug的地方。同Server端的同学进行协商？？？
+                                        String userId = dataUnit.getString("user_id");
+                                        String photoUrl = dataUnit.getString("img_url");
+                                        String name = dataUnit.getString("username");
+                                        String sex = dataUnit.getString("sex");
+                                        String money = dataUnit.getString("money");
+                                        long range = dataUnit.getLong("range");
+                                        String kinds = dataUnit.getString("class");
+                                        String district = dataUnit.getString("district");
 
-                            NearbyAssistCoauchSubFragmentBean assistCoauchBean = new NearbyAssistCoauchSubFragmentBean(
-                                    userId,
-                                    photoUrl,
-                                    name,
-                                    NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex),
-                                    NearbyFragmentsCommonUtils.parseBilliardsKinds(mContext, kinds),
-                                    money,
-                                    String.valueOf(range)
-                            );
-                            cacheASCoauchList.add(assistCoauchBean);
-                        }
-                        if (cacheASCoauchList.isEmpty())
+                                        NearbyAssistCoauchSubFragmentBean assistCoauchBean = new NearbyAssistCoauchSubFragmentBean(
+                                                userId,
+                                                photoUrl,
+                                                name,
+                                                NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex),
+                                                NearbyFragmentsCommonUtils.parseBilliardsKinds(mContext, kinds),
+                                                money,
+                                                String.valueOf(range)
+                                        );
+                                        cacheASCoauchList.add(assistCoauchBean);
+                                    }
+                                    if (cacheASCoauchList.isEmpty()) {
+                                        mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                    } else {
+                                        // 然后我们直接将我们得到助教List直接发送到mUIEventHandler进行处理，因为我们只能在MainUIThread当中进行有关于数据的更新操作
+                                        mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheASCoauchList).sendToTarget();
+//                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
+                                    }
+                                }
+                            }
+                        } else if (status == HttpConstants.ResponseCode.TIME_OUT)
+                        {
+                            // 进行超时处理的请求
+                            mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                        } else if (status == HttpConstants.ResponseCode.NO_RESULT)
                         {
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                         } else
                         {
-                            // 然后我们直接将我们得到助教List直接发送到mUIEventHandler进行处理，因为我们只能在MainUIThread当中进行有关于数据的更新操作
-                            mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_SUCCESS, cacheASCoauchList).sendToTarget();
-//                            mUIEventsHandler.sendEmptyMessage(UI_HIDE_DIALOG);
-                        }
-                    } else if (status == HttpConstants.ResponseCode.TIME_OUT)
-                    {
-                        // 进行超时处理的请求
-                        mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-                    } else if (status == HttpConstants.ResponseCode.NO_RESULT)
-                    {
-                        mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                    } else
-                    {
-                        // 这里需要注意的是，服务器端可能会把msg内容置为null，即错误了，但是没有返回任何内容
-                        // 如果我们采用下面的方法，空的bundle会被传输，然后就显示一个空的Toast
+                            // 这里需要注意的是，服务器端可能会把msg内容置为null，即错误了，但是没有返回任何内容
+                            // 如果我们采用下面的方法，空的bundle会被传输，然后就显示一个空的Toast
 //                        mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR,
-//                                initialResultJsonObj.getString("msg")).sendToTarget();
-                        Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
-                        Bundle errorData = new Bundle();
-                        String errorStr = initialResultJsonObj.getString("msg");
-                        if (! TextUtils.isEmpty(errorStr))
-                        {
-                            errorData.putString(KEY_REQUEST_ERROR_MSG, errorStr);
+//                                response.getString("msg")).sendToTarget();
+                            Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
+                            Bundle errorData = new Bundle();
+                            String errorStr = response.getString("msg");
+                            if (! TextUtils.isEmpty(errorStr))
+                            {
+                                errorData.putString(KEY_REQUEST_ERROR_MSG, errorStr);
+                            }
+                            errorMsg.setData(errorData);
+                            mUIEventsHandler.sendMessage(errorMsg);
                         }
-                        errorMsg.setData(errorData);
-                        mUIEventsHandler.sendMessage(errorMsg);
                     }
+                } catch (JSONException e)
+                {
+                    e.printStackTrace();
+                    mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                    Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
                 }
-            } catch (JSONException e)
-            {
-                e.printStackTrace();
-                mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-                Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
             }
-        } else
-        {
-            // 我们获取到的数据是空的，即没有任何数据
-            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-            Log.d(TAG, " we have got nothing from the server ");
-        }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            }
+        });
+             
     }
 
 
@@ -404,11 +414,16 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
     private static final int NETWORK_UNAVAILABLE = 1 << 11;
 
+    private static final int SET_PULLREFRESH_DISABLE = 42;
+
     private Handler mUIEventsHandler = new Handler()
     {
         @Override
         public void handleMessage(Message msg)
         {
+            if(mListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
             if (mListView.isRefreshing())
             {
                 mListView.onRefreshComplete();
@@ -458,19 +473,24 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     {
                         if (! mAssistCoauchList.contains(asBean))
                         {
-                            if (mRefresh && !isListEmpty)
-                            {
-                                mAssistCoauchList.add(0, asBean);
-                            } else
-                            {
-                                if (mIsSavedInstance)
-                                {
-                                    mAssistCoauchList.add(0, asBean);
-                                } else
-                                {
-                                    mAssistCoauchList.add(asBean);
-                                }
+                            if(!isListEmpty && Integer.valueOf(mAssistCoauchList.get(0).getUserId()) < Integer.valueOf(asBean.getUserId())){
+                                mAssistCoauchList.add(0,asBean);
+                            }else {
+                                mAssistCoauchList.add(asBean);
                             }
+//                            if (mRefresh && !isListEmpty)
+//                            {
+//                                mAssistCoauchList.add(0, asBean);
+//                            } else
+//                            {
+//                                if (mIsSavedInstance)
+//                                {
+//                                    mAssistCoauchList.add(0, asBean);
+//                                } else
+//                                {
+//                                    mAssistCoauchList.add(asBean);
+//                                }
+//                            }
                         }
                     }
                     mAfterCount = mAssistCoauchList.size();
@@ -559,7 +579,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     {
                         if (mLoadMore)
                         {
-                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.search_billiard_assist_coauch_str)));
+                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.nearby_billiard_assist_coauch_str)));
                         }
                     }
                     hideProgress();
@@ -581,6 +601,9 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     }
 
                     hideProgress();
+                    break;
+                case SET_PULLREFRESH_DISABLE:
+                    mListView.setMode(PullToRefreshBase.Mode.DISABLED);
                     break;
             }
 

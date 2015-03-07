@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.tencent.mm.sdk.modelbase.BaseReq;
 import com.tencent.mm.sdk.modelbase.BaseResp;
@@ -16,6 +17,7 @@ import com.tencent.mm.sdk.modelmsg.WXTextObject;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
+import com.yueqiu.R;
 import com.yueqiu.constant.HttpConstants;
 
 import java.io.ByteArrayOutputStream;
@@ -63,20 +65,27 @@ public class WeChatShareManager implements IWXAPIEventHandler
         return sInstance;
     }
 
-    public void shareByWeChat(ShareContent shareContent, int shareType)
+    public void shareByWeChat(ShareContent shareContent, boolean shareToTimeLine)
     {
-        switch (shareContent.getShareWay())
+        if (! mWXApi.isWXAppInstalled())
         {
-            case WECHAT_SHARE_WAY_PIC:
-                Log.d(TAG, " share picture to we chat ");
-                sharePic(shareType, shareContent);
-                // 分享图片到微信
-                break;
-            case WECHAT_SHARE_WAY_TEXT:
-                // 分享文字内容到微信
-                Log.d(TAG, " share text to we chat ");
-                shareText(shareType, shareContent);
-                break;
+            Toast.makeText(mContext, mContext.getString(R.string.weixin_need_to_install_first), Toast.LENGTH_SHORT).show();
+            return;
+        } else
+        {
+            switch (shareContent.getShareWay())
+            {
+                case WECHAT_SHARE_WAY_PIC:
+                    Log.d(TAG, " share picture to we chat ");
+                    sharePic(shareContent, shareToTimeLine);
+                    // 分享图片到微信
+                    break;
+                case WECHAT_SHARE_WAY_TEXT:
+                    // 分享文字内容到微信
+                    Log.d(TAG, " share text to we chat ");
+                    shareText(shareContent, shareToTimeLine);
+                    break;
+            }
         }
     }
 
@@ -85,8 +94,6 @@ public class WeChatShareManager implements IWXAPIEventHandler
     public void onReq(BaseReq baseReq)
     {
         Log.d(TAG, " the weChat sending message to the 3-rd party app ");
-
-
     }
 
     // 当我们向微信发送消息，需要监听的就是这个接口的返回值
@@ -121,6 +128,7 @@ public class WeChatShareManager implements IWXAPIEventHandler
                 break;
             case BaseResp.ErrCode.ERR_UNSUPPORT:
                 // 不支持分享操作，可能是用户当前的设备上面没有安装微信程序
+
                 break;
             case BaseResp.ErrCode.ERR_USER_CANCEL:
                 break;
@@ -215,7 +223,13 @@ public class WeChatShareManager implements IWXAPIEventHandler
         }
     }
 
-    private void shareText(int shareType, ShareContent shareContent)
+    /**
+     *
+     * @param shareContent
+     * @param visibleToTimeLine 当这个值为true时，我们直接将当前的内容分享到微信朋友圈的timeLine,即朋友圈
+     *
+     */
+    private void shareText(ShareContent shareContent, boolean visibleToTimeLine)
     {
         final String text = shareContent.getContent();
         if (! TextUtils.isEmpty(text))
@@ -238,17 +252,22 @@ public class WeChatShareManager implements IWXAPIEventHandler
             req.transaction = buildTransaction("textshare");
             req.message = msg;
             // TODO: 现在在测试阶段，我们默认是将球厅的信息分享到Timeline上，也就是所有的好友都是可见的
-            req.scene = SendMessageToWX.Req.WXSceneTimeline;
-//            req.scene = shareType;
+            req.scene = visibleToTimeLine ? SendMessageToWX.Req.WXSceneTimeline : SendMessageToWX.Req.WXSceneSession;
             Log.d(TAG, " sending message here ... ");
             mWXApi.sendReq(req);
-        } else
+        }
+        else
         {
             Log.d(TAG, " the content you share must not be null ");
         }
     }
 
-    private void sharePic(int shareType, ShareContent shareContent)
+    /**
+     *
+     * @param shareContent
+     * @param visibleToTimeLine 当这个值为true时，我们直接将当前的内容分享到微信朋友圈的timeLine,即朋友圈
+     */
+    private void sharePic(ShareContent shareContent, boolean visibleToTimeLine)
     {
         final int PIC_RES_ID = shareContent.getPicRes();
 
@@ -277,10 +296,9 @@ public class WeChatShareManager implements IWXAPIEventHandler
             }
 
             SendMessageToWX.Req req = new SendMessageToWX.Req();
-            // TODO: ？？？
             req.transaction = buildTransaction("imagesharedata");
             req.message = msg;
-            req.scene = shareType;
+            req.scene = visibleToTimeLine ? SendMessageToWX.Req.WXSceneTimeline : SendMessageToWX.Req.WXSceneSession;
             mWXApi.sendReq(req);
         } else
         {

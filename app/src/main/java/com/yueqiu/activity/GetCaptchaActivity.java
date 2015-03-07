@@ -12,6 +12,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,14 +22,17 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.MyURLSpan;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,22 +53,22 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
     private ProgressBar mPreProgress;
     private Drawable mProgressDrawable;
     private Map<String,String> mParamMap = new HashMap<String, String>();
-    private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgress.setVisibility(View.GONE);
             switch (msg.what) {
 
                 case PublicConstant.GET_SUCCESS:
                     Bundle arg = (Bundle) msg.obj;
                     String smsCode = arg.getString("smsCode");
                     mCode = arg.getInt("code");
-                    if(smsCode.equals("false")){
-                        Utils.showToast(GetCaptchaActivity.this,getString(R.string.send_sms_failed));
-                    }else{
+//                    if(smsCode.equals("false")){
+//                        Utils.showToast(GetCaptchaActivity.this,getString(R.string.send_sms_failed));
+//                    }else{
                         Utils.showToast(GetCaptchaActivity.this,getString(R.string.wait_for_captcha_sms));
-                    }
+//                    }
                     break;
                 case PublicConstant.TIME_OUT:
                     Utils.showToast(GetCaptchaActivity.this,getString(R.string.http_request_time_out));
@@ -130,7 +134,11 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
                     Utils.showToast(GetCaptchaActivity.this,getString(R.string.please_input_right_number));
                     return;
                 }
-                getCaptcha();
+                if(Utils.networkAvaiable(this)) {
+                    getCaptcha();
+                }else{
+                    Utils.showToast(this,getString(R.string.network_not_available));
+                }
                 Utils.dismissInputMethod(this,mEtPhone);
                 break;
             case R.id.activity_checkphone_btn_register:
@@ -139,7 +147,7 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
                     Utils.showToast(GetCaptchaActivity.this,getString(R.string.please_input_captcha));
                     return;
                 }
-                if (!code.equals(mCode)) {
+                if (!code.equals(String.valueOf(mCode))) {
                     Utils.showToast(GetCaptchaActivity.this,getString(R.string.captcha_is_wrong));
                     return;
                 }
@@ -156,7 +164,6 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
                 intent.setClass(GetCaptchaActivity.this, Register1Activity.class);
                 intent.putExtras(bundle);
                 startActivity(intent);
-                finish();
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case R.id.activity_checkphone_tv_login:
@@ -167,52 +174,47 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
     }
 
     private void getCaptcha(){
+
+        mPreProgress.setVisibility(View.VISIBLE);
+
         mParamMap.put(HttpConstants.Captcha.PHONE,mPhone);
         mParamMap.put(HttpConstants.Captcha.ACTION_TYPE,String.valueOf(3));
 
-        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Captcha.URL);
-        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
-
-        new GetCaptchaTask(mParamMap).execute(mUrlAndMethodMap);
-
-    }
-
-    private class GetCaptchaTask extends AsyncTaskUtil<String>{
-
-        public GetCaptchaTask(Map<String, String> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgress.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject object) {
-            super.onPostExecute(object);
-            mPreProgress.setVisibility(View.GONE);
-            try {
-                if(!object.isNull("code")) {
-                    if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                        Bundle arg = new Bundle();
-                        arg.putString("smsCode",object.getJSONObject("result").getString("smsCode"));
-                        arg.putInt("code", object.getJSONObject("result").getInt("code"));
-                        mHandler.obtainMessage(PublicConstant.GET_SUCCESS,arg).sendToTarget();
-                    }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
-                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                    }else {
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,object.getString("msg")).sendToTarget();
+        //TODO:暂时用testHttp这个方法，等所有接口都部署到新服务器地址后改回requestHttp
+        HttpUtil.testHttp(HttpConstants.Captcha.URL,mParamMap,HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","get captcha response ->" + response);
+                try {
+                    if(!response.isNull("code")) {
+                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                            Bundle arg = new Bundle();
+                            arg.putString("smsCode",response.getJSONObject("result").getString("smsCode"));
+                            arg.putInt("code", response.getJSONObject("result").getInt("code"));
+                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS,arg).sendToTarget();
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                        }else {
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                        }
+                    }else{
+                        mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                     }
-                }else{
-                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
+
             }
-        }
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            }
+        });
+
     }
+
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

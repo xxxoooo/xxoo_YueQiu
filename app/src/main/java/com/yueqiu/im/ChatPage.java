@@ -131,10 +131,10 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 api.getLocalMessages(room, true);
                 GotyeRoom temp = api.requestRoomInfo(room.Id, true);
                 if (temp != null && !TextUtils.isEmpty(temp.getRoomName())) {
-                    mActionBar.setTitle("聊天室：" + temp.getRoomName());
+                    mActionBar.setTitle(getString(R.string.chat_room) + temp.getRoomName());
                 }
             } else {
-                ProgressDialogUtil.showProgress(this, "正在进入房间...");
+                ProgressDialogUtil.showProgress(this, getString(R.string.entering_room));
             }
         } else if (chatType == 2) {
             api.activeSession(group);
@@ -219,10 +219,10 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
         if (user != null) {
             chatType = 0;
-            mActionBar.setTitle("和 " + user.name + " 聊天");
+            mActionBar.setTitle(getString(R.string.and) + user.name + getString(R.string.chat));
         } else if (room != null) {
             chatType = 1;
-            mActionBar.setTitle("聊天室：" + room.getRoomID());
+            mActionBar.setTitle(getString(R.string.chat_room) + room.getRoomID());
         } else if (group != null) {
             chatType = 2;
             String titleText = null;
@@ -236,7 +236,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                     titleText = String.valueOf(group.getGroupID());
                 }
             }
-            mActionBar.setTitle("群：" + titleText);
+            mActionBar.setTitle(getString(R.string.crowed) + titleText);
         }
 
         textMessage.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -280,7 +280,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                         }
                         adapter.refreshData(list);
                     } else {
-                        Utils.showToast(ChatPage.this, "没有更多历史消息");
+                        Utils.showToast(ChatPage.this, getString(R.string.no_more_history_info));
                     }
                 }
                 adapter.notifyDataSetChanged();
@@ -314,12 +314,12 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                                 .equals(currentLoginUser.name)) {
                             return;
                         }
-                        MenuItem m = conMenu.add(0, 0, 0, "举报");
+                        MenuItem m = conMenu.add(0, 0, 0, getString(R.string.report));
                         m.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
 
                             @Override
                             public boolean onMenuItemClick(MenuItem item) {
-                                api.report(0, "举报的说明", message);
+                                api.report(0, getString(R.string.report_content), message);
                                 return true;
                             }
                         });
@@ -602,7 +602,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     public void selectPicFromCamera() {
         if (!FileUtil.isSDCardReady()) {
-            Toast.makeText(getApplicationContext(), "SD卡不存在，不能拍照",
+            Toast.makeText(getApplicationContext(), getString(R.string.no_sdcard_cannot_photo),
                     Toast.LENGTH_SHORT).show();
             return;
         }
@@ -725,7 +725,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 }
                 adapter.refreshData(listmessages);
             } else {
-                Utils.showToast(this, "没有历史记录");
+                Utils.showToast(this, getString(R.string.no_history));
             }
         }
         adapter.notifyDataSetInvalidated();
@@ -749,7 +749,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         if (this.group != null && group.getGroupID() == this.group.getGroupID()) {
 //            Intent i = new Intent(this, MainActivity.class);
 //            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            Toast.makeText(getBaseContext(), "群主解散了该群,会话结束", Toast.LENGTH_SHORT)
+            Toast.makeText(getBaseContext(), getString(R.string.group_owner_dismiss_group), Toast.LENGTH_SHORT)
                     .show();
             finish();
 //            startActivity(i);
@@ -764,7 +764,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             if (kicked.getName().equals(currentLoginUser.getName())) {
 //                Intent i = new Intent(this, MainActivity.class);
 //                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                Toast.makeText(getBaseContext(), "您被踢出了群,会话结束",
+                Toast.makeText(getBaseContext(), getString(R.string.you_are_out_group),
                         Toast.LENGTH_SHORT).show();
                 finish();
 //                startActivity(i);
@@ -777,9 +777,9 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     public void onReport(int code, GotyeMessage message) {
         // TODO Auto-generated method stub
         if (code == GotyeStatusCode.CODE_OK) {
-            Utils.showToast(this, "举报成功");
+            Utils.showToast(this, getString(R.string.report_success));
         } else {
-            Utils.showToast(this, "举报失败");
+            Utils.showToast(this, getString(R.string.report_fail));
         }
         super.onReport(code, message);
     }
@@ -788,7 +788,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     public void onRequestRoomInfo(int code, GotyeRoom room) {
         // TODO Auto-generated method stub
         if (this.room != null && this.room.getRoomID() == room.getRoomID()) {
-            mActionBar.setTitle("聊天室：" + room.getRoomName());
+            mActionBar.setTitle(getString(R.string.chat_room) + room.getRoomName());
         }
         super.onRequestRoomInfo(code, room);
     }
@@ -797,7 +797,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     public void onRequestGroupInfo(int code, GotyeGroup group) {
         // TODO Auto-generated method stub
         if (this.group != null && this.group.getGroupID() == group.getGroupID()) {
-            mActionBar.setTitle("聊天室：" + group.getGroupName());
+            mActionBar.setTitle(getString(R.string.chat_room) + group.getGroupName());
         }
     }
 

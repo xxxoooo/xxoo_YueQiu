@@ -6,6 +6,7 @@ import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -19,11 +20,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.adapter.PlayListViewAdapter;
 import com.yueqiu.bean.PlayInfo;
@@ -33,15 +37,18 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.PlayDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -136,17 +143,57 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
     private void initActionBar(){
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle(getString(R.string.tab_title_activity));
+        mActionBar.setTitle(getString(R.string.business_play));
     }
     private void requestPlay(){
-        mParamMap.put(HttpConstants.Play.TYPE, PublicConstant.PLAY_BUSSINESS);
+//        mParamMap.put(HttpConstants.Play.TYPE, PublicConstant.PLAY_BUSSINESS);
         mParamMap.put(HttpConstants.Play.START_NO,mStart);
         mParamMap.put(HttpConstants.Play.END_NO,mEnd);
 
-        mUrlAndMethodMap.put(PublicConstant.URL,HttpConstants.Play.GETLISTEE);
-        mUrlAndMethodMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.GET);
+        mPreProgressBar.setVisibility(View.VISIBLE);
+        mPreTextView.setVisibility(View.VISIBLE);
 
-        new RequestPlayTask(mParamMap).execute(mUrlAndMethodMap);
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
+
+        HttpUtil.requestHttp(HttpConstants.Play.BUSINESS,mParamMap,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                try{
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            if(response.getString("result") != null){
+                                List<PlayInfo> list = setPlayByJSON(response);
+                                if(list.isEmpty()){
+                                    mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                                }else{
+                                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list).sendToTarget();
+                                }
+                            }else{
+                                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            }
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                            mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                        }
+                    }else{
+                        mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+            }
+        });
+
     }
 
 
@@ -155,6 +202,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         PlayInfo info = (PlayInfo) mAdapter.getItem(position-1);
         Intent intent = new Intent(this, PlayDetailActivity.class);
         Bundle args = new Bundle();
+        args.putInt(PublicConstant.PLAY_TYPE,PublicConstant.PLAY_BUSSINESS);
         args.putInt(DatabaseConstant.PlayTable.TABLE_ID,Integer.parseInt(info.getTable_id()));
         args.putString(DatabaseConstant.PlayTable.CREATE_TIME,info.getCreate_time());
         args.putString(DatabaseConstant.PlayTable.TYPE,info.getType());
@@ -162,52 +210,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         startActivity(intent);
     }
 
-    private class RequestPlayTask extends AsyncTaskUtil<Integer>{
 
-        public RequestPlayTask(Map<String, Integer> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgressBar.setVisibility(View.VISIBLE);
-            mPreTextView.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            super.onPostExecute(jsonObject);
-            mPreProgressBar.setVisibility(View.GONE);
-            mPreTextView.setVisibility(View.GONE);
-            try{
-                if(!jsonObject.isNull("code")){
-                    if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                        if(jsonObject.getString("result") != null){
-                            List<PlayInfo> list = setPlayByJSON(jsonObject);
-                            if(list.isEmpty()){
-                                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                            }else{
-                                mHandler.obtainMessage(PublicConstant.GET_SUCCESS,list).sendToTarget();
-                            }
-                        }else{
-                            mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                        }
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
-                        mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-                    }else if(jsonObject.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
-                        mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                    }else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
-                    }
-                }else{
-                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
-                }
-            }catch (JSONException e){
-                e.printStackTrace();
-            }
-        }
-    }
 
     private List<PlayInfo> setPlayByJSON(JSONObject object){
         List<PlayInfo> list = new ArrayList<PlayInfo>();
@@ -232,6 +235,11 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgressBar.setVisibility(View.GONE);
+            mPreTextView.setVisibility(View.GONE);
+            if(mPullToRefreshListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
             if(mPullToRefreshListView.isRefreshing())
                 mPullToRefreshListView.onRefreshComplete();
             switch (msg.what){
@@ -374,7 +382,47 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+        int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
+        EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
+        searchEditText.setTextColor(Color.WHITE);
+        searchEditText.setHintTextColor(Color.LTGRAY);
+
+        // 用于改变SearchView当中的icon
+        searchView.setIconifiedByDefault(false);
+        try {
+            Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
+            searchField.setAccessible(true);
+            ImageView searchHintIcon = (ImageView) searchField.get(searchView);
+            searchHintIcon.setImageResource(R.drawable.search);
+        } catch (NoSuchFieldException e)
+        {
+            e.printStackTrace();
+        } catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(PlayBusinessActivity.this)) {
+                    Intent intent = new Intent(PlayBusinessActivity.this, SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_BUSINESS_PLAY);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    intent.putExtras(args);
+                    startActivity(intent);
+                }else{
+                    Utils.showToast(PlayBusinessActivity.this,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
         return true;
     }
 

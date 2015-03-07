@@ -14,9 +14,7 @@ import android.widget.RelativeLayout;
 import com.yueqiu.R;
 import com.yueqiu.constant.HttpConstants;
 
-/**
- * Created by yinfeng on 15/1/3.
- */
+
 public class PlaySelectSex extends Activity implements View.OnClickListener{
     private static final String TAG = "ActivitySelectSex";
     private RelativeLayout mMan;

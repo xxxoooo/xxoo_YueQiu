@@ -1,6 +1,7 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,7 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.rockerhieu.emojicon.EmojiconTextView;
 import com.yueqiu.R;
 import com.yueqiu.bean.GroupNoteInfo;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;
@@ -65,7 +67,8 @@ public class GroupBasicAdapter extends BaseAdapter{
             holder = (ViewHolder) convertView.getTag();
         }
         holder.image.setDefaultImageResId(R.drawable.default_head);
-        holder.image.setImageUrl(mList.get(position).getImg_url(),mImgLoader);
+        holder.image.setErrorImageResId(R.drawable.default_head);
+        holder.image.setImageUrl("http://"+ mList.get(position).getImg_url(),mImgLoader);
         holder.title.setText(mList.get(position).getTitle());
         holder.content.setText(mList.get(position).getContent());
         holder.browseCount.setText(""+mList.get(position).getBrowseCount());

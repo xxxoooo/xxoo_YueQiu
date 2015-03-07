@@ -70,7 +70,7 @@ public class PublishedInfoActivity extends FragmentActivity implements ActionBar
 
         mPagerAdapter = new SectionPagerAdapter(getSupportFragmentManager());
         mTitles = new String[]{
-                getString(R.string.search_billiard_dating_str),
+                getString(R.string.nearby_billiard_dating_str),
                 getString(R.string.tab_title_activity),
                 getString(R.string.billiard_group)
         };

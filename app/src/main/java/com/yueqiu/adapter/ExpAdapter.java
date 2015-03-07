@@ -9,10 +9,14 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.ContactsList;
 import com.yueqiu.bean.RecentChat;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.FileUtil;
+import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.contacts.IphoneTreeView;
 
 import java.lang.ref.SoftReference;
@@ -24,60 +28,31 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
 
     private static final String TAG = "ExpAdapter";
     private Context mContext;
-    private HashMap<String, List<RecentChat>> maps;
     private IphoneTreeView mIphoneTreeView;
-    private View mSearchView;
-    private HashMap<String, SoftReference<Bitmap>> hashMaps = new HashMap<String, SoftReference<Bitmap>>();
-    private String dir = FileUtil.getRecentChatPath();
 
     public void setData(HashMap<Integer, List<ContactsList.Contacts>> data) {
         mData = data;
     }
-
     private HashMap<Integer, List<ContactsList.Contacts>> mData;
+    private ImageLoader mImgLoader;
 
     // 伪数据
     private HashMap<Integer, Integer> groupStatusMap;
     private String[] groups = {"球友", "助教", "教练"};
-    private String[][] children = {
-            {"宋慧乔", "章泽天", "宋茜", "韩孝珠", "景甜", "刘亦菲", "康逸琨", "邓紫棋"},
-            {"宋慧乔", "章泽天", "宋茜", "韩孝珠", "景甜", "刘亦菲"},
-            {"宋慧乔", "章泽天", "宋茜", "韩孝珠", "景甜", "刘亦菲", "康逸琨", "邓紫棋"}};
-    private String[][] childPath = {
-            {dir + "songhuiqiao.jpg", dir + "zhangzetian.jpg",
-                    dir + "songqian.jpg", dir + "hangxiaozhu.jpg",
-                    dir + "jingtian.jpg", dir + "liuyifei.jpg",
-                    dir + "kangyikun.jpg", dir + "dengziqi.jpg"},
-            {dir + "songhuiqiao.jpg", dir + "zhangzetian.jpg",
-                    dir + "songqian.jpg", dir + "hangxiaozhu.jpg",
-                    dir + "jingtian.jpg", dir + "liuyifei.jpg",
-                    dir + "kangyikun.jpg", dir + "dengziqi.jpg"},
-            {dir + "songhuiqiao.jpg", dir + "zhangzetian.jpg",
-                    dir + "songqian.jpg", dir + "hangxiaozhu.jpg",
-                    dir + "jingtian.jpg", dir + "liuyifei.jpg",
-                    dir + "kangyikun.jpg", dir + "dengziqi.jpg"}};
 
     public ExpAdapter(Context context, IphoneTreeView mIphoneTreeView) {
         this.mContext = context;
         this.mIphoneTreeView = mIphoneTreeView;
-        groupStatusMap = new HashMap<Integer, Integer>();
-//        dir = FileUtil.getRecentChatPath();
-//        mSearchView = searchView;
+        this.groupStatusMap = new HashMap<Integer, Integer>();
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
     }
-
-//    public ExpAdapter(Context context, HashMap<String, List<RecentChat>> maps, IphoneTreeView mIphoneTreeView) {
-//        this.mContext = context;
-//        this.maps = maps;
-//        this.mIphoneTreeView = mIphoneTreeView;
-//        groupStatusMap = new HashMap<Integer, Integer>();
-////        dir = FileUtil.getRecentChatPath();
-//    }
 
     public ExpAdapter(Context context, HashMap<Integer, List<ContactsList.Contacts>> data, IphoneTreeView mIphoneTreeView) {
         this.mContext = context;
-        mData = data;
+        this.mData = data;
         this.mIphoneTreeView = mIphoneTreeView;
-        groupStatusMap = new HashMap<Integer, Integer>();
+        this.groupStatusMap = new HashMap<Integer, Integer>();
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
     }
 
     public Object getChild(int groupPosition, int childPosition) {
@@ -121,50 +96,22 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
     @Override
     public View getChildView(int groupPosition, int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
-        GroupHolder holder = null;
+        ChildHolder holder;
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(
                     R.layout.item_fragment_constact_child, null);
-            holder = new GroupHolder();
-            holder.nameView = (TextView) convertView
-                    .findViewById(R.id.contact_list_item_name);
-            holder.feelView = (TextView) convertView
-                    .findViewById(R.id.cpntact_list_item_state);
-            holder.iconView = (ImageView) convertView.findViewById(R.id.icon);
+            holder = new ChildHolder();
+            holder.nameView = (TextView) convertView.findViewById(R.id.contact_list_item_name);
+            holder.feelView = (TextView) convertView.findViewById(R.id.cpntact_list_item_state);
+            holder.iconView = (NetworkImageView) convertView.findViewById(R.id.icon);
             holder.date = (TextView) convertView.findViewById(R.id.contact_list_item_time);
             convertView.setTag(holder);
         } else {
-            holder = (GroupHolder) convertView.getTag();
+            holder = (ChildHolder) convertView.getTag();
         }
-
-        String path = childPath[groupPosition][childPosition];
-        /**
-         * 高大上的好友头像加载机制，demo中为减轻资源的装载省略利用路径的方式加载图片！！
-         */
-//		if (hashMaps.containsKey(path)) {
-//			holder.iconView.setImageBitmap(hashMaps.get(path).get());
-//			// 另一个地方缓存释放资源
-//			ImgUtil.getInstance().reomoveCache(path);
-//		} else {
-//			holder.iconView.setTag(path);
-//			ImgUtil.getInstance().loadBitmap(path, new ImgUtil.OnLoadBitmapListener() {
-//				@Override
-//				public void loadImage(Bitmap bitmap, String path) {
-//					ImageView iv = (ImageView) mIphoneTreeView
-//							.findViewWithTag(path);
-//					if (bitmap != null && iv != null) {
-//						bitmap = SystemMethod.toRoundCorner(bitmap, 15);
-//						iv.setImageBitmap(bitmap);
-//
-//						if (!hashMaps.containsKey(path)) {
-//							hashMaps.put(path,
-//									new SoftReference<Bitmap>(bitmap));
-//						}
-//					}
-//				}
-//			});
-//
-//		}
+        holder.iconView.setDefaultImageResId(R.drawable.default_head);
+        holder.iconView.setErrorImageResId(R.drawable.default_head);
+        holder.iconView.setImageUrl(HttpConstants.IMG_BASE_URL + ((ContactsList.Contacts) getChild(groupPosition, childPosition)).getImg_url(),mImgLoader);
         holder.nameView.setText(((ContactsList.Contacts) getChild(groupPosition, childPosition)).getUsername());
         holder.feelView.setText(((ContactsList.Contacts) getChild(groupPosition, childPosition)).getContent());
         holder.date.setText(((ContactsList.Contacts) getChild(groupPosition, childPosition)).getCreate_time());
@@ -174,11 +121,11 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded,
                              View convertView, ViewGroup parent) {
-        ChildHolder holder = null;
+        GroupHolder holder = null;
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(
                     R.layout.item_fragment_constact_group, null);
-            holder = new ChildHolder();
+            holder = new GroupHolder();
             holder.nameView = (TextView) convertView
                     .findViewById(R.id.group_name);
             holder.onLineView = (TextView) convertView
@@ -187,7 +134,7 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
                     .findViewById(R.id.group_indicator);
             convertView.setTag(holder);
         } else {
-            holder = (ChildHolder) convertView.getTag();
+            holder = (GroupHolder) convertView.getTag();
         }
         holder.nameView.setText(groups[groupPosition]);
         holder.nameView.setTextColor(mContext.getResources().getColor(R.color.md__defaultBackground));
@@ -241,14 +188,14 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
         }
     }
 
-    class GroupHolder {
+    class ChildHolder {
         TextView nameView;
         TextView feelView;
-        ImageView iconView;
+        NetworkImageView iconView;
         TextView date;
     }
 
-    class ChildHolder {
+    class GroupHolder {
         TextView nameView;
         TextView onLineView;
         ImageView iconView;
