@@ -53,12 +53,14 @@ public class SendImageMessageTask extends AsyncTask<String, String, String> {
 		createMessage = GotyeMessage.createImageMessage(GotyeAPI.getInstance()
                 .getCurrentLoginUser(), target, imagePath);
 		createMessage.getMedia().setPath_ex(imagePath);
+        Log.e("ddd", "sending message: createmessage = " + createMessage);
 		int code = GotyeAPI.getInstance().sendMessage(createMessage);
+        Log.e("ddd", "chat page send a image result: code = " + code);
 	}
 
 	@Override
 	protected void onPostExecute(String result) {
-		// TODO Auto-generated method stub
+		Log.e("ddd", "task onPostExecute: result = " + result);
 		if (result == null) {
 			Utils.showToast(chatPage, "请发送jpg图片");
 			return;
@@ -67,6 +69,7 @@ public class SendImageMessageTask extends AsyncTask<String, String, String> {
 		if (createMessage == null) {
             Utils.showToast(chatPage, "图片消息发送失败");
 		} else {
+            Log.e("ddd", "send a image success:");
 			createMessage.getMedia().setPath_ex(bigImagePath);
 			chatPage.callBackSendImageMessage(createMessage);
 		}

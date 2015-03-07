@@ -97,7 +97,7 @@ public class MessageListAdapter extends BaseAdapter {
 		}
 
 		final GotyeChatTarget session =  getItem(arg0);
-		Log.d("offLine", "session" + session);
+		Log.e("MessageListAdapter init view", "session = " + session);
 		if (getItemViewType(arg0)==0) {
 			viewHolder.title.setText("验证消息");//session.name
 			viewHolder.content.setVisibility(View.GONE);
@@ -115,6 +115,7 @@ public class MessageListAdapter extends BaseAdapter {
 			String title = "", content = "";
 			viewHolder.content.setVisibility(View.VISIBLE);
 			GotyeMessage lastMsg = api.getLastMessage(session);
+            Log.e("ddd", "lastMsg  = " + lastMsg );
 			String lastMsgTime = TimeUtil
 					.dateToMessageTime(lastMsg.getDate() * 1000);
 			viewHolder.time.setText(lastMsgTime);
@@ -183,9 +184,11 @@ public class MessageListAdapter extends BaseAdapter {
 	private void setIcon(ImageView imgView, GotyeChatTarget target) {
 		if (target.type == GotyeChatTargetType.GotyeChatTargetTypeUser) {
 			GotyeUser user = api.requestUserInfo(target.name, true);
+            Log.e("ddd", "user = " + user);
 			if (user == null) {
 				return;
 			} else if (user.getIcon() != null) {
+                Log.e("ddd", " image url = " + user.getIcon().getUrl() + "   image path" + user.getIcon().getPath());
 				ImageCache.getInstance().setIcom(imgView,
 						user.getIcon().getPath(), user.getIcon().getUrl());
 			}

@@ -426,6 +426,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     }
 
     public void callBackSendImageMessage(GotyeMessage msg) {
+        Log.e("ddd", "send image task finished: callback ui update>>>>>GotyeMessage = " + msg);
         adapter.addMsgToBottom(msg);
         scrollToBottom();
     }
@@ -592,6 +593,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     private void takePic() {
 //        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
 //        intent.setType("image/*");
+        Log.e("ddd", "isOnline? before send img  " + api.isOnline());
         Intent albumIntent = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(albumIntent, REQUEST_PIC);
     }
@@ -625,6 +627,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 if (selectedImage != null) {
                     String path = FileUtil.uriToPath(this, selectedImage);
                     if (null != path && !"".equals(path))
+                        Log.e("ddd", "chat page send image from album: path = " + path);
                         sendPicture(path);
                 }
             }
@@ -663,7 +666,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onSendMessage(int code, GotyeMessage message) {
-        Log.d("ddd", "code= " + code + "message = " + message);
+        Log.d("ddd", "Chatpage onSendMessage>>>> code= " + code + " message = " + message);
         // GotyeChatManager.getInstance().insertChatMessage(message);
         adapter.updateMessage(message);
         if (message.getType() == GotyeMessageType.GotyeMessageTypeAudio) {
@@ -676,6 +679,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onReceiveMessage(int code, GotyeMessage message) {
+        Log.d("ddd", "Chatpage onReceiveMessage>>>> code= " + code + " message = " + message);
         // GotyeChatManager.getInstance().insertChatMessage(message);
         if (chatType == 0) {
             if (isMyMessage(message)) {
@@ -710,12 +714,14 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onDownloadMessage(int code, GotyeMessage message) {
+        Log.d("ddd", "Chatpage onDownloadMessage>>>> code= " + code + " message = " + message);
         adapter.downloadDone(message);
     }
 
 
     @Override
     public void onGetHistoryMessageList(int code, List<GotyeMessage> list) {
+        Log.d("ddd", "Chatpage onGetHistoryMessageList>>>> code= " + code );
         if (chatType == 1) {
             List<GotyeMessage> listmessages = api.getLocalMessages(room,
                     false);
@@ -739,7 +745,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onDownloadMedia(int code, String path, String url) {
-        // TODO Auto-generated method stub
+        Log.d("ddd", "Chatpage onDownloadMedia>>>> code= " + code + " path = " + path + " url = " + url);
         adapter.notifyDataSetChanged();
     }
 
@@ -831,7 +837,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                     mIsDisplayEmoji = false;
                 } else if (mIsDisplayPlugin) {
                     mExtension.setVisibility(View.GONE);
-                    mIsDisplayInputMethod = false;
+                    mIsDisplayPlugin = false;
                 } else {
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);

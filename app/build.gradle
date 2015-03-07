@@ -15,13 +15,13 @@ android {
     // 由于我们需要使用微信的分享接口，所以我们需要在这里提供我们自己的KeyStore，而不是默认的keyStore
     signingConfigs {
         debug {
-            storeFile file('/Users/wangyun/xxoo_YueQiu/yueqiu.keystore')
+            storeFile file('yueqiu.keystore')
             keyAlias 'yueqiu.keystore'
             keyPassword '123456'
             storePassword '123456'
         }
         release {
-            storeFile file('/Users/wangyun/xxoo_YueQiu/yueqiu.keystore')
+            storeFile file('yueqiu.keystore')
             keyAlias 'yueqiu.keystore'
             keyPassword '123456'
             storePassword '123456'
