@@ -1,21 +1,29 @@
 package com.yueqiu.bean;
 
 
+import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by wangyun on 15/1/13.
  */
-public class FavorInfo {
+public class FavorInfo implements ISlideMenuBasic{
 
     private int user_id;
     private String table_id;
+    private int rid;
     private int type;
     private String title;
     private String content;
     private String createTime;
     private String userName;
+    private String img_url;
+    //TODO:不做缓存的话，不需要这个字段，现在先不做缓存，所以去掉
+//    private int subType;
     private boolean checked;
 
     public int getUser_id() {
@@ -74,6 +82,22 @@ public class FavorInfo {
         this.userName = userName;
     }
 
+    public int getRid() {
+        return rid;
+    }
+
+    public void setRid(int rid) {
+        this.rid = rid;
+    }
+
+    public String getImg_url() {
+        return img_url;
+    }
+
+    public void setImg_url(String img_url) {
+        this.img_url = img_url;
+    }
+
     public boolean isChecked() {
         return checked;
     }
@@ -81,6 +105,14 @@ public class FavorInfo {
     public void setChecked(boolean checked) {
         this.checked = checked;
     }
+//
+//    public int getSubType() {
+//        return subType;
+//    }
+//
+//    public void setSubType(int subType) {
+//        this.subType = subType;
+//    }
 
     @Override
     public boolean equals(Object o) {
@@ -99,5 +131,69 @@ public class FavorInfo {
         result  = 37 * result + type;
         result  = 37 * result + user_id;
         return result;
+    }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable's
+     * marshalled representation.
+     *
+     * @return a bitmask indicating the set of special object types marshalled
+     * by the Parcelable.
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+
+        dest.writeInt(user_id);
+        dest.writeString(table_id);
+        dest.writeInt(rid);
+        dest.writeInt(type);
+        dest.writeString(title);
+        dest.writeString(content);
+        dest.writeString(createTime);
+        dest.writeString(userName);
+        dest.writeString(img_url);
+        Bundle arg = new Bundle();
+        arg.putBoolean("checked",checked);
+        dest.writeBundle(arg);
+    }
+
+    public static Creator<FavorInfo> CREATOR = new Creator<FavorInfo>() {
+        @Override
+        public FavorInfo createFromParcel(Parcel source) {
+            return new FavorInfo(source);
+        }
+
+        @Override
+        public FavorInfo[] newArray(int size) {
+            return new FavorInfo[size];
+        }
+    };
+
+    public FavorInfo(Parcel in) {
+        user_id = in.readInt();
+        table_id = in.readString();
+        rid = in.readInt();
+        type = in.readInt();
+        title = in.readString();
+        content = in.readString();
+        createTime = in.readString();
+        userName = in.readString();
+        img_url = in.readString();
+        checked = in.readBundle().getBoolean("checked");
+    }
+
+    public FavorInfo() {
     }
 }

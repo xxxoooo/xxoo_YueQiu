@@ -12,6 +12,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.format.DateUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ActionMode;
 import android.view.Gravity;
@@ -25,10 +26,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
-import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.FavorInfo;
-import com.yueqiu.bean.GroupNoteInfo;
+import com.yueqiu.bean.ISlideMenuBasic;
 import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -39,6 +40,7 @@ import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -52,6 +54,7 @@ import java.util.Map;
  * Created by wangyun on 15/1/20.
  */
 public abstract class SlideMenuBasicFragment extends Fragment {
+    private static final String TAG = "SlideMenu";
     protected Activity mActivity;
     protected View mView;
     protected ProgressBar mPreProgress;
@@ -61,12 +64,12 @@ public abstract class SlideMenuBasicFragment extends Fragment {
     protected PullToRefreshListView mPullToRefreshListView;
     protected ListView mListView;
     protected int mType;
-    protected boolean mLoadMore,mRefresh;
+    protected boolean mLoadMore,mRefresh,mIsSavedInstance,mIsListEmpty;
     private BasicHandler mHandler;
     protected int mStart_no = 0,mEnd_no = 9;
     protected int mCurrPosition;
     protected int mAfterCount,mBeforeCount;
-    protected List<Object> mList = new ArrayList<Object>();
+    protected ArrayList<ISlideMenuBasic> mList = new ArrayList<ISlideMenuBasic>();
     protected Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
     protected Map<String,Integer> mParamsMap = new HashMap<String, Integer>();
     protected List<PublishedInfo> mPublishInsertList = new ArrayList<PublishedInfo>();
@@ -96,8 +99,9 @@ public abstract class SlideMenuBasicFragment extends Fragment {
         mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
         mPullToRefreshListView.setOnRefreshListener(mOnRefreshListener);
         mListView = mPullToRefreshListView.getRefreshableView();
-        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        mListView.setMultiChoiceModeListener(new ActionModeCallback());
+//        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+//        mListView.setMultiChoiceModeListener(new ActionModeCallback());
+        mEmptyView = new TextView(mActivity);
 
 
         mPreText = (TextView) mView.findViewById(R.id.pre_text);
@@ -110,13 +114,19 @@ public abstract class SlideMenuBasicFragment extends Fragment {
 
 
     }
-    protected void setEmptyViewVisible(){
-        mEmptyView = new TextView(mActivity);
+    protected void setEmptyViewVisible(String text){
+
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
-        mEmptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
-        mEmptyView.setText(getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+        mEmptyView.setTextColor(mActivity.getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setText(text);
         mPullToRefreshListView.setEmptyView(mEmptyView);
+    }
+
+    protected void setEmptyViewGone(){
+        if(null != mEmptyView){
+            mEmptyView.setVisibility(View.GONE);
+        }
     }
 
 
@@ -127,34 +137,16 @@ public abstract class SlideMenuBasicFragment extends Fragment {
     }
 
 
-    protected class RequestAsyncTask<T> extends AsyncTaskUtil<Integer> {
-
-        public RequestAsyncTask(Map<String, Integer> map) {
-            super(map);
-        }
-
+    protected class ResponseHandler<T> extends JsonHttpResponseHandler{
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            if(!mLoadMore && !mRefresh) {
-                mPreProgress.setVisibility(View.VISIBLE);
-                mPreText.setVisibility(View.VISIBLE);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonResult) {
-            super.onPostExecute(jsonResult);
-            mPreProgress.setVisibility(View.GONE);
-            mPreText.setVisibility(View.GONE);
-
-            if(mPullToRefreshListView.isRefreshing())
-                mPullToRefreshListView.onRefreshComplete();
+        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+            super.onSuccess(statusCode, headers, response);
+            Log.d("wy","response ->" + response);
             try {
-                if(!jsonResult.isNull("code")) {
-                    if (jsonResult.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                        if (jsonResult.getJSONObject("result") != null) {
-                            List<T> list = setBeanByJSON(jsonResult);
+                if(!response.isNull("code")) {
+                    if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                        if (response.getJSONObject("result") != null) {
+                            List<T> list = setBeanByJSON(response);
                             if(list.isEmpty()){
                                 mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                             }else{
@@ -165,14 +157,14 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                             mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                         }
                     }
-                    else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                    else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
                         mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
                     }
-                    else if(jsonResult.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                    else if(response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
                         mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
                     }
                     else{
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,jsonResult.getString("msg")).sendToTarget();
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
                     }
                 }else{
                     mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
@@ -181,43 +173,55 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                 e.printStackTrace();
             }
         }
+
+        @Override
+        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+            super.onFailure(statusCode, headers, responseString, throwable);
+            mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+        }
     }
+
 
     protected class BasicHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgress.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
+            if(mPullToRefreshListView.getMode() == PullToRefreshBase.Mode.DISABLED){
+                mPullToRefreshListView.setMode(PullToRefreshBase.Mode.BOTH);
+            }
             if(mPullToRefreshListView.isRefreshing())
                 mPullToRefreshListView.onRefreshComplete();
             switch (msg.what){
                 case PublicConstant.NO_RESULT:
                     if(mList.isEmpty()) {
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
                     }else{
                         if(mLoadMore)
-                            Utils.showToast(mActivity, getString(R.string.no_more_info, mEmptyTypeStr));
+                            Utils.showToast(mActivity, mActivity.getString(R.string.no_more_info, mEmptyTypeStr));
                     }
                     break;
                 case PublicConstant.REQUEST_ERROR:
                     if(null == msg.obj){
-                        Utils.showToast(mActivity,getString(R.string.http_request_error));
+                        Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
                     }else{
                         Utils.showToast(mActivity, (String) msg.obj);
                     }
                     if(mList.isEmpty()) {
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
                     }
                     break;
                 case PublicConstant.TIME_OUT:
-                    Utils.showToast(mActivity,getString(R.string.http_request_time_out));
+                    Utils.showToast(mActivity,mActivity.getString(R.string.http_request_time_out));
                     if(mList.isEmpty()) {
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
                     }
                     break;
                 case PublicConstant.NO_NETWORK:
-                    Utils.showToast(mActivity,getString(R.string.network_not_available));
+                    Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
                     if(mList.isEmpty())
-                        setEmptyViewVisible();
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
                     break;
             }
         }
@@ -277,14 +281,14 @@ public abstract class SlideMenuBasicFragment extends Fragment {
             switch(item.getItemId()){
                 case R.id.delete:
                     mode.finish();
-                    View contents = View.inflate(mActivity,R.layout.confirm_delete_content_layout, null);
+                    View contents = View.inflate(mActivity,R.layout.dialog_delete_content_layout, null);
                     TextView msg = (TextView) contents.findViewById(R.id.confir_dialog_message);
-                    msg.setText(getString(R.string.published_delete_content,mSelectedItems.size()));
+                    msg.setText(mActivity.getString(R.string.published_delete_content,mSelectedItems.size()));
                     YueQiuDialogBuilder builder = new YueQiuDialogBuilder(mActivity);
                     builder.setTitle(R.string.action_delete);
                     builder.setIcon(R.drawable.warning_white);
                     builder.setView(contents);
-                    SpannableString confirmSpanStr = new SpannableString(getString(R.string.published_confirm_str));
+                    SpannableString confirmSpanStr = new SpannableString(mActivity.getString(R.string.published_confirm_str));
                     confirmSpanStr.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.md__defaultBackground)), 0, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     builder.setPositiveButton(confirmSpanStr,new DialogInterface.OnClickListener() {
                         @Override
@@ -292,7 +296,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                             dialog.dismiss();
                         }
                     });
-                    SpannableString cancelSpanStr = new SpannableString(getString(R.string.published_cancel_str));
+                    SpannableString cancelSpanStr = new SpannableString(mActivity.getString(R.string.published_cancel_str));
                     cancelSpanStr.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.md__defaultBackground)), 0, 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                     builder.setNegativeButton(cancelSpanStr,null);
                     builder.show();
@@ -327,6 +331,9 @@ public abstract class SlideMenuBasicFragment extends Fragment {
             mPublishUpdateList.clear();
             mFavorInsertList.clear();
             mFavorInsertList.clear();
+            if(mEmptyView.getVisibility() == View.VISIBLE){
+                mEmptyView.setVisibility(View.GONE);
+            }
             if(Utils.networkAvaiable(mActivity)){
                mParamsMap.put(HttpConstants.Published.START_NO,0);
                mParamsMap.put(HttpConstants.Published.END_NO, 9);
@@ -350,19 +357,24 @@ public abstract class SlideMenuBasicFragment extends Fragment {
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
 
             mLoadMore = true;
-            mRefresh = false;
             mPublishInsertList.clear();
             mPublishUpdateList.clear();
             mFavorInsertList.clear();
             mFavorUpdateList.clear();
             mCurrPosition = mList.size() ;
-            if(mBeforeCount != mAfterCount){
+
+            if(mEmptyView.getVisibility() == View.VISIBLE){
+                mEmptyView.setVisibility(View.GONE);
+            }
+
+            if(mBeforeCount != mAfterCount && mRefresh){
                   mStart_no = mEnd_no + (mAfterCount-mBeforeCount);
                   mEnd_no += 10 + (mAfterCount-mBeforeCount);
              }else{
                   mStart_no = mEnd_no + 1;
                   mEnd_no += 10;
              }
+            mRefresh = false;
              if(Utils.networkAvaiable(mActivity)) {
                   mParamsMap.put(HttpConstants.Published.START_NO,mStart_no);
                   mParamsMap.put(HttpConstants.Published.END_NO, mEnd_no);

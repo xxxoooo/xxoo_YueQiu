@@ -16,14 +16,13 @@
         android:layout_height="0dp"
         android:layout_weight="1.1">
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <com.android.volley.toolbox.NetworkImageView
+            android:layout_width="@dimen/listview_item_user_photo_width"
+            android:layout_height="@dimen/listview_item_user_photo_height"
             android:id="@+id/play_detail_img_iv"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_margin="10dp"
-            android:src="@drawable/default_head"
             android:padding="2dp"
             />
         <TextView
@@ -33,6 +32,9 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="4dp"
             android:textSize="18sp"
+            android:layout_toLeftOf="@+id/play_create_time_tv"
+            android:layout_marginRight="3dp"
+            android:ellipsize="marquee"
             />
 
         <!-- 用于显示用户的性别 -->
@@ -216,6 +218,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="7dp"
                 />
+            <com.android.volley.toolbox.NetworkImageView
+                android:id="@+id/play_detail_extra_img"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/play_detail_illustration_info"
+                android:layout_marginLeft="5dp"
+                />
         </RelativeLayout>
     </ScrollView>
 
@@ -240,7 +249,7 @@
             />
 
         <GridView
-            android:numColumns="5"
+            android:numColumns="4"
             android:layout_below="@id/tv_indicator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -254,7 +263,7 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/btn_search_dating_detailed_iwantin"
+        android:id="@+id/btn_search_dating_detailed_join"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/search_dating_detailed_btn_i_want_in"
@@ -273,15 +282,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         />
-    <TextView
-        android:id="@+id/play_detail_no_result_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textColor="@color/md__defaultBackground"
-        android:textSize="18sp"
-        android:text="@string/sorry_no_info"
-        android:visibility="gone"/>
+
 </RelativeLayout>
 
 

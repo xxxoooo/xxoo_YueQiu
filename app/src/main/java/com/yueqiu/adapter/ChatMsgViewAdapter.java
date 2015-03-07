@@ -75,10 +75,10 @@ public class ChatMsgViewAdapter extends BaseAdapter {
 		if (convertView == null) {
 			if (isComMsg) {
 				convertView = mInflater.inflate(
-						R.layout.chatting_item_msg_text_left, null);
+						R.layout.item_chatting_msg_text_left, null);
 			} else {
 				convertView = mInflater.inflate(
-						R.layout.chatting_item_msg_text_right, null);
+						R.layout.item_chatting_msg_text_right, null);
 			}
 
 			viewHolder = new ViewHolder();

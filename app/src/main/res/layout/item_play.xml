@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        >
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/activities_lv_item_iv_head"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_centerVertical="true"
+            android:layout_width="@dimen/listview_item_user_photo_width"
+            android:layout_height="@dimen/listview_item_user_photo_height" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/activities_lv_item_iv_head"
+            android:layout_toEndOf="@+id/activities_lv_item_iv_head"
+            android:layout_toLeftOf="@+id/activities_lv_item_tv_time_hour"
+            android:layout_marginRight="3dp"
+            android:id="@+id/linearLayout2">
+            <TextView
+                android:id="@+id/activities_lv_item_tv_title"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textSize="16sp"
+                android:textColor="@color/md__defaultBackground"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+               />
+            <TextView
+                android:id="@+id/activities_lv_item_tv_activities_time"
+                android:ellipsize="end"
+                android:textColor="@color/md__defaultBackground"
+                android:textSize="13sp"
+                android:singleLine="true"
+                style="@style/TimeTextStyle"
+
+               />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:id="@+id/activities_lv_item_tv_time_day"
+            android:text="21:06"
+            android:textSize="12sp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:textColor="@color/search_distance_color"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:id="@+id/activities_lv_item_tv_time_hour"
+            android:text="12-19"
+            android:textSize="12sp"
+            android:textColor="@color/search_distance_color"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/activities_lv_item_tv_time_day"
+            android:layout_toStartOf="@+id/activities_lv_item_tv_time_day"
+            android:layout_marginRight="24dp"
+            android:layout_marginEnd="24dp" />
+    </RelativeLayout>

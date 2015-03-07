@@ -4,31 +4,39 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.UserDao;
-import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
+
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,14 +44,7 @@ import java.util.HashMap;
 
 import java.util.Map;
 
-
-
-
-/**
- * 登录Activity
- * Created by yinfeng on 14/12/17.
- */
-public class LoginActivity extends Activity implements View.OnClickListener {
+public class LoginActivity extends Activity implements View.OnClickListener{
     private static final String TAG = "LoginActivity";
 
     private Button mBtnLogin;
@@ -57,12 +58,15 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     private String mUserName;
     private String mPwd;
     private UserDao mUserDao;
+    private View mRootView;
 
 
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgress.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
             switch (msg.what) {
                 case PublicConstant.REQUEST_ERROR:
                     if(msg.obj == null){
@@ -76,7 +80,10 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 case PublicConstant.GET_SUCCESS:
                     Toast.makeText(LoginActivity.this, getString(R.string.login_success),Toast.LENGTH_SHORT).show();
                     Map<String,String> map = (Map<String, String>) msg.obj;
+                    //TODO:用来更新全局userinfo
                     Utils.getOrUpdateUserBaseInfo(LoginActivity.this,map);
+                    Intent intent = new Intent(PublicConstant.SLIDE_ACCOUNT_ACTION);
+                    sendBroadcast(intent);
                     if(!mUserDao.queryUserId(map)){
                         mUserDao.insertUserInfo(map);
                     }
@@ -119,6 +126,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         mTvRegister = (TextView) findViewById(R.id.activity_login_tv_register);
         mEtUserId = (EditText) findViewById(R.id.activity_login_et_username);
         mEtPwd = (EditText) findViewById(R.id.activity_login_et_password);
+        mRootView = findViewById(R.id.login_root_view);
 
 
         mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
@@ -132,6 +140,20 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         mBtnLogin.setOnClickListener(this);
         mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mTvRegister.setOnClickListener(this);
+
+        ViewTreeObserver observer = mRootView.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect rect = new Rect();
+                mRootView.getRootView().getWindowVisibleDisplayFrame(rect);
+                int screenHeight = mRootView.getRootView().getHeight();
+                int keyboardHeight = screenHeight - (rect.bottom - rect.top);
+                if(keyboardHeight != rect.top){
+                    YueQiuApp.sKeyboardHeight = keyboardHeight;
+                }
+            }
+        });
     }
 
 
@@ -153,15 +175,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                     return;
                 }
 
-                Map<String, String> requestMap = new HashMap<String, String>();
-                requestMap.put(HttpConstants.LoginConstant.USERNAME, mUserName);
-                requestMap.put(HttpConstants.LoginConstant.PASSWORD, mPwd);
-
-                Map<String,String> paramMap = new HashMap<String, String>();
-                paramMap.put(PublicConstant.URL,HttpConstants.LoginConstant.URL);
-                paramMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
                 if(Utils.networkAvaiable(LoginActivity.this)) {
-                    new LoginAsyncTask(requestMap).execute(paramMap);
+                    login();
                 }else{
                     Toast.makeText(LoginActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
                 }
@@ -169,7 +184,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 mImm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 break;
             case R.id.activity_login_tv_register:
-                startActivity(new Intent(LoginActivity.this, CheckNumActivity.class));
+                startActivity(new Intent(LoginActivity.this, GetCaptchaActivity.class));
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
         }
@@ -177,57 +192,105 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     }
 
 
-    private class LoginAsyncTask extends AsyncTaskUtil<String>{
+    private void login(){
 
-        public LoginAsyncTask(Map<String, String> map) {
-            super(map);
-        }
+        mPreProgress.setVisibility(View.VISIBLE);
+        mPreText.setVisibility(View.VISIBLE);
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgress.setVisibility(View.VISIBLE);
-            mPreText.setVisibility(View.VISIBLE);
-        }
+        Map<String, String> params = new HashMap<String, String>();
+        params.put(HttpConstants.LoginConstant.USERNAME, mUserName);
+        params.put(HttpConstants.LoginConstant.PASSWORD, mPwd);
 
-        @Override
-        protected void onPostExecute(JSONObject object) {
-            super.onPostExecute(object);
-            mPreProgress.setVisibility(View.GONE);
-            mPreText.setVisibility(View.GONE);
-            try {
-                if (!object.isNull("code")){
-                    if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                        Map<String, String> successObj = new HashMap<String, String>();
-                        successObj.put(DatabaseConstant.UserTable.USERNAME, object.getJSONObject("result").
-                                getString(DatabaseConstant.UserTable.USERNAME));
-                        successObj.put(DatabaseConstant.UserTable.PASSWORD, mPwd);
-                        successObj.put(DatabaseConstant.UserTable.USER_ID, object.getJSONObject("result").
-                                getString(DatabaseConstant.UserTable.USER_ID));
-                        successObj.put(DatabaseConstant.UserTable.LOGIN_TIME, object.getJSONObject("result").
-                                getString(DatabaseConstant.UserTable.LOGIN_TIME));
-                        successObj.put(DatabaseConstant.UserTable.PHONE, object.getJSONObject("result").
-                                getString(DatabaseConstant.UserTable.PHONE));
-                        successObj.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
-                                getString(DatabaseConstant.UserTable.IMG_URL));
+        HttpUtil.requestHttp(HttpConstants.LoginConstant.URL,params,HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+            }
 
-                        mHandler.obtainMessage(PublicConstant.GET_SUCCESS,successObj).sendToTarget();
-                    }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
-                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                    }else if(object.getInt("code") == HttpConstants.ResponseCode.REQUEST_ERROR){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","login response ->" + response);
+                try {
+                    if (!response.isNull("code")){
+                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                            Map<String, String> successObj = new HashMap<String, String>();
+                            successObj.put(DatabaseConstant.UserTable.USERNAME, response.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.USERNAME));
+                            successObj.put(DatabaseConstant.UserTable.PASSWORD, mPwd);
+                            successObj.put(DatabaseConstant.UserTable.USER_ID, response.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.USER_ID));
+                            successObj.put(DatabaseConstant.UserTable.LOGIN_TIME, response.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.LOGIN_TIME));
+                            successObj.put(DatabaseConstant.UserTable.PHONE, response.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.PHONE));
+                            successObj.put(DatabaseConstant.UserTable.IMG_URL, response.getJSONObject("result").
+                                    getString(DatabaseConstant.UserTable.IMG_URL));
+                            successObj.put(DatabaseConstant.UserTable.TITLE,response.getJSONObject("result").getString("title"));
+                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS,successObj).sendToTarget();
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.REQUEST_ERROR){
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                        }
+                        else {
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                        }
+                    }else{
                         mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                     }
-                    else {
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,object.getString("msg")).sendToTarget();
-                    }
-                }else{
-                    mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
-        }
+        });
     }
+//    @Override
+//    public void onLogout(int code) {
+//
+//    }
+//
+//    @Override
+//    public void onLogin(int code, GotyeUser currentLoginUser) {
+//        Log.e("gotyeapi", "onLogin-->callback   code = " + code);
+//        // 判断登陆是否成功
+//        if (code == GotyeStatusCode.CODE_OK) {
+//            saveUser(mUserName, mPwd);
+//
+//            Intent toService = new Intent(this, GotyeService.class);
+//            startService(toService);
+//            Log.d(TAG, "登录时。。IM服务启动");
+//        } else {
+//            Log.d(TAG, "登录时。。IM服务启动失败，code = " + code);
+//            // 失败,可根据code定位失败原因
+////            Toast.makeText(this, "IM系统登录失败....", Toast.LENGTH_SHORT).show();
+//        }
+//    }
+
+    private static final String CONFIG = "chatbar_login_config";
+
+    public void saveUser(String name, String password) {
+        SharedPreferences sp = getSharedPreferences(CONFIG,
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = sp.edit();
+        edit.putString("username", name);
+        edit.putString("password", password);
+        edit.commit();
+    }
+
+    public static String[] getUser(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(CONFIG,
+                Context.MODE_PRIVATE);
+        String name = sp.getString("username", null);
+        String password = sp.getString("password", null);
+        String[] user = new String[2];
+        user[0] = name;
+        user[1] = password;
+        return user;
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -251,8 +314,9 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         return super.onKeyDown(keyCode, event);
     }
 
-
-
-
-
+    @Override
+    protected void onDestroy() {
+        // 移除监听
+        super.onDestroy();
+    }
 }

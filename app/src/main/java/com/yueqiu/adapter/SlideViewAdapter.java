@@ -9,8 +9,9 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.os.Build;
-import android.util.Base64;
+import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,11 +19,17 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.activity.LoginActivity;
-import com.yueqiu.bean.ListItem;
-import com.yueqiu.bean.SlideAccountItem;
-import com.yueqiu.bean.SlideOtherItem;
+import com.yueqiu.bean.ISlideListItem;
+import com.yueqiu.bean.SlideAccountItemISlide;
+import com.yueqiu.bean.SlideOtherItemISlide;
+import com.yueqiu.util.BitmapUtil;
+import com.yueqiu.util.ImgUtil;
+import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;
 
@@ -31,13 +38,16 @@ import java.util.List;
  */
 public class SlideViewAdapter extends BaseAdapter {
     private Context mContext;
-    private List<ListItem> mList;
+    private List<ISlideListItem> mList;
     private LayoutInflater mInflater;
+    private ImageLoader mImgLoader;
 
-    public SlideViewAdapter(Context context,List<ListItem> list){
+    public SlideViewAdapter(Context context,List<ISlideListItem> list){
         this.mContext = context;
         this.mList = list;
         this.mInflater = LayoutInflater.from(context);
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
+
     }
 
     /**
@@ -75,7 +85,7 @@ public class SlideViewAdapter extends BaseAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        ListItem item = (ListItem) getItem(position);
+        ISlideListItem item = (ISlideListItem) getItem(position);
         int type = item.getType();
         return type;
     }
@@ -85,73 +95,102 @@ public class SlideViewAdapter extends BaseAdapter {
         return 2;
     }
 
-
-    /**
-     * Get a View that displays the data at the specified position in the data set. You can either
-     * create a View manually or inflate it from an XML layout file. When the View is inflated, the
-     * parent View (GridView, ListView...) will apply default layout parameters unless you use
-     * {@link android.view.LayoutInflater#inflate(int, android.view.ViewGroup, boolean)}
-     * to specify a root view and to prevent attachment to the root.
-     *
-     * @param position    The position of the item within the adapter's data set of the item whose view
-     *                    we want.
-     * @param convertView The old view to reuse, if possible. Note: You should check that this view
-     *                    is non-null and of an appropriate type before using. If it is not possible to convert
-     *                    this view to display the correct data, this method can create a new view.
-     *                    Heterogeneous lists can specify their number of view types, so that this View is
-     *                    always of the right type (see {@link #getViewTypeCount()} and
-     *                    {@link #getItemViewType(int)}).
-     * @param parent      The parent that this view will eventually be attached to
-     * @return A View corresponding to the data at the specified position.
-     */
+    private static final String TAG_1 = "bitmap_debug";
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ListItem item = (ListItem) getItem(position);
+        ISlideListItem item = (ISlideListItem) getItem(position);
         int type = item.getType();
-        ViewAccountHolder accountHolder;
+        final ViewAccountHolder accountHolder;
         ViewHolder holder;
         switch (type) {
-           case ListItem.ITEM_ACCOUNT:
-               if(convertView == null) {
-                   convertView = mInflater.inflate(R.layout.more_account_layout, null);
-                   accountHolder = new ViewAccountHolder();
-                   accountHolder.image = (ImageView) convertView.findViewById(R.id.account_image);
-                   accountHolder.name = (TextView) convertView.findViewById(R.id.account_name);
-                   accountHolder.login = (TextView) convertView.findViewById(R.id.slide_login);
-                   convertView.setTag(accountHolder);
-               }else{
-                   accountHolder = (ViewAccountHolder) convertView.getTag();
-               }
-               SlideAccountItem accountItem = (SlideAccountItem) item;
-               int embedResId = R.drawable.lable_friend;
-               if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_assist_coauch_str))){
-                   embedResId = R.drawable.lable_assistant;
-               }else if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_mate_str))){
-                   embedResId = R.drawable.lable_friend;
-               }else if(accountItem.getTitle().equals(mContext.getString(R.string.search_billiard_coauch_str))){
-                   embedResId = R.drawable.lable_coach;
-               }
+            case ISlideListItem.ITEM_ACCOUNT:
+                if(convertView == null) {
+                    convertView = mInflater.inflate(R.layout.item_more_account_layout, null);
+                    accountHolder = new ViewAccountHolder();
+                    accountHolder.image = (ImageView) convertView.findViewById(R.id.account_image);
+                    accountHolder.name = (TextView) convertView.findViewById(R.id.account_name);
+                    accountHolder.login = (TextView) convertView.findViewById(R.id.slide_login);
+                    convertView.setTag(accountHolder);
+                }else{
+                    accountHolder = (ViewAccountHolder) convertView.getTag();
+                }
+                SlideAccountItemISlide accountItem = (SlideAccountItemISlide) item;
+                int embedResId = R.drawable.lable_friend;
+                if(accountItem.getTitle().equals(mContext.getString(R.string.nearby_billiard_assist_coauch_str))){
+                    embedResId = R.drawable.lable_assistant;
+                }else if(accountItem.getTitle().equals(mContext.getString(R.string.nearby_billiard_mate_str))){
+                    embedResId = R.drawable.lable_friend;
+                }else if(accountItem.getTitle().equals(mContext.getString(R.string.nearby_billiard_coauch_str))){
+                    embedResId = R.drawable.lable_coach;
+                }
 
-               int user_id = accountItem.getUserId();
-               if(user_id > 0){
-                   accountHolder.login.setVisibility(View.GONE);
-                   accountHolder.name.setVisibility(View.VISIBLE);
-                   accountHolder.name.setText(accountItem.getName());
-                   String img = accountItem.getImg();
-                   Bitmap source = null;
-                   if(img.equals("")){
-                       source = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.head_img);
-                   }else {
-                       try {
-                           byte[] bitmapArray;
-                           bitmapArray = Base64.decode(img, Base64.DEFAULT);
-                           source = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
-                       } catch (Exception e) {
-                           e.printStackTrace();
-                       }
+                int user_id = accountItem.getUserId();
+                if(user_id > 0){
+                    accountHolder.login.setVisibility(View.GONE);
+                    accountHolder.name.setVisibility(View.VISIBLE);
+                    accountHolder.name.setText(accountItem.getName());
+                    final String img = accountItem.getImg();
+                    // the following are the source bitmap we need to get from network service
+//                   if(img.equals("")){
+//                       source = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.head_img);
+//                   }else {
+//                       try {
+//                           byte[] bitmapArray;
+//                           bitmapArray = Base64.decode(img, Base64.DEFAULT);
+//                           source = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
+//                       } catch (Exception e) {
+//                           e.printStackTrace();
+//                       }
+//                   }
+//                   String img_test = "http://byu1145240001.my3w.com/image/11.png";
+//
+                    String img_url = "http://" + img;
+                   final int finallyEmbedResId = embedResId;
+                   if (! TextUtils.isEmpty(img))
+                   {
+                       mImgLoader.get(
+                               img_url, // pass this as test
+                               new ImageLoader.ImageListener()
+                               {
+                                   @Override
+                                   public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate)
+                                   {
+                                       Bitmap sourceBitmap = response.getBitmap();
+                                       if (null != sourceBitmap)
+                                       {
+                                           Log.d("wy","bitmap is not null");
+                                           Log.d(TAG_1, " the embeded resource id : " + finallyEmbedResId + ", and the source are: " + sourceBitmap);
+                                           accountHolder.image.setImageBitmap(ImgUtil.embedBitmap(mContext.getResources(), sourceBitmap, finallyEmbedResId));
+                                       } else
+                                       {
+                                           Log.d("wy","bitmap is null");
+                                           Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
+                                           accountHolder.image.setImageBitmap(ImgUtil.embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
+                                       }
+                                   }
+
+                                   @Override
+                                   public void onErrorResponse(VolleyError error)
+                                   {
+                                        Log.d(TAG_1, " some error happened, and the detailed error info are: " + error.toString());
+                                       // TODO: 当我们传递的URL为空的时候，就会发生这个错误。
+                                       // TODO: 我们也可以在这里设置当获取用户头像失败时我们应该加载的系统默认图片
+                                       // TODO: 如果不满意我们在onResponse()方法加载系统默认图片的做法，我们就在这里加载，
+
+
+                                   }
+                               },
+                               400,
+                               400
+                       );
+                   } else
+                   {
+                       // 现在是没有Url的情况，即服务器端传递到的url为空的情况，我们需要在这里直接加载我们的默认图片
+                       Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
+                       accountHolder.image.setImageBitmap(ImgUtil.embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
                    }
-                   accountHolder.image.setImageBitmap(embedBitmap(mContext.getResources(),source,embedResId));
-               }else {
+
+               } else {
                    accountHolder.name.setVisibility(View.GONE);
                    accountHolder.login.setVisibility(View.VISIBLE);
                    accountHolder.login.setOnClickListener(new View.OnClickListener() {
@@ -163,26 +202,25 @@ public class SlideViewAdapter extends BaseAdapter {
                    });
                    accountHolder.image.setImageResource(R.drawable.head_img);
                }
-
-
-               //accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accountItem.getGolden());
-               break;
-            case ListItem.ITEM_BASIC:
+                //accountHolder.golden.setText(mContext.getString(R.string.slide_account_golden) + accountItem.getGolden());
+                break;
+            case ISlideListItem.ITEM_BASIC:
                 if(convertView == null){
-                    convertView = mInflater.inflate(R.layout.more_other_layout,null);
+                    convertView = mInflater.inflate(R.layout.item_more_other_layout,null);
                     holder = new ViewHolder();
                     holder.image = (ImageView) convertView.findViewById(R.id.other_image);
                     holder.name = (TextView) convertView.findViewById(R.id.other_name);
-                    holder.hasMsg = convertView.findViewById(R.id.other_has_msg);
+                    holder.hasMsg = (ImageView) convertView.findViewById(R.id.other_has_msg);
                     holder.bottom = convertView.findViewById(R.id.other_bottom);
                     convertView.setTag(holder);
                 }else{
                     holder = (ViewHolder) convertView.getTag();
                 }
 
-                SlideOtherItem otherItem = (SlideOtherItem) item;
+                SlideOtherItemISlide otherItem = (SlideOtherItemISlide) item;
                 holder.image.setImageResource(otherItem.getImgId());
                 holder.name.setText(otherItem.getName());
+                ///holder.hasMsg.setBackgroundColor(mContext.getResources().getColor(R.color.slide_drawer_more_other_has_msg));
                 if(otherItem.hasMsg()){
                     holder.hasMsg.setVisibility(View.VISIBLE);
                 }else{
@@ -191,7 +229,7 @@ public class SlideViewAdapter extends BaseAdapter {
                 if(position == mList.size()-1){
                     holder.bottom.setVisibility(View.INVISIBLE);
                 }
-            break;
+                break;
         }
         return convertView;
     }
@@ -206,42 +244,10 @@ public class SlideViewAdapter extends BaseAdapter {
     private class ViewHolder{
         ImageView image;
         TextView  name;
-        View hasMsg;
+        ImageView hasMsg;
         View bottom;
     }
 
-    private Bitmap embedBitmap(Resources resources,Bitmap source,int embedImgId){
-//        BitmapFactory.Options options = new BitmapFactory.Options();
-//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
-//            options.inMutable = true;
-//        }
-        //options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        //Bitmap source = BitmapFactory.decodeResource(resources,sourceId,options);
-        Bitmap embedded;
-        if(source.isMutable()){
-            embedded = source;
-        }else{
-            embedded = source.copy(Bitmap.Config.ARGB_8888,true);
-            source.recycle();
-        }
 
-        embedded.setHasAlpha(true);
-
-        final int srcWidth = embedded.getWidth();
-        final int srcHeight = embedded.getHeight();
-
-        Canvas canvas = new Canvas(embedded);
-        Bitmap mask = BitmapFactory.decodeResource(resources,embedImgId);
-        final int maskWidth = mask.getWidth();
-        final int maskHeight = mask.getHeight();
-
-        Paint paint = new Paint();
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_OVER));
-        canvas.drawBitmap(mask,srcWidth-maskWidth,srcHeight-maskHeight,paint);
-
-        mask.recycle();
-
-        return embedded;
-    }
 
 }

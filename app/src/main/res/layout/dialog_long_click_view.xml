@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/delete_photo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:padding="15dp"
+        android:textSize="18sp"
+        android:text="@string/delete_this_photo"
+        android:background="@drawable/dlg_custom_view_bg"/>
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="0.5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="5dp"
+        android:background="@color/search_distance_color"/>
+    <TextView
+        android:id="@+id/take_photo_now"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:padding="15dp"
+        android:textSize="18sp"
+        android:text="@string/take_photo_now"
+        android:background="@drawable/dlg_custom_view_bg"/>
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="0.5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="5dp"
+        android:background="@color/search_distance_color"/>
+    <TextView
+        android:id="@+id/select_photo_from_album"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:padding="15dp"
+        android:textSize="18sp"
+        android:text="@string/select_photo_from_album"
+        android:background="@drawable/dlg_custom_view_bg"/>
+
+</LinearLayout>

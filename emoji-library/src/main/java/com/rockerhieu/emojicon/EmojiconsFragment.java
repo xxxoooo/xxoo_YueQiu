@@ -26,6 +26,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.*;
 import android.widget.EditText;
 import com.rockerhieu.emojicon.emoji.*;
@@ -164,24 +165,31 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
 
     @Override
     public void onPageSelected(int i) {
+        Log.e("ddd", "onPageSelected>>>i = " + i);
         if (mEmojiTabLastSelectedIndex == i) {
             return;
         }
-        switch (i) {
-            case 0:
-            case 1:
-            case 2:
-            case 3:
-            case 4:
-            case 5:
-                if (mEmojiTabLastSelectedIndex >= 0 && mEmojiTabLastSelectedIndex < mEmojiTabs.length) {
-                    mEmojiTabs[mEmojiTabLastSelectedIndex].setSelected(false);
-                }
-                mEmojiTabs[i].setSelected(true);
-                mEmojiTabLastSelectedIndex = i;
-                mRecentsManager.setRecentPage(i);
-                break;
+//        switch (i) {
+//            case 0:
+//            case 1:
+//            case 2:
+//            case 3:
+//            case 4:
+//            case 5:
+//                if (mEmojiTabLastSelectedIndex >= 0 && mEmojiTabLastSelectedIndex < mEmojiTabs.length) {
+//                    mEmojiTabs[mEmojiTabLastSelectedIndex].setSelected(false);
+//                }
+//                mEmojiTabs[i].setSelected(true);
+//                mEmojiTabLastSelectedIndex = i;
+//                mRecentsManager.setRecentPage(i);
+//                break;
+//        }
+        if (mEmojiTabLastSelectedIndex >= 0 && mEmojiTabLastSelectedIndex < mEmojiTabs.length) {
+            mEmojiTabs[mEmojiTabLastSelectedIndex].setSelected(false);
         }
+        mEmojiTabs[i].setSelected(true);
+        mEmojiTabLastSelectedIndex = i;
+        mRecentsManager.setRecentPage(i);
     }
 
     @Override
@@ -191,18 +199,22 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
     private static class EmojisPagerAdapter extends FragmentStatePagerAdapter {
         private List<EmojiconGridFragment> fragments;
 
-        public EmojisPagerAdapter(FragmentManager fm, List<EmojiconGridFragment> fragments) {
+        public EmojisPagerAdapter(FragmentManager fm, List<EmojiconGridFragment> fragments)
+        {
             super(fm);
             this.fragments = fragments;
         }
 
         @Override
-        public Fragment getItem(int i) {
+        public Fragment getItem(int i)
+        {
+            Log.e("ddd", "current position = " + i);
             return fragments.get(i);
         }
 
         @Override
-        public int getCount() {
+        public int getCount()
+        {
             return fragments.size();
         }
     }

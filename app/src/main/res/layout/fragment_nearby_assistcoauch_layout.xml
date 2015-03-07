@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+    <include
+        layout="@layout/nearby_view_pager_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <LinearLayout
+        android:layout_below="@+id/gallery_view_pager_zone"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/nearby_subfragment_filter_btn_height"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:id="@+id/assistcoauch_filter_group"
+        android:background="@drawable/btn_bg"
+        >
+
+        <Button
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:id="@+id/btn_assistcoauch_distance"
+            android:text="@string/search_mate_subfragment_title_distance"
+            android:layout_weight="0.25"
+            />
+
+        <View
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:padding="5dp"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/search_distance_color"
+            >
+        </View>
+
+        <Button
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:id="@+id/btn_assistcoauch_cost"
+            android:text="@string/search_assistcaouch_subfragment_title_cost"
+            android:layout_weight="0.25"
+            />
+
+        <View
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:padding="5dp"
+            android:layout_width="0.5dp"
+            android:layout_height="match_parent"
+            android:background="@color/search_distance_color"
+            >
+        </View>
+
+        <Button
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:id="@+id/btn_assistcoauch_kinds"
+            android:layout_weight="0.25"
+            android:text="@string/search_assistcaouch_subfragment_title_kinds"/>
+
+        <View
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:padding="5dp"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/search_distance_color"
+            >
+        </View>
+
+        <Button
+            style="@style/SearchSubFragmentFilterBtnStyle"
+            android:id="@+id/btn_assistcoauch_level"
+            android:layout_weight="0.25"
+            android:text="@string/search_assistcaouch_subfragment_title_level"/>
+    </LinearLayout>
+
+    <com.yueqiu.view.pullrefresh.PullToRefreshListView
+        android:layout_below="@id/assistcoauch_filter_group"
+        style="@style/SearchSubActivityListViewStyle"
+        android:id="@+id/search_assistcoauch_subfragment_listview"
+        android:layout_marginBottom="@dimen/nearby_subfragment_listview_margin_bottom">
+
+    </com.yueqiu.view.pullrefresh.PullToRefreshListView>
+
+
+    <include
+        layout="@layout/pre_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        ></include>
+
+
+</RelativeLayout>

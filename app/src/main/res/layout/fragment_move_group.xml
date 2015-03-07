@@ -20,9 +20,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/search_billiard_mate_str"/>
+            android:text="@string/nearby_billiard_mate_str"/>
 
         <ImageView
+            android:visibility="gone"
             android:textColor="@color/md__defaultBackground"
             android:id="@+id/friends_group_qiuyou_iv"
             android:layout_centerInParent="true"
@@ -53,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/search_billiard_assist_coauch_str"/>
+            android:text="@string/nearby_billiard_assist_coauch_str"/>
 
         <ImageView
             android:visibility="gone"
@@ -86,7 +87,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:text="@string/search_billiard_coauch_str"/>
+            android:text="@string/nearby_billiard_coauch_str"/>
 
         <ImageView
             android:visibility="gone"

@@ -15,6 +15,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +25,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.yueqiu.BilliardSearchActivity;
+import com.loopj.android.http.JsonHttpResponseHandler;
+import com.yueqiu.BilliardNearbyActivity;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.DatabaseConstant;
@@ -33,10 +35,12 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.UserDao;
 import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.MyURLSpan;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,9 +48,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * Created by yinfeng on 15/1/19.
- */
 public class Register1Activity extends Activity implements View.OnClickListener {
     private ActionBar mActionBar;
     private Intent mIntent;
@@ -78,6 +79,7 @@ public class Register1Activity extends Activity implements View.OnClickListener 
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            mPreProgress.setVisibility(View.GONE);
             switch (msg.what)
             {
                 case REGISTER_ERROR:
@@ -90,12 +92,10 @@ public class Register1Activity extends Activity implements View.OnClickListener 
                 case REGISTER_SUCCESS:
                     Utils.showToast(Register1Activity.this,getString(R.string.register_success));
                     Map<String,String> map = (Map<String, String>) msg.obj;
-
                     YueQiuApp.sUserInfo.setUser_id(Integer.valueOf(map.get(DatabaseConstant.UserTable.USER_ID)));
                     YueQiuApp.sUserInfo.setPhone(map.get(DatabaseConstant.UserTable.PHONE));
                     YueQiuApp.sUserInfo.setLogin_time(map.get(DatabaseConstant.UserTable.LOGIN_TIME));
                     YueQiuApp.sUserInfo.setUsername(map.get(DatabaseConstant.UserTable.USERNAME));
-
                     Iterator iter = map.entrySet().iterator();
                     while(iter.hasNext()){
                         Map.Entry<String,String> entry = (Map.Entry<String, String>) iter.next();
@@ -104,9 +104,9 @@ public class Register1Activity extends Activity implements View.OnClickListener 
                     mEditor.apply();
 
                     mUserDao.insertUserInfo(map);
-                    Intent intent = new Intent(Register1Activity.this, BilliardSearchActivity.class);
+                    Intent intent = new Intent(Register1Activity.this, BilliardNearbyActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
-                    Register1Activity.this.finish();
                     overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);
                     break;
             }
@@ -147,6 +147,7 @@ public class Register1Activity extends Activity implements View.OnClickListener 
         mPreProgress.setIndeterminateDrawable(mProgressDrawable);
         mPreProgress.getIndeterminateDrawable().setBounds(bounds);
         mPreText.setText(getString(R.string.pre_register_text));
+        mPreText.setVisibility(View.GONE);
 
         SpannableString spanStr = new SpannableString(getString(R.string.already_read_and_agree_the_article));
         spanStr.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.have_agree_and_read)), 0, 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -203,7 +204,7 @@ public class Register1Activity extends Activity implements View.OnClickListener 
                     Utils.showToast(Register1Activity.this,getString(R.string.please_select_sex));
                     return;
                 }
-                mMap.put(HttpConstants.RegisterConstant.SEX, sex);
+                mMap.put(HttpConstants.RegisterConstant.SEX, sex.equals(getString(R.string.man)) ? "1" : "2");
 
                 String password = mEtPwd.getText().toString().trim();
                 if (TextUtils.isEmpty(password)) {
@@ -225,12 +226,44 @@ public class Register1Activity extends Activity implements View.OnClickListener 
                 mMap.put(HttpConstants.RegisterConstant.PHONE, mPhone);
                 mMap.put(HttpConstants.RegisterConstant.VERFICATION_CODE, mCode);
 
-                Map<String,String> paramMap = new HashMap<String, String>();
-                paramMap.put(PublicConstant.URL,HttpConstants.RegisterConstant.URL);
-                paramMap.put(PublicConstant.METHOD,HttpConstants.RequestMethod.POST);
 
                 if(Utils.networkAvaiable(Register1Activity.this)){
-                    new RegisterAsyncTask(mMap).execute(paramMap);
+                    mPreProgress.setVisibility(View.VISIBLE);
+                    HttpUtil.requestHttp(HttpConstants.RegisterConstant.URL,mMap,HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            super.onSuccess(statusCode, headers, response);
+                            Log.d("wy","register response ->" + response);
+                            try {
+                                if(!response.isNull("code")) {
+                                    if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                                        Map<String, String> map = new HashMap<String, String>();
+                                        map.put(DatabaseConstant.UserTable.USERNAME, mAccount);
+                                        map.put(DatabaseConstant.UserTable.USER_ID, response.getJSONObject("result").
+                                                getString(DatabaseConstant.UserTable.USER_ID));
+                                        map.put(DatabaseConstant.UserTable.PHONE, response.getJSONObject("result").getString(DatabaseConstant.UserTable.PHONE));
+                                        map.put(DatabaseConstant.UserTable.LOGIN_TIME, response.getJSONObject("result").getString(DatabaseConstant.UserTable.LOGIN_TIME));
+                                        mHandler.obtainMessage(REGISTER_SUCCESS, map).sendToTarget();
+                                    }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                                    }
+                                    else {
+                                        mHandler.obtainMessage(REGISTER_ERROR, response.getString("msg")).sendToTarget();
+                                    }
+                                }else{
+                                    mHandler.obtainMessage(REGISTER_ERROR).sendToTarget();
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                            super.onFailure(statusCode, headers, responseString, throwable);
+                            mHandler.obtainMessage(REGISTER_ERROR).sendToTarget();
+                        }
+                    });
                 }else{
                     Utils.showToast(Register1Activity.this, getString(R.string.network_not_available));
                 }
@@ -265,52 +298,6 @@ public class Register1Activity extends Activity implements View.OnClickListener 
     }
 
 
-    private class RegisterAsyncTask extends AsyncTaskUtil<String> {
-
-        public RegisterAsyncTask(Map<String, String> map) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            mPreProgress.setVisibility(View.VISIBLE);
-            mPreText.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject object) {
-            super.onPostExecute(object);
-            mPreProgress.setVisibility(View.GONE);
-            mPreText.setVisibility(View.GONE);
-            try {
-                if(!object.isNull("code")) {
-                    if (object.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
-
-
-                        Map<String, String> map = new HashMap<String, String>();
-                        map.put(DatabaseConstant.UserTable.USERNAME, mAccount);
-                        map.put(DatabaseConstant.UserTable.USER_ID, object.getJSONObject("result").
-                                getString(DatabaseConstant.UserTable.USER_ID));
-                        map.put(DatabaseConstant.UserTable.PHONE, object.getJSONObject("result").getString(DatabaseConstant.UserTable.PHONE));
-                        map.put(DatabaseConstant.UserTable.LOGIN_TIME, object.getJSONObject("result").getString(DatabaseConstant.UserTable.LOGIN_TIME));
-                        mHandler.obtainMessage(REGISTER_SUCCESS, map).sendToTarget();
-
-
-                    }else if(object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
-                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                    }
-                    else {
-                        mHandler.obtainMessage(REGISTER_ERROR, object.getString("msg")).sendToTarget();
-                    }
-                }else{
-                    mHandler.obtainMessage(REGISTER_ERROR).sendToTarget();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }
-//01-19 11:45:26.396: I/HttpUtil(2426): http://hxu0480201.my3w.com/index.php/v1/user/register?verfication_code=964390&phone=13810191597&password=123456&account=USSR&sex=%E7%94%B7
+
 

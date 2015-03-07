@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
-   <include
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <include
         layout="@layout/pre_load"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-    />
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,30 +20,24 @@
             android:id="@+id/search_friend_nearby"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:clickable="true"
-            android:background="@drawable/list_corner_round_mid2"><!--临时的-->
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_margin="10dp"
-                android:gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:background="@drawable/list_corner_round_mid2"
+            android:padding="8dp">
+
+            <ImageView
                 android:layout_width="wrap_content"
-                android:layout_height="40dp">
+                android:layout_height="wrap_content"
+                android:src="@drawable/around_people"/>
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/around_people"/>
-
-                <TextView
-                    style="@style/ListItemTvStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:textSize="18sp"
-                    android:text="@string/tv_add_persion_nearby"/>
-
-            </LinearLayout>
+            <TextView
+                style="@style/ListItemTvStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:textSize="18sp"
+                android:text="@string/tv_add_persion_nearby"/>
         </LinearLayout>
 
 
@@ -53,14 +46,28 @@
             android:layout_height="0.5dp"
             android:background="@color/devide_line"/>
 
-
-        <ListView
-            android:id="@+id/search_result_container"
-            android:layout_marginTop="10dp"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-        </ListView>
-    </LinearLayout>
+            <ListView
+                android:id="@+id/search_result_container"
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
+            </ListView>
+
+            <TextView
+                android:visibility="gone"
+                android:id="@+id/empty_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="@string/nearby_no_user"
+                android:textSize="16sp"
+                android:textColor="@color/md__defaultBackground"/>
+        </RelativeLayout>
+
+    </LinearLayout>
 </FrameLayout>

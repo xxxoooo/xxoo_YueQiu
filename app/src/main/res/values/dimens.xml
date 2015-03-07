@@ -18,4 +18,23 @@
     <dimen name="header_footer_top_bottom_padding">12dp</dimen>
 
     <dimen name="search_view_width">0dip</dimen>
+
+    <!--这个值是用于定义PullToRefreshListView距离屏幕底部的距离，考虑到PullToRefreshListView
+        的官方Demo当中建议是将ListView的高度定义成match_parent,但是会被NearbyActivity当中
+        底部的TabHost阻挡掉一部分，所以我们设置了这个值.
+        这个值在我们后期具体部署时，需要针对具体的设备进行更细化的适配-->
+    <dimen name="nearby_subfragment_listview_margin_bottom">48dp</dimen>
+    <dimen name="nearby_subfragment_filter_btn_height">39dp</dimen>
+    <dimen name="dialog_padding">25dp</dimen>
+
+    <dimen name="add_img_margin_left">10dp</dimen>
+    <!--用于定义每一个ListView的item当中的用户头像userPhoto的大小的dimen值，因为服务器
+        端传送过来的图片有一些大，不符合客户端的设计的目标 -->
+    <dimen name="listview_item_user_photo_width">62dp</dimen>
+    <dimen name="listview_item_user_photo_height">62dp</dimen>
+
+    <dimen name="friend_listview_divider_height">10dp</dimen>
+
+
+
 </resources>

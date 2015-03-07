@@ -6,6 +6,10 @@
       <root url="file://$PROJECT_DIR$/datetimepicker-library/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/res" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/datetimepicker-library/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/datetimepicker-library/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/res" />
+      <root url="jar://$PROJECT_DIR$/datetimepicker-library/build/intermediates/exploded-aar/com.android.support/support-v4/20.0.0/libs/internal_impl-20.0.0.jar!/" />
+    </SOURCES>
   </library>
 </component>

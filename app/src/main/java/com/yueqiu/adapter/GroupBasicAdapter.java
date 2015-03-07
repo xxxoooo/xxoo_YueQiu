@@ -1,6 +1,8 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +10,15 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
+import com.rockerhieu.emojicon.EmojiconTextView;
 import com.yueqiu.R;
 import com.yueqiu.bean.GroupNoteInfo;
+import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.util.BitmapUtil;
+import com.yueqiu.util.ImgUtil;
+import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;
 
@@ -20,11 +29,13 @@ public class GroupBasicAdapter extends BaseAdapter{
     private List<GroupNoteInfo> mList;
     private Context mContext;
     private LayoutInflater mInflater;
+    private ImageLoader mImgLoader;
 
     public GroupBasicAdapter(Context context,List<GroupNoteInfo> list){
         this.mContext = context;
         this.mList = list;
-        mInflater = LayoutInflater.from(mContext);
+        this.mInflater = LayoutInflater.from(mContext);
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
     }
 
     @Override
@@ -46,11 +57,11 @@ public class GroupBasicAdapter extends BaseAdapter{
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if(convertView == null){
-            convertView = mInflater.inflate(R.layout.billiard_group_item_layout,null);
+            convertView = mInflater.inflate(R.layout.item_billiard_group_layout,null);
             holder = new ViewHolder();
-            holder.image = (ImageView) convertView.findViewById(R.id.group_item_image);
+            holder.image = (NetworkImageView) convertView.findViewById(R.id.group_item_image);
             holder.title = (TextView) convertView.findViewById(R.id.billiard_group_title);
-            holder.content = (TextView) convertView.findViewById(R.id.group_content);
+            holder.content = (EmojiconTextView) convertView.findViewById(R.id.group_content);
             holder.browseCount = (TextView) convertView.findViewById(R.id.billiard_group_browse_count_text);
             holder.commentCount = (TextView) convertView.findViewById(R.id.group_comment_count_text);
             holder.issueTime = (TextView) convertView.findViewById(R.id.group_issue_time);
@@ -58,6 +69,9 @@ public class GroupBasicAdapter extends BaseAdapter{
         }else{
             holder = (ViewHolder) convertView.getTag();
         }
+        holder.image.setDefaultImageResId(R.drawable.default_head);
+        holder.image.setErrorImageResId(R.drawable.default_head);
+        holder.image.setImageUrl("http://"+ mList.get(position).getImg_url(),mImgLoader);
         holder.title.setText(mList.get(position).getTitle());
         holder.content.setText(mList.get(position).getContent());
         holder.browseCount.setText(""+mList.get(position).getBrowseCount());
@@ -67,9 +81,9 @@ public class GroupBasicAdapter extends BaseAdapter{
     }
 
     class ViewHolder{
-        ImageView image;
+        NetworkImageView image;
         TextView  title;
-        TextView  content;
+        EmojiconTextView content;
         TextView  browseCount;
         TextView  commentCount;
         TextView  issueTime;

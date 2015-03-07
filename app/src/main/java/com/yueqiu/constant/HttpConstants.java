@@ -7,6 +7,10 @@ package com.yueqiu.constant;
 public class HttpConstants
 {
 
+    public static final String BASE_URL = "http://app.chuangyezheluntan.com/index.php/v1";
+
+    public static final String IMG_BASE_URL = "http://app.chuangyezheluntan.com/index.php/v1/system/getImg/img_url/";
+
     /**
      * 请求方式
      */
@@ -32,10 +36,6 @@ public class HttpConstants
          */
         public static final String URL = "/user/register";
 
-        public static final String CODEURL = "/user/sendCode";
-
-
-        public static final String ACTION_TYPE = "action_type";
 
         public static final String VERFICATION_CODE = "verfication_code";
 
@@ -90,6 +90,11 @@ public class HttpConstants
         public static final String URL = "/user/logout";
     }
 
+    public static final class PartIn{
+
+        public static final String URL = "/center/getJoin";
+    }
+
     /**
      * 我的收藏
      */
@@ -97,11 +102,15 @@ public class HttpConstants
 
         public static final String URL = "/store/getStore";
 
+        public static final String STORE_URL = "/store/storeSave";
+
         public static final String TYPE = "type";
 
         public static final String START_NO = "start_no";
 
         public static final String END_NO = "end_no";
+
+        public static final String KEYWORD = "keyword";
     }
 
     /**
@@ -117,6 +126,8 @@ public class HttpConstants
         public static final String START_NO = "start_no";
 
         public static final String END_NO = "end_no";
+
+        public static final String KEYWORD = "keyword";
     }
 
     /*
@@ -137,7 +148,7 @@ public class HttpConstants
      * 球友的请求参数
      * 发送Get请求
      */
-    public static final class SearchMate
+    public static final class NearbyMate
     {
         public static final String URL = "/home/friend";
     }
@@ -146,7 +157,7 @@ public class HttpConstants
      * 约球的请求参数
      * 发送GET请求
      */
-    public static final class SearchDating
+    public static final class NearbyDating
     {
         public static final String URL = "/home/appointBall";
 
@@ -155,13 +166,19 @@ public class HttpConstants
 
         // 用于获取约球详情的信息列表的URL
         public static final String URL_DATING_DETAILE = "/home/appointBllDetail";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String TYPE_ID = "type_id";
+
+        public static final String P_ID = "p_id";
     }
 
     /**
      * 助教的请求参数
      *
      */
-    public static final class SearchAssistCoauch
+    public static final class NearbyAssistCoauch
     {
        public static final String URL = "/home/tutor";
     }
@@ -169,7 +186,7 @@ public class HttpConstants
     /**
      * 用于请求教练的相关信息的Http url常量
      */
-    public static final class SearchCoauch
+    public static final class NearbyCoauch
     {
         public static final String URL = "/home/coach";
 
@@ -181,7 +198,7 @@ public class HttpConstants
      * 大众点评的接口来获得大众点评推荐的所有的球厅的列表的信息
      * 也就是说这里我们SearchRoom使用的是大众点评的接口，而不是服务器端的同志开发的接口
      */
-    public static final class SearchRoom
+    public static final class NearbyRoom
     {
         public static final String URL = "";
     }
@@ -191,7 +208,7 @@ public class HttpConstants
      * 我们通过这个接口获得的信息主要是用于显示球厅Fragment上面显示的Image Gallery列表
      *
      */
-    public static final class SearchRoomRecommendation
+    public static final class NearbyRoomRecommendation
     {
         public static final String URL = "/home/GetBallHall";
     }
@@ -360,7 +377,11 @@ public class HttpConstants
 
         public static final String GETLISTEE = "/play/getList";
 
+        public static final String BUSINESS = "/play/getBusinessList";
+
         public static final String GETDETAIL = "/play/deatil";
+
+        public static final String BUSINESS_DETAIL = "/play/getBusinessDeatil";
 
         public static final String TYPE = "type";
 
@@ -371,6 +392,30 @@ public class HttpConstants
         public static final String END_NO = "end_no";
 
         public static final String USER_ID = "user_id";
+
+        public static final String TITLE = "title";
+
+        public static final String ADDRESS = "address";
+
+        public static final String BEGIN_TIME = "begin_time";
+
+        public static final String END_TIME = "end_time";
+
+        public static final String MODEL = "model";
+
+        public static final String CONTENT = "content";
+
+        public static final String LAT = "lat";
+
+        public static final String LNG = "lng";
+
+        public static final String NAME = "name";
+
+        public static final String PHONE = "phone";
+
+        public static final String IMG_URL = "img_url";
+
+        public static final String KEYWORD = "keyword";
     }
 
     /**
@@ -387,6 +432,8 @@ public class HttpConstants
         public static final String TITLE    = "title";
 
         public static final String CONTENT  = "content";
+
+        public static final String IMG_URL = "img_url";
     }
 
     /**
@@ -402,12 +449,15 @@ public class HttpConstants
 
         public static final String END_NO   = "end_no";
 
+        public static final String KEYWORD = "keyword";
+
 
     }
 
     public static class StroeSave{
         public static final String URL      = "/store/storeSave";
     }
+
 
     /**
      * 台球圈详情
@@ -480,6 +530,142 @@ public class HttpConstants
         public static final int TIME_OUT = 1011;
     }
 
+    public static class FeedBack{
+        public static final String URL = "/center/suggest";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String TITLE = "title";
+
+        public static final String CONTENT = "content";
+    }
+
+    public static class Captcha{
+
+        public static final String URL = "/user/sendCode";
+
+        public static final String PHONE = "phone";
+
+        public static final String ACTION_TYPE = "action_type";
+    }
+
+    public static class ChangePhoto{
+
+        //TODO:服务端接口还没定
+        public static final String URL = "/user/ImgUp";
+
+        //TODO:服务端要穿的参数也没定,要根据服务器那边确定参数名称
+        public static final String IMG_DATA = "img_data";
+
+        //TODO:应该有user_id
+        public static final String USER_ID = "user_id";
+
+        public static final String IMG_SUFFIX = "img_suffix";
+
+
+    }
+
+    public static class SetNickName{
+
+        public static final String URL = "/user/setNickName";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String NICKNAME = "nickname";
+    }
+
+    public static class SetAttr{
+
+        public static final String URL = "/system/setAttri";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String CLASS = "class";//球种
+
+        public static final String MONEYS = "moneys";
+
+        public static final String AGE = "age";
+
+        public static final String MYTYPE = "mytype";
+
+        public static final String USER_TYPE = "user_type";
+
+        public static final String LEVELS = "levels";
+
+        public static final String ZIZHI = "zizhi";
+
+        public static final String BALLARM = "ballArm";
+
+        public static final String USED_TYPE = "usedType";
+
+        public static final String DISTRICT = "district";
+
+        public static final String SEX = "sex";
+
+        public static final String IDOL = "idol";
+
+        public static final String IDOL_NAME = "idol_name";
+
+        public static final String APPOINT_DATE = "appoint_date";
+
+        public static final String WORK_LIVE = "work_live";
+    }
+
+    public static class SetUserUp{
+
+        public static final String URL = "/user/setUserUp";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String USER_TYPE = "user_type";
+
+    }
+
+    public static class DateIssue{
+
+        public static final String URL = "/center/publish";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String TITLE = "title";
+
+        public static final String ADDRESS = "address";
+
+        public static final String BEGIN_TIME = "begin_time";
+
+        public static final String END_TIME = "end_time";
+
+        public static final String MODEL = "model";
+
+        public static final String CONTENT = "content";
+
+        public static final String NAME = "name";
+
+        public static final String PHONE = "phone";
+
+        public static final String IMG_URL = "img_url";
+
+    }
+
+    public static class Praise{
+
+        public static final String URL = "/laud/addOne";
+
+        public static final String ID = "id";
+    }
+
+    public static class Reply{
+
+        public static final String URL = "/cricle/comment";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String TID = "tid";
+
+        public static final String CONTENT = "content";
+
+
+    }
 
     // 这是SearchActivity当中的球厅Fragment当中的请求数据的过程
     // 因为服务器端使用的是大众点评的SDK，所以我们的请求地址是以大众点评为基础的
@@ -488,5 +674,23 @@ public class HttpConstants
     public static final String DP_APP_KEY = "0786070696";
     public static final String DP_APP_SECRET = "f3e6c9dbe811446884f9a5010b8729f4";
 
+    // 球厅Activity当中用于实现台球厅信息分享的AppId信息
+    public static final String WEIXIN_APP_ID = "wx54ce5d6762a720da";
+    public static final String WEIXIN_APP_SECRET = "864c7254c6cfb0dfcb7bce4fae475eeb";
 
+    // 球厅Activity当中用于实现球厅信息分享的AppId信息
+    public static final String WEIBO_APP_KEY = "539638208";
+    public static final String WEIBO_APP_SECRET = "b72217374751952a8b4f97dbc1dc876c";
+
+    // 球厅Activity当中用于实现分享球厅信息到RenRen的AppID
+    public static final String RENREN_APP_ID = "475119";
+    public static final String RENREN_APP_KEY = "6258359513124f9797f799e1c8b7efb7";
+    public static final String RENREN_SECRET_KEY = "6b6b310a0e1749f1a2742d7705e027ca";
+
+    // 球厅Activity当中qq分享的账号(腾讯微博和qq空间公用一个APP_KEY)
+    public static final String QQ_ZONE_APP_KEY = "1104270786";
+    public static final String QQ_ZONE_APP_SECRET = "5rSgvhoqBRb2FpKt";
+
+
+    public static final String DEFAULT_DIRECT_URL = "http://www.pinruiwenhua.com";
 }

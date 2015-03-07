@@ -9,8 +9,12 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
+import com.yueqiu.bean.ISlideMenuBasic;
 import com.yueqiu.bean.PublishedInfo;
+import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;
 
@@ -18,14 +22,15 @@ import java.util.List;
  * Created by wangyun on 15/1/15.
  */
 public class PublishedBasicAdapter extends BaseAdapter {
-    private List<Object> mList;
+    private List<ISlideMenuBasic> mList;
     private Context mContext;
     private LayoutInflater mInflater;
-
-    public PublishedBasicAdapter(Context context,List<Object> list){
+    private ImageLoader mImgLoader;
+    public PublishedBasicAdapter(Context context,List<ISlideMenuBasic> list){
         this.mContext = context;
         this.mList = list;
-        mInflater = LayoutInflater.from(mContext);
+        this.mInflater = LayoutInflater.from(mContext);
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
     }
 
     @Override
@@ -47,9 +52,9 @@ public class PublishedBasicAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if(convertView == null){
-            convertView = mInflater.inflate(R.layout.published_info_item,null);
+            convertView = mInflater.inflate(R.layout.item_published_info,null);
             holder = new ViewHolder();
-            holder.image = (ImageView) convertView.findViewById(R.id.published_item_image);
+//            holder.image = (NetworkImageView) convertView.findViewById(R.id.published_item_image);
             holder.title = (TextView) convertView.findViewById(R.id.published_title);
             holder.content = (TextView) convertView.findViewById(R.id.published_content);
             holder.dateTime = (TextView) convertView.findViewById(R.id.published_time);
@@ -64,6 +69,7 @@ public class PublishedBasicAdapter extends BaseAdapter {
         }else{
             holder.whole_bg.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.published_item_bg));
         }
+//        holder.image.setVisibility(View.GONE);
         holder.title.setText(((PublishedInfo)mList.get(position)).getTitle());
         holder.content.setText(((PublishedInfo)mList.get(position)).getContent());
         holder.dateTime.setText(((PublishedInfo)mList.get(position)).getDateTime());
@@ -71,7 +77,7 @@ public class PublishedBasicAdapter extends BaseAdapter {
     }
 
     class ViewHolder{
-        ImageView image;
+//        NetworkImageView image;
         TextView  title;
         TextView  content;
         TextView  dateTime;

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:background="@color/white"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
@@ -9,59 +8,59 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <RelativeLayout
+            android:id="@+id/profile_photo_container"
             android:layout_margin="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/image_1_1"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:padding="3dp"
-                android:src="@drawable/head_img"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@id/image_1_1"
-                android:layout_alignTop="@id/image_1_1"
-                android:src="@drawable/delete_img"/>
+            <com.android.volley.toolbox.NetworkImageView
+                android:id="@+id/profile_photo_img"
+                android:layout_width="@dimen/listview_item_user_photo_width"
+                android:layout_height="@dimen/listview_item_user_photo_height"
+                />
+            <!--<ImageView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignRight="@id/image_1_1"-->
+                <!--android:layout_alignTop="@id/image_1_1"-->
+                <!--android:src="@drawable/delete_img"/>-->
             </RelativeLayout>
 
-        <RelativeLayout
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/image_1_2"
-                android:padding="3dp"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/head_img"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@id/image_1_2"
-                android:layout_alignTop="@id/image_1_2"
-                android:src="@drawable/delete_img"/>
-        </RelativeLayout>
+        <!--<RelativeLayout-->
+            <!--android:layout_marginTop="10dp"-->
+            <!--android:layout_marginBottom="10dp"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content">-->
+            <!--<ImageView-->
+                <!--android:id="@+id/image_1_2"-->
+                <!--android:padding="3dp"-->
+                <!--android:layout_width="60dp"-->
+                <!--android:layout_height="60dp"-->
+                <!--android:src="@drawable/head_img"/>-->
+            <!--<ImageView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignRight="@id/image_1_2"-->
+                <!--android:layout_alignTop="@id/image_1_2"-->
+                <!--android:src="@drawable/delete_img"/>-->
+        <!--</RelativeLayout>-->
 
-        <RelativeLayout
-            android:layout_margin="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/image_1_3"
-                android:padding="3dp"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/head_img"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@id/image_1_3"
-                android:layout_alignTop="@id/image_1_3"
-                android:src="@drawable/delete_img"/>
-        </RelativeLayout>
+        <!--<RelativeLayout-->
+            <!--android:layout_margin="10dp"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content">-->
+            <!--<ImageView-->
+                <!--android:id="@+id/image_1_3"-->
+                <!--android:padding="3dp"-->
+                <!--android:layout_width="60dp"-->
+                <!--android:layout_height="60dp"-->
+                <!--android:src="@drawable/head_img"/>-->
+            <!--<ImageView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignRight="@id/image_1_3"-->
+                <!--android:layout_alignTop="@id/image_1_3"-->
+                <!--android:src="@drawable/delete_img"/>-->
+        <!--</RelativeLayout>-->
         <RelativeLayout
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
@@ -69,16 +68,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <ImageView
-                android:id="@+id/image_1_4"
+                android:id="@+id/profile_photo_add_img"
                 android:padding="3dp"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:src="@drawable/add_img"/>
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@id/image_1_4"
-                android:layout_alignTop="@id/image_1_4"/>
+                android:src="@drawable/add_img_bg"/>
         </RelativeLayout>
         </LinearLayout>
-</LinearLayout>
+
+    <include
+        layout="@layout/pre_load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        />
+</RelativeLayout>

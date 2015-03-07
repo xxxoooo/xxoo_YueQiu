@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp">
+
+    <!--用于约球详细Activity当中的GridView当中的item的布局文件-->
+    <com.android.volley.toolbox.NetworkImageView
+        android:layout_width="@dimen/listview_item_user_photo_width"
+        android:layout_height="@dimen/listview_item_user_photo_height"
+        android:src="@drawable/default_head"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/img_grid_search_dating_detailed_userphoto"/>
+
+    <TextView
+        android:id="@+id/tv_grid_search_dating_detailed_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/md__defaultBackground"
+        android:layout_below="@id/img_grid_search_dating_detailed_userphoto"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:gravity="center"/>
+
+</RelativeLayout>

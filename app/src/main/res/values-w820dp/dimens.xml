@@ -3,4 +3,12 @@
          (such as screen margins) for screens with more than 820dp of available width. This
          would include 7" and 10" devices in landscape (~960dp and ~1280dp respectively). -->
     <dimen name="activity_horizontal_margin">64dp</dimen>
+
+    <!-- 这个值是用于定义PullToRefreshListView距离屏幕底部的距离，考虑到PullToRefreshListView
+        的官方Demo当中建议是将ListView的高度定义成match_parent,但是会被NearbyActivity当中
+        底部的TabHost阻挡掉一部分，所以我们设置了这个值.
+        这个值在我们后期具体部署时，需要针对具体的设备进行更细化的适配
+        这里我们定义的是专门针对屏幕为w820dp的，但是具体值还要根据具体的设备进行确定适配 -->
+    <dimen name="nearby_subfragment_listview_margin_bottom">54dp</dimen>
+
 </resources>

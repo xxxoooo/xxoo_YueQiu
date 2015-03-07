@@ -18,6 +18,9 @@
         <item name="android:textAppearanceLargePopupMenu">@style/CustomActionBarTextStyle</item>
     </style>
 
+    <style name="SplashScreenTheme" parent="android:Theme.NoTitleBar.Fullscreen">
+        <item name="android:windowBackground">@drawable/cab_background_top_example</item>
+    </style>
 
     <style name="Widget"/>
 
@@ -43,10 +46,11 @@
 
     <style name="ActionBar" parent="android:Widget.ActionBar">
         <item name="android:background">@color/actionbar_color</item>
+        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_example</item>
         <item name="android:icon">@android:color/transparent</item>
         <item name="android:titleTextStyle">@style/ActionBar.TitleText</item>
-
     </style>
+
 
     <style name="ActionBarTab" parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
         <item name="android:background">@drawable/tab_indicator_ab_example</item>
@@ -58,6 +62,7 @@
         <item name="android:textColor">@color/md__defaultBackground</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">normal</item>
+
     </style>
 
     <style name="ActionBar.TitleText" parent="android:TextAppearance.Holo.Widget.ActionBar.Title">
@@ -105,9 +110,9 @@
     <!--用于SearchActivity定义PopupWindow当中的TextView的style-->
     <style name="PopupWindowTvStyle" parent="AppTheme">
         <item name="android:textStyle">normal</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">34dp</item>
         <item name="android:gravity">left|center_vertical</item>
         <item name="android:textColor">@color/login_btn_normal</item>
         <item name="android:background">@drawable/popup_window_item_bg</item>
@@ -118,13 +123,13 @@
         <item name="android:dividerHeight">0.5dp</item>
         <item name="android:divider">@color/search_list_divider</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
         <item name="android:padding">2dp</item>
     </style>
 
     <!--定义SearchActivity当中的用于过滤的Button的style的控制-->
     <style name="SearchSubFragmentFilterBtnStyle" parent="AppTheme">
-        <item name="android:textSize">16sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:background">@drawable/btn_bg</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -181,7 +186,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">22sp</item>
-        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:layout_marginBottom">3dp</item>
 
     </style>
 
@@ -240,6 +245,42 @@
         <item name="android:windowEnterAnimation">@anim/push_up_in</item>
         <item name="android:windowExitAnimation">@anim/push_up_out</item>
     </style>
+
+
+    <style name="dialog_tran" parent="android:style/Theme.Dialog">
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:backgroundDimAmount">0.4</item>
+    </style>
+    <style name="dialog_untran" parent="dialog_tran">
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+    <style name="dialog_btn">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">36dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginBottom">10dp</item>
+        <item name="android:background">@drawable/dlg_btn_selector</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:gravity">center</item>
+    </style>
+    <style name="DialogWindowTitle">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="chat_text_name_style">
+        <item name="android:textColor">#818181</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:gravity">center</item>
+    </style>
+
 
 
 </resources>

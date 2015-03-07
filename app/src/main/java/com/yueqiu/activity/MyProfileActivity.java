@@ -1,61 +1,69 @@
 package com.yueqiu.activity;
 
 import android.app.Activity;
-import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.bean.Attr;
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.UserDao;
-import com.yueqiu.db.DBUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
 
 import android.app.ActionBar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**
  * Created by doushuqi on 14/12/19.
  * 我的资料主Activity
  */
-public class MyProfileActivity extends Activity implements View.OnClickListener {
+public class MyProfileActivity extends FragmentActivity implements View.OnClickListener {
     private static final String TAG = "MyProfileActivity";
     private Button mAssistant, mCoach;
     private RelativeLayout mPhoto, mAccount, mGender, mNickName, mRegion, mLevel, mBallType,
-            mBilliardsCue, mCueHabits, mPlayAge, mIdol, mSign, mTheNewestPost;
+            mBilliardsCue, mCueHabits, mPlayAge, mIdol, mSign,mCost,mWorkLive,mMyType;//mTheNewestPost;
     private TextView mNickNameTextView, mRegionTextView, mLevelTextView, mBallTypeTextView,
             mBilliardsCueTextView, mCueHabitsTextView, mPlayAgeTextView, mIdolTextView,
-            mSignTextView, mAccountTextView, mGenderTextView;
-    private ImageView mPhotoImageView, mTheNewestPostImageView;
+            mSignTextView, mAccountTextView, mGenderTextView,mCostTextView,mMyTypeTextView,mWorkLiveTextView;
+//    private ImageView mTheNewestPostImageView;
+    private NetworkImageView mPhotoImageView;
+    private SharedPreferences mSharedPreference;
+    private SharedPreferences.Editor mEditor;
 
     public static final String EXTRA_FRAGMENT_ID =
             "com.yueqiu.activity.searchmenu.myprofileactivity.fragment_id";
@@ -72,11 +80,17 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
     private static final int DATA_SUCCESS = 2;
     private Map<String, String> mMap = new HashMap<String, String>();
     private UserDao mUserDao;
+    private ImageLoader mImgLoader;
+    private LinearLayout mAfterUpgradeAssitantView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_myprofile);
+
+        mSharedPreference = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
+        mEditor = mSharedPreference.edit();
+        mImgLoader = VolleySingleton.getInstance().getImgLoader();
         mUserDao = DaoFactory.getUser(this);
         mMap.put(DatabaseConstant.UserTable.USER_ID, String.valueOf(mUserId));
         ActionBar actionBar = getActionBar();
@@ -84,7 +98,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         actionBar.setTitle(getString(R.string.search_my_profile_str));
         initView();
         setClickListener();
-        initData();
+//        initData();
 
     }
 
@@ -103,7 +117,14 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         mPlayAge = (RelativeLayout) findViewById(R.id.my_profile_play_age);
         mIdol = (RelativeLayout) findViewById(R.id.my_profile_idol);
         mSign = (RelativeLayout) findViewById(R.id.my_profile_sign);
-        mTheNewestPost = (RelativeLayout) findViewById(R.id.my_profile_the_new_post);
+        mAfterUpgradeAssitantView = (LinearLayout) findViewById(R.id.profile_after_upgrade_assistant);
+        mCost = (RelativeLayout) findViewById(R.id.profile_cost_re);
+        mWorkLive = (RelativeLayout) findViewById(R.id.profile_work_live_re);
+        mMyType = (RelativeLayout) findViewById(R.id.profile_type_re);
+        mCostTextView = (TextView) findViewById(R.id.profile_upgrade_cost);
+        mMyTypeTextView = (TextView) findViewById(R.id.profile_upgrade_type);
+        mWorkLiveTextView = (TextView) findViewById(R.id.profile_upgrade_experience);
+//        mTheNewestPost = (RelativeLayout) findViewById(R.id.my_profile_the_new_post);
 
         mAccountTextView = (TextView) findViewById(R.id.my_profile_account_tv);
         mGenderTextView = (TextView) findViewById(R.id.my_profile_gender_tv);
@@ -117,8 +138,35 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         mIdolTextView = (TextView) findViewById(R.id.my_profile_idol_tv);
         mSignTextView = (TextView) findViewById(R.id.my_profile_sign_tv);
 
-        mPhotoImageView = (ImageView) findViewById(R.id.my_profile_photo_iv);
-        mTheNewestPostImageView = (ImageView) findViewById(R.id.my_profile_the_new_post_im);
+        mPhotoImageView = (NetworkImageView) findViewById(R.id.my_profile_photo_iv);
+//        mTheNewestPostImageView = (ImageView) findViewById(R.id.my_profile_the_new_post_im);
+        mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
+        mPhotoImageView.setErrorImageResId(R.drawable.default_head);
+
+
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+//        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_coauch_str))){
+//            mAssistant.setVisibility(View.GONE);
+//            mCoach.setVisibility(View.GONE);
+//        }
+        initData();
+        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_mate_str))){
+            mAfterUpgradeAssitantView.setVisibility(View.GONE);
+        }
+
+        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_assist_coauch_str)) ||
+                YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_coauch_str))){
+            mAssistant.setVisibility(View.GONE);
+            mCoach.setVisibility(View.GONE);
+            mAfterUpgradeAssitantView.setVisibility(View.VISIBLE);
+        }
     }
 
     //初始化我的资料数据
@@ -126,72 +174,107 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
 
         if (Utils.networkAvaiable(this)) {
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
                     Map<String, Integer> map = new HashMap<String, Integer>();
                     map.put(HttpConstants.GetMyInfo.USER_ID, mUserId);
 
-                    String result = HttpUtil.urlClient(HttpConstants.GetMyInfo.URL,
-                            map, HttpConstants.RequestMethod.GET);
-                    JSONObject object = Utils.parseJson(result);
-                    Message message = new Message();
-                    try {
-                        if (!object.isNull("code")) {
-                            if (object.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                    HttpUtil.requestHttp(HttpConstants.GetMyInfo.URL,map,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+                        @Override
+                        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                            super.onSuccess(statusCode, headers, response);
+                            Log.d("wy","myprofile response->" + response);
+                            Message message = new Message();
+                            try {
+                                if (!response.isNull("code")) {
+                                    if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
 
-                                mMap.put(DatabaseConstant.UserTable.SEX, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.SEX));
-                                mMap.put(DatabaseConstant.UserTable.IMG_URL, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.IMG_URL));
-                                mMap.put(DatabaseConstant.UserTable.USERNAME, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.USERNAME));
-                                mMap.put(DatabaseConstant.UserTable.NICK, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.NICK));
-                                mMap.put(DatabaseConstant.UserTable.DISTRICT, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.DISTRICT));
-                                mMap.put(DatabaseConstant.UserTable.LEVEL, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.LEVEL));
-                                mMap.put(DatabaseConstant.UserTable.BALL_TYPE, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.BALL_TYPE));
-                                mMap.put(DatabaseConstant.UserTable.APPOINT_DATE, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.APPOINT_DATE));
-                                mMap.put(DatabaseConstant.UserTable.BALLARM, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.BALLARM));
-                                mMap.put(DatabaseConstant.UserTable.USERDTYPE, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.USERDTYPE));
-                                mMap.put(DatabaseConstant.UserTable.BALLAGE, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.BALLAGE));
-                                mMap.put(DatabaseConstant.UserTable.IDOL, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.IDOL));
-                                mMap.put(DatabaseConstant.UserTable.IDOL_NAME, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.IDOL_NAME));
-                                mMap.put(DatabaseConstant.UserTable.NEW_IMG, object.getJSONObject("result").
-                                        getString(DatabaseConstant.UserTable.NEW_IMG));
+                                        String sex = response.getJSONObject("result").getString(DatabaseConstant.UserTable.SEX);
+                                        String img_url = response.getJSONObject("result").getString(DatabaseConstant.UserTable.IMG_URL);
+                                        String username = response.getJSONObject("result").getString(DatabaseConstant.UserTable.USERNAME);
+                                        String nick = response.getJSONObject("result").getString(DatabaseConstant.UserTable.NICK);
+                                        String district = response.getJSONObject("result").getString(DatabaseConstant.UserTable.DISTRICT);
+                                        String level = response.getJSONObject("result").getString(DatabaseConstant.UserTable.LEVEL);
+                                        String ball_type = response.getJSONObject("result").getString(DatabaseConstant.UserTable.BALL_TYPE);
+                                        String appoint_date = response.getJSONObject("result").getString(DatabaseConstant.UserTable.APPOINT_DATE);
+                                        String ball_arm = response.getJSONObject("result").getString(DatabaseConstant.UserTable.BALLARM);
+                                        String usedType = response.getJSONObject("result").getString(DatabaseConstant.UserTable.USERDTYPE);
+                                        String ball_age = response.getJSONObject("result").getString(DatabaseConstant.UserTable.BALLAGE);
+                                        String idol = response.getJSONObject("result").getString(DatabaseConstant.UserTable.IDOL);
+                                        String idol_name = response.getJSONObject("result").getString(DatabaseConstant.UserTable.IDOL_NAME);
+                                        String new_img = response.getJSONObject("result").getString(DatabaseConstant.UserTable.NEW_IMG);
+                                        String cost = response.getJSONObject("result").getString(DatabaseConstant.UserTable.COST);
+                                        String my_type = response.getJSONObject("result").getString(DatabaseConstant.UserTable.MY_TYPE);
+                                        String work_live = response.getJSONObject("result").getString(DatabaseConstant.UserTable.WORK_LIVE);
 
-                                mUserInfo = Utils.mapingObject(UserInfo.class, object.getJSONObject("result"));
-                                message.what = DATA_SUCCESS;
-                                message.obj = mUserInfo;
+                                        mMap.put(DatabaseConstant.UserTable.SEX, sex);
+                                        mMap.put(DatabaseConstant.UserTable.IMG_URL, img_url);
+                                        mMap.put(DatabaseConstant.UserTable.USERNAME, username);
+                                        mMap.put(DatabaseConstant.UserTable.NICK, nick);
+                                        mMap.put(DatabaseConstant.UserTable.DISTRICT, district);
+                                        mMap.put(DatabaseConstant.UserTable.LEVEL, level);
+                                        mMap.put(DatabaseConstant.UserTable.BALL_TYPE, ball_type);
+                                        mMap.put(DatabaseConstant.UserTable.APPOINT_DATE, appoint_date);
+                                        mMap.put(DatabaseConstant.UserTable.BALLARM, ball_arm);
+                                        mMap.put(DatabaseConstant.UserTable.USERDTYPE, usedType);
+                                        mMap.put(DatabaseConstant.UserTable.BALLAGE, ball_age);
+                                        mMap.put(DatabaseConstant.UserTable.IDOL, idol);
+                                        mMap.put(DatabaseConstant.UserTable.IDOL_NAME, idol_name);
+                                        mMap.put(DatabaseConstant.UserTable.NEW_IMG, new_img);
+                                        //TODO:等服务器那边加上了，取消注释
+                                        mMap.put(DatabaseConstant.UserTable.COST,cost);
+                                        mMap.put(DatabaseConstant.UserTable.MY_TYPE,my_type);
+                                        mMap.put(DatabaseConstant.UserTable.WORK_LIVE,work_live);
+
+//                                        mUserInfo = Utils.mapingObject(UserInfo.class, response.getJSONObject("result"));
+                                        mUserInfo = new UserInfo();
+                                        mUserInfo.setSex(Integer.valueOf(sex));
+                                        mUserInfo.setImg_url(img_url);
+                                        mUserInfo.setUsername(username);
+                                        mUserInfo.setNick(nick);
+                                        mUserInfo.setDistrict(district);
+                                        mUserInfo.setLevel(Integer.valueOf(level));
+                                        mUserInfo.setBall_type(Integer.valueOf(ball_type));
+                                        mUserInfo.setAppoint_date(appoint_date);
+                                        mUserInfo.setBallArm(Integer.valueOf(ball_arm));
+                                        mUserInfo.setUsedType(Integer.valueOf(usedType));
+                                        mUserInfo.setBallAge(ball_age);
+                                        mUserInfo.setIdol(idol);
+                                        mUserInfo.setIdol_name(idol_name);
+                                        mUserInfo.setCost(cost);
+                                        mUserInfo.setMy_type(Integer.valueOf(my_type));
+                                        mUserInfo.setWork_live(work_live);
 
 
-                            } else if (object.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
-                                mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                            } else {
-                                message.what = DATA_ERROR;
-                                message.obj = object.getString("msg");
+                                        message.what = DATA_SUCCESS;
+                                        message.obj = mUserInfo;
+
+                                    } else if (response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                                        mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                                    } else {
+                                        message.what = DATA_ERROR;
+                                        message.obj = response.getString("msg");
+                                    }
+                                    mHandler.sendMessage(message);
+                                } else {
+                                    message.what = DATA_ERROR;
+                                    mHandler.sendMessage(message);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                //加载本地数据
+                                getMyProfileFromLocal();
                             }
-                            mHandler.sendMessage(message);
-                        } else {
-                            message.what = DATA_ERROR;
-                            mHandler.sendMessage(message);
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        //加载本地数据
-                        getMyProfileFromLocal();
-                    }
-                }
-            }).start();
+
+                        @Override
+                        public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                            super.onFailure(statusCode, headers, responseString, throwable);
+                            mHandler.sendEmptyMessage(DATA_ERROR);
+                        }
+                    });
+
         } else {
             getMyProfileFromLocal();
             mHandler.obtainMessage(DATA_SUCCESS, mUserInfo).sendToTarget();
@@ -217,15 +300,18 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
                     }
                     getMyProfileFromLocal();
                     updateUI(mUserInfo);
+                    updateGlobalUserId(mUserInfo);
                     break;
                 case DATA_SUCCESS:
                     mUserDao.updateUserInfo(mMap);
                     updateUI((UserInfo) msg.obj);
+                    updateGlobalUserId((UserInfo) msg.obj);
                     break;
                 case PublicConstant.TIME_OUT:
                     Toast.makeText(MyProfileActivity.this, getString(R.string.http_request_time_out), Toast.LENGTH_SHORT).show();
                     getMyProfileFromLocal();
                     updateUI(mUserInfo);
+                    updateGlobalUserId(mUserInfo);
                     break;
             }
         }
@@ -233,7 +319,7 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
 
     private void updateUI(UserInfo userInfo) {
         String unset = getString(R.string.unset);
-//        mPhotoImageView.setImageDrawable();
+        mPhotoImageView.setImageUrl("http://" + userInfo.getImg_url(),mImgLoader);
         mAccountTextView.setText(userInfo.getUsername());
         mGenderTextView.setText(userInfo.getSex() == 1
                 ? getString(R.string.man) : getString(R.string.woman));
@@ -252,12 +338,57 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         mCueHabitsTextView.setText(1 == userInfo.getUsedType()
                 ? getString(R.string.habit_1) : (2 == userInfo.getUsedType() ?
                 getString(R.string.habit_2) : getString(R.string.habit_3)));
-        mPlayAgeTextView.setText(userInfo.getBallAge());
+        mPlayAgeTextView.setText("0".equals(userInfo.getIdol_name())
+                ? unset : userInfo.getBallAge());
         mIdolTextView.setText("".equals(userInfo.getIdol())
                 ? unset : userInfo.getIdol());
-        mSignTextView.setText("".equals(userInfo.getIdol_name())
+        mSignTextView.setText("".equals(userInfo.getIdol_name())|| "0".equals(userInfo.getIdol_name())
                 ? unset : userInfo.getIdol_name());
+        mCostTextView.setText(TextUtils.isEmpty(userInfo.getCost()) || "0".equals(userInfo.getIdol_name())
+                ? unset : userInfo.getCost());
+        mMyTypeTextView.setText(TextUtils.isEmpty(String.valueOf(userInfo.getMy_type()))?
+                unset : getTypeStrByTypeId(userInfo.getMy_type()));
+        mWorkLiveTextView.setText(TextUtils.isEmpty(userInfo.getWork_live()) ?
+                unset : userInfo.getWork_live());
 //        mTheNewestPostImageView.setImageDrawable();
+    }
+
+
+    private void updateGlobalUserId(UserInfo user){
+        YueQiuApp.sUserInfo.setUsername(user.getUsername());
+        YueQiuApp.sUserInfo.setImg_url(user.getImg_url());
+        YueQiuApp.sUserInfo.setSex(user.getSex());
+        YueQiuApp.sUserInfo.setNick(user.getNick());
+        YueQiuApp.sUserInfo.setDistrict(user.getDistrict());
+        YueQiuApp.sUserInfo.setLevel(user.getLevel());
+        YueQiuApp.sUserInfo.setBall_type(user.getBall_type());
+        YueQiuApp.sUserInfo.setBallArm(user.getBallArm());
+        YueQiuApp.sUserInfo.setUsedType(user.getUsedType());
+        YueQiuApp.sUserInfo.setBallAge(user.getBallAge());
+        YueQiuApp.sUserInfo.setIdol(user.getIdol());
+        YueQiuApp.sUserInfo.setIdol_name(user.getIdol_name());
+        //TODO:等服务器加上这几个字段取消注释
+        YueQiuApp.sUserInfo.setCost(user.getCost());
+        YueQiuApp.sUserInfo.setMy_type(user.getMy_type());
+        YueQiuApp.sUserInfo.setWork_live(user.getWork_live());
+
+        mEditor.putString(DatabaseConstant.UserTable.USERNAME,user.getUsername());
+        mEditor.putString(DatabaseConstant.UserTable.IMG_URL,user.getImg_url());
+        mEditor.putInt(DatabaseConstant.UserTable.SEX,user.getSex());
+        mEditor.putString(DatabaseConstant.UserTable.NICK,user.getNick());
+        mEditor.putString(DatabaseConstant.UserTable.DISTRICT,user.getDistrict());
+        mEditor.putInt(DatabaseConstant.UserTable.LEVEL,user.getLevel());
+        mEditor.putInt(DatabaseConstant.UserTable.BALL_TYPE,user.getBall_type());
+        mEditor.putInt(DatabaseConstant.UserTable.BALLARM,user.getBallArm());
+        mEditor.putInt(DatabaseConstant.UserTable.USERDTYPE,user.getUsedType());
+        mEditor.putString(DatabaseConstant.UserTable.BALLAGE, user.getBallAge());
+        mEditor.putString(DatabaseConstant.UserTable.IDOL,user.getIdol());
+        mEditor.putString(DatabaseConstant.UserTable.IDOL_NAME,user.getIdol_name());
+        mEditor.putString(DatabaseConstant.UserTable.COST,user.getCost());
+        mEditor.putString(DatabaseConstant.UserTable.MY_TYPE,String.valueOf(user.getMy_type()));
+        mEditor.putString(DatabaseConstant.UserTable.WORK_LIVE,user.getWork_live());
+
+        mEditor.apply();
     }
 
     @Override
@@ -293,7 +424,10 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         mPlayAge.setOnClickListener(this);
         mIdol.setOnClickListener(this);
         mSign.setOnClickListener(this);
-        mTheNewestPost.setOnClickListener(this);
+        mCost.setOnClickListener(this);
+        mMyType.setOnClickListener(this);
+        mWorkLive.setOnClickListener(this);
+//        mTheNewestPost.setOnClickListener(this);
     }
 
     @Override
@@ -315,14 +449,20 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
         switch (v.getId()) {
             case R.id.update_assistant_btn:
                 //TODO:升级助教界面
-                startActivity(new Intent(this, UpdateAssistantActivity.class));
+                Intent assitant = new Intent(this, UpgradeAssistantActivity.class);
+                assitant.putExtra(DatabaseConstant.UserTable.TITLE,getString(R.string.nearby_billiard_assist_coauch_str));
+                startActivity(assitant);
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case R.id.update_coach_btn:
                 //TODO:升级教练界面
-                startActivity(new Intent(this, UpdateAssistantActivity.class));
+                Intent coach = new Intent(this, UpgradeAssistantActivity.class);
+                coach.putExtra(DatabaseConstant.UserTable.TITLE,getString(R.string.nearby_billiard_coauch_str));
+                startActivity(coach);
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case R.id.my_profile_photo:
-                startMyActivity(0);
+                startMyActivity(Attr.PHOTO);
                 break;
             case R.id.my_profile_account:
 //                startMyActivity(1);
@@ -331,42 +471,53 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
 //                startMyActivity(2);
                 break;
             case R.id.my_profile_nick_name:
-                startMyActivity(3);
+                startMyActivity(Attr.NICKNAME);
                 break;
             case R.id.my_profile_region:
-                startMyActivity(4);
+                startMyActivity(Attr.DISTRICT);
                 break;
             case R.id.my_profile_level:
-                startMyActivity(5);
+                startMyActivity(Attr.LEVEL);
                 break;
             case R.id.my_profile_ball_type:
-                startMyActivity(6);
+                startMyActivity(Attr.BALL_CLASS);
                 break;
             case R.id.my_profile_billiards_cue:
-                startMyActivity(7);
+                startMyActivity(Attr.BALL_ARM);
                 break;
             case R.id.my_profile_cue_habits:
-                startMyActivity(8);
+                startMyActivity(Attr.USE_TYPE);
                 break;
             case R.id.my_profile_play_age:
-                startMyActivity(9);
+                startMyActivity(Attr.BALL_AGE);
                 break;
             case R.id.my_profile_idol:
-                startMyActivity(10);
+                startMyActivity(Attr.IDOL);
                 break;
             case R.id.my_profile_sign:
-                startMyActivity(11);
+                startMyActivity(Attr.IDOL_NAME);
                 break;
-            case R.id.my_profile_the_new_post:
+            case R.id.profile_cost_re:
+                startMyActivity(Attr.COST);
+                break;
+            case R.id.profile_type_re:
+                startMyActivity(Attr.MY_TYPE);
+                break;
+            case R.id.profile_work_live_re:
+                startMyActivity(Attr.WORK_LIVE);
+                break;
+//            case R.id.my_profile_the_new_post:
 //                startMyActivity(12);
-                break;
+//                break;
         }
     }
 
-    private void startMyActivity(int id) {
+    private void startMyActivity(Attr attr) {
+        Log.d("wy","attr ->" + attr.name());
         Intent i = new Intent(this, ProfileSetupActivity.class);
-        i.putExtra(EXTRA_FRAGMENT_ID, id);
-        startActivityForResult(i, id);
+        i.putExtra(EXTRA_FRAGMENT_ID, attr.ordinal());
+        startActivityForResult(i, attr.ordinal());
+        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 
     @Override
@@ -378,73 +529,140 @@ public class MyProfileActivity extends Activity implements View.OnClickListener 
             return;
         if (mUserInfo == null)
             mUserInfo = new UserInfo();
-        switch (requestCode) {
-            case 0:
 
-                break;
-            case 1:
-
-                break;
-            case 2:
-
-                break;
-            case 3:
+        Attr attr = getAttrById(requestCode);
+        switch (attr) {
+            case PHOTO:
+                String img_url = "http://" + data.getStringExtra(PublicConstant.IMG_URL);
+                mPhotoImageView.setImageUrl(img_url,mImgLoader);
+            case NICKNAME:
                 mNickNameTextView.setText(str);
                 mUserInfo.setNick(str);
                 mMap.put(DatabaseConstant.UserTable.NICK, str);
                 break;
-            case 4:
+            case DISTRICT:
                 mRegionTextView.setText(str);
                 mUserInfo.setDistrict(str);
                 mMap.put(DatabaseConstant.UserTable.DISTRICT, str);
                 break;
-            case 5:
+            case LEVEL:
                 mLevelTextView.setText("1".equals(str)
                         ? getString(R.string.level_base) : (("2".equals(str)) ?
                         getString(R.string.level_middle) : getString(R.string.level_master)));
                 mUserInfo.setLevel(Integer.parseInt(str));
                 mMap.put(DatabaseConstant.UserTable.LEVEL, str);
                 break;
-            case 6:
+            case BALL_CLASS:
                 mBallTypeTextView.setText("1".equals(str)
                         ? getString(R.string.ball_type_1) : ("2".equals(str) ?
                         getString(R.string.ball_type_2) : getString(R.string.ball_type_3)));
                 mUserInfo.setBall_type(Integer.parseInt(str));
                 mMap.put(DatabaseConstant.UserTable.BALL_TYPE, str);
                 break;
-            case 7:
+            case BALL_ARM:
                 mBilliardsCueTextView.setText("1".equals(str)
                         ? getString(R.string.cue_1) : getString(R.string.cue_2));
                 mUserInfo.setUsedType(Integer.parseInt(str));
                 mMap.put(DatabaseConstant.UserTable.BALLARM, str);
                 break;
-            case 8:
+            case USE_TYPE:
                 mCueHabitsTextView.setText("1".equals(str)
                         ? getString(R.string.habit_1) : ("2".equals(str) ?
                         getString(R.string.habit_2) : getString(R.string.habit_3)));
                 mUserInfo.setBallArm(Integer.parseInt(str));
                 mMap.put(DatabaseConstant.UserTable.USERDTYPE, str);
                 break;
-            case 9:
+            case BALL_AGE:
                 mPlayAgeTextView.setText(str);
                 mUserInfo.setBallAge(str);
                 mMap.put(DatabaseConstant.UserTable.BALLAGE, str);
                 break;
-            case 10:
+            case IDOL:
                 mIdolTextView.setText(str);
                 mUserInfo.setIdol(str);
                 mMap.put(DatabaseConstant.UserTable.IDOL, str);
                 break;
-            case 11:
+            case IDOL_NAME:
                 mSignTextView.setText(str);
                 mUserInfo.setIdol_name(str);
                 mMap.put(DatabaseConstant.UserTable.IDOL_NAME, str);
                 break;
-            case 12:
+            case COST:
+                mCostTextView.setText(str);
+                mUserInfo.setCost(str);
+                mMap.put(DatabaseConstant.UserTable.COST,str);
                 break;
+            case MY_TYPE:
+                int typeId = Integer.valueOf(str);
+                String myType = getTypeStrByTypeId(typeId);
+                mMyTypeTextView.setText(myType);
+                mUserInfo.setMy_type(typeId);
+                mMap.put(DatabaseConstant.UserTable.MY_TYPE,String.valueOf(typeId));
+                break;
+            case WORK_LIVE:
+                mWorkLiveTextView.setText(str);
+                mUserInfo.setWork_live(str);
+                mMap.put(DatabaseConstant.UserTable.WORK_LIVE,str);
+                break;
+
         }
         mUserDao.updateUserInfo(mMap);
     }
 
+    private Attr getAttrById(int id){
+        Attr attr = null;
+        if(id == 0){
+            attr = Attr.PHOTO;
+        }else if(id == 1){
+            attr = Attr. NICKNAME;
+        }else if(id == 2){
+            attr = Attr.LEVEL;
+        }else if(id == 3){
+            attr = Attr.BALL_CLASS;
+        }else if(id == 4){
+            attr = Attr.BALL_ARM;
+        }else if(id == 5){
+            attr = Attr.USE_TYPE;
+        }else if(id == 6){
+            attr = Attr.BALL_AGE;
+        }else if(id == 7){
+            attr = Attr.IDOL;
+        }else if(id == 8){
+            attr = Attr.IDOL_NAME;
+        }else if(id == 9){
+            attr = Attr.COST;
+        }else if(id == 10){
+            attr = Attr.COST;
+        }else if(id == 11){
+            attr = Attr.MY_TYPE;
+        }else if(id == 12){
+            attr = Attr.WORK_LIVE;
+        }
+        return attr;
+    }
+    private String getTypeStrByTypeId(int type_id){
+        String str = "";
+        switch (type_id){
+            case PublicConstant.LOVELY_TYPE:
+                str = getString(R.string.lovely_type);
+                break;
+            case PublicConstant.MATURE_TYPE:
+                str = getString(R.string.mature_type);
+                break;
+            case PublicConstant.GODNESS_TYPE:
+                str = getString(R.string.godness_type);
+                break;
+            case PublicConstant.CHARMING_TYPE:
+                str = getString(R.string.charming_type);
+                break;
+            case PublicConstant.STRENGTH_TYPE:
+                str = getString(R.string.strength_type);
+                break;
+            case PublicConstant.HANDSOME_TYPE:
+                str = getString(R.string.handsome_type);
+                break;
+        }
+        return str;
+    }
 
 }

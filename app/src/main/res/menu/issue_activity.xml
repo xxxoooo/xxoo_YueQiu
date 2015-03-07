@@ -5,7 +5,7 @@
     tools:context="com.yueqiu.activity.PlayIssueActivity">
     <item
             android:id="@+id/issue_activity"
-            android:title="@string/issueactivities"
+            android:title="@string/issue"
             android:orderInCategory="100"
             android:showAsAction="ifRoom|withText"
         />

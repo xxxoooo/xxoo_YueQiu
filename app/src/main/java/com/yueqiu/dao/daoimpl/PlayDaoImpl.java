@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.yueqiu.bean.PlayInfo;
 import com.yueqiu.constant.DatabaseConstant;
@@ -32,7 +33,7 @@ public class PlayDaoImpl implements PlayDao {
     }
 
     @Override
-    public long insertPlayInfo(List<PlayInfo> list) {
+    public synchronized long insertPlayInfo(List<PlayInfo> list) {
         long result = -1;
         mDB = mDBUtils.getWritableDatabase();
         mDB.beginTransaction();
@@ -52,6 +53,8 @@ public class PlayDaoImpl implements PlayDao {
                 values.put(DatabaseConstant.PlayTable.MODEL,checkIsEmpty(info.getBegin_time()));
                 values.put(DatabaseConstant.PlayTable.CONTENT,info.getContent());
                 values.put(DatabaseConstant.PlayTable.CREATE_TIME,info.getCreate_time());
+                values.put(DatabaseConstant.PlayTable.CONTACT,info.getContact());
+                values.put(DatabaseConstant.PlayTable.PHONE,info.getPhone());
                 result = mDB.insert(DatabaseConstant.PlayTable.TABLENAME,null,values);
             }
             mDB.setTransactionSuccessful();
@@ -72,6 +75,32 @@ public class PlayDaoImpl implements PlayDao {
             for(PlayInfo info : list){
                 ContentValues values = new ContentValues();
                 values.put(DatabaseConstant.PlayTable.TABLE_ID,info.getTable_id());
+                values.put(DatabaseConstant.PlayTable.TYPE,checkIsEmpty(info.getType()));
+                values.put(DatabaseConstant.PlayTable.TITLE,info.getTitle());
+                values.put(DatabaseConstant.PlayTable.CONTENT,info.getContent());
+                values.put(DatabaseConstant.PlayTable.CREATE_TIME,info.getCreate_time());
+                result = mDB.update(DatabaseConstant.PlayTable.TABLENAME, values, DatabaseConstant.PublishInfoTable.TABLE_ID + "=? and "
+                                + DatabaseConstant.PublishInfoTable.TYPE + "=?",
+                        new String[]{String.valueOf(info.getTable_id()), String.valueOf(info.getType())});
+            }
+            mDB.setTransactionSuccessful();
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            mDB.endTransaction();
+        }
+        return result;
+    }
+
+    @Override
+    public synchronized long updatesDetailPlayInfo(List<PlayInfo> list) {
+        long result = -1;
+        mDB = mDBUtils.getWritableDatabase();
+        mDB.beginTransaction();
+        try{
+            for(PlayInfo info : list){
+                ContentValues values = new ContentValues();
+                values.put(DatabaseConstant.PlayTable.TABLE_ID,info.getTable_id());
                 values.put(DatabaseConstant.PlayTable.USERNAME, checkIsEmpty(info.getUsername()));
                 values.put(DatabaseConstant.PlayTable.SEX, checkIsEmpty(info.getSex()));
                 values.put(DatabaseConstant.PlayTable.IMG_URL,info.getImg_url());
@@ -81,9 +110,11 @@ public class PlayDaoImpl implements PlayDao {
                 values.put(DatabaseConstant.PlayTable.ADDRESS,checkIsEmpty(info.getAddress()));
                 values.put(DatabaseConstant.PlayTable.BEGIN_TIME,checkIsEmpty(info.getBegin_time()));
                 values.put(DatabaseConstant.PlayTable.END_TIME,checkIsEmpty(info.getBegin_time()));
-                values.put(DatabaseConstant.PlayTable.MODEL,checkIsEmpty(info.getBegin_time()));
+                values.put(DatabaseConstant.PlayTable.MODEL,checkIsEmpty(info.getModel()));
                 values.put(DatabaseConstant.PlayTable.CONTENT,info.getContent());
                 values.put(DatabaseConstant.PlayTable.CREATE_TIME,info.getCreate_time());
+                values.put(DatabaseConstant.PlayTable.CONTACT,info.getContact());
+                values.put(DatabaseConstant.PlayTable.PHONE,info.getPhone());
                 result = mDB.update(DatabaseConstant.PlayTable.TABLENAME, values, DatabaseConstant.PublishInfoTable.TABLE_ID + "=? and "
                                 + DatabaseConstant.PublishInfoTable.TYPE + "=?",
                         new String[]{String.valueOf(info.getTable_id()), String.valueOf(info.getType())});
@@ -121,6 +152,8 @@ public class PlayDaoImpl implements PlayDao {
                 info.setEnd_time(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.END_TIME)));
                 info.setModel(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.MODEL)));
                 info.setCreate_time(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.CREATE_TIME)));
+                info.setContact(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.CONTACT)));
+                info.setPhone(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.PHONE)));
                 list.add(info);
             }while(cursor.moveToNext());
         }
@@ -151,6 +184,8 @@ public class PlayDaoImpl implements PlayDao {
                 info.setEnd_time(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.END_TIME)));
                 info.setModel(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.MODEL)));
                 info.setCreate_time(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.CREATE_TIME)));
+                info.setContact(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.CONTACT)));
+                info.setPhone(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.PHONE)));
                 list.add(info);
             }while(cursor.moveToNext());
         }
@@ -163,7 +198,8 @@ public class PlayDaoImpl implements PlayDao {
         PlayInfo info = new PlayInfo();
         String sql = "SELECT * FROM " + DatabaseConstant.PlayTable.TABLENAME + " where " + DatabaseConstant.PlayTable.TYPE + "=?"
                 + " and " + DatabaseConstant.PlayTable.TABLE_ID + "=?";
-        Cursor cursor = mDB.rawQuery(sql,new String[]{String.valueOf(type)});
+        Cursor cursor = mDB.rawQuery(sql,new String[]{String.valueOf(type),String.valueOf(tableId)});
+        Log.d("wy","cursor.count->" + cursor.getCount());
         if(cursor != null && cursor.getCount() != 0){
             cursor.moveToFirst();
             do{
@@ -181,6 +217,8 @@ public class PlayDaoImpl implements PlayDao {
                 info.setEnd_time(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.END_TIME)));
                 info.setModel(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.MODEL)));
                 info.setCreate_time(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.CREATE_TIME)));
+                info.setContact(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.CONTACT)));
+                info.setPhone(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.PlayTable.PHONE)));
             }while(cursor.moveToNext());
         }
         return info;

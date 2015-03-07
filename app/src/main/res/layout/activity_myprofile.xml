@@ -73,14 +73,13 @@
                             android:text="@string/photo"
                             android:textColor="@color/md__defaultBackground"/>
 
-                        <ImageView
+                        <com.android.volley.toolbox.NetworkImageView
                             android:id="@+id/my_profile_photo_iv"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
+                            android:layout_width="62dp"
+                            android:layout_height="62dp"
                             android:layout_marginRight="10dp"
                             android:layout_alignParentRight="true"
                             android:layout_centerVertical="true"
-                            android:src="@drawable/head_img"
                             android:textColor="@color/md__defaultBackground"/>
                     </RelativeLayout>
 
@@ -437,30 +436,129 @@
                         android:layout_height="0.5dp"
                         android:background="@color/devide_line"/>
 
+                    <!--<RelativeLayout-->
+                        <!--android:id="@+id/my_profile_the_new_post"-->
+                        <!--android:clickable="true"-->
+                        <!--android:background="@drawable/list_corner_round_mid2"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="44dp">-->
+
+                        <!--<TextView-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_marginLeft="10dp"-->
+                            <!--android:layout_centerVertical="true"-->
+                            <!--android:text="@string/the_new_post"-->
+                            <!--android:textColor="@color/md__defaultBackground"/>-->
+
+                        <!--<ImageView-->
+                            <!--android:id="@+id/my_profile_the_new_post_im"-->
+                            <!--android:layout_width="wrap_content"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_marginRight="10dp"-->
+                            <!--android:layout_centerVertical="true"-->
+                            <!--android:layout_alignParentRight="true"-->
+                            <!--android:textColor="@color/md__defaultBackground"/>-->
+                    <!--</RelativeLayout>-->
+
+                </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/profile_after_upgrade_assistant"
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:background="@drawable/list_corner_round_bg">
+
                     <RelativeLayout
-                        android:id="@+id/my_profile_the_new_post"
+                        android:layout_width="match_parent"
                         android:clickable="true"
                         android:background="@drawable/list_corner_round_mid2"
-                        android:layout_width="match_parent"
-                        android:layout_height="44dp">
+                        android:layout_height="44dp"
+                        android:id="@+id/profile_cost_re">
 
                         <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginLeft="10dp"
                             android:layout_centerVertical="true"
-                            android:text="@string/the_new_post"
-                            android:textColor="@color/md__defaultBackground"/>
+                            android:text="@string/cost"
+                            />
 
-                        <ImageView
-                            android:id="@+id/my_profile_the_new_post_im"
+                        <TextView
+                            android:textColor="@color/md__defaultBackground"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginRight="10dp"
                             android:layout_centerVertical="true"
                             android:layout_alignParentRight="true"
-                            android:textColor="@color/md__defaultBackground"/>
+                            android:text="@string/unset"
+                            android:id="@+id/profile_upgrade_cost"/>
                     </RelativeLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:background="@color/devide_line"/>
+
+                    <RelativeLayout
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:id="@+id/profile_type_re">
+
+                        <TextView
+                            android:textColor="@color/md__defaultBackground"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_centerVertical="true"
+                            android:text="@string/type"/>
+
+                        <TextView
+                            android:textColor="@color/md__defaultBackground"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentRight="true"
+                            android:text="@string/unset"
+                            android:id="@+id/profile_upgrade_type"/>
+                    </RelativeLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.5dp"
+                        android:background="@color/devide_line"/>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
+                        android:id="@+id/profile_work_live_re">
+
+                        <TextView
+                            android:textColor="@color/md__defaultBackground"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_centerVertical="true"
+                            android:text="@string/profession_experiences"/>
+
+                        <TextView
+                            android:textColor="@color/md__defaultBackground"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentRight="true"
+                            android:text="@string/unset"
+                            android:id="@+id/profile_upgrade_experience"/>
+                    </RelativeLayout>
+
 
                 </LinearLayout>
             </LinearLayout>
