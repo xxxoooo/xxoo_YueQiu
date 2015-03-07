@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -16,19 +17,27 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationListener;
+import com.amap.api.location.LocationManagerProxy;
+import com.amap.api.location.LocationProviderProxy;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.NearbyBilliardsDatingActivity;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyDatingSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyDatingSubFragmentDatingBean;
 import com.yueqiu.constant.HttpConstants;
@@ -36,6 +45,7 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
+import com.yueqiu.fragment.nearby.common.NearbySubFragmentConstants;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
@@ -46,6 +56,7 @@ import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,6 +70,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BilliardsNearbyDatingFragment extends Fragment
 {
     private static final String TAG = "BilliardsNearbyDatingFragment";
+    private static final String TAG_2 = "dating_fragment";
     private Context mContext;
 
     public BilliardsNearbyDatingFragment()
@@ -114,10 +126,9 @@ public class BilliardsNearbyDatingFragment extends Fragment
     // 用于保存在我们的状态当中的cacheList
     private ArrayList<NearbyDatingSubFragmentDatingBean> mCachedDatingList = new ArrayList<NearbyDatingSubFragmentDatingBean>();
     private NearbyDatingSubFragmentListAdapter mDatingListAdapter;
-    // TODO: mArgs是我们在初始化Fragment时需要接受来自初始化这个Fragment所传递的参数的容器，
-    // TODO: 只不过我们现在没有用到，但是这个参数是我们更好的封装Fragment的基础，不要忽略
-    private Bundle mArgs;
     private NearbyPopBasicClickListener mClickListener;
+
+    private String mArguments;
 
     private NearbyFragmentsCommonUtils.ControlPopupWindowCallback mCallback;
 
@@ -125,7 +136,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         mView = inflater.inflate(R.layout.fragment_nearby_dating_layout, container, false);
-
+        setHasOptionsMenu(true);
         NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
         commonUtils.initViewPager(mContext, mView);
 
@@ -137,7 +148,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
         mCallback = mClickListener;
 
         Bundle args = getArguments();
-        mArgs = args;
+        mArguments = args.getString(NearbySubFragmentConstants.BILLIARD_SEARCH_TAB_NAME);
 
         mDatingListView = (PullToRefreshListView) mView.findViewById(R.id.search_dating_subfragment_list);
         mDatingListView.setMode(PullToRefreshBase.Mode.BOTH);
@@ -200,9 +211,6 @@ public class BilliardsNearbyDatingFragment extends Fragment
         return mView;
     }
 
-
-
-
     @Override
     public void onSaveInstanceState(Bundle outState)
     {
@@ -260,7 +268,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
      *                 例如start_no=0
      * @param endNum   请求列表信息的结束条目，例如我们可以一次只加载10条，当用户请求的时候再加载更多的数据,例如end_no=9
      */
-    private void retrieveDatingInfo(final String userId, final String range, final String date, final int startNum, final int endNum)
+    private void retrieveDatingInfo(final float lat, final float lng, final String userId, final String range, final String date, final int startNum, final int endNum)
     {
         if (!Utils.networkAvaiable(getActivity()))
         {
@@ -309,6 +317,10 @@ public class BilliardsNearbyDatingFragment extends Fragment
         {
             requestParams.put("begin_time", date);
         }
+
+        // 将经纬度作为参数添加上
+        requestParams.put("lat", String.valueOf(lat));
+        requestParams.put("lng", String.valueOf(lng));
         requestParams.put("start_no", startNum + "");
         requestParams.put("end_no", endNum + "");
 
@@ -437,6 +449,11 @@ public class BilliardsNearbyDatingFragment extends Fragment
     private static final int USER_HAS_NOT_LOGIN = 1 << 10;
 
     private static final int SET_PULLREFRESH_DISABLE = 42;
+    public static final int GET_LOCATION = 43;
+    public static final int LOCATION_HAS_GOT = 44;
+
+    private int mRequstFlag;
+    private float mLat, mLng;
 
     private Handler mUIEventsHandler = new Handler()
     {
@@ -623,11 +640,68 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 case SET_PULLREFRESH_DISABLE:
                     mDatingListView.setMode(PullToRefreshBase.Mode.DISABLED);
                     break;
+                case GET_LOCATION:
+                    Log.d(TAG_2, " start getting dating data ");
+                    showProgress();
+                    mDatingListView.setMode(PullToRefreshBase.Mode.DISABLED);
+                    if (mEmptyView.getVisibility() == View.INVISIBLE)
+                    {
+                        mDatingListView.setEmptyView(null);
+                        mEmptyView.setVisibility(View.GONE);
+                    }
+                    mRequstFlag = msg.arg1;
+                    mArguments = (String) msg.obj;
+                    Log.d(TAG_2, " the request flag are : " + mRequstFlag + ", and the arguments are : " + mArguments);
+                    getLocation();
+                    break;
+
+                case LOCATION_HAS_GOT:
+                    Bundle args = (Bundle) msg.obj;
+                    mLat = args.getFloat("lat");
+                    mLng = args.getFloat("lng");
+                    switch (mRequstFlag)
+                    {
+                        case START_RETRIEVE_ALL_DATA:
+                            Log.d(TAG_2, " kind0 --> start retrieving all data , and startNo : " + mStarNum + " endNo : " + mEndNum);
+                            String cacheRange = sParamsPreference.getDatingRange(mContext);
+                            String cacheDate = sParamsPreference.getDatingPublishedDate(mContext);
+                            retrieveDatingInfo(mLat, mLng, String.valueOf(YueQiuApp.sUserInfo.getUser_id()), cacheRange, cacheDate, mStarNum, mEndNum);
+                            break;
+                        case RETRIEVE_DATA_WITH_DATE_FILTERED:
+                            if (! mDatingList.isEmpty())
+                            {
+                                mDatingList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+                            Log.d(TAG_2, " kind1 --> start retrieving date filtered ");
+                            String publishDateL = mArguments;
+                            Log.d(TAG_2, " inside the dating fragment BackgroundHandlerThread --> the publishDate we need to filter are : " + publishDateL);
+                            String dateCacheRange = sParamsPreference.getDatingRange(mContext);
+                            // 每次筛选请求都是从零开始的重新请求
+                            retrieveDatingInfo(mLat, mLng, String.valueOf(YueQiuApp.sUserInfo.getUser_id()), dateCacheRange, publishDateL, 0, 9);
+                            break;
+                        case RETRIEVE_DATA_WITH_RANGE_FILTERED:
+                            if (!mDatingList.isEmpty())
+                            {
+                                mDatingList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+
+                            Log.d(TAG_2, " kind2 --> start retrieving range filtered ");
+                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
+                            String rangeL = mArguments;
+                            Log.d(TAG_2, " inside the dating fragment BackgroundHandlerThread --> the range we need to filter are : " + rangeL);
+                            String rangeCacheDate = sParamsPreference.getDatingPublishedDate(mContext);
+                            // 我们需要从0开始重新请求
+                            retrieveDatingInfo(mLat, mLng, String.valueOf(YueQiuApp.sUserInfo.getUser_id()), rangeL, rangeCacheDate, 0, 9);
+                            break;
+                    }
+
+
             }
             mDatingListAdapter.notifyDataSetChanged();
         }
     };
-
 
     private TextView mEmptyView;
     // 我们通过将disable的值设置为false来进行加载EmptyView
@@ -635,7 +709,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
     private void setEmptyViewVisible(){
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
-        mEmptyView.setTextColor(getActivity().getResources().getColor(R.color.md__defaultBackground));
+        mEmptyView.setTextColor(mContext.getResources().getColor(R.color.md__defaultBackground));
         mEmptyView.setText(R.string.search_activity_subfragment_empty_tv_str);
         mDatingListView.setEmptyView(mEmptyView);
     }
@@ -689,31 +763,34 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 {
                     super.handleMessage(msg);
                     switch (msg.what) {
-                        case START_RETRIEVE_ALL_DATA:
-                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            Bundle requestInfo = msg.getData();
-                            final int startNum = requestInfo.getInt(KEY_REQUEST_START_NUM);
-                            final int endNum = requestInfo.getInt(KEY_REQUEST_END_NUM);
-                            String cacheRange = sParamsPreference.getDatingRange(mContext);
-                            String cacheDate = sParamsPreference.getDatingPublishedDate(mContext);
-                            retrieveDatingInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()), cacheRange, cacheDate, startNum, endNum);
-
-                            break;
-                        case RETRIEVE_DATA_WITH_DATE_FILTERED:
-                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            String publishDate = (String) msg.obj;
-                            Log.d(TAG, " inside the dating fragment BackgroundHandlerThread --> the publishDate we need to filter are : " + publishDate);
-                            String dateCacheRange = sParamsPreference.getDatingRange(mContext);
-                            // 每次筛选请求都是从零开始的重新请求
-                            retrieveDatingInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()), dateCacheRange, publishDate, 0, 9);
-                            break;
-                        case RETRIEVE_DATA_WITH_RANGE_FILTERED:
-                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            String range = (String) msg.obj;
-                            Log.d(TAG, " inside the dating fragment BackgroundHandlerThread --> the range we need to filter are : " + range);
-                            String rangeCacheDate = sParamsPreference.getDatingPublishedDate(mContext);
-                            // 我们需要从0开始重新请求
-                            retrieveDatingInfo(String.valueOf(YueQiuApp.sUserInfo.getUser_id()), range, rangeCacheDate, 0, 9);
+//                        case START_RETRIEVE_ALL_DATA:
+//                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
+//                            Bundle requestInfo = msg.getData();
+//                            final int startNum = requestInfo.getInt(KEY_REQUEST_START_NUM);
+//                            final int endNum = requestInfo.getInt(KEY_REQUEST_END_NUM);
+//                            String cacheRange = sParamsPreference.getDatingRange(mContext);
+//                            String cacheDate = sParamsPreference.getDatingPublishedDate(mContext);
+//                            // TODO: 将经纬度添加上
+//                            retrieveDatingInfo("", "", String.valueOf(YueQiuApp.sUserInfo.getUser_id()), cacheRange, cacheDate, startNum, endNum);
+//
+//                            break;
+//                        case RETRIEVE_DATA_WITH_DATE_FILTERED:
+//                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
+//                            String publishDate = (String) msg.obj;
+//                            Log.d(TAG, " inside the dating fragment BackgroundHandlerThread --> the publishDate we need to filter are : " + publishDate);
+//                            String dateCacheRange = sParamsPreference.getDatingRange(mContext);
+//                            // 每次筛选请求都是从零开始的重新请求
+//                            retrieveDatingInfo("", "", String.valueOf(YueQiuApp.sUserInfo.getUser_id()), dateCacheRange, publishDate, 0, 9);
+//                            break;
+//                        case RETRIEVE_DATA_WITH_RANGE_FILTERED:
+//                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
+//                            String range = (String) msg.obj;
+//                            Log.d(TAG, " inside the dating fragment BackgroundHandlerThread --> the range we need to filter are : " + range);
+//                            String rangeCacheDate = sParamsPreference.getDatingPublishedDate(mContext);
+//                            // 我们需要从0开始重新请求
+//                            retrieveDatingInfo("", "", String.valueOf(YueQiuApp.sUserInfo.getUser_id()), range, rangeCacheDate, 0, 9);
+//                            break;
+                        default:
                             break;
                     }
                 }
@@ -728,12 +805,14 @@ public class BilliardsNearbyDatingFragment extends Fragment
         {
             if (null != mWorkerHandler)
             {
-                Message requestMsg = mWorkerHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
-                Bundle data = new Bundle();
-                data.putInt(KEY_REQUEST_START_NUM, startNum);
-                data.putInt(KEY_REQUEST_END_NUM, endNum);
-                requestMsg.setData(data);
-                mWorkerHandler.sendMessage(requestMsg);
+//                Message requestMsg = mWorkerHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
+//                Bundle data = new Bundle();
+//                data.putInt(KEY_REQUEST_START_NUM, startNum);
+//                data.putInt(KEY_REQUEST_END_NUM, endNum);
+//                requestMsg.setData(data);
+//                mWorkerHandler.sendMessage(requestMsg);
+                Log.d(TAG_2, " start the worker thread here ");
+                mUIEventsHandler.obtainMessage(GET_LOCATION, START_RETRIEVE_ALL_DATA, 0).sendToTarget();
             }
         }
 
@@ -754,6 +833,36 @@ public class BilliardsNearbyDatingFragment extends Fragment
             }
         }
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+        super.onCreateOptionsMenu(menu, inflater);
+        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(mContext)) {
+                    Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_NEARBY_DATE);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    intent.putExtras(args);
+                    startActivity(intent);
+                }else{
+                    Utils.showToast(mContext,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 
     private boolean mRefresh;
@@ -821,6 +930,63 @@ public class BilliardsNearbyDatingFragment extends Fragment
             }
         }
     };
+
+    private LocationManagerProxy mLocationManagerProxy;
+
+    private void getLocation()
+    {
+        mLocationManagerProxy = LocationManagerProxy.getInstance(getActivity());
+
+        //此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
+        //注意设置合适的定位时间的间隔，并且在合适时间调用removeUpdates()方法来取消定位请求
+        //在定位结束后，在合适的生命周期调用destroy()方法
+        //其中如果间隔时间为-1，则定位只定一次
+        mLocationManagerProxy.requestLocationData(
+                LocationProviderProxy.AMapNetwork, -1, 15, new AMapLocationListener() {
+                    @Override
+                    public void onLocationChanged(AMapLocation aMapLocation) {
+                        if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
+                            //获取位置信息
+                            double latitude = aMapLocation.getLatitude();
+                            double longitude = aMapLocation.getLongitude();
+
+                            Log.d(TAG_2, "latitude ->" + latitude);
+                            Log.d(TAG_2, "longitude ->" + longitude);
+                            // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
+                            sParamsPreference.ensurePreference(mContext);
+                            sParamsPreference.setRoomLati(mContext, (float) latitude);
+                            sParamsPreference.setRoomLongi(mContext, (float) longitude);
+
+                            Bundle args = new Bundle();
+                            args.putFloat("lat", (float) latitude);
+                            args.putFloat("lng", (float) longitude);
+                            mUIEventsHandler.obtainMessage(LOCATION_HAS_GOT, args).sendToTarget();
+                        }
+                    }
+
+                    @Override
+                    public void onLocationChanged(Location location) {
+
+                    }
+
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                    }
+
+                    @Override
+                    public void onProviderEnabled(String provider) {
+
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String provider) {
+
+                    }
+                });
+
+        mLocationManagerProxy.setGpsEnable(false);
+    }
 
 
 }

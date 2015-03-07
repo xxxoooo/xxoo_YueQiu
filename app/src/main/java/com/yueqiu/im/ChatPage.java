@@ -423,7 +423,9 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     }
 
     public void callBackSendImageMessage(GotyeMessage msg) {
+
         mAdapter.addMsgToBottom(msg);
+
         scrollToBottom();
     }
 
@@ -589,6 +591,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     private void takePic() {
 //        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
 //        intent.setType("image/*");
+        Log.e("ddd", "isOnline? before send img  " + api.isOnline());
         Intent albumIntent = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(albumIntent, REQUEST_PIC);
     }
@@ -620,6 +623,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 if (selectedImage != null) {
                     String path = FileUtil.uriToPath(this, selectedImage);
                     if (null != path && !"".equals(path))
+                        Log.e("ddd", "chat page send image from album: path = " + path);
                         sendPicture(path);
                 }
             }
@@ -658,7 +662,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onSendMessage(int code, GotyeMessage message) {
-        Log.d("ddd", "code= " + code + "message = " + message);
+        Log.d("ddd", "Chatpage onSendMessage>>>> code= " + code + " message = " + message);
         // GotyeChatManager.getInstance().insertChatMessage(message);
         mAdapter.updateMessage(message);
         if (message.getType() == GotyeMessageType.GotyeMessageTypeAudio) {
@@ -671,6 +675,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onReceiveMessage(int code, GotyeMessage message) {
+        Log.d("ddd", "Chatpage onReceiveMessage>>>> code= " + code + " message = " + message);
         // GotyeChatManager.getInstance().insertChatMessage(message);
         if (mChatType == 0) {
             if (isMyMessage(message)) {
@@ -704,14 +709,18 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onDownloadMessage(int code, GotyeMessage message) {
+
         mAdapter.downloadDone(message);
+
     }
 
 
     @Override
     public void onGetHistoryMessageList(int code, List<GotyeMessage> list) {
+
         if (mChatType == 1) {
             List<GotyeMessage> listmessages = api.getLocalMessages(mRoom,false);
+
             if (listmessages != null) {
                 for (GotyeMessage temp : listmessages) {
                     api.downloadMessage(temp);
@@ -734,6 +743,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     public void onDownloadMedia(int code, String path, String url) {
         // TODO Auto-generated method stub
         mAdapter.notifyDataSetChanged();
+
     }
 
     @Override

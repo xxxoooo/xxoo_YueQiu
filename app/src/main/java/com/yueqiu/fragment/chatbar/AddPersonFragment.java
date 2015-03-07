@@ -45,6 +45,8 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.RequestAddFriendActivity;
+import com.yueqiu.activity.SearchResultActivity;
+import com.yueqiu.adapter.AddAdapter;
 import com.yueqiu.bean.NearbyPeopleInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -84,7 +86,8 @@ public class AddPersonFragment extends Fragment {
     private TextView mProgressBarText;
     private ImageLoader mImageLoader;
     private LocationManagerProxy mLocationManagerProxy;
-    private MyAdapter mAdapter;
+    private AddAdapter mAdapter;
+    private SearchView mSearchView;
     private List<NearbyPeopleInfo.SearchPeopleItemInfo> mList = new ArrayList<NearbyPeopleInfo.SearchPeopleItemInfo>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,7 +115,7 @@ public class AddPersonFragment extends Fragment {
         mEmptyView.setVisibility(View.GONE);
 
         mListView = (ListView) view.findViewById(R.id.search_result_container);
-        mAdapter= new MyAdapter(getActivity(), mList);
+        mAdapter= new AddAdapter(getActivity(), mList);
         mListView.setAdapter(mAdapter);
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.pre_progress);
@@ -184,34 +187,46 @@ public class AddPersonFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-//        LocalBroadcastManager.getInstance(getActivity())
-//                .registerReceiver(mBroadcastReceiver, new IntentFilter(LocationUtil.BROADCAST_FILTER));
-
-
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+            ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-//        mLocationManager.removeUpdates(this);
-//        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+            ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchFriendsByKeyWords(searchView.getQuery().toString());
-                if (null != mList && 0 != mList.size()) {
-                    mList.clear();
-                    mListView.deferNotifyDataSetChanged();
+
+                if(Utils.networkAvaiable(getActivity())) {
+                    Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_FRIEND);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    intent.putExtras(args);
+                    startActivity(intent);
+                    ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                }else{
+                    Utils.showToast(getActivity(),getString(R.string.network_not_available));
                 }
-                showProgressBar(true);
-                ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
-                        .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                mSearchView.clearFocus();
+
+//                searchFriendsByKeyWords(searchView.getQuery().toString());
                 return true;
             }
 
@@ -418,71 +433,7 @@ public class AddPersonFragment extends Fragment {
         Utils.showToast(getActivity(), getString(R.string.no_data));
     }
 
-    class MyAdapter extends BaseAdapter {
-        private Context mContext;
-        private List<NearbyPeopleInfo.SearchPeopleItemInfo> mList;
-        private LayoutInflater mInflater;
 
-        MyAdapter(Context context, List<NearbyPeopleInfo.SearchPeopleItemInfo> list) {
-            this.mContext = context;
-            this.mList = list;
-            mInflater = LayoutInflater.from(mContext);
-        }
-
-        @Override
-        public int getCount() {
-            return mList.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder viewHolder;
-            if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.item_chatbar_account, null);
-                viewHolder = new ViewHolder();
-                viewHolder.mImageView = (NetworkImageView) convertView.findViewById(R.id.chatbar_item_account_iv);
-                viewHolder.mNickName = (TextView) convertView.findViewById(R.id.chatbar_item_account_tv);
-                viewHolder.mGender = (TextView) convertView.findViewById(R.id.chatbar_item_gender_tv);
-                viewHolder.mDistrict = (TextView) convertView.findViewById(R.id.chatbar_item_district_tv);
-                //绑定viewholder对象
-                convertView.setTag(viewHolder);
-            } else {
-                viewHolder = (ViewHolder) convertView.getTag();
-            }
-            Log.e(TAG, String.valueOf(convertView));
-            viewHolder.mImageView.setDefaultImageResId(R.drawable.default_head);
-            viewHolder.mImageView.setErrorImageResId(R.drawable.default_head);
-            viewHolder.mImageView.setImageUrl(HttpConstants.IMG_BASE_URL + mList.get(position).getImg_url(), mImageLoader);
-            viewHolder.mNickName.setText(mList.get(position).getUsername());
-            viewHolder.mGender.setText(mList.get(position).getSex() == 1 ? getString(R.string.man) : getString(R.string.woman));
-            viewHolder.mGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, NearbyFragmentsCommonUtils.parseGenderDrawable(mList.get(position).getSex() == 1 ? "男" : "女"), 0);
-            String district = mList.get(position).getDistrict();
-            if("".equals(district)){
-                viewHolder.mDistrict.setVisibility(View.GONE);
-            }else{
-                viewHolder.mDistrict.setText(getActivity().getString(R.string.unknown));
-                viewHolder.mDistrict.setVisibility(View.VISIBLE);
-            }
-            return convertView;
-        }
-
-        final class ViewHolder {
-            public NetworkImageView mImageView;
-            public TextView mNickName;
-            public TextView mGender;
-            public TextView mDistrict;
-        }
-    }
 
 
     /**

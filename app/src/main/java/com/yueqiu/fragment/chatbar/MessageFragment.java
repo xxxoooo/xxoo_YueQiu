@@ -85,6 +85,7 @@ public class MessageFragment extends Fragment implements DownloadListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        mApi.addListerer(this);
         updateList();
         setListener();
 
@@ -166,13 +167,15 @@ public class MessageFragment extends Fragment implements DownloadListener{
 
     @Override
     public void onDestroy() {
+        mApi.removeListener(this);
         super.onDestroy();
 
     }
 
     @Override
     public void onDownloadMedia(int code, String path, String url) {
-        // TODO Auto-generated method stub
+        Log.e("ddd", "头像图片下载回调");
+        Log.e("ddd", "code = " + code + " path = " + path + "  url = " + url);
         mAdapter.notifyDataSetChanged();
     }
 

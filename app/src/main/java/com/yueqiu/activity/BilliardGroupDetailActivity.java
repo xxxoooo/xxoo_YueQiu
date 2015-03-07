@@ -88,11 +88,13 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
     private List<IGroupDetailItem> mDetailItemList = new ArrayList<IGroupDetailItem>();
     private Map<String,Integer> mParamsMap = new HashMap<String,Integer>();
     private Map<String,String>  mUrlAndMethodMap = new HashMap<String, String>();
+    private View mRootView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_billiard_group_detail);
-
+        mRootView = getWindow().getDecorView().findViewById(android.R.id.content);
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle(getString(R.string.billiard_group_detail));
@@ -327,7 +329,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
             overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
         }else if(id == R.id.billiard_detail_action_share)
         {
-            mShareDlg = Utils.showSheet(this);
+            mShareDlg = Utils.showSheet(this, Utils.getCurrentScreenShot(mRootView));
             mShareDlg.show();
 
         }else if(id == R.id.billiard_detail_action_collect){
@@ -342,7 +344,6 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
                 }
             }
         }
-
         return true;
     }
 

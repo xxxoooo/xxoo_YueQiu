@@ -107,7 +107,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         final int len = rawDistance.length();
                         String distance = rawDistance.substring(0, len - 3);
                         mParamsPreference.setAScouchRange(mContext, distance);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_DISTANCE_FILTERED, distance).sendToTarget();
+                        mUIEventsHandler.obtainMessage(
+                                BilliardsNearbyAssistCoauchFragment.GET_LOCATION,
+                                BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_DISTANCE_FILTERED,
+                                0,
+                                distance).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -157,6 +161,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
 //                        final String clazzStr = String.valueOf(posVal + 1);
                         mParamsPreference.setAScouchLevel(mContext, posVal);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETREIVE_INFO_WITH_KINDS_FILTERED, posVal).sendToTarget();
+
                         mPopupWindow.dismiss();
                     }
                 });
@@ -186,7 +191,6 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         String posVal = String.valueOf(position);
 //                        final String levelStr = String.valueOf(posVal + 1);
                         mParamsPreference.setAScouchLevel(mContext, posVal);
-
                         mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_LEVEL_FILTERED, posVal).sendToTarget();
                         mPopupWindow.dismiss();
                     }
@@ -211,8 +215,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         final int posVal = position;
                         final String gender = String.valueOf(posVal + 1);
                         mParamsPreference.setMateGender(mContext, gender);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyMateFragment.GET_LOCATION,BilliardsNearbyMateFragment.START_RETRIEVE_DATA_WITH_GENDER_FILTER,
-                                0,gender).sendToTarget();
+                        mUIEventsHandler.obtainMessage(
+                                BilliardsNearbyMateFragment.GET_LOCATION,
+                                BilliardsNearbyMateFragment.START_RETRIEVE_DATA_WITH_GENDER_FILTER,
+                                0,
+                                gender).sendToTarget();
 
 //                        mUIEventsHandler.obtainMessage(BilliardsNearbyMateFragment.START_RETRIEVE_DATA_WITH_GENDER_FILTER, gender).sendToTarget();
                         mPopupWindow.dismiss();
@@ -245,7 +252,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         final int len = rawDistanceStr.length();
                         String distanceVal = rawDistanceStr.substring(0, len - 3);
                         mParamsPreference.setMateRange(mContext, distanceVal);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyMateFragment.GET_LOCATION,BilliardsNearbyMateFragment.START_RETRIEVE_DATA_WITH_RANGE_FILTER,0, distanceVal).sendToTarget();
+                        mUIEventsHandler.obtainMessage(
+                                BilliardsNearbyMateFragment.GET_LOCATION,
+                                BilliardsNearbyMateFragment.START_RETRIEVE_DATA_WITH_RANGE_FILTER,
+                                0,
+                                distanceVal).sendToTarget();
                         mPopupWindow.dismiss();
                         Log.d(TAG_1, " we are almost come to the end of the popupWindow processing ");
                     }
@@ -295,7 +306,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         final int posVal = position;
                         String clazzStr = String.valueOf(posVal + 1);
                         mParamsPreference.setCouchClazz(mContext, clazzStr);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyCoachFragment.RETRIEVE_COAUCH_WITH_CLASS_FILTERED, clazzStr).sendToTarget();
+                        mUIEventsHandler.obtainMessage(
+                                BilliardsNearbyCoachFragment.GET_LOCATION,
+                                BilliardsNearbyCoachFragment.RETRIEVE_COAUCH_WITH_CLASS_FILTERED,
+                                0,
+                                clazzStr).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -322,7 +337,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         int len = rawRangeStr.length();
                         String range = rawRangeStr.substring(0, len - 3);
                         mParamsPreference.setDatingRange(mContext, range);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyDatingFragment.RETRIEVE_DATA_WITH_RANGE_FILTERED, range).sendToTarget();
+                        mUIEventsHandler.obtainMessage(BilliardsNearbyDatingFragment.GET_LOCATION,
+                                BilliardsNearbyDatingFragment.RETRIEVE_DATA_WITH_RANGE_FILTERED,
+                                0,
+                                range
+                                ).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });

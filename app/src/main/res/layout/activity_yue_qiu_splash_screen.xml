@@ -1,10 +1,21 @@
-<com.yueqiu.util.AspectRatioImgView
+<!--<com.yueqiu.util.AspectRatioImgView-->
+<!--xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--xmlns:tools="http://schemas.android.com/tools"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="match_parent"-->
+<!--android:adjustViewBounds="true"-->
+<!--android:layout_centerHorizontal="true"-->
+<!--android:id="@+id/img_splash_screen"-->
+<!--android:src="@drawable/splash_screen"-->
+<!--/>-->
+<!--上面的那种单页的做法不用了，采用下面的ViewPager的做法-->
+<com.yueqiu.adapter.SplashScreenViewPager
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:adjustViewBounds="true"
-    android:layout_centerHorizontal="true"
-    android:id="@+id/img_splash_screen"
-    android:src="@drawable/splash_screen"
-    />
+    android:id="@+id/splash_screen_view_pager">
+
+</com.yueqiu.adapter.SplashScreenViewPager>
+
+

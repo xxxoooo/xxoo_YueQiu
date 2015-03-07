@@ -16,6 +16,7 @@ package com.yueqiu.util;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.gotye.api.GotyeAPI;
@@ -46,7 +47,9 @@ public class ImageCache {
 	
 	
 	public void setIcom(ImageView iconView,String path,String urlForDownload){
+        Log.e("ddd", "ImageCache setIcon>>> path = " + path + "  urlForDownload = " + urlForDownload);
 		 Bitmap bmp=ImageCache.getInstance().get(path);
+        Log.e("ddd", "setIcon: bmp = " + bmp);
    	  if(bmp!=null){
    		  iconView.setImageBitmap(bmp);
    	  }else{
@@ -56,7 +59,8 @@ public class ImageCache {
    			put(path, bmp);
    		  }else{
    			  iconView.setImageResource(R.drawable.default_head);
-   			  GotyeAPI.getInstance().downloadMedia(urlForDownload);
+   			  int code = GotyeAPI.getInstance().downloadMedia(urlForDownload);
+              Log.e("ddd", "ImageCache setIcon>>> code = " + code);
    		  }
    	  }
    	

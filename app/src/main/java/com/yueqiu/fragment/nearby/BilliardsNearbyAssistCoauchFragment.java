@@ -3,8 +3,10 @@ package com.yueqiu.fragment.nearby;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -16,15 +18,23 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationListener;
+import com.amap.api.location.LocationManagerProxy;
+import com.amap.api.location.LocationProviderProxy;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyAssistCoauchSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyAssistCoauchSubFragmentBean;
 import com.yueqiu.constant.HttpConstants;
@@ -32,6 +42,7 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
+import com.yueqiu.fragment.nearby.common.NearbySubFragmentConstants;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
@@ -119,15 +130,20 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
     private NearbyFragmentsCommonUtils.ControlPopupWindowCallback mCallback;
 
+    private int mRequestFlags;
+    private String mArgs;
+    private float mLat, mLng;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
-
         mView = inflater.inflate(R.layout.fragment_nearby_assistcoauch_layout, container, false);
-
+        setHasOptionsMenu(true);
         NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(getActivity());
         commonUtils.initViewPager(getActivity(),mView);
+
+        Bundle args = getArguments();
+        mArgs = args.getString(NearbySubFragmentConstants.BILLIARD_SEARCH_TAB_NAME);
 
         mClickListener = new NearbyPopBasicClickListener(mContext, mUIEventsHandler, sParamsPreference);
         (mBtnDistance = (Button) mView.findViewById(R.id.btn_assistcoauch_distance)).setOnClickListener(mClickListener);
@@ -238,7 +254,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
      * @param startNo
      * @param endNo
      */
-    private void retrieveAllInitialAssistCoauchInfo(String rangeParam, String priceParam, String clazzParam, String levelParam, final int startNo, final int endNo)
+    private void retrieveAllInitialAssistCoauchInfo(final float lati, final float lng, String rangeParam, String priceParam, String clazzParam, String levelParam, final int startNo, final int endNo)
     {
         if (!Utils.networkAvaiable(getActivity())) {
             mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_FAILED,
@@ -249,6 +265,10 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         final List<NearbyAssistCoauchSubFragmentBean> cacheASCoauchList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
 
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
+        // 将经纬度作为参数添加上
+        requestParams.put("lat", String.valueOf(lati));
+        requestParams.put("lng", String.valueOf(lng));
+
         if (! TextUtils.isEmpty(rangeParam))
         {
             requestParams.put("range", rangeParam);
@@ -415,6 +435,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     private static final int NETWORK_UNAVAILABLE = 1 << 11;
 
     private static final int SET_PULLREFRESH_DISABLE = 42;
+    public static final int GET_LOCATION = 43;
+    public static final int LOCATION_HAS_GOT = 44;
 
     private Handler mUIEventsHandler = new Handler()
     {
@@ -605,6 +627,87 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                 case SET_PULLREFRESH_DISABLE:
                     mListView.setMode(PullToRefreshBase.Mode.DISABLED);
                     break;
+
+                case GET_LOCATION:
+                    showProgress();
+                    mListView.setMode(PullToRefreshBase.Mode.DISABLED);
+                    if(mEmptyView.getVisibility() == View.VISIBLE){
+                        mListView.setEmptyView(null);
+                        mEmptyView.setVisibility(View.GONE);
+                    }
+                    mRequestFlags = msg.arg1;
+                    mArgs = (String) msg.obj;
+                    getLocation();
+                    break;
+                case LOCATION_HAS_GOT:
+                    Bundle args = (Bundle) msg.obj;
+                    mLat = args.getFloat("lat");
+                    mLng = args.getFloat("lng");
+                    switch (mRequestFlags)
+                    {
+                        case RETRIEVE_ALL_RAW_INFO:
+                            String cacheRange = sParamsPreference.getAScouchRange(mContext);
+                            String cachePrice = sParamsPreference.getASCouchPrice(mContext);
+                            String cacheLevel = sParamsPreference.getASCouchLevel(mContext);
+                            String cacheClazz = sParamsPreference.getASCouchClazz(mContext);
+                            // 将经纬度作为参数添加上
+                            retrieveAllInitialAssistCoauchInfo(mLat, mLng, cacheRange, cachePrice, cacheClazz, cacheLevel, mStartNum, mEndNum);
+                            break;
+                        case RETREIVE_INFO_WITH_KINDS_FILTERED:
+                            if (! mAssistCoauchList.isEmpty())
+                            {
+                                mAssistCoauchList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+                            String clazzL = mArgs;
+                            Log.d(TAG, " Inside the WorkerThread --> the clazz we need to filter are : " + clazzL);
+                            String clazzCacheRange = sParamsPreference.getAScouchRange(mContext);
+                            String clazzCachePrice = sParamsPreference.getASCouchPrice(mContext);
+                            String clazzCacheLevel = sParamsPreference.getASCouchLevel(mContext);
+                            retrieveAllInitialAssistCoauchInfo(mLat, mLng, clazzCacheRange, clazzCachePrice, clazzL, clazzCacheLevel, 0, 9);
+                            break;
+                        case RETRIEVE_INFO_WITH_DISTANCE_FILTERED:
+                            if (! mAssistCoauchList.isEmpty())
+                            {
+                                mAssistCoauchList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+                            String distanceL = mArgs;
+                            Log.d(TAG, " Inside the WorkerThread --> the distance we need to filter are : " + distanceL);
+                            String rangeCachePrice = sParamsPreference.getASCouchPrice(mContext);
+                            String rangeCacheClazz = sParamsPreference.getASCouchClazz(mContext);
+                            String rangeCacheLevel = sParamsPreference.getASCouchLevel(mContext);
+                            retrieveAllInitialAssistCoauchInfo(mLat, mLng, distanceL, rangeCachePrice, rangeCacheClazz, rangeCacheLevel, 0, 9);
+                            break;
+                        case RETRIEVE_INFO_WITH_LEVEL_FILTERED:
+                            if (! mAssistCoauchList.isEmpty())
+                            {
+                                mAssistCoauchList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+                            String levelL = mArgs;
+                            Log.d(TAG, " Inside the WorkerThread --> the level data we need to filter are : " + levelL);
+                            String levelCacheClazz = sParamsPreference.getASCouchClazz(mContext);
+                            String levelCachePrice = sParamsPreference.getASCouchPrice(mContext);
+                            String levelCacheRange = sParamsPreference.getAScouchRange(mContext);
+
+                            retrieveAllInitialAssistCoauchInfo(mLat, mLng, levelCacheRange, levelCachePrice, levelCacheClazz, levelL, 0, 9);
+                            break;
+                        case RETRIEVE_INFO_WITH_PRICE_FILTERED:
+                            if (! mAssistCoauchList.isEmpty())
+                            {
+                                mAssistCoauchList.clear();
+                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                            }
+                            String priceL = mArgs;
+                            Log.d(TAG, " Inside the WorkerThread --> the price we need to filter are : " + priceL);
+                            String priceCacheRange = sParamsPreference.getAScouchRange(mContext);
+                            String priceCacheClazz = sParamsPreference.getASCouchClazz(mContext);
+                            String priceCacheLevel = sParamsPreference.getASCouchLevel(mContext);
+                            retrieveAllInitialAssistCoauchInfo(mLat, mLng, priceCacheRange, priceL, priceCacheClazz, priceCacheLevel, 0, 9);
+                            break;
+                    }
+                    break;
             }
 
             mAssistCoauchListAdapter.notifyDataSetChanged();
@@ -652,69 +755,73 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     super.handleMessage(msg);
                     switch (msg.what)
                     {
-                        case RETRIEVE_ALL_RAW_INFO:
-                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
-                            Bundle requestData = msg.getData();
-                            final int startNum = requestData.getInt(KEY_REQUEST_START_NUM);
-                            final int endNum = requestData.getInt(KEY_REQUEST_END_NUM);
-                            String cacheRange = sParamsPreference.getAScouchRange(mContext);
-                            String cachePrice = sParamsPreference.getASCouchPrice(mContext);
-                            String cacheLevel = sParamsPreference.getASCouchLevel(mContext);
-                            String cacheClazz = sParamsPreference.getASCouchClazz(mContext);
-                            retrieveAllInitialAssistCoauchInfo(cacheRange, cachePrice, cacheClazz, cacheLevel, startNum, endNum);
-
-                            break;
-                        case RETRIEVE_INFO_WITH_LEVEL_FILTERED:
-                            if (! mAssistCoauchList.isEmpty())
-                            {
-                                mAssistCoauchList.clear();
-                            }
-                            String level = (String) msg.obj;
-                            Log.d(TAG, " Inside the WorkerThread --> the level data we need to filter are : " + level);
-                            String levelCacheClazz = sParamsPreference.getASCouchClazz(mContext);
-                            String levelCachePrice = sParamsPreference.getASCouchPrice(mContext);
-                            String levelCacheRange = sParamsPreference.getAScouchRange(mContext);
-                            retrieveAllInitialAssistCoauchInfo(levelCacheRange, levelCachePrice, levelCacheClazz, level, 0, 9);
-
-                            break;
-                        case RETREIVE_INFO_WITH_KINDS_FILTERED:
-                            if (! mAssistCoauchList.isEmpty())
-                            {
-                                mAssistCoauchList.clear();
-                            }
-                            String clazz = (String) msg.obj;
-                            Log.d(TAG, " Inside the WorkerThread --> the clazz we need to filter are : " + clazz);
-                            String clazzCacheRange = sParamsPreference.getAScouchRange(mContext);
-                            String clazzCachePrice = sParamsPreference.getASCouchPrice(mContext);
-                            String clazzCacheLevel = sParamsPreference.getASCouchLevel(mContext);
-                            retrieveAllInitialAssistCoauchInfo(clazzCacheRange, clazzCachePrice, clazz, clazzCacheLevel, 0, 9);
-
-                            break;
-                        case RETRIEVE_INFO_WITH_PRICE_FILTERED:
-                            if (! mAssistCoauchList.isEmpty())
-                            {
-                                mAssistCoauchList.clear();
-                            }
-                            String price = (String) msg.obj;
-                            Log.d(TAG, " Inside the WorkerThread --> the price we need to filter are : " + price);
-                            String priceCacheRange = sParamsPreference.getAScouchRange(mContext);
-                            String priceCacheClazz = sParamsPreference.getASCouchClazz(mContext);
-                            String priceCacheLevel = sParamsPreference.getASCouchLevel(mContext);
-                            retrieveAllInitialAssistCoauchInfo(priceCacheRange, price, priceCacheClazz, priceCacheLevel, 0, 9);
-
-                            break;
-                        case RETRIEVE_INFO_WITH_DISTANCE_FILTERED:
-                            if (! mAssistCoauchList.isEmpty())
-                            {
-                                mAssistCoauchList.clear();
-                            }
-                            String distance = (String) msg.obj;
-                            Log.d(TAG, " Inside the WorkerThread --> the distance we need to filter are : " + distance);
-                            String rangeCachePrice = sParamsPreference.getASCouchPrice(mContext);
-                            String rangeCacheClazz = sParamsPreference.getASCouchClazz(mContext);
-                            String rangeCacheLevel = sParamsPreference.getASCouchLevel(mContext);
-                            retrieveAllInitialAssistCoauchInfo(distance, rangeCachePrice, rangeCacheClazz, rangeCacheLevel, 0, 9);
-
+//                        case RETRIEVE_ALL_RAW_INFO:
+//                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_DIALOG);
+//                            Bundle requestData = msg.getData();
+//                            final int startNum = requestData.getInt(KEY_REQUEST_START_NUM);
+//                            final int endNum = requestData.getInt(KEY_REQUEST_END_NUM);
+//                            String cacheRange = sParamsPreference.getAScouchRange(mContext);
+//                            String cachePrice = sParamsPreference.getASCouchPrice(mContext);
+//                            String cacheLevel = sParamsPreference.getASCouchLevel(mContext);
+//                            String cacheClazz = sParamsPreference.getASCouchClazz(mContext);
+//                            // 将经纬度作为参数添加上
+//                            retrieveAllInitialAssistCoauchInfo("", "", cacheRange, cachePrice, cacheClazz, cacheLevel, startNum, endNum);
+//
+//                            break;
+//                        case RETRIEVE_INFO_WITH_LEVEL_FILTERED:
+//                            if (! mAssistCoauchList.isEmpty())
+//                            {
+//                                mAssistCoauchList.clear();
+//                            }
+//                            String level = (String) msg.obj;
+//                            Log.d(TAG, " Inside the WorkerThread --> the level data we need to filter are : " + level);
+//                            String levelCacheClazz = sParamsPreference.getASCouchClazz(mContext);
+//                            String levelCachePrice = sParamsPreference.getASCouchPrice(mContext);
+//                            String levelCacheRange = sParamsPreference.getAScouchRange(mContext);
+//
+//                            retrieveAllInitialAssistCoauchInfo("", "", levelCacheRange, levelCachePrice, levelCacheClazz, level, 0, 9);
+//
+//                            break;
+//                        case RETREIVE_INFO_WITH_KINDS_FILTERED:
+//                            if (! mAssistCoauchList.isEmpty())
+//                            {
+//                                mAssistCoauchList.clear();
+//                            }
+//                            String clazz = (String) msg.obj;
+//                            Log.d(TAG, " Inside the WorkerThread --> the clazz we need to filter are : " + clazz);
+//                            String clazzCacheRange = sParamsPreference.getAScouchRange(mContext);
+//                            String clazzCachePrice = sParamsPreference.getASCouchPrice(mContext);
+//                            String clazzCacheLevel = sParamsPreference.getASCouchLevel(mContext);
+//                            retrieveAllInitialAssistCoauchInfo("", "", clazzCacheRange, clazzCachePrice, clazz, clazzCacheLevel, 0, 9);
+//
+//                            break;
+//                        case RETRIEVE_INFO_WITH_PRICE_FILTERED:
+//                            if (! mAssistCoauchList.isEmpty())
+//                            {
+//                                mAssistCoauchList.clear();
+//                            }
+//                            String price = (String) msg.obj;
+//                            Log.d(TAG, " Inside the WorkerThread --> the price we need to filter are : " + price);
+//                            String priceCacheRange = sParamsPreference.getAScouchRange(mContext);
+//                            String priceCacheClazz = sParamsPreference.getASCouchClazz(mContext);
+//                            String priceCacheLevel = sParamsPreference.getASCouchLevel(mContext);
+//                            retrieveAllInitialAssistCoauchInfo("", "", priceCacheRange, price, priceCacheClazz, priceCacheLevel, 0, 9);
+//
+//                            break;
+//                        case RETRIEVE_INFO_WITH_DISTANCE_FILTERED:
+//                            if (! mAssistCoauchList.isEmpty())
+//                            {
+//                                mAssistCoauchList.clear();
+//                            }
+//                            String distance = (String) msg.obj;
+//                            Log.d(TAG, " Inside the WorkerThread --> the distance we need to filter are : " + distance);
+//                            String rangeCachePrice = sParamsPreference.getASCouchPrice(mContext);
+//                            String rangeCacheClazz = sParamsPreference.getASCouchClazz(mContext);
+//                            String rangeCacheLevel = sParamsPreference.getASCouchLevel(mContext);
+//                            retrieveAllInitialAssistCoauchInfo("", "", distance, rangeCachePrice, rangeCacheClazz, rangeCacheLevel, 0, 9);
+//
+//                            break;
+                        default:
                             break;
                     }
                 }
@@ -730,12 +837,16 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         {
             if (null != mBackgroundHandler)
             {
-                Message msg = mBackgroundHandler.obtainMessage(RETRIEVE_ALL_RAW_INFO);
-                Bundle requestData = new Bundle();
-                requestData.putInt(KEY_REQUEST_START_NUM, startNum);
-                requestData.putInt(KEY_REQUEST_END_NUM, endNum);
-                msg.setData(requestData);
-                mBackgroundHandler.sendMessage(msg);
+//                Message msg = mBackgroundHandler.obtainMessage(RETRIEVE_ALL_RAW_INFO);
+//                Bundle requestData = new Bundle();
+//                requestData.putInt(KEY_REQUEST_START_NUM, startNum);
+//                requestData.putInt(KEY_REQUEST_END_NUM, endNum);
+//                msg.setData(requestData);
+//                mBackgroundHandler.sendMessage(msg);
+                mUIEventsHandler.obtainMessage(
+                        GET_LOCATION,
+                        RETRIEVE_ALL_RAW_INFO,
+                        0).sendToTarget();
             }
         }
 
@@ -770,6 +881,38 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                 mBackgroundHandler.obtainMessage(RETREIVE_INFO_WITH_KINDS_FILTERED,clazz).sendToTarget();
             }
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+        super.onCreateOptionsMenu(menu, inflater);
+        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(mContext)) {
+                    Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_NEARBY_ASSITANT);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    intent.putExtras(args);
+                    startActivity(intent);
+
+
+                }else{
+                    Utils.showToast(mContext,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 
     private boolean mLoadMore;
@@ -837,7 +980,67 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         }
     };
 
+    private LocationManagerProxy mLocationManagerProxy;
 
+    /**
+     * 初始化定位,用高德SDK获取经纬度，准确率貌似更高点，
+     * 之后可能会加功能，会用到高德的SDK
+     */
+    private void getLocation() {
+
+        mLocationManagerProxy = LocationManagerProxy.getInstance(getActivity());
+
+        //此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
+        //注意设置合适的定位时间的间隔，并且在合适时间调用removeUpdates()方法来取消定位请求
+        //在定位结束后，在合适的生命周期调用destroy()方法
+        //其中如果间隔时间为-1，则定位只定一次
+        mLocationManagerProxy.requestLocationData(
+                LocationProviderProxy.AMapNetwork, -1, 15, new AMapLocationListener() {
+                    @Override
+                    public void onLocationChanged(AMapLocation aMapLocation) {
+                        if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
+                            //获取位置信息
+                            double latitude = aMapLocation.getLatitude();
+                            double longitude = aMapLocation.getLongitude();
+
+                            Log.d("wy","latitude ->" + latitude);
+                            Log.d("wy","longitude ->" + longitude);
+                            // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
+                            sParamsPreference.ensurePreference(mContext);
+                            sParamsPreference.setRoomLati(mContext, (float) latitude);
+                            sParamsPreference.setRoomLongi(mContext, (float) longitude);
+
+                            Bundle args = new Bundle();
+                            args.putFloat("lat", (float) latitude);
+                            args.putFloat("lng", (float) longitude);
+                            mUIEventsHandler.obtainMessage(LOCATION_HAS_GOT,args).sendToTarget();
+
+                        }
+                    }
+
+                    @Override
+                    public void onLocationChanged(Location location) {
+
+                    }
+
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                    }
+
+                    @Override
+                    public void onProviderEnabled(String provider) {
+
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String provider) {
+
+                    }
+                });
+
+        mLocationManagerProxy.setGpsEnable(false);
+    }
 
 }
 

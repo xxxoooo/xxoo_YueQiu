@@ -14,7 +14,7 @@ public class NearbySubFragmentConstants
     public static final String COAUCH_FRAGMENT_INIT = "coauchFragmentInit";
     public static final String ROOM_FRAGMENT_INIT = "roomFragmentInit";
 
-
+    public static final String BILLIARD_SEARCH_TAB_NAME = "billiard_search_tab_name";
 
 
 }
