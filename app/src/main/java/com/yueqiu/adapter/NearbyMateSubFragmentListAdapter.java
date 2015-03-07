@@ -36,10 +36,11 @@ public class NearbyMateSubFragmentListAdapter extends BaseAdapter
     // contains all of the user list
     private List<NearbyMateSubFragmentUserBean> mUserList;
     private ImageLoader mImgLoader;
+    private Context mContext;
     public NearbyMateSubFragmentListAdapter(Context context, ArrayList<NearbyMateSubFragmentUserBean> userList)
     {
-        mImgLoader = VolleySingleton.getInstance().getImgLoader();
-
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
+        this.mContext = context;
         this.mInflater = LayoutInflater.from(context);
         this.mUserList = userList;
     }
@@ -103,8 +104,14 @@ public class NearbyMateSubFragmentListAdapter extends BaseAdapter
         viewHolder.mUserGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, NearbyFragmentsCommonUtils.parseGenderDrawable(userInsta.getUserGender()), 0);
         viewHolder.mUserGender.setCompoundDrawablePadding(6);
         viewHolder.mUserNickName.setText(userInsta.getUserNickName());
-        viewHolder.mUserDistanceMeter.setText(userInsta.getUserDistance());
-        viewHolder.mUserDistrict.setText(userInsta.getUserDistrict());
+        viewHolder.mUserDistanceMeter.setText(mContext.getString(R.string.in_meter,userInsta.getUserDistance()));
+        if(userInsta.getUserDistrict().equals("")){
+            viewHolder.mUserDistrict.setVisibility(View.GONE);
+        }else{
+            viewHolder.mUserDistrict.setText(userInsta.getUserDistrict());
+            viewHolder.mUserDistrict.setVisibility(View.VISIBLE);
+        }
+
 
         return convertView;
     }

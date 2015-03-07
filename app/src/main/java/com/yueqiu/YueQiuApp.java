@@ -79,6 +79,8 @@ public class YueQiuApp extends Application implements LoginListener {
 
     public static int sKeyboardHeight;
 
+    public static int sBottomHeight;
+
     public Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {

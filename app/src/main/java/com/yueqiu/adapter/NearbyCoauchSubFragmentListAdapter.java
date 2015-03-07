@@ -29,13 +29,13 @@ public class NearbyCoauchSubFragmentListAdapter extends BaseAdapter
     private List<NearbyCoauchSubFragmentCoauchBean> mBeanList;
     private LayoutInflater mInflater;
     private ImageLoader mImgLoader;
-
+    private Context mContext;
     public NearbyCoauchSubFragmentListAdapter(Context context, ArrayList<NearbyCoauchSubFragmentCoauchBean> beanList)
     {
-        mImgLoader = VolleySingleton.getInstance().getImgLoader();
-
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
+        this.mContext = context;
         this.mBeanList = beanList;
-        mInflater = LayoutInflater.from(context);
+        this. mInflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class NearbyCoauchSubFragmentListAdapter extends BaseAdapter
             viewHolder.mKinds = (TextView) convertView.findViewById(R.id.tv_coauch_subfragment_listitem_kinds);
             viewHolder.mLevel = (TextView) convertView.findViewById(R.id.tv_coauch_subfragment_listitem_level);
             viewHolder.mGender = (TextView) convertView.findViewById(R.id.tv_coauch_subfragment_listitem_gender);
-
+            viewHolder.mDistrict = (TextView) convertView.findViewById(R.id.tv_coauch_subfragment_listitem_district);
             convertView.setTag(viewHolder);
         } else
         {
@@ -80,9 +80,20 @@ public class NearbyCoauchSubFragmentListAdapter extends BaseAdapter
         NearbyCoauchSubFragmentCoauchBean bean = mBeanList.get(position);
 
         // then, inflate the layout of this list view item
-        viewHolder.mLevel.setText(bean.getUserLevel());
+        if(bean.getUserLevel().equals(mContext.getString(R.string.search_dating_popupwindow_other))){
+            viewHolder.mLevel.setVisibility(View.GONE);
+            if(!bean.getDistrict().equals("")){
+                viewHolder.mDistrict.setText(bean.getDistrict());
+                viewHolder.mDistrict.setVisibility(View.VISIBLE);
+            }
+        }else{
+            viewHolder.mLevel.setText(bean.getUserLevel());
+            viewHolder.mLevel.setVisibility(View.VISIBLE);
+
+        }
+
         viewHolder.mKinds.setText(bean.getmBilliardKind());
-        viewHolder.mDistance.setText(bean.getUserDistance());
+        viewHolder.mDistance.setText(mContext.getString(R.string.in_meter, bean.getUserDistance()));
         viewHolder.mGender.setText(bean.getUserGender());
         viewHolder.mGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, NearbyFragmentsCommonUtils.parseGenderDrawable(bean.getUserGender()), 0);
         viewHolder.mGender.setCompoundDrawablePadding(6);
@@ -97,7 +108,7 @@ public class NearbyCoauchSubFragmentListAdapter extends BaseAdapter
     private static class ViewHolder
     {
         public NetworkImageView mPhoto;
-        private TextView mName, mGender, mLevel, mKinds, mDistance;
+        private TextView mName, mGender, mLevel, mKinds, mDistance,mDistrict;
     }
 }
 

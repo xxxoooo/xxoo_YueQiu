@@ -82,7 +82,6 @@
             android:layout_alignTop="@id/tv_search_dating_detail_nickname"
             android:layout_alignParentRight="true"
             style="@style/TimeTextStyle"
-            android:text="@string/search_dating_detailed_activity_time_1"
             android:layout_marginTop="10dp"
             android:layout_marginRight="7dp"
             />
@@ -93,7 +92,6 @@
             android:layout_alignTop="@id/tv_search_dating_detail_nickname"
             android:layout_toLeftOf="@id/tv_search_dating_detailed_time_1"
             style="@style/TimeTextStyle"
-            android:text="@string/search_dating_detailed_activity_time"
             android:layout_marginTop="10dp"
             android:layout_marginRight="7dp"
             />

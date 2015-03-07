@@ -16,6 +16,7 @@
         android:layout_alignParentBottom="true"
         android:weightSum="4"
         android:orientation="horizontal"
+
         >
         <RadioButton
             android:id="@+id/first_title_nearby"

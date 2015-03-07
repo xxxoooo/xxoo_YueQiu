@@ -59,13 +59,13 @@ public class PartInAdapter extends BaseAdapter{
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if(convertView == null){
-            convertView = mInflater.inflate(R.layout.item_published_info,null);
+            convertView = mInflater.inflate(R.layout.item_part_in,null);
             holder = new ViewHolder();
-            holder.image = (NetworkImageView) convertView.findViewById(R.id.published_item_image);
-            holder.title = (TextView) convertView.findViewById(R.id.published_title);
-            holder.content = (TextView) convertView.findViewById(R.id.published_content);
-            holder.dateTime = (TextView) convertView.findViewById(R.id.published_time);
-            holder.whole_bg = (RelativeLayout) convertView.findViewById(R.id.published_item_bg_view);
+            holder.image = (NetworkImageView) convertView.findViewById(R.id.partin_item_image);
+            holder.title = (TextView) convertView.findViewById(R.id.partin_title);
+            holder.content = (TextView) convertView.findViewById(R.id.partin_content);
+            holder.dateTime = (TextView) convertView.findViewById(R.id.partin_time);
+            holder.whole_bg = (RelativeLayout) convertView.findViewById(R.id.partin_item_bg_view);
             convertView.setTag(holder);
         }else{
             holder = (ViewHolder) convertView.getTag();

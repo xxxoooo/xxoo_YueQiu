@@ -243,15 +243,17 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
         if (! TextUtils.isEmpty(clazzRequest))
         {
-            requestParams.put("clazz", clazzRequest);
+            requestParams.put("class", clazzRequest);
         }
         if (! TextUtils.isEmpty(levelRequest))
         {
-            requestParams.put("level", levelRequest);
+            requestParams.put("zizhi", levelRequest);
         }
 
         requestParams.put("start_no", startNo + "");
         requestParams.put("end_no", endNo + "");
+
+        Log.d("wy","coach request param ->" + requestParams);
 
         final List<NearbyCoauchSubFragmentCoauchBean> cacheCoauchList = new ArrayList<NearbyCoauchSubFragmentCoauchBean>();
 
@@ -298,8 +300,9 @@ public class BilliardsNearbyCoachFragment extends Fragment
                                                     userName,
                                                     NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex),
                                                     String.valueOf(range),
-                                                    NearbyFragmentsCommonUtils.parseCoauchLevel(mContext, level),
-                                                    NearbyFragmentsCommonUtils.parseBilliardsKinds(mContext, kinds));
+                                                    NearbyFragmentsCommonUtils.parseCoachZizhi(mContext, level),
+                                                    NearbyFragmentsCommonUtils.parseBilliardsKinds(mContext, kinds),
+                                                    district);
 
                                             cacheCoauchList.add(coauchBean);
                                         }
@@ -649,6 +652,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
                             break;
                         case RETRIEVE_COAUCH_WITH_LEVEL_FILTERED:
+                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
                             String level = (String) msg.obj;
                             Log.d(TAG, " inside the BackgroundThread --> the level string we get in the CoauchFragment are : " + level);
                             String levelCacheClazz = sParamsPreference.getCouchClazz(mContext);

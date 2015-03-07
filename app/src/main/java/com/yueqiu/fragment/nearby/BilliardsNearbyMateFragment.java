@@ -1090,7 +1090,7 @@ public class BilliardsNearbyMateFragment extends Fragment
      * 初始化定位,用高德SDK获取经纬度，准确率貌似更高点，
      * 之后可能会加功能，会用到高德的SDK
      */
-    private void getLocation() {
+    public void getLocation() {
 
         mLocationManagerProxy = LocationManagerProxy.getInstance(getActivity());
 
@@ -1158,6 +1158,8 @@ public class BilliardsNearbyMateFragment extends Fragment
             return lhsUserId > rhsUserId ? -1 : 1;
         }
     }
+
+
 
 }
 

@@ -1,6 +1,7 @@
 package com.yueqiu.fragment.group;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -18,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -94,6 +96,8 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
     private List<GroupNoteInfo> mInsertList = new ArrayList<GroupNoteInfo>();
     private List<GroupNoteInfo> mUpdateList = new ArrayList<GroupNoteInfo>();
 
+    private SearchView mSearchView;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -154,7 +158,6 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
 //        }
 
 
-
         return mView;
     }
 
@@ -168,6 +171,10 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
         }else{
             mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
         }
+        if(mSearchView != null) {
+            mSearchView.clearFocus();
+        }
+
     }
 
     private void initView(){
@@ -437,20 +444,23 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
 //                    }).start();
 
                     break;
-                case PublicConstant.TIME_OUT:
-                    Utils.showToast(mActivity,mActivity.getString(R.string.http_request_time_out));
-                    if(mList.isEmpty()) {
-                        setEmptyViewVisible();
-                    }
-                    break;
                 case PublicConstant.REQUEST_ERROR:
+
+                    if(mList.isEmpty()) {
+//                        if(null == msg.obj){
+//                            mEmptyTypeStr = mActivity.getString(R.string.http_request_error);
+//                        }else{
+//                            mEmptyTypeStr = (String) msg.obj;
+//                        }
+                        setEmptyViewVisible();
+                   }else{
+                        setmEmptyViewGone();
+
+                    }
                     if(null == msg.obj){
                         Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
                     }else{
                         Utils.showToast(mActivity, (String) msg.obj);
-                    }
-                    if(mList.isEmpty()) {
-                        setEmptyViewVisible();
                     }
                     break;
                 case PublicConstant.NO_RESULT:
@@ -471,8 +481,9 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
                     break;
                 case PublicConstant.NO_NETWORK:
                     Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
-                    if(mList.isEmpty())
+                    if(mList.isEmpty()) {
                         setEmptyViewVisible();
+                    }
                     break;
             }
             mListView.setAdapter(mAdapter);
@@ -617,8 +628,8 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.group_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView =(SearchView) menu.findItem(R.id.group_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
@@ -629,11 +640,14 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
                     args.putString(PublicConstant.SEARCH_KEYWORD, query);
                     intent.putExtras(args);
                     startActivity(intent);
-
+                    ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 }else{
                     Utils.showToast(mActivity,getString(R.string.network_not_available));
                 }
+                mSearchView.clearFocus();
                 return true;
+
             }
 
             @Override

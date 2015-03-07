@@ -19,8 +19,11 @@
         android:id="@+id/chatbar_item_account_tv"
         android:layout_toRightOf="@+id/chatbar_item_account_iv"
         android:layout_alignTop="@+id/chatbar_item_account_iv"
-        android:textSize="18sp"
-        style="@style/ListItemTvStyle"/>
+        android:textSize="16sp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        style="@style/ListItemTvStyle"
+        android:layout_toLeftOf="@+id/chatbar_item_sendtime_tv"/>
 
     <TextView
         style="@style/TimeTextStyle"
@@ -41,7 +44,11 @@
         android:textSize="14sp"
         android:layout_toRightOf="@+id/chatbar_item_gender_tv"
         android:layout_below="@+id/chatbar_item_account_tv"
-        android:background="@color/devide_line"/>
+        android:background="@color/devide_line"
+        android:singleLine="true"
+        android:ellipsize="end"
+
+        />
     <TextView
         style="@style/TimeTextStyle"
         android:id="@+id/friends_application_verify_message"
@@ -50,6 +57,9 @@
         android:textSize="14sp"
         android:layout_toRightOf="@+id/chatbar_item_district_tv"
         android:layout_below="@+id/chatbar_item_account_tv"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:layout_toLeftOf="@+id/chatbar_item_sendtime_tv"
         />
 
     <TextView
@@ -59,6 +69,7 @@
         android:textColor="@color/search_distance_color"
         android:textSize="12sp"
         style="@style/TimeTextStyle"
+
         />
 
 </RelativeLayout>

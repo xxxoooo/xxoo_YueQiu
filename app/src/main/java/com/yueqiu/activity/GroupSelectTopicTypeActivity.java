@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.yueqiu.R;
+import com.yueqiu.constant.DatabaseConstant;
 
 public class GroupSelectTopicTypeActivity extends Activity implements View.OnClickListener{
     public static final String TOPIC_TYPE_KEY = "topic_type";
@@ -23,6 +24,7 @@ public class GroupSelectTopicTypeActivity extends Activity implements View.OnCli
     private ImageView mIvGetMaster,mIvBeMaster,mIvFindFriend,mIvEquip,mIvOther;
     private Intent mIntent;
     private int mTopicType;
+    private String mTitle,mContent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +54,8 @@ public class GroupSelectTopicTypeActivity extends Activity implements View.OnCli
 
         mIntent = getIntent();
         mTopicType = mIntent.getIntExtra(TOPIC_TYPE_KEY,1);
+//        mTitle = mIntent.getStringExtra(DatabaseConstant.GroupInfo.TITLE);
+//        mContent = mIntent.getStringExtra(DatabaseConstant.GroupInfo.CONTENT);
         if(mTopicType == GET_MASTER){
             mIvBeMaster.setVisibility(View.GONE);
             mIvFindFriend.setVisibility(View.GONE);
@@ -94,15 +98,21 @@ public class GroupSelectTopicTypeActivity extends Activity implements View.OnCli
         int id = item.getItemId();
 
         if (id == android.R.id.home) {
-            this.finish();
+            mIntent = new Intent();
+            mIntent.putExtra(TOPIC_TYPE_KEY,mTopicType);
+            setResult(RESULT_OK,mIntent);
+            finish();
             overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
+                mIntent = new Intent();
+                mIntent.putExtra(TOPIC_TYPE_KEY,mTopicType);
+                setResult(RESULT_OK,mIntent);
                 finish();
                 overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 break;
@@ -119,21 +129,28 @@ public class GroupSelectTopicTypeActivity extends Activity implements View.OnCli
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.group_topic_type_get_master:
+                mTopicType = GET_MASTER;
                 mIntent.putExtra(TOPIC_TYPE_KEY,GET_MASTER);
                 break;
             case R.id.group_topic_type_be_master:
+                mTopicType = BE_MASTER;
                 mIntent.putExtra(TOPIC_TYPE_KEY,BE_MASTER);
                 break;
             case R.id.group_topic_type_find_friend:
+                mTopicType = FIND_FRIEND;
                 mIntent.putExtra(TOPIC_TYPE_KEY,FIND_FRIEND);
                 break;
             case R.id.group_topic_type_equip:
+                mTopicType = EQUIP;
                 mIntent.putExtra(TOPIC_TYPE_KEY,EQUIP);
                 break;
             case R.id.group_topic_type_other:
+                mTopicType = OTHER;
                 mIntent.putExtra(TOPIC_TYPE_KEY,OTHER);
                 break;
         }
+//        mIntent.putExtra(DatabaseConstant.GroupInfo.TITLE,mTitle);
+//        mIntent.putExtra(DatabaseConstant.GroupInfo.CONTENT,mContent);
         setResult(RESULT_OK, mIntent);
         finish();
         overridePendingTransition(R.anim.push_right_in,R.anim.push_right_out);

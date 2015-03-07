@@ -43,6 +43,8 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -82,6 +84,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
     private String mEmptyTypeStr;
     private BaseAdapter mAdapter;
     private boolean mRefresh, mLoadMore, mIsListEmpty;
+    private int mBeforeCount,mAfterCount;
 
     private Map<String, String> mParams = new HashMap<String, String>();
     private ArrayList<PlayInfo> mPlayList = new ArrayList<PlayInfo>();
@@ -120,18 +123,11 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
         mReceiveTypeParam = intent.getExtras().getInt(PublicConstant.TYPE, -1);
     }
 
-    private void initActionBar() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.billiard_search, menu);
 
-        mActionBar = getActionBar();
-
-        View customSearchView = LayoutInflater.from(this).inflate(R.layout.custom_actionbar_layout, null);
-        int searchViewWidth = getResources().getDimensionPixelSize(R.dimen.search_view_width);
-        if (searchViewWidth == 0) {
-            searchViewWidth = ActionBar.LayoutParams.MATCH_PARENT;
-        }
-        ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(searchViewWidth, ActionBar.LayoutParams.WRAP_CONTENT);
-        mSearchView = (SearchView) customSearchView.findViewById(R.id.search_view);
-        mSearchView.setIconified(true);
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
         EditText searchEditText = (EditText) mSearchView.findViewById(searchSrcTextId);
         searchEditText.setTextColor(Color.WHITE);
@@ -149,24 +145,46 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), 0);
-
-        View backView = customSearchView.findViewById(R.id.back_menu_item);
-        backView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-//        mSearchView.setOnCloseListener(this);
         mSearchView.setQuery(mQueryResult, false);
         mSearchView.setOnQueryTextListener(this);
-        mActionBar.setCustomView(customSearchView, layoutParams);
+
+        return true;
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return true;
+    }
+
+    private void initActionBar() {
+
+        mActionBar = getActionBar();
+//        View customSearchView = LayoutInflater.from(this).inflate(R.layout.custom_actionbar_layout, null);
+//        int searchViewWidth = getResources().getDimensionPixelSize(R.dimen.search_view_width);
+//        if (searchViewWidth == 0) {
+//            searchViewWidth = ActionBar.LayoutParams.MATCH_PARENT;
+//        }
+//        ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(searchViewWidth, ActionBar.LayoutParams.WRAP_CONTENT);
+//        mSearchView = (SearchView) customSearchView.findViewById(R.id.search_view);
+//        View backView = customSearchView.findViewById(R.id.back_menu_item);
+//        backView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//            }
+//        });
+//        mSearchView.setOnCloseListener(this);
+
+//        mActionBar.setCustomView(customSearchView, layoutParams);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setDisplayShowCustomEnabled(true);
+        mActionBar.setTitle(getString(R.string.btn_back));
     }
 
     private void initView() {
@@ -239,6 +257,8 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
     @Override
     public boolean onQueryTextSubmit(String query) {
         mQueryResult = query;
+        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
         requestSearch();
         return true;
     }
@@ -853,6 +873,29 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                     DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
 
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+
+            mLoadMore = true;
+            if(mEmptyView.getVisibility() == View.VISIBLE){
+                mEmptyView.setVisibility(View.GONE);
+            }
+            if(mBeforeCount != mAfterCount && mRefresh){
+                mStart = mEnd + (mAfterCount - mBeforeCount);
+                mEnd += 10 + (mAfterCount - mBeforeCount);
+            }else{
+                mStart = mEnd + 1;
+                mEnd += 10;
+            }
+            mRefresh = false;
+            if(Utils.networkAvaiable(SearchResultActivity.this)){
+                mParams.put(HttpConstants.GroupList.STAR_NO,String.valueOf(mStart));
+                mParams.put(HttpConstants.GroupList.END_NO,String.valueOf(mEnd));
+                requestSearch();
+            }
+            //TODO:由于目前不需要缓存，所以当没有网络时，就直接toast无网络
+            //TODO:如果后面需要缓存，再替换成注释掉的代码
+            else{
+                mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
+            }
         }
     };
 
@@ -969,6 +1012,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
 
                 break;
             case PublicConstant.SEARCH_FAVOR:
+                mBeforeCount = mFavorList.size();
                 mIsListEmpty = mFavorList.isEmpty();
                 List<FavorInfo> favorList = (List<FavorInfo>) msg.obj;
                 for(FavorInfo info : favorList){
@@ -987,11 +1031,13 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                     }
 
                 }
+                mAfterCount = mFavorList.size();
                 if(mFavorList.isEmpty()){
                     setEmptyViewVisible();
                 }
                 break;
             case PublicConstant.SEARCH_JOIN:
+                mBeforeCount = mJoinList.size();
                 mIsListEmpty = mJoinList.isEmpty();
                 List<PartInInfo> joinList = (List<PartInInfo>) msg.obj;
                 for(PartInInfo info : joinList){
@@ -1008,11 +1054,13 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         mJoinList.add(info);
                     }
                 }
+                mAfterCount = mJoinList.size();
                 if(mJoinList.isEmpty()){
                     setEmptyViewVisible();
                 }
                 break;
             case PublicConstant.SEARCH_PUBLISH:
+                mBeforeCount = mPublishedList.size();
                 mIsListEmpty = mPublishedList.isEmpty();
                 List<PublishedInfo> publishedInfoList = (List<PublishedInfo>) msg.obj;
                 for(PublishedInfo info : publishedInfoList){
@@ -1024,12 +1072,13 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         }
                     }
                 }
+                mBeforeCount = mPublishedList.size();
                 if(mPublishedList.isEmpty()){
                     setEmptyViewVisible();
                 }
                 break;
             case PublicConstant.SEARCH_PLAY:
-
+                mBeforeCount = mPlayList.size();
                 mIsListEmpty = mPlayList.isEmpty();
                 List<PlayInfo> playList = (List<PlayInfo>) msg.obj;
                 for(PlayInfo info : playList){
@@ -1042,12 +1091,14 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         }
                     }
                 }
+                mBeforeCount = mPlayList.size();
                 if(mPlayList.isEmpty()){
                     setEmptyViewVisible();
                 }
 
                 break;
             case PublicConstant.SEARCH_GROUP:
+                mBeforeCount = mGroupList.size();
                 mIsListEmpty = mGroupList.isEmpty();
                 List<GroupNoteInfo> groupList = (List<GroupNoteInfo>) msg.obj;
                 for(GroupNoteInfo info : groupList){
@@ -1061,18 +1112,26 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         }
                     }
                 }
-
+                mAfterCount = mGroupList.size();
                 if(mGroupList.isEmpty()) {
                     setEmptyViewVisible();
                 }
                 break;
             case PublicConstant.SEARCH_BUSINESS_PLAY:
-                List<PlayInfo> businessList = (List<PlayInfo>) msg.obj;
-                for(PlayInfo info : businessList){
-                    if(!mBusinessList.contains(info)){
-                        mBusinessList.add(info);
+                mBeforeCount = mBusinessList.size();
+                mIsListEmpty = mBusinessList.isEmpty();
+                List<PlayInfo> list = (List<PlayInfo>) msg.obj;
+                for(PlayInfo info : list){
+                    if (!mBusinessList.contains(info)) {
+
+                        if(!mIsListEmpty && Integer.valueOf(mBusinessList.get(0).getTable_id()) < Integer.valueOf(info.getTable_id())){
+                            mBusinessList.add(0,info);
+                        }else {
+                            mBusinessList.add(info);
+                        }
                     }
                 }
+                mAfterCount = mBusinessList.size();
                 if(mBusinessList.isEmpty()){
                     setEmptyViewVisible();
                 }

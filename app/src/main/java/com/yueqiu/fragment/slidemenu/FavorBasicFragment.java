@@ -1,6 +1,7 @@
 package com.yueqiu.fragment.slidemenu;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
@@ -10,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.SearchView;
 
@@ -55,7 +57,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
     private FavorDao mFavorDao;
     //跟数据库相关的list
     private List<FavorInfo> mCacheList;
-
+    private SearchView mSearchView;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -121,6 +123,9 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
             requestResult();
         }else{
             mHandler.obtainMessage(PublicConstant.NO_NETWORK).sendToTarget();
+        }
+        if(mSearchView != null){
+            mSearchView.clearFocus();
         }
     }
 
@@ -392,8 +397,8 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
@@ -402,13 +407,15 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                     Bundle args = new Bundle();
                     args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_FAVOR);
                     args.putString(PublicConstant.SEARCH_KEYWORD, query);
-                    args.putInt(PublicConstant.TYPE,mType);
+                    args.putInt(PublicConstant.TYPE, mType);
                     intent.putExtras(args);
                     startActivity(intent);
-
+                    ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 }else{
                     Utils.showToast(mActivity,getString(R.string.network_not_available));
                 }
+                mSearchView.clearFocus();
                 return true;
             }
 
@@ -417,5 +424,6 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                 return false;
             }
         });
+
     }
 }

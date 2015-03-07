@@ -278,20 +278,27 @@ public class FriendsApplicationFragment extends Fragment {
                     showEmptyView(false);
                     break;
                 case PublicConstant.NO_RESULT:
-                    showEmptyView(true);
-                    Toast.makeText(getActivity(), getString(R.string.no_friend_apply_info), Toast.LENGTH_LONG).show();
-                    break;
-                case PublicConstant.TIME_OUT:
-                    showEmptyView(true);
-                    Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
+                    if(mList.isEmpty()){
+                        showEmptyView(true);
+                    }else{
+                        showEmptyView(false);
+                        Toast.makeText(getActivity(), getString(R.string.no_friend_apply_info), Toast.LENGTH_LONG).show();
+                    }
+//
                     break;
                 case PublicConstant.REQUEST_ERROR:
-                    showEmptyView(true);
-                    if (null == msg.obj) {
-                        Utils.showToast(getActivity(), getString(R.string.http_request_error));
-                    } else {
-                        Utils.showToast(getActivity(), (String) msg.obj);
+
+                    if(mList.isEmpty()){
+                        showEmptyView(true);
+                    }else{
+                        showEmptyView(false);
+                        if (null == msg.obj) {
+                            Utils.showToast(getActivity(), getString(R.string.http_request_error));
+                        } else {
+                            Utils.showToast(getActivity(), (String) msg.obj);
+                        }
                     }
+
                     break;
                 default:
                     break;

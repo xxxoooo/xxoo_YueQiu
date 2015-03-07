@@ -555,4 +555,19 @@ public class NearbyFragmentsCommonUtils{
         }
         return levelStr;
     }
+    public static final String parseCoachZizhi(Context context,String levelVal){
+        String levelStr = "";
+        if (!TextUtils.isEmpty(levelVal)) {
+            if (levelVal.equals("1")) {
+                levelStr = context.getString(R.string.zizhi_country_team_member);
+            } else if (levelVal.equals("2")) {
+                levelStr = context.getString(R.string.zizhi_profession_memeber);
+            } else if (levelVal.equals("3")) {
+                levelStr = context.getString(R.string.zizhi_coach);
+            } else if (levelVal.equals("4")) {
+                levelStr = context.getString(R.string.search_dating_popupwindow_other);
+            }
+        }
+        return levelStr;
+    }
 }

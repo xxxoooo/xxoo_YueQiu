@@ -1,5 +1,7 @@
 package com.gotye.api;
 
+import com.yueqiu.bean.FriendsApplication;
+
 import java.io.Serializable;
 
 /**
@@ -28,5 +30,11 @@ public class GotyeChatTarget implements Serializable{
 	 * 类型 
 	 */
 	public GotyeChatTargetType type;
+
+    public boolean hasNewMsg;
+
+    public FriendsApplication newFriend;
+
+    public String title;
 	
 }

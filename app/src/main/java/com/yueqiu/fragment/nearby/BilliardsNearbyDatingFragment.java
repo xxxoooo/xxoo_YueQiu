@@ -307,10 +307,12 @@ public class BilliardsNearbyDatingFragment extends Fragment
 //        Log.d(TAG, " the detailed date we get for today are : " + currentDateStr);
         if (! TextUtils.isEmpty(date))
         {
-            requestParams.put("date", date);
+            requestParams.put("begin_time", date);
         }
         requestParams.put("start_no", startNum + "");
         requestParams.put("end_no", endNum + "");
+
+        Log.d("wy","date requestPatam ->" + requestParams);
 
         final List<NearbyDatingSubFragmentDatingBean> cacheDatingList = new ArrayList<NearbyDatingSubFragmentDatingBean>();
 

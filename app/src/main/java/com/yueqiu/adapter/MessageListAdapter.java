@@ -19,6 +19,7 @@ import com.gotye.api.GotyeMessageType;
 import com.gotye.api.GotyeRoom;
 import com.gotye.api.GotyeUser;
 import com.yueqiu.R;
+import com.yueqiu.bean.FriendsApplication;
 import com.yueqiu.fragment.chatbar.MessageFragment;
 import com.yueqiu.util.ImageCache;
 import com.yueqiu.util.TimeUtil;
@@ -26,19 +27,19 @@ import com.yueqiu.util.TimeUtil;
 import java.util.List;
 
 public class MessageListAdapter extends BaseAdapter {
-	private MessageFragment messageFragment;
+	private MessageFragment mMessageFragment;
 	private List<GotyeChatTarget> sessions;
 	private GotyeAPI api;
+    private String mContent;
 
-	public MessageListAdapter(MessageFragment messageFragment,
-                              List<GotyeChatTarget> sessions) {
-		this.messageFragment = messageFragment;
+	public MessageListAdapter(MessageFragment mMessageFragment,List<GotyeChatTarget> sessions) {
+		this.mMessageFragment = mMessageFragment;
 		this.sessions = sessions;
-		api = GotyeAPI.getInstance();
+		this.api = GotyeAPI.getInstance();
 	}
 
-	static class ViewHolder {
-		ImageView icon;
+    static class ViewHolder {
+		ImageView icon,state_icon;
 		TextView title, content, time, count;
 	}
 
@@ -83,10 +84,11 @@ public class MessageListAdapter extends BaseAdapter {
 		// TODO Auto-generated method stub
 		ViewHolder viewHolder;
 		if (view == null) {
-			view = LayoutInflater.from(messageFragment.getActivity()).inflate(
+			view = LayoutInflater.from(mMessageFragment.getActivity()).inflate(
 					R.layout.item_delete, null);
 			viewHolder = new ViewHolder();
 			viewHolder.icon = (ImageView) view.findViewById(R.id.icon);
+            viewHolder.state_icon = (ImageView) view.findViewById(R.id.message_state_icon);
 			viewHolder.title = (TextView) view.findViewById(R.id.title_tx);
 			viewHolder.content = (TextView) view.findViewById(R.id.content_tx);
 			viewHolder.time = (TextView) view.findViewById(R.id.time_tx);
@@ -99,10 +101,24 @@ public class MessageListAdapter extends BaseAdapter {
 		final GotyeChatTarget session =  getItem(arg0);
 		Log.d("offLine", "session" + session);
 		if (getItemViewType(arg0)==0) {
-			viewHolder.title.setText("验证消息");//session.name
-			viewHolder.content.setVisibility(View.GONE);
+			viewHolder.title.setText(session.title);//session.name
+
+            if(session.newFriend == null) {
+                viewHolder.content.setVisibility(View.GONE);
+                viewHolder.time.setVisibility(View.GONE);
+            }else{
+                viewHolder.content.setVisibility(View.VISIBLE);
+                viewHolder.content.setText(mMessageFragment.getActivity().getString(R.string.ask_for_friend,session.newFriend.getUsername()));
+                viewHolder.time.setVisibility(View.VISIBLE);
+                viewHolder.time.setText(session.newFriend.getCreate_time());
+            }
 			viewHolder.icon.setImageResource(R.drawable.message);
-			viewHolder.time.setVisibility(View.GONE);
+            if(session.hasNewMsg) {
+                viewHolder.state_icon.setVisibility(View.VISIBLE);
+            }else{
+                viewHolder.state_icon.setVisibility(View.GONE);
+            }
+
 			int count = api.getUnreadNotifyCount();
 			if (count > 0) {
 				viewHolder.count.setVisibility(View.VISIBLE);
@@ -120,50 +136,50 @@ public class MessageListAdapter extends BaseAdapter {
 			viewHolder.time.setText(lastMsgTime);
 			setIcon(viewHolder.icon, session);
 			if (lastMsg.getType() == GotyeMessageType.GotyeMessageTypeText) {
-				content = "文本消息：" + lastMsg.getText();
+				content = mMessageFragment.getString(R.string.text_msg) + lastMsg.getText();
 			} else if (lastMsg.getType() == GotyeMessageType.GotyeMessageTypeImage) {
-				content = "图片消息";
+				content = mMessageFragment.getString(R.string.image_msg);
 			} else if (lastMsg.getType() == GotyeMessageType.GotyeMessageTypeAudio) {
-				content = "语音消息";
+				content = mMessageFragment.getString(R.string.voice_msg);
 			} else if (lastMsg.getType() == GotyeMessageType.GotyeMessageTypeUserData) {
-				content = "自定义消息";
+				content = mMessageFragment.getString(R.string.custom_msg);
 			} else if (lastMsg.getType() == GotyeMessageType.GotyeMessageTypeInviteGroup) {
-				content = "邀请消息";
+				content = mMessageFragment.getString(R.string.invent_msg);
 			}
 
 			if (session.type == GotyeChatTargetType.GotyeChatTargetTypeUser) {
 				GotyeUser user = api.requestUserInfo(session.name, false);
 				if (user != null) {
 					if (TextUtils.isEmpty(user.getNickname())) {
-						title = "好友：" + user.name;
+						title = mMessageFragment.getString(R.string.good_friend) + user.name;
 					} else {
-						title = "好友：" + user.getNickname();
+						title = mMessageFragment.getString(R.string.good_friend) + user.getNickname();
 					}
 				} else {
-					title = "好友：" + session.name;
+					title = mMessageFragment.getString(R.string.good_friend)+ session.name;
 				}
 			} else if (session.type == GotyeChatTargetType.GotyeChatTargetTypeRoom) {
 				GotyeRoom room = api.requestRoomInfo(session.Id, false);
 				if (room != null) {
 					if (TextUtils.isEmpty(room.getRoomName())) {
-						title = "聊天室：" + room.Id;
+						title = mMessageFragment.getString(R.string.chatbar_room) + room.Id;
 					} else {
-						title = "聊天室：" + room.getRoomName();
+						title = mMessageFragment.getString(R.string.chatbar_room) + room.getRoomName();
 					}
 				} else {
-					title = "聊天室：" + session.Id;
+					title = mMessageFragment.getString(R.string.chatbar_room) + session.Id;
 				}
 
 			} else if (session.type == GotyeChatTargetType.GotyeChatTargetTypeGroup) {
 				GotyeGroup group = api.requestGroupInfo(session.Id, false);
 				if (group != null) {
 					if (TextUtils.isEmpty(group.getGroupName())) {
-						title = "群：" + group.Id;
+						title = mMessageFragment.getString(R.string.chatbar_group) + group.Id;
 					} else {
-						title = "群：" + group.getGroupName();
+						title = mMessageFragment.getString(R.string.chatbar_group) + group.getGroupName();
 					}
 				} else {
-					title = "群：" + session.Id;
+					title = mMessageFragment.getString(R.string.chatbar_group) + session.Id;
 				}
 
 			}

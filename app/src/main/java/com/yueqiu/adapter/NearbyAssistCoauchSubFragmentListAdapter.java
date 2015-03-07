@@ -32,13 +32,17 @@ public class NearbyAssistCoauchSubFragmentListAdapter extends BaseAdapter
     private LayoutInflater mInflater;
 
     private ImageLoader mImgLoader;
+
+    private Context mContext;
     public NearbyAssistCoauchSubFragmentListAdapter(Context context, ArrayList<NearbyAssistCoauchSubFragmentBean> beanList)
     {
+        this.mContext = context;
+
         this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
 
         this.mBeanList = beanList;
         // a better way to get the LAYOUT_INFLATE_SERVICE
-        mInflater = LayoutInflater.from(context);
+        this.mInflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -96,8 +100,12 @@ public class NearbyAssistCoauchSubFragmentListAdapter extends BaseAdapter
         viewHolder.mKinds.setText(bean.getKinds());
         // TODO: the price here should use the String placeHolder to implement it,
         // TODO: otherwise, some exception would happen
-        viewHolder.mPrice.setText(bean.getPrice());
-        viewHolder.mDistance.setText(bean.getDistance());
+        if(bean.getPrice().equals("0")){
+            viewHolder.mPrice.setText(mContext.getString(R.string.search_dating_detailed_model_1));
+        }else{
+            viewHolder.mPrice.setText(mContext.getString(R.string.low_and_equal,bean.getPrice()));
+        }
+        viewHolder.mDistance.setText(mContext.getString(R.string.in_meter,bean.getDistance()));
 
         return convertView;
     }

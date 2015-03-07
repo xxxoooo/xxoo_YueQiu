@@ -2,41 +2,47 @@
 
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/published_item_bg_view"
+    android:id="@+id/partin_item_bg_view"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="10dp"
     android:background="@drawable/published_item_bg"
     android:layout_weight="4">
-
-    <TextView
-        android:id="@+id/published_title"
-        style="@style/ListItemTvStyle"
+    <com.android.volley.toolbox.NetworkImageView
+        android:id="@+id/partin_item_image"
+        android:layout_width="@dimen/listview_item_user_photo_width"
+        android:layout_height="@dimen/listview_item_user_photo_height"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/default_head"/>
+    <TextView
+        android:id="@+id/partin_title"
+        style="@style/ListItemTvStyle"
+        android:layout_alignTop="@+id/published_item_image"
+        android:layout_toRightOf="@+id/published_item_image"
         android:layout_marginLeft="10dp"
         android:textSize="16sp"
         android:ellipsize="end"
         android:singleLine="true"
         android:layout_toLeftOf="@+id/published_time"
-        android:layout_marginRight="3dp"
-
         />
     <TextView
-        android:id="@+id/published_content"
+        android:id="@+id/partin_content"
         android:layout_below="@+id/published_title"
         android:layout_alignLeft="@+id/published_title"
+        android:layout_alignBottom="@+id/published_item_image"
         android:ellipsize="end"
         android:textSize="14sp"
         style="@style/TimeTextStyle"
         android:singleLine="true"
         android:layout_toLeftOf="@+id/published_time"
         android:layout_marginRight="3dp"
-
-
         />
     <TextView
-        android:id="@+id/published_time"
+        android:id="@+id/partin_time"
         style="@style/TimeTextStyle"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"

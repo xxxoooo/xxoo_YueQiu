@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,12 +21,16 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -67,6 +72,8 @@ import com.yueqiu.view.menudrawer.Position;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -125,7 +132,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                 getString(R.string.nearby_billiard_dating_str),
                 getString(R.string.nearby_billiard_assist_coauch_str),
                 getString(R.string.nearby_billiard_coauch_str),
-                getString(R.string.nearby_billiard_coauch_str)};
+                getString(R.string.nearby_billiard_room_str)};
         mMenuDrawer = MenuDrawer.attach(this, MenuDrawer.Type.BEHIND, Position.LEFT, MenuDrawer.MENU_DRAG_WINDOW);
         mMenuDrawer.setContentView(R.layout.activity_nearby_billiard);
         mMenuDrawer.setMenuView(R.layout.slide_drawer_layout);
@@ -170,6 +177,15 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         });
         setupTabs();
         initDrawer();
+
+        ViewTreeObserver observer = mGroup.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                YueQiuApp.sBottomHeight = mGroup.getHeight();
+                Log.d("wy","bottom height ->" + YueQiuApp.sBottomHeight);
+            }
+        });
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(PublicConstant.SLIDE_PART_IN_ACTION);
@@ -766,6 +782,8 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
             }
         }
     };
+
+
 
 }
 
