@@ -37,6 +37,12 @@ import android.widget.TextView;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
+import com.gotye.api.GotyeAPI;
+import com.gotye.api.GotyeGender;
+import com.gotye.api.GotyeUser;
+import com.gotye.api.Icon;
+import com.gotye.api.PathUtil;
+import com.gotye.api.listener.UserListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.SyncHttpClient;
@@ -48,6 +54,7 @@ import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.group.ImageFragment;
+import com.yueqiu.util.BitmapUtil;
 import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.Utils;
@@ -56,10 +63,12 @@ import com.yueqiu.view.CustomDialogBuilder;
 import com.yueqiu.view.IssueImageView;
 import com.yueqiu.view.dlgeffect.EffectsType;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -73,7 +82,7 @@ import java.util.UUID;
 /**
  * Created by doushuqi on 15/1/4.
  */
-public class PhotoSetupFragment extends Fragment implements View.OnClickListener{
+public class PhotoSetupFragment extends Fragment implements View.OnClickListener, UserListener {
     private static final int CAMERA_REQUEST = 1;
     private static final int ALBUM_REQUEST = 2;
     private static final String DIALOG_IMAGE = "image";
@@ -82,21 +91,24 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
     private NetworkImageView mPhotoView;
     private ImageView mAddImg;
     private View mView;
-    private TextView mTakePhoto,mSelectPhoto;
+    private TextView mTakePhoto, mSelectPhoto;
     private RelativeLayout mPhotoContainer;
-    private String mImgFilePath,mPhotoImgUrl;
+    private String mImgFilePath, mPhotoImgUrl;
     private ProgressBar mPreProgress;
     private TextView mPreTextView;
-    private Drawable mPhotoViewDrawable,mProgressDrawable;
+    private Drawable mPhotoViewDrawable, mProgressDrawable;
     private Bitmap mUploadBitmap;
     private ImageLoader mImgLoader;
     private CustomDialogBuilder mDlgBuilder;
-    private int mAddViewWidth,mAddViewHeight;
+    private int mAddViewWidth, mAddViewHeight;
 
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
 
     private List<IssueImageView> mAddViewList = new ArrayList<IssueImageView>();
+    private GotyeAPI api;
+    private GotyeUser mGotyeUser;
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -144,7 +156,7 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
 
         mPhotoView.setDefaultImageResId(R.drawable.default_head);
         mPhotoView.setErrorImageResId(R.drawable.default_head);
-        mPhotoView.setImageUrl(mPhotoImgUrl,mImgLoader);
+        mPhotoView.setImageUrl(mPhotoImgUrl, mImgLoader);
         mAddImg.setOnClickListener(this);
         mPhotoView.setOnClickListener(this);
 
@@ -153,8 +165,18 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        api = GotyeAPI.getInstance();
+        api.addListerer(this);
+        mGotyeUser = api.getCurrentLoginUser();
+        api.requestUserInfo(mGotyeUser.name, true);
+
+    }
+
+    @Override
     public void onClick(View v) {
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.profile_photo_add_img:
                 mDlgBuilder = CustomDialogBuilder.getsInstance(mActivity);
                 mDlgBuilder.withTitle(getString(R.string.select_photo))
@@ -184,38 +206,93 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                 break;
             case R.id.profile_photo_img:
                 mPhotoViewDrawable = mPhotoView.getDrawable();
-                if(mPhotoViewDrawable != null){
+                if (mPhotoViewDrawable != null) {
                     DefaultImageFragment mDefault = new DefaultImageFragment();
-                    mDefault.setStyle(DialogFragment.STYLE_NO_TITLE,0);
-                    mDefault.show(mActivity.getSupportFragmentManager(),DEFAULT_TAG);
+                    mDefault.setStyle(DialogFragment.STYLE_NO_TITLE, 0);
+                    mDefault.show(mActivity.getSupportFragmentManager(), DEFAULT_TAG);
 
                 }
                 break;
             case R.id.take_photo_now:
                 Uri imageFileUri = null;
-                if(FileUtil.isSDCardReady()){
+                if (FileUtil.isSDCardReady()) {
                     mImgFilePath = FileUtil.getSDCardPath() + "/yueqiu/" + UUID.randomUUID().toString() + ".jpg";
                     File imageFile = new File(mImgFilePath);
-                    if(!imageFile.exists()){
+                    if (!imageFile.exists()) {
                         imageFile.getParentFile().mkdirs();
                     }
                     imageFileUri = Uri.fromFile(imageFile);
                 }
                 Intent captureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                captureIntent.putExtra(MediaStore.EXTRA_OUTPUT,imageFileUri);
+                captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageFileUri);
                 startActivityForResult(captureIntent, CAMERA_REQUEST);
-                if(mDlgBuilder != null)
+                if (mDlgBuilder != null)
                     mDlgBuilder.dismiss();
                 break;
             case R.id.select_photo_from_album:
-                Intent albumIntent = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(albumIntent,ALBUM_REQUEST);
-                if(mDlgBuilder != null)
+                Intent albumIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(albumIntent, ALBUM_REQUEST);
+                if (mDlgBuilder != null)
                     mDlgBuilder.dismiss();
         }
     }
 
-    private  class DefaultImageFragment extends DialogFragment{
+    @Override
+    public void onRequestUserInfo(int code, GotyeUser user) {
+        Log.e("ddd","onRequestUserInfo");
+    }
+
+    @Override
+    public void onModifyUserInfo(int code, GotyeUser user) {
+        Log.e("ddd","onModifyUserInfo callback");
+        if (code == 0) {
+            Log.e("ddd", "Im 用户头像修改成功！！");
+            Utils.showToast(getActivity(), "Im 用户头像修改成功！！");
+        } else {
+        }
+    }
+
+    @Override
+    public void onSearchUserList(int code, List<GotyeUser> mList, int pagerIndex) {
+
+    }
+
+    @Override
+    public void onAddFriend(int code, GotyeUser user) {
+
+    }
+
+    @Override
+    public void onGetFriendList(int code, List<GotyeUser> mList) {
+
+    }
+
+    @Override
+    public void onAddBlocked(int code, GotyeUser user) {
+
+    }
+
+    @Override
+    public void onRemoveFriend(int code, GotyeUser user) {
+
+    }
+
+    @Override
+    public void onRemoveBlocked(int code, GotyeUser user) {
+
+    }
+
+    @Override
+    public void onGetBlockedList(int code, List<GotyeUser> mList) {
+
+    }
+
+    @Override
+    public void onGetProfile(int code, GotyeUser user) {
+        Log.e("ddd", "PhotoSetupFragment onGetProfile callback>>> code = " + code + " user = " + user);
+    }
+
+    private class DefaultImageFragment extends DialogFragment {
 
 
         @Override
@@ -233,7 +310,7 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK) {
             BitmapDrawable bitmap = ImgUtil.getThumbnailScaledBitmap(mActivity, mImgFilePath, mAddViewWidth, mAddViewHeight);
             BitmapBean bmpBean = new BitmapBean();
             bmpBean.bitmapDrawable = bitmap;
@@ -247,25 +324,24 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
             image.setImageDrawable(bitmap);
             image.setScaleType(ImageView.ScaleType.FIT_XY);
             mPhotoContainer.removeViewAt(0);
-            mPhotoContainer.addView(image,0);
+            mPhotoContainer.addView(image, 0);
 
             image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     BitmapBean bean = image.getBitmapBean();
-                    if(bean == null)
-                        return ;
+                    if (bean == null)
+                        return;
                     FragmentManager fm = mActivity.getSupportFragmentManager();
                     String imgPath = bean.imgFilePath;
                     Uri imgUri = bean.imgUri;
-                    ImageFragment.newInstance(imgPath, imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
+                    ImageFragment.newInstance(imgPath, imgUri == null ? null : imgUri.toString()).show(fm, DIALOG_IMAGE);
                 }
             });
             mAddViewList.add(image);
-        }
-        else if (requestCode == ALBUM_REQUEST && resultCode == Activity.RESULT_OK){
+        } else if (requestCode == ALBUM_REQUEST && resultCode == Activity.RESULT_OK) {
             Uri imageFileUri = data.getData();
-            BitmapDrawable drawable = ImgUtil.getThumbnailScaleBitmapByUri(mActivity,imageFileUri,mAddViewWidth,mAddViewHeight);
+            BitmapDrawable drawable = ImgUtil.getThumbnailScaleBitmapByUri(mActivity, imageFileUri, mAddViewWidth, mAddViewHeight);
             BitmapBean bmpBean = new BitmapBean();
             bmpBean.bitmapDrawable = drawable;
             bmpBean.imgFilePath = null;
@@ -273,7 +349,7 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
             final IssueImageView image = new IssueImageView(mActivity);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mActivity.getResources().getDimensionPixelOffset(R.dimen.listview_item_user_photo_width),
                     mActivity.getResources().getDimensionPixelOffset(R.dimen.listview_item_user_photo_height));
-            params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left),0,0,0);
+            params.setMargins(getResources().getDimensionPixelOffset(R.dimen.add_img_margin_left), 0, 0, 0);
             image.setLayoutParams(params);
             image.setBitmapBean(bmpBean);
             image.setImageDrawable(drawable);
@@ -285,12 +361,12 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                 @Override
                 public void onClick(View v) {
                     BitmapBean bean = image.getBitmapBean();
-                    if(bean == null)
-                        return ;
+                    if (bean == null)
+                        return;
                     FragmentManager fm = mActivity.getSupportFragmentManager();
                     String imgPath = bean.imgFilePath;
                     Uri imgUri = bean.imgUri;
-                    ImageFragment.newInstance(imgPath, imgUri == null ? null : imgUri.toString()).show(fm,DIALOG_IMAGE);
+                    ImageFragment.newInstance(imgPath, imgUri == null ? null : imgUri.toString()).show(fm, DIALOG_IMAGE);
                 }
             });
             mAddViewList.add(image);
@@ -300,12 +376,13 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onDestroy() {
+        api.removeListener(this);
         super.onDestroy();
         ImgUtil.clearImageView(mAddViewList);
         File dir = new File(FileUtil.getSdDirectory() + "/yueqiu/");
-        if(dir.exists()){
+        if (dir.exists()) {
             File[] files = dir.listFiles(new FileUtil.FileNameFilter("jpg"));
-            for(File file : files){
+            for (File file : files) {
                 file.delete();
             }
         }
@@ -315,7 +392,7 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
-        switch(item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.setup_confirm:
                 changePhoto();
                 break;
@@ -323,14 +400,15 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
         return true;
     }
 
-    private void changePhoto(){
+    private void changePhoto() {
 
         View view = mPhotoContainer.getChildAt(0);
-        if(view instanceof NetworkImageView){
+        if (view instanceof NetworkImageView) {
             mActivity.finish();
-        }else if(view instanceof IssueImageView){
-            final BitmapBean bean = ((IssueImageView)view).getBitmapBean();
-            String imgFilePath = bean.imgFilePath;
+        } else if (view instanceof IssueImageView) {
+            final BitmapBean bean = ((IssueImageView) view).getBitmapBean();
+            final String imgFilePath = bean.imgFilePath;
+            Log.e("ddd", "imgFilePath = " + imgFilePath);
             Uri imgUri = bean.imgUri;
 //            if(imgFilePath != null){
 //                mUploadBitmap = ImgUtil.getOriginBitmapByPath(mActivity,imgFilePath);
@@ -340,8 +418,8 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
 //            }
 
             //TODO:拍照后上传
-            if(bean.imgFilePath != null){
-                new AsyncTask<Void,Void,Void>(){
+            if (bean.imgFilePath != null) {
+                new AsyncTask<Void, Void, Void>() {
 
                     @Override
                     protected Void doInBackground(Void... params) {
@@ -356,8 +434,8 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                             e.printStackTrace();
                         } catch (IOException e) {
                             e.printStackTrace();
-                        }finally {
-                            if (in != null){
+                        } finally {
+                            if (in != null) {
                                 try {
                                     in.close();
                                 } catch (IOException e) {
@@ -365,39 +443,46 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                                 }
                             }
                         }
-                        char[] hex= Hex.encodeHex(buffer);
-                        for(char c : hex) {
+                        char[] hex = Hex.encodeHex(buffer);
+                        for (char c : hex) {
                             bitmapStr.append(c);
                         }
                         SyncHttpClient client = new SyncHttpClient();
                         RequestParams requestParams = new RequestParams();
-                        requestParams .put(HttpConstants.ChangePhoto.IMG_DATA, bitmapStr.toString());
-                        requestParams .put(HttpConstants.ChangePhoto.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
-                        requestParams .put(HttpConstants.ChangePhoto.IMG_SUFFIX, "jpg");
+                        requestParams.put(HttpConstants.ChangePhoto.IMG_DATA, bitmapStr.toString());
+                        requestParams.put(HttpConstants.ChangePhoto.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+                        requestParams.put(HttpConstants.ChangePhoto.IMG_SUFFIX, "jpg");
 
-                        client.post("http://app.chuangyezheluntan.com/index.php/v1" + HttpConstants.ChangePhoto.URL,requestParams,new JsonHttpResponseHandler(){
+                        client.post("http://app.chuangyezheluntan.com/index.php/v1" + HttpConstants.ChangePhoto.URL, requestParams, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                Log.d("wy","response ->" + response);
-                                try{
-                                    if(!response.isNull("code")){
-                                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                                            if(response.getString("result") != null) {
+                                Log.d("wy", "response ->" + response);
+                                try {
+                                    if (!response.isNull("code")) {
+                                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                                            if (response.getString("result") != null) {
+                                                //TODO:upload IM service
+                                                new Thread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        setIMUserPhoto(imgFilePath);
+                                                    }
+                                                }).start();
                                                 mHandler.obtainMessage(PublicConstant.GET_SUCCESS).sendToTarget();
-                                            }else{
+                                            } else {
                                                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                                             }
-                                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                                        } else if (response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
                                             mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                                        }else if(response.getInt("code") == HttpConstants.ResponseCode.REQUEST_ERROR){
+                                        } else if (response.getInt("code") == HttpConstants.ResponseCode.REQUEST_ERROR) {
                                             mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
-                                        }else{
-                                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                                        } else {
+                                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, response.getString("msg")).sendToTarget();
                                         }
-                                    }else{
+                                    } else {
                                         mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                                     }
-                                }catch(JSONException e){
+                                } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
@@ -427,12 +512,12 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
             }
 
             //TODO:选择图片的上传
-            if(bean.imgUri != null){
-                new AsyncTask<Void,Void,Void>(){
+            if (bean.imgUri != null) {
+                new AsyncTask<Void, Void, Void>() {
 
                     @Override
                     protected Void doInBackground(Void... params) {
-                        String [] proj={MediaStore.Images.Media.DATA};
+                        String[] proj = {MediaStore.Images.Media.DATA};
                         Cursor cursor = getActivity().getContentResolver().query(bean.imgUri,
                                 proj,                 // Which columns to return
                                 null,       // WHERE clause; which rows to return (all rows)
@@ -443,7 +528,8 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                         cursor.moveToFirst();
 
                         StringBuilder bitmapStr = new StringBuilder();
-                        File file = new File(cursor.getString(column_index));
+                        final String filePath = cursor.getString(column_index);
+                        File file = new File(filePath);
                         byte[] buffer = new byte[(int) file.length()];
                         try {
                             FileInputStream in = new FileInputStream(file);
@@ -456,39 +542,46 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                         }
 
                         char[] hex = Hex.encodeHex(buffer);
-                        for(int i=0;i<hex.length;i++) {
+                        for (int i = 0; i < hex.length; i++) {
                             bitmapStr.append(hex[i]);
                         }
                         SyncHttpClient client = new SyncHttpClient();
                         RequestParams requestParams = new RequestParams();
-                        requestParams .put(HttpConstants.ChangePhoto.IMG_DATA, bitmapStr.toString());
-                        requestParams .put(HttpConstants.ChangePhoto.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
-                        requestParams .put(HttpConstants.ChangePhoto.IMG_SUFFIX, "jpg");
+                        requestParams.put(HttpConstants.ChangePhoto.IMG_DATA, bitmapStr.toString());
+                        requestParams.put(HttpConstants.ChangePhoto.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+                        requestParams.put(HttpConstants.ChangePhoto.IMG_SUFFIX, "jpg");
 
-                        client.post("http://app.chuangyezheluntan.com/index.php/v1" + HttpConstants.ChangePhoto.URL,requestParams,new JsonHttpResponseHandler(){
+                        client.post("http://app.chuangyezheluntan.com/index.php/v1" + HttpConstants.ChangePhoto.URL, requestParams, new JsonHttpResponseHandler() {
                             @Override
                             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                                Log.d("wy","response ->" + response);
-                                try{
-                                    if(!response.isNull("code")){
-                                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                                            if(response.getJSONObject("result") != null) {
+                                Log.d("wy", "response ->" + response);
+                                try {
+                                    if (!response.isNull("code")) {
+                                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                                            if (response.getJSONObject("result") != null) {
                                                 String img_url = response.getJSONObject("result").getString("s_img_url");
-                                                mHandler.obtainMessage(PublicConstant.GET_SUCCESS,img_url).sendToTarget();
-                                            }else{
+                                                //TODO:上传IM服务器
+                                                new Thread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        setIMUserPhoto(filePath);
+                                                    }
+                                                }).start();
+                                                mHandler.obtainMessage(PublicConstant.GET_SUCCESS, img_url).sendToTarget();
+                                            } else {
                                                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                                             }
-                                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                                        } else if (response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
                                             mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                                        }else if(response.getInt("code") == HttpConstants.ResponseCode.REQUEST_ERROR){
+                                        } else if (response.getInt("code") == HttpConstants.ResponseCode.REQUEST_ERROR) {
                                             mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
-                                        }else{
-                                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                                        } else {
+                                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, response.getString("msg")).sendToTarget();
                                         }
-                                    }else{
+                                    } else {
                                         mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                                     }
-                                }catch(JSONException e){
+                                } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
                             }
@@ -521,22 +614,41 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
         }
     }
 
-    private Handler mHandler = new Handler(){
+    private void setIMUserPhoto(String path) {
+        Bitmap smaillBit = BitmapUtil.getSmallBitmap(path, 50, 50);
+        String smallPath = BitmapUtil.saveBitmapFile(smaillBit);
+        modifyUserIcon(smallPath);
+    }
+
+    private void modifyUserIcon(String smallImagePath) {
+        mGotyeUser.setInfo("too young, too simple, too naive");// 修改扩展信息
+        mGotyeUser.setNickname(mGotyeUser.name);
+        Log.e("ddd", "icon = " + mGotyeUser.getIcon());
+        mGotyeUser.setIcon(mGotyeUser.getIcon());
+        Log.e("ddd", "name = " + mGotyeUser.name + "  info = " + mGotyeUser.getInfo() + " gender = " + mGotyeUser.getGender());
+        Log.e("ddd", "smallImagePath = " + smallImagePath);
+        Log.e("ddd", "mGotyeUser = " + mGotyeUser);
+        int result = api.modifyUserInfo(mGotyeUser, smallImagePath);
+        Log.e("ddd", "IM upload result = " + result);
+    }
+
+
+    private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            switch(msg.what){
+            switch (msg.what) {
                 case PublicConstant.GET_SUCCESS:
                     String img_url = (String) msg.obj;
-
-                    mEditor.putString(DatabaseConstant.UserTable.IMG_URL,img_url);
+                    Log.e("ddd", "img_url = " + img_url);
+                    mEditor.putString(DatabaseConstant.UserTable.IMG_URL, img_url);
                     mEditor.apply();
 
                     YueQiuApp.sUserInfo.setImg_url(img_url);
 
                     Intent intent = new Intent();
                     intent.putExtra(MyProfileActivity.EXTRA_RESULT_ID, DEFAULT_TAG);
-                    intent.putExtra(PublicConstant.IMG_URL,img_url);
+                    intent.putExtra(PublicConstant.IMG_URL, img_url);
                     mActivity.setResult(Activity.RESULT_OK, intent);
 
                     Intent updatePhoto = new Intent();
@@ -554,10 +666,6 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
             }
         }
     };
-
-
-
-
 
 
 }

@@ -16,13 +16,13 @@ android {
     signingConfigs {
         // TODO: 以下的keystore文件的位置会随着不同的开发机器而不同，我们现在写的是绝对路径，需要换成相对路径
         debug {
-            storeFile file('/Users/scguo/yueqiu_new/xxoo_YueQiu/yueqiu.keystore')
+            storeFile file('yueqiu.keystore')
             keyAlias 'yueqiu.keystore'
             keyPassword '123456'
             storePassword '123456'
         }
         release {
-            storeFile file('/Users/scguo/yueqiu_new/xxoo_YueQiu/yueqiu.keystore')
+            storeFile file('yueqiu.keystore')
             keyAlias 'yueqiu.keystore'
             keyPassword '123456'
             storePassword '123456'
