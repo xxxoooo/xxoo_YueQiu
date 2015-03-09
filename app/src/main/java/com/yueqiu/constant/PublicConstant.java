@@ -14,12 +14,17 @@ public class PublicConstant {
     public static final String SLIDE_PUBLISH_ACTION = "com.yueqiu.slide.publish.update";
     public static final String SLIDE_ACCOUNT_ACTION = "com.yueqiu.slide.account.update";
 
+    public static final String CHAT_HAS_NEW_MSG = "com.yueqiu.chat.has_new_msg";
+    public static final String CHAT_HAS_NO_MSG = "com.yueqiu.chat.has_no_msg";
+
     public static final String IMG_URL = "img_url";
     public static final String PLAY_TYPE = "play_type";
     public static final String SEARCH_TYPE = "search_type";
     public static final String SEARCH_KEYWORD = "search_keyword";
     public static final String TYPE = "type";
 
+    // 用于分享到新浪微博的bitmap
+    public static final String SHARE_TO_SINA_BITMAP = "shareToSinaBitmap";
 
     public static final int GET_SUCCESS   = 0;
     public static final int NO_RESULT     = -1;
@@ -86,6 +91,7 @@ public class PublicConstant {
     public static final int SEARCH_PUBLISH          = 9;
     public static final int SEARCH_JOIN             = 10;
     public static final int SEARCH_BUSINESS_PLAY    = 11;
+    public static final int SEARCH_FRIEND           = 12;
 
 
 }

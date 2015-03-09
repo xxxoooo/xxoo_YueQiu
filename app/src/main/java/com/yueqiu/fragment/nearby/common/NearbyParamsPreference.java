@@ -43,6 +43,7 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
     private static final String KEY_ROOM_LONGI = "keyRoomLongi";
 
     private SharedPreferences mSharedPreference = null;
+    private static final String KEY_FIRST_ENTER = "firstEnterYueqiu";
 
     private static NearbyParamsPreference sPreference = null;
 
@@ -59,6 +60,20 @@ public class NearbyParamsPreference implements SharedPreferences.OnSharedPrefere
             mSharedPreference = PreferenceManager.getDefaultSharedPreferences(context);
 
         return this;
+    }
+
+    public boolean getFirstEnter(Context context)
+    {
+        ensurePreference(context);
+        return mSharedPreference.getBoolean(KEY_FIRST_ENTER, true);
+    }
+
+    public void setFirstEnterTag(Context context, boolean firstEnter)
+    {
+        ensurePreference(context);
+        SharedPreferences.Editor editor = mSharedPreference.edit();
+        editor.putBoolean(KEY_FIRST_ENTER, firstEnter);
+        editor.apply();
     }
 
     public float getRoomLongi(Context context)

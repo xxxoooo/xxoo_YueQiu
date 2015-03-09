@@ -149,7 +149,7 @@
     <string name="search_dating_detailed_activity_intro_indi_test">联系我时，就说是在约球上面看到的</string>
 
     <!-- 3.助教子Fragment的title -->
-    <string name="search_assistcaouch_subfragment_title_cost">花费</string>
+    <string name="search_assistcaouch_subfragment_title_cost">费用</string>
     <string name="search_assistcaouch_subfragment_title_kinds">球种</string>
     <string name="search_assistcaouch_subfragment_title_level">水平</string>
 
@@ -157,8 +157,8 @@
         这个是用于显示助教的价格，这里我们将用到<=这个符号，为了将这个符号完整的拼接到TextView当中，我们最好使用
         Xliff，而不是通过复杂的StringBuilder来实现，因为我们的TextView是有背景图片的，所以我们只能使用这个技巧
     -->
-    <string name="search_assistcaouch_subfragment_listitem_price">大约<xliff:g id="number" example="38">%1$s</xliff:g> 元/时</string>
-    <string name="nearby_room_subfragment_listitem_range"><xliff:g id="number" example="2500">%1$s</xliff:g> 米以内</string>
+    <!--<string name="search_assistcaouch_subfragment_listitem_price">大约<xliff:g id="number" example="38">%1$s</xliff:g> 元/时</string>-->
+    <string name="nearby_room_subfragment_listitem_range"><xliff:g id="number" example="2500">%1$s</xliff:g>千米以内</string>
 
     <!-- 4.教练子Fragment的title -->
     <string name="search_caouch_subfragment_title_ability">资质</string>
@@ -168,9 +168,9 @@
     <string name="search_coauch_filter_kinds_sinuoke">斯诺克</string>
     <string name="search_coauch_filter_kinds_jiuqiu">九球</string>
     <string name="search_coauch_filter_kinds_desk">中式</string>
-    <string name="search_coauch_filter_level_guojiadui">前国家队队员</string>
-    <string name="search_coauch_filter_level_pre_guojiadui">准国家队队员</string>
-    <string name="search_coauch_filter_level_in_guojiadui">在役国家队队员</string>
+    <!--<string name="search_coauch_filter_level_guojiadui">前国家队队员</string>-->
+    <!--<string name="search_coauch_filter_level_pre_guojiadui">准国家队队员</string>-->
+    <!--<string name="search_coauch_filter_level_in_guojiadui">在役国家队队员</string>-->
 
     <!-- 5.球厅子Fragment的title -->
     <string name="search_room_subfragment_title_zone">区域</string>
@@ -213,7 +213,7 @@
     <!-- 以下是以上的字段对应的测试字符串 -->
     <string name="search_room_detailedactivity_price_test">37元</string>
     <string name="search_room_detailedactivity_tag_test">苏州桥</string>
-    <string name="search_room_detailedactivity_address_test">苏州街29号维亚大厦B1楼(苏州街地铁站北侧)</string>
+    <!--<string name="search_room_detailedactivity_address_test">苏州街29号维亚大厦B1楼(苏州街地铁站北侧)</string>-->
     <!-- 需要注意的是以下的是电话号码字段，我们需要做成超链接的形式，即可以调用implicit intent的链接 -->
     <string name="search_room_detailedactivity_phone_test">(010)52712345</string>
 
@@ -222,18 +222,18 @@
     <!-- 这是用于显示在ViewPager下面的一行广告语 -->
     <string name="search_gallery_pager_test_str">暂时还未获取到信息...</string>
     <string name="search_mate_sub_fragment_listitem_user_zone">海淀区</string>
-    <string name="search_mate_sub_fragment_listitem_testname">温柔的雨</string>
-    <string name="search_room_sub_fragment_listitem_roomname">夜时尚台球(沙河镇店)</string>
+    <!--<string name="search_mate_sub_fragment_listitem_testname">温柔的雨</string>-->
+    <!--<string name="search_room_sub_fragment_listitem_roomname">夜时尚台球(沙河镇店)</string>-->
     <string name="search_room_sub_fragment_listitem_roomdistrict">昌平区</string>
-    <string name="search_room_sub_fragment_listitem_roomaddress">昌平区 沙河城铁站(B1口出)南拐再右拐然后向西100米学院国际大厦(Z座1001)</string>
-    <string name="search_room_sub_fragment_listitem_roomdistance">0.77km</string>
-    <string name="search_coauch_sub_fragment_listitem_username">温柔的语</string>
+    <!--<string name="search_room_sub_fragment_listitem_roomaddress">昌平区 沙河城铁站(B1口出)南拐再右拐然后向西100米学院国际大厦(Z座1001)</string>-->
+    <!--<string name="search_room_sub_fragment_listitem_roomdistance">0.77km</string>-->
+    <!--<string name="search_coauch_sub_fragment_listitem_username">温柔的语</string>-->
     <string name="search_coauch_sub_fragment_listitem_userlevel">国家队队员</string>
     <string name="search_coauch_sub_fragment_listitem_userkinds">斯诺克</string>
     <string name="search_coauch_sub_fragment_listitem_userdistan">100米以内</string>
-    <string name="search_dating_sub_fragment_listitem_user_declar">我最喜爱的台球杯开始报名啦</string>
-    <string name="search_dating_detailed_activity_time">12:20</string>
-    <string name="search_dating_detailed_activity_time_1">21:20</string>
+    <!--<string name="search_dating_sub_fragment_listitem_user_declar">我最喜爱的台球杯开始报名啦</string>-->
+    <!--<string name="search_dating_detailed_activity_time">12:20</string>-->
+    <!--<string name="search_dating_detailed_activity_time_1">21:20</string>-->
 
     <!-- 用于球厅Fragment当中的一些字符串 -->
     <string name="search_room_sub_fragment_price_indi">人均 ￥</string>
@@ -297,7 +297,7 @@
     <string name="no_your_published_info">你还没有发布任何<xliff:g id="number" example="15">%1$s</xliff:g>信息</string>
     <string name="http_request_error">网络请求错误</string>
     <string name="http_request_time_out">网络请求超时，请稍后再试</string>
-    <string name="location_request_time_out">请求超时！请检查GPS或者网络是否可用！</string>
+    <string name="location_request_time_out">请求超时，请检查GPS或者网络是否可用</string>
     <string name="no_published_info">网络请求发生错误，未获取发布信息</string>
     <string name="no_store_info">网络请求错误，未获取收藏信息</string>
     <string name="your_favor_is_empty">未获取任何<xliff:g id="number" example="15">%1$s</xliff:g>收藏信息</string>
@@ -479,7 +479,7 @@
     <string name="ball_type_2">斯诺克</string>
     <string name="ball_type_3">九球</string>
     <string name="account_null">请输入账户名称</string>
-    <string name="phone_null">电话不能为空！</string>
+    <string name="phone_null">电话不能为空</string>
     <string name="password_null">请输入6-30位密码</string>
     <string name="please_select_sex">请选择性别</string>
     <string name="inputtype">1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM</string>
@@ -525,8 +525,8 @@
 
 
     <!-- IM -->
-    <string name="im_login_other_device">您的账号在另外一台设备上登录了！</string>
-    <string name="im_user_offline">您的账号掉线了！</string>
+    <string name="im_login_other_device">您的账号在另外一台设备上登录了</string>
+    <string name="im_user_offline">您的账号掉线了</string>
 
     <string name="title_activity_group_detail_reply">GroupDetailReplyActivity</string>
 
@@ -539,6 +539,32 @@
     <string name="no_search_info">未查询到相关<xliff:g id="number" example="15">%1$s</xliff:g></string>
     <string name="of">的</string>
     <string name="info">信息</string>
+    <string name="ask_for_friend"><xliff:g id="number" example="15">%1$s</xliff:g>请求加你为好友</string>
+    <string name="verify_msg">验证消息</string>
+    <string name="new_friend">新的朋友</string>
+    <string name="text_msg">文本消息：</string>
+    <string name="image_msg">图片消息</string>
+    <string name="voice_msg">语音消息</string>
+    <string name="custom_msg">自定义消息</string>
+    <string name="invent_msg">邀请消息</string>
+    <string name="good_friend">好友：</string>
+    <string name="chatbar_room">聊天室：</string>
+    <string name="chatbar_group">群：</string>
+
+    <string name="nearby_no_user">未查找到附近的用户</string>
+    <string name="quering">正在查找附近的人</string>
+    <string name="getting_location">正在确定你的位置</string>
+
+    <string name="low_and_equal">≤<xliff:g id="number" example="15">%1$s</xliff:g>元小时</string>
+    <string name="high_and_equal">≥</string>
+
+    <string name="in_meter"><xliff:g id="number" example="15">%1$s</xliff:g>米以内</string>
+    <string name="zizhi_country_team_member">国家队队员</string>
+    <string name="zizhi_profession_memeber">职业选手</string>
+    <string name="zizhi_coach">球厅教练</string>
+    <string name="no_good_buddy">未查询到该用户</string>
+
+
 
 
 

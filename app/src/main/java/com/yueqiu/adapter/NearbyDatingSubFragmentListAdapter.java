@@ -31,12 +31,12 @@ public class NearbyDatingSubFragmentListAdapter extends BaseAdapter
 
     private LayoutInflater mInflater;
     private ImageLoader mImgLoader;
-
+    private Context mContext;
     public NearbyDatingSubFragmentListAdapter(Context context, ArrayList<NearbyDatingSubFragmentDatingBean> beanList)
     {
-        mImgLoader = VolleySingleton.getInstance().getImgLoader();
-        mInflater = LayoutInflater.from(context);
-
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
+        this.mInflater = LayoutInflater.from(context);
+        this.mContext = context;
         this.mDatingBeanList = beanList;
     }
 
@@ -86,7 +86,7 @@ public class NearbyDatingSubFragmentListAdapter extends BaseAdapter
             viewHolder.mUserPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + bean.getUserPhoto(), mImgLoader);
 
             viewHolder.mUserNickname.setText(bean.getUserName());
-            viewHolder.mUserDistance.setText(bean.getUserDistance());
+            viewHolder.mUserDistance.setText(mContext.getString(R.string.in_meter,bean.getUserDistance()));
             viewHolder.mUserDeclareation.setText(bean.getUserDeclare());
         }
 

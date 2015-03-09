@@ -118,6 +118,27 @@ public class ContactsDaoImpl implements ContactsDao {
     }
 
     @Override
+    public ContactsList.Contacts getContactByName(String userName) {
+        SQLiteDatabase db = mDBUtils.getReadableDatabase();
+        ContactsList.Contacts info = new ContactsList().new Contacts();
+        String sql = "select * from " + DatabaseConstant.FriendsTable.TABLE + " where " + DatabaseConstant.FriendsTable.USERNAME + "=?";
+        Cursor cursor = db.rawQuery(sql, new String[]{userName});
+        if (cursor != null && cursor.getCount() != 0) {
+            cursor.moveToFirst();
+            info.setUser_id(Integer.parseInt(cursor.getString(cursor.getColumnIndex(DatabaseConstant.FriendsTable.USER_ID))));
+            info.setGroup_id(Integer.parseInt(cursor.getString(cursor.getColumnIndex(DatabaseConstant.FriendsTable.GROUP_ID))));
+            info.setUsername(userName);
+            info.setImg_url(cursor.getString(cursor.getColumnIndex(DatabaseConstant.FriendsTable.IMG_URL)));
+            info.setContent(cursor.getString(cursor.getColumnIndex(DatabaseConstant.FriendsTable.LAST_MESSAGE)));
+            info.setCreate_time(cursor.getString(cursor.getColumnIndex(DatabaseConstant.FriendsTable.DATETIME)));
+            cursor.close();
+        }
+
+        db.close();
+        return info;
+    }
+
+    @Override
     public HashMap<Integer, List<ContactsList.Contacts>> getContactList() {
         SQLiteDatabase db = mDBUtils.getReadableDatabase();
         HashMap<Integer, List<ContactsList.Contacts>> contactsMap = new HashMap<Integer, List<ContactsList.Contacts>>();

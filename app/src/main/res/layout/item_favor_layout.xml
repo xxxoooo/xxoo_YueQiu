@@ -23,16 +23,19 @@
         android:id="@+id/favor_title"
         style="@style/ListItemTvStyle"
         android:layout_marginLeft="10dp"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:layout_toRightOf="@+id/favor_item_image"
         android:layout_alignTop="@+id/favor_item_image"
+        android:layout_toLeftOf="@+id/favor_time"
+        android:singleLine="true"
+        android:ellipsize="end"
         />
     <TextView
         android:id="@+id/favor_content"
         android:layout_below="@+id/favor_title"
         android:layout_alignLeft="@+id/favor_title"
         android:ellipsize="end"
-        android:textSize="16sp"
+        android:textSize="14sp"
         style="@style/TimeTextStyle"
         android:singleLine="true"
         android:layout_marginTop="5dp"
@@ -40,6 +43,7 @@
         android:layout_toRightOf="@+id/favor_item_image"
         android:layout_toLeftOf="@+id/favor_time"
         android:layout_marginRight="3dp"
+
         />
     <TextView
         android:id="@+id/favor_time"

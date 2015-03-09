@@ -45,7 +45,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
-                    android:text="@string/search_room_sub_fragment_listitem_roomname"
                     android:layout_centerVertical="true"
                     />
 
@@ -93,7 +92,7 @@
                 android:id="@+id/tv_search_room_per_people_price"
                 style="@style/SearchRoomActivityTvStyle"
                 android:layout_toRightOf="@id/tv_search_room_per_people_price_indi"
-                android:text="@string/search_room_detailedactivity_price_test"/>
+                />
 
             <TextView
                 android:layout_below="@id/tv_search_room_per_people_price_indi"
@@ -106,7 +105,6 @@
             <TextView
                 style="@style/SearchRoomActivityTvStyle"
                 android:id="@+id/tv_search_room_tag"
-                android:text="@string/search_room_detailedactivity_tag_test"
                 android:layout_toRightOf="@id/tv_search_room_tag_indi"
                 android:layout_below="@id/tv_search_room_per_people_price_indi"/>
 
@@ -121,7 +119,6 @@
                 android:layout_below="@id/tv_search_room_tag_indi"
                 style="@style/SearchRoomActivityTvStyle"
                 android:id="@+id/tv_search_room_address"
-                android:text="@string/search_room_detailedactivity_address_test"
                 android:layout_toRightOf="@id/tv_search_room_address_indi"/>
 
             <TextView
@@ -137,7 +134,6 @@
                 android:layout_below="@id/tv_search_room_address"
                 style="@style/SearchRoomActivityTvStyle"
                 android:layout_toRightOf="@id/search_room_phone_indi"
-                android:text="@string/search_room_detailedactivity_phone_test"
                 android:autoLink="phone"
                 />
 

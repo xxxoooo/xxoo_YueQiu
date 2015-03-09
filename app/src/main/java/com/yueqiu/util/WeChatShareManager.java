@@ -142,7 +142,7 @@ public class WeChatShareManager implements IWXAPIEventHandler
         protected abstract String getContent();
         protected abstract String getTitle();
         protected abstract String getURL();
-        protected abstract int getPicRes();
+        protected abstract Bitmap getPicRes();
     }
 
     public class ShareTextContent extends ShareContent
@@ -178,18 +178,18 @@ public class WeChatShareManager implements IWXAPIEventHandler
         }
 
         @Override
-        protected int getPicRes()
+        protected Bitmap getPicRes()
         {
-            return -1;
+            return null;
         }
     }
 
     public class SharePicContent extends ShareContent
     {
-        private final int PIC_RES_ID;
-        public SharePicContent(final int picResId)
+        private Bitmap mSharedBitmap;
+        public SharePicContent(Bitmap bitmap)
         {
-            this.PIC_RES_ID = picResId;
+            this.mSharedBitmap = bitmap;
         }
 
         @Override
@@ -217,9 +217,9 @@ public class WeChatShareManager implements IWXAPIEventHandler
         }
 
         @Override
-        protected int getPicRes()
+        protected Bitmap getPicRes()
         {
-            return PIC_RES_ID;
+            return this.mSharedBitmap;
         }
     }
 
@@ -269,22 +269,26 @@ public class WeChatShareManager implements IWXAPIEventHandler
      */
     private void sharePic(ShareContent shareContent, boolean visibleToTimeLine)
     {
-        final int PIC_RES_ID = shareContent.getPicRes();
+        final Bitmap sharedBitmap = shareContent.getPicRes();
 
-        if (PIC_RES_ID != -1)
+        if (sharedBitmap != null)
         {
             Log.d(TAG, " decoding the bitmap that needs to share to wechat ");
-            Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), PIC_RES_ID);
-            WXImageObject imgObj = new WXImageObject(bitmap);
+
+            WXImageObject imgObj = new WXImageObject(sharedBitmap);
 
             WXMediaMessage msg = new WXMediaMessage();
             msg.mediaObject = imgObj;
 
-            Bitmap thumbBitmap = Bitmap.createScaledBitmap(bitmap,
+            Bitmap thumbBitmap = Bitmap.createScaledBitmap(sharedBitmap,
                     THUMB_SIZE,
                     THUMB_SIZE,
                     true);
-            bitmap.recycle();
+            // TODO: 这里有一个bug，就是我们的Bitmap应该是被回收掉的，但是如果采用sharedBitmap.recycle()
+            // TODO: 的话，就会抛出异常：trying to use a recycled bitmap android.graphics.Bitmap
+            // TODO: 我们在制作用户头像时也遇到这个问题，但是如果不回收的话，时间长了就会造成内容拥挤，
+            // TODO: 这个问题其实挺严重的，我们应该及早着手处理！！！
+//            sharedBitmap.recycle();
             // 设置用于分享的内容的缩略图
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             thumbBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);

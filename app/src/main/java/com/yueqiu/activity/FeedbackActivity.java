@@ -75,7 +75,7 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
     private static final int ALBUM_REQUEST = 2;
     private EditText mEtFeedbackTitle;
     private EmojiconEditText mEtFeedbackContent;
-    private ImageView mEmotionView,mBackupEmotionView;
+//    private ImageView mEmotionView,mBackupEmotionView;
     private TextView mDeletePhoto;
     private LinearLayout mAddImgContainer;
     private RelativeLayout mRootView,mExpressRelative;
@@ -129,11 +129,11 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
                 Log.d(TAG,"keyboard height is ->" + mKeyboardHeight);
                 //TODO:有问题，oldTop最后也有可能大于keyheight
                 if(mExpressionNewTop > mKeyboardHeight && mKeyboardHeight > rect.top){
-                    mBackupEmotionView.setVisibility(View.VISIBLE);
-                    mEmotionView.setVisibility(View.INVISIBLE);
+//                    mBackupEmotionView.setVisibility(View.VISIBLE);
+//                    mEmotionView.setVisibility(View.INVISIBLE);
                 }else{
-                    mBackupEmotionView.setVisibility(View.INVISIBLE);
-                    mEmotionView.setVisibility(View.VISIBLE);
+//                    mBackupEmotionView.setVisibility(View.INVISIBLE);
+//                    mEmotionView.setVisibility(View.VISIBLE);
                 }
 
                 if(mIsKeyboardShow){
@@ -179,8 +179,9 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
     private void initView(){
         mEtFeedbackTitle = (EditText) findViewById(R.id.feed_back_title);
         mEtFeedbackContent = (EmojiconEditText) findViewById(R.id.feed_back_content);
-        mEmotionView = (ImageView) findViewById(R.id.feed_back_emotion);
-        mBackupEmotionView = (ImageView) findViewById(R.id.feed_back_backup_expression);
+//        mEmotionView = (ImageView) findViewById(R.id.feed_back_emotion);
+//        mEmotionView.setVisibility(View.GONE);
+//        mBackupEmotionView = (ImageView) findViewById(R.id.feed_back_backup_expression);
         mAddImgContainer = (LinearLayout) findViewById(R.id.feed_back_add_img_container);
         mAddImg = (IssueImageView) findViewById(R.id.feed_back_add_img);
         mRootView = (RelativeLayout) findViewById(R.id.feedback_root_relative_view);
@@ -197,8 +198,8 @@ public class FeedbackActivity extends FragmentActivity implements View.OnClickLi
         mPreTextView.setText(getString(R.string.feed_backing));
 
         mAddImg.setOnClickListener(this);
-        mEmotionView.setOnClickListener(this);
-        mBackupEmotionView.setOnClickListener(this);
+//        mEmotionView.setOnClickListener(this);
+//        mBackupEmotionView.setOnClickListener(this);
 
         mAddImg.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

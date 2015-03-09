@@ -1,6 +1,7 @@
 package com.yueqiu.fragment.chatbar;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -59,13 +60,15 @@ public class ContactFragment extends Fragment {
     private ExpAdapter mExpAdapter;
     private HashMap<Integer, List<ContactsList.Contacts>> mMaps;
     private Map<String, String> mMapArgument = new HashMap<String, String>();
-//    private ContactsDao mContactsDao;
+    private ContactsDao mContactsDao;
     private List<GotyeChatTarget> mTargets;
+    private FriendsListChanged mListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        mContactsDao = DaoFactory.getContacts(getActivity());
+        mContactsDao = DaoFactory.getContacts(getActivity());
+
     }
 
     @Override
@@ -77,6 +80,16 @@ public class ContactFragment extends Fragment {
         init();
         initData();
         return mBaseView;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (FriendsListChanged) activity;
+        }catch (ClassCastException e){
+            throw new ClassCastException(activity.toString() + " must implement IndexListener");
+        }
     }
 
     private void findView() {
@@ -113,10 +126,11 @@ public class ContactFragment extends Fragment {
         });
     }
 
-    private void initData() {
+    public void initData() {
+        Log.e("ddd", "contact list init data start!!");
         if (!Utils.networkAvaiable(getActivity())) {
             //本地获取联系人列表
-//            mMaps = mContactsDao.getContactList();
+            mMaps = mContactsDao.getContactList();
             mExpAdapter.setData(mMaps);
             mExpAdapter.notifyDataSetChanged();
             Toast.makeText(getActivity(), getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
@@ -190,7 +204,8 @@ public class ContactFragment extends Fragment {
                                         mMapArgument.put(DatabaseConstant.FriendsTable.IMG_URL, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.IMG_URL));
                                         mMapArgument.put(DatabaseConstant.FriendsTable.LAST_MESSAGE, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.LAST_MESSAGE));
                                         mMapArgument.put(DatabaseConstant.FriendsTable.DATETIME, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.DATETIME));
-//                                      mContactsDao.insertContact(mMapArgument);
+                                        mContactsDao.insertContact(mMapArgument);
+                                        mContactsDao.updateContact(mMapArgument);
                                         ContactsList.Contacts contacts = contactsList.new Contacts();
                                         contacts.setUser_id(list_data.getJSONObject(j).getInt("user_id"));
                                         contacts.setGroup_id(list_data.getJSONObject(j).getInt("group_id"));
@@ -242,6 +257,7 @@ public class ContactFragment extends Fragment {
                     mMaps = (HashMap<Integer, List<ContactsList.Contacts>>) msg.obj;
                     mExpAdapter.setData(mMaps);
                     mExpAdapter.notifyDataSetChanged();
+                    mListener.onFriendsListChanged();
                     break;
                 case PublicConstant.TIME_OUT:
                     Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
@@ -262,4 +278,8 @@ public class ContactFragment extends Fragment {
 
         }
     };
+
+    public interface FriendsListChanged {
+        public void onFriendsListChanged();
+    }
 }

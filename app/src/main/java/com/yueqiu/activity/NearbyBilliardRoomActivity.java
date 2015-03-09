@@ -96,11 +96,15 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
 
     private IWeiboShareAPI mWeiboShareApi = null;
 
+    private View mRootView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_billiard_room);
+
+        mRootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
         mRoomPhoto = (NetworkImageView) findViewById(R.id.img_search_room_detailed_photo);
         mRoomName = (TextView) findViewById(R.id.tv_search_room_detailed_name);
@@ -324,7 +328,7 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
                 // 我们需要传入Intent来进行微信分享请求的结果监听
                 // 我们可以在这个Intent当中传递我们需要的分享的具体数据
                 // 我们目前需要分享包括基本的球厅的信息，球厅图片(Bitmap),球厅活动说明
-                Dialog dlg = Utils.showSheet(this, getIntent());
+                Dialog dlg = Utils.showSheet(this, Utils.getCurrentScreenShot(mRootView));
                 dlg.show();
                 // TODO: 以下是测试代码，我们暂时将所有的涉及到分享的代码移动到当前的Activity当中，因为关于分享的部分会涉及到一些关于
                 // TODO: Activity生命周期的控制方法

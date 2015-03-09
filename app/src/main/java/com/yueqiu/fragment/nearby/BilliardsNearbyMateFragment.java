@@ -22,12 +22,15 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +40,7 @@ import com.amap.api.location.LocationManagerProxy;
 import com.amap.api.location.LocationProviderProxy;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
+import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyMateSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyDatingDetailedAlreadyBean;
 import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
@@ -46,6 +50,7 @@ import com.yueqiu.dao.daoimpl.NearbyMateDaoImpl;
 import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
+import com.yueqiu.fragment.nearby.common.NearbySubFragmentConstants;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
@@ -81,7 +86,6 @@ public class BilliardsNearbyMateFragment extends Fragment
 {
     private static final String TAG = "DeskBallFragment";
     private static final String TAG_2 = "data_retrieve_debug";
-    public static final String BILLIARD_SEARCH_TAB_NAME = "billiard_search_tab_name";
     private View mView;
     private String mArgs;
     private Context mContext;
@@ -177,6 +181,7 @@ public class BilliardsNearbyMateFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
     {
         mView = inflater.inflate(R.layout.fragment_nearby_mate_layout, container, false);
+        setHasOptionsMenu(true);
         // then, inflate the image view pager
         NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
         commonUtils.initViewPager(mContext, mView);
@@ -199,7 +204,7 @@ public class BilliardsNearbyMateFragment extends Fragment
         mPopupwindowCallback = mClickListener;
 
         Bundle args = getArguments();
-        mArgs = args.getString(BILLIARD_SEARCH_TAB_NAME);
+        mArgs = args.getString(NearbySubFragmentConstants.BILLIARD_SEARCH_TAB_NAME);
 
         // TODO: 以下加载是测试数据，暂时不能删除(因为现在的数据不完整，我们还需要这些测试数据来查看数据加载完整的具体的具体的UI效果)
 //        initListViewDataSrc();
@@ -716,6 +721,7 @@ public class BilliardsNearbyMateFragment extends Fragment
                     }
                     mRequestFlag = msg.arg1;
                     mArgs = (String) msg.obj;
+                    Log.d(TAG_2, " start retrieving all mate data, the request flags are : " + mRequestFlag + ", the args : " + mArgs);
 //                    getActivity().startService(new Intent(getActivity(), LocationUtil.class));
                     getLocation();
                     break;
@@ -1090,7 +1096,7 @@ public class BilliardsNearbyMateFragment extends Fragment
      * 初始化定位,用高德SDK获取经纬度，准确率貌似更高点，
      * 之后可能会加功能，会用到高德的SDK
      */
-    private void getLocation() {
+    public void getLocation() {
 
         mLocationManagerProxy = LocationManagerProxy.getInstance(getActivity());
 
@@ -1146,6 +1152,41 @@ public class BilliardsNearbyMateFragment extends Fragment
         mLocationManagerProxy.setGpsEnable(false);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        super.onCreateOptionsMenu(menu, inflater);
+        super.onCreateOptionsMenu(menu, inflater);
+        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
+                if(Utils.networkAvaiable(mContext))
+                {
+                    Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_NEARBY_MATE);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    intent.putExtras(args);
+                    startActivity(intent);
+
+
+                }else{
+                    Utils.showToast(mContext,getString(R.string.network_not_available));
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+    }
+
+
+
     /**
      * 由于服务器是按降序排序，但是从网络获取到的json却是升序，所以重新排序一下
      */
@@ -1158,6 +1199,8 @@ public class BilliardsNearbyMateFragment extends Fragment
             return lhsUserId > rhsUserId ? -1 : 1;
         }
     }
+
+
 
 }
 

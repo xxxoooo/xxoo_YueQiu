@@ -158,7 +158,8 @@ public class UserDaoImpl implements UserDao{
             info.setNew_img(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.NEW_IMG)));
             info.setLogin_time(cursor.getString(cursor.getColumnIndex(DatabaseConstant.UserTable.LOGIN_TIME)));
             info.setCost(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.COST)));
-            info.setMy_type(Integer.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.MY_TYPE))));
+            String str = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.MY_TYPE));
+            info.setMy_type(Integer.valueOf(str.equals("") ? "-1": str));
             info.setWork_live(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.WORK_LIVE)));
         }
         cursor.close();

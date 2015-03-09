@@ -119,7 +119,7 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
     private String mImgFilePath;
     private int mTimeFlag;
     private TextView mEtActivityType,mUploadFailedTv;
-    private ImageView  mIvExpression;
+//    private ImageView  mIvExpression;
     private IssueImageView mIvAddImg;
 //    private GridView mGridView;
     private LinearLayout mAddImgContainer;
@@ -322,7 +322,8 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
 
         mEtActivityType = (TextView) findViewById(R.id.activitie_title_edit_type);
         mIvAddImg = (IssueImageView) findViewById(R.id.activitiy_issues_iv_add_img);
-        mIvExpression = (ImageView) findViewById(R.id.activity_issues_expression);
+//        mIvExpression = (ImageView) findViewById(R.id.activity_issues_expression);
+//        mIvExpression.setVisibility(View.GONE);
 
         mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
         mProgressDrawable = new FoldingCirclesDrawable.Builder(this).build();
@@ -351,7 +352,7 @@ public class PlayIssueActivity extends FragmentActivity implements View.OnClickL
         mEndTimeTv.setOnClickListener(this);
         mChargeModuleTv.setOnClickListener(this);
         mEtActivityType.setOnClickListener(this);
-        mIvExpression.setOnClickListener(this);
+//        mIvExpression.setOnClickListener(this);
         mIvAddImg.setOnClickListener(this);
 
         mIvAddImg.setOnLongClickListener(new View.OnLongClickListener() {

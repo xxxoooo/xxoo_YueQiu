@@ -47,9 +47,7 @@ public class ImageCache {
 	
 	
 	public void setIcom(ImageView iconView,String path,String urlForDownload){
-        Log.e("ddd", "ImageCache setIcon>>> path = " + path + "  urlForDownload = " + urlForDownload);
 		 Bitmap bmp=ImageCache.getInstance().get(path);
-        Log.e("ddd", "setIcon: bmp = " + bmp);
    	  if(bmp!=null){
    		  iconView.setImageBitmap(bmp);
    	  }else{
@@ -60,7 +58,6 @@ public class ImageCache {
    		  }else{
    			  iconView.setImageResource(R.drawable.default_head);
    			  int code = GotyeAPI.getInstance().downloadMedia(urlForDownload);
-              Log.e("ddd", "ImageCache setIcon>>> code = " + code);
    		  }
    	  }
    	

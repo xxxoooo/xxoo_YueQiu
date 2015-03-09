@@ -245,10 +245,9 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onModifyUserInfo(int code, GotyeUser user) {
-        Log.e("ddd","onModifyUserInfo callback");
         if (code == 0) {
             Log.e("ddd", "Im 用户头像修改成功！！");
-            Utils.showToast(getActivity(), "Im 用户头像修改成功！！");
+//            Utils.showToast(getActivity(), "Im 用户头像修改成功！！");
         } else {
         }
     }
@@ -290,7 +289,6 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onGetProfile(int code, GotyeUser user) {
-        Log.e("ddd", "PhotoSetupFragment onGetProfile callback>>> code = " + code + " user = " + user);
     }
 
     private class DefaultImageFragment extends DialogFragment {
@@ -409,7 +407,6 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
         } else if (view instanceof IssueImageView) {
             final BitmapBean bean = ((IssueImageView) view).getBitmapBean();
             final String imgFilePath = bean.imgFilePath;
-            Log.e("ddd", "imgFilePath = " + imgFilePath);
             Uri imgUri = bean.imgUri;
 //            if(imgFilePath != null){
 //                mUploadBitmap = ImgUtil.getOriginBitmapByPath(mActivity,imgFilePath);
@@ -626,13 +623,8 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
     private void modifyUserIcon(String smallImagePath) {
         mGotyeUser.setInfo("too young, too simple, too naive");// 修改扩展信息
         mGotyeUser.setNickname(mGotyeUser.name);
-        Log.e("ddd", "icon = " + mGotyeUser.getIcon());
         mGotyeUser.setIcon(mGotyeUser.getIcon());
-        Log.e("ddd", "name = " + mGotyeUser.name + "  info = " + mGotyeUser.getInfo() + " gender = " + mGotyeUser.getGender());
-        Log.e("ddd", "smallImagePath = " + smallImagePath);
-        Log.e("ddd", "mGotyeUser = " + mGotyeUser);
         int result = api.modifyUserInfo(mGotyeUser, smallImagePath);
-        Log.e("ddd", "IM upload result = " + result);
     }
 
 
@@ -645,7 +637,6 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                     //update im user photo
                     setIMUserPhoto(mUpdataToImPhotoPath);
                     String img_url = (String) msg.obj;
-                    Log.e("ddd", "img_url = " + img_url);
                     mEditor.putString(DatabaseConstant.UserTable.IMG_URL, img_url);
                     mEditor.apply();
 

@@ -128,7 +128,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
                     android:layout_marginLeft="10dp"
-                    android:id="@+id/group_issue_express" />
+                    android:id="@+id/group_issue_express"
+                    android:visibility="gone"/>
             </RelativeLayout>
         </LinearLayout>
         <LinearLayout

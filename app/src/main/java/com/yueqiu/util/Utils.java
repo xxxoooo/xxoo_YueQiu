@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -409,18 +410,19 @@ public class Utils
         return sdp.format(new Date());
     }
 
-    public static Dialog showSheet(Context context)
+    public static Dialog showSheet(Context context, Bitmap bitmap)
     {
-        return showSheet(context, null);
+        return showSheet(context, null, bitmap);
     }
 
     /**
      * 弹出底部对话框,并初始化所有view
      *
      * @param context 这个参数一定要是一个完整的Activity实例，因为我们需要通过这个context实例来启动微博分享的Activity
+     * @param bitmap 这是我们要分享的Bitmap,Bitmap的具体内容就是当前屏幕的截图
      * @return
      */
-    public static Dialog showSheet(final Context context, Intent intent)
+    public static Dialog showSheet(final Context context, Intent intent, final Bitmap bitmap)
     {
         // 创建用于实现微信分享的实例
         final WeChatShareManager weChatShareManager = WeChatShareManager.getInstance(context, intent);
@@ -533,7 +535,7 @@ public class Utils
 //                            weChatShareManager.shareByWeChat(
 //                                    weChatShareManager.new ShareTextContent(context.getString(R.string.renren_share_content)),
 //                                    true);
-                            weChatShareManager.shareByWeChat(weChatShareManager.new SharePicContent(R.drawable.ic_launcher),
+                            weChatShareManager.shareByWeChat(weChatShareManager.new SharePicContent(bitmap),
                                     true);
                         }
                         break;
@@ -541,7 +543,7 @@ public class Utils
                         // 分享到微信的指定好友那里
                         if (null != weChatShareManager) {
                             weChatShareManager.shareByWeChat(
-                                    weChatShareManager.new ShareTextContent(context.getString(R.string.renren_share_content)),
+                                    weChatShareManager.new SharePicContent(bitmap),
                                     false);
                         }
                         break;
@@ -584,7 +586,8 @@ public class Utils
                                         String token = response.getString(Constants.PARAM_ACCESS_TOKEN);
                                         String expires = response.getString(Constants.PARAM_EXPIRES_IN);
                                         String openId = response.getString(Constants.PARAM_OPEN_ID);
-                                        if (!TextUtils.isEmpty(token) && !TextUtils.isEmpty(expires) && !TextUtils.isEmpty(openId)) {
+                                        if (!TextUtils.isEmpty(token) && !TextUtils.isEmpty(expires) && !TextUtils.isEmpty(openId))
+                                        {
                                             tencent.setAccessToken(token, expires);
                                             tencent.setOpenId(openId);
                                         }
@@ -592,7 +595,8 @@ public class Utils
                                         final String sharedContent = context.getString(R.string.renren_share_content);
                                         weibo.sendText(sharedContent, tencentWeiboListener);
 
-                                    } catch (JSONException e) {
+                                    } catch (JSONException e)
+                                    {
                                         e.printStackTrace();
                                     }
                                 }
@@ -611,15 +615,18 @@ public class Utils
 
                         break;
                     case R.id.img_search_dating_detail_share_sinaweibo:
-                        ((Activity) context).startActivity(new Intent((Activity) context, WeiboShareActionCompleteActivity.class));
+                        Intent sinaIntent = new Intent(context, WeiboShareActionCompleteActivity.class);
+                        sinaIntent.putExtra(PublicConstant.SHARE_TO_SINA_BITMAP, bitmap);
+                        context.startActivity(sinaIntent);
                         break;
                     case R.id.img_search_dating_detail_share_renren:
                         if (null != renRenShareManager && renRenShareManager.isRenrenClientInstalled())
                         {
+
                             // 以下我们采用分享的是测试图片
-                            Bitmap sharedBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+//                            Bitmap sharedBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
                             Log.d("renren_share", "Share to renren site ");
-                            renRenShareManager.shareToRenren(context.getString(R.string.renren_share_content), sharedBitmap);
+                            renRenShareManager.shareToRenren(context.getString(R.string.renren_share_content), bitmap);
                         } else
                         {
                             // 人人客户端在没有安装时是无法支持正常分享的
@@ -802,5 +809,23 @@ public class Utils
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * 截取当前屏幕截图
+     *
+     * @param view 我们要截取的屏幕的RootView的ViewGroup
+     * @return 返回当前屏幕的截图
+     */
+    public static Bitmap getCurrentScreenShot(View view)
+    {
+        Bitmap bitmap = Bitmap.createBitmap(
+                view.getWidth(),
+                view.getHeight(),
+                Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+
+        return bitmap;
     }
 }

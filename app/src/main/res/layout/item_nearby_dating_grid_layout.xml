@@ -18,7 +18,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="12sp"
-        android:text="@string/search_coauch_sub_fragment_listitem_username"
         android:textColor="@color/md__defaultBackground"
         android:layout_below="@id/img_grid_search_dating_detailed_userphoto"
         android:layout_centerHorizontal="true"

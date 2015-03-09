@@ -20,19 +20,21 @@
     <TextView
         style="@style/ListItemTvStyle"
         android:id="@+id/tv_coauch_subfragment_listitem_name"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:layout_toRightOf="@id/img_coauch_subfragment_listitem_photo"
         android:layout_alignTop="@+id/img_coauch_subfragment_listitem_photo"
-        android:text="@string/search_coauch_sub_fragment_listitem_username"
         android:textColor="@color/md__defaultBackground"
         android:layout_marginLeft="15dp"
+        android:layout_toLeftOf="@+id/tv_coauch_subfragment_listitem_distance"
+        android:singleLine="true"
+        android:ellipsize="end"
         />
 
     <TextView
         style="@style/TimeTextStyle"
         android:id="@+id/tv_coauch_subfragment_listitem_gender"
         android:text="@string/gender"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:drawableRight="@drawable/male"
         android:drawablePadding="3dp"
         android:paddingLeft="4dp"
@@ -51,7 +53,7 @@
         android:background="@drawable/textview_withdrawable_bg"
         android:layout_toRightOf="@id/tv_coauch_subfragment_listitem_gender"
         android:layout_alignBottom="@id/tv_coauch_subfragment_listitem_gender"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:paddingLeft="4dp"
         android:padding="4dp"
         android:layout_marginLeft="4dp"
@@ -63,13 +65,25 @@
         android:text="@string/search_coauch_sub_fragment_listitem_userkinds"
         android:layout_toRightOf="@id/tv_coauch_subfragment_listitem_level"
         android:layout_alignBottom="@id/tv_coauch_subfragment_listitem_level"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:paddingLeft="4dp"
         android:padding="4dp"
         android:layout_marginLeft="4dp"
         android:background="@drawable/textview_withdrawable_bg"
         />
-
+    <TextView
+        style="@style/TimeTextStyle"
+        android:id="@+id/tv_coauch_subfragment_listitem_district"
+        android:text="@string/search_coauch_sub_fragment_listitem_userkinds"
+        android:layout_toRightOf="@id/tv_coauch_subfragment_listitem_kinds"
+        android:layout_alignBottom="@id/tv_coauch_subfragment_listitem_kinds"
+        android:textSize="14sp"
+        android:paddingLeft="4dp"
+        android:padding="4dp"
+        android:layout_marginLeft="4dp"
+        android:background="@drawable/textview_withdrawable_bg"
+        android:visibility="gone"
+        />
     <TextView
         style="@style/TimeTextStyle"
         android:text="@string/search_coauch_sub_fragment_listitem_userdistan"
