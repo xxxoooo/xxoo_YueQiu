@@ -184,11 +184,11 @@ public class MessageListAdapter extends BaseAdapter {
 	private void setIcon(ImageView imgView, GotyeChatTarget target) {
 		if (target.type == GotyeChatTargetType.GotyeChatTargetTypeUser) {
 			GotyeUser user = api.requestUserInfo(target.name, true);
-            Log.e("ddd", "user = " + user);
+            Log.e("ddd", "MessageListAdapter setIcon user = " + user);
 			if (user == null) {
 				return;
 			} else if (user.getIcon() != null) {
-                Log.e("ddd", " image url = " + user.getIcon().getUrl() + "   image path" + user.getIcon().getPath());
+                Log.e("ddd", "MessageListAdapter setIcon image url = " + user.getIcon().getUrl() + "   image path" + user.getIcon().getPath());
 				ImageCache.getInstance().setIcom(imgView,
 						user.getIcon().getPath(), user.getIcon().getUrl());
 			}

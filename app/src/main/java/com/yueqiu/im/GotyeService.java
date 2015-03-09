@@ -18,13 +18,16 @@ import com.gotye.api.GotyeNotify;
 import com.gotye.api.GotyeStatusCode;
 import com.gotye.api.GotyeUser;
 import com.gotye.api.listener.NotifyListener;
+import com.gotye.api.listener.UserListener;
 import com.yueqiu.ChatBarActivity;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.util.AppUtil;
 
+import java.util.List;
 
-public class GotyeService extends Service implements NotifyListener {
+
+public class GotyeService extends Service implements NotifyListener, UserListener {
     private static final String TAG = "GotyeService";
     public static final String ACTION_INIT = "gotye.action.init";
 
@@ -139,8 +142,48 @@ public class GotyeService extends Service implements NotifyListener {
     }
 
     @Override
+    public void onRemoveBlocked(int code, GotyeUser user) {
+
+    }
+
+    @Override
+    public void onGetBlockedList(int code, List<GotyeUser> mList) {
+
+    }
+
+    @Override
+    public void onGetProfile(int code, GotyeUser user) {
+        Log.e("ddd", "im service onGetProfile callback");
+    }
+
+    @Override
+    public void onRequestUserInfo(int code, GotyeUser user) {
+
+    }
+
+    @Override
+    public void onModifyUserInfo(int code, GotyeUser user) {
+        Log.e("ddd", "im service onModifyUserInfo callback");
+    }
+
+    @Override
+    public void onSearchUserList(int code, List<GotyeUser> mList, int pagerIndex) {
+
+    }
+
+    @Override
     public void onAddFriend(int code, GotyeUser user) {
         // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onGetFriendList(int code, List<GotyeUser> mList) {
+
+    }
+
+    @Override
+    public void onAddBlocked(int code, GotyeUser user) {
 
     }
 

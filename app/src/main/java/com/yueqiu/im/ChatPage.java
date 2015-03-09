@@ -714,7 +714,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onDownloadMessage(int code, GotyeMessage message) {
-        Log.d("ddd", "Chatpage onDownloadMessage>>>> code= " + code + " message = " + message);
+        Log.d("ddd", "Chatpage onDownloadMessage callback>>>> code= " + code + " message = " + message);
         adapter.downloadDone(message);
     }
 

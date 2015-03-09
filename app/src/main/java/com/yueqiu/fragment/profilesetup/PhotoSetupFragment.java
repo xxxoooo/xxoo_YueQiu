@@ -108,6 +108,7 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
     private List<IssueImageView> mAddViewList = new ArrayList<IssueImageView>();
     private GotyeAPI api;
     private GotyeUser mGotyeUser;
+    private String mUpdataToImPhotoPath;
 
     @Override
     public void onAttach(Activity activity) {
@@ -462,12 +463,13 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                                         if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
                                             if (response.getString("result") != null) {
                                                 //TODO:upload IM service
-                                                new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        setIMUserPhoto(imgFilePath);
-                                                    }
-                                                }).start();
+                                                mUpdataToImPhotoPath = imgFilePath;
+//                                                new Thread(new Runnable() {
+//                                                    @Override
+//                                                    public void run() {
+//                                                        setIMUserPhoto(imgFilePath);
+//                                                    }
+//                                                }).start();
                                                 mHandler.obtainMessage(PublicConstant.GET_SUCCESS).sendToTarget();
                                             } else {
                                                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
@@ -561,12 +563,13 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                                             if (response.getJSONObject("result") != null) {
                                                 String img_url = response.getJSONObject("result").getString("s_img_url");
                                                 //TODO:上传IM服务器
-                                                new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        setIMUserPhoto(filePath);
-                                                    }
-                                                }).start();
+                                                mUpdataToImPhotoPath = filePath;
+//                                                new Thread(new Runnable() {
+//                                                    @Override
+//                                                    public void run() {
+//                                                        setIMUserPhoto(filePath);
+//                                                    }
+//                                                }).start();
                                                 mHandler.obtainMessage(PublicConstant.GET_SUCCESS, img_url).sendToTarget();
                                             } else {
                                                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
@@ -639,6 +642,8 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
             super.handleMessage(msg);
             switch (msg.what) {
                 case PublicConstant.GET_SUCCESS:
+                    //update im user photo
+                    setIMUserPhoto(mUpdataToImPhotoPath);
                     String img_url = (String) msg.obj;
                     Log.e("ddd", "img_url = " + img_url);
                     mEditor.putString(DatabaseConstant.UserTable.IMG_URL, img_url);

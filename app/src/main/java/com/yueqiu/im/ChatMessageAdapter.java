@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -201,6 +202,7 @@ public class ChatMessageAdapter extends BaseAdapter {
                 timestamp.setVisibility(View.GONE);
             }
         }
+        Log.e("ddd", "ChatMessageAdapter message.getSender().name = " + message.getSender().name);
         setIcon(holder.head_iv, message.getSender().name);
         return convertView;
     }
@@ -315,10 +317,12 @@ public class ChatMessageAdapter extends BaseAdapter {
 
     private void setIcon(ImageView iconView, String name) {
         Bitmap bmp = cache.get(name);
+        Log.e("ddd", "ChatMessageAdapter setIcon: bmp = " + bmp);
         if (bmp != null) {
             iconView.setImageBitmap(bmp);
         } else {
             GotyeUser user = api.requestUserInfo(name, false);
+            Log.e("ddd", "ChatMessageAdapter setIcon: user = " + user);
             if (user != null && user.getIcon() != null) {
                 bmp = cache.get(user.getIcon().path);
                 if (bmp != null) {
@@ -331,6 +335,8 @@ public class ChatMessageAdapter extends BaseAdapter {
                         cache.put(name, bmp);
                     } else {
                         iconView.setImageResource(R.drawable.default_head);
+                        int code = api.downloadMedia(user.getIcon().url);
+                        Log.e("ddd", "ChatMessageAdapter setIcon: code = " + code);
                     }
                 }
             } else {
