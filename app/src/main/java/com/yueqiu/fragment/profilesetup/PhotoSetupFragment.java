@@ -169,9 +169,9 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         api = GotyeAPI.getInstance();
-        api.addListerer(this);
+        api.addListener(this);
         mGotyeUser = api.getCurrentLoginUser();
-        api.requestUserInfo(mGotyeUser.name, true);
+        api.requestUserInfo(mGotyeUser.getName(), true);
 
     }
 
@@ -622,9 +622,9 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
 
     private void modifyUserIcon(String smallImagePath) {
         mGotyeUser.setInfo("too young, too simple, too naive");// 修改扩展信息
-        mGotyeUser.setNickname(mGotyeUser.name);
+        mGotyeUser.setNickname(mGotyeUser.getName());
         mGotyeUser.setIcon(mGotyeUser.getIcon());
-        int result = api.modifyUserInfo(mGotyeUser, smallImagePath);
+        int result = api.requestModifyUserInfo(mGotyeUser, smallImagePath);
     }
 
 

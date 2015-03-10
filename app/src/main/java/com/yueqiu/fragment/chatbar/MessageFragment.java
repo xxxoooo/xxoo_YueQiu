@@ -20,8 +20,6 @@ import android.widget.ListView;
 import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeChatTarget;
 import com.gotye.api.GotyeChatTargetType;
-import com.gotye.api.GotyeGroup;
-import com.gotye.api.GotyeRoom;
 import com.gotye.api.GotyeUser;
 import com.gotye.api.listener.DownloadListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -43,7 +41,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -58,11 +55,12 @@ public class MessageFragment extends Fragment implements DownloadListener{
     private ActionBar mActionBar;
     public static final String FRIEND_USER_ID = "com.yueqiu.fragment.chatbar.MessageFragment.friend_user_id";
     public static final String FRIEND_USER_NAME = "com.yueqiu.fragment.chatbar.MessageFragment.friend_user_name";
-    public static final String fixName = "通知列表";//验证消息
+    public static final String fixName = "验证消息";//验证消息
     private GotyeAPI mApi = GotyeAPI.getInstance();
     public MessageListAdapter mAdapter;
     private GotyeChatTarget mTarget;
     private Intent mBroadcastIntent;
+    private MessageListAdapter.Verification mVerification;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +83,7 @@ public class MessageFragment extends Fragment implements DownloadListener{
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mApi.addListerer(this);
+        mApi.addListener(this);
         updateList();
         setListener();
 
@@ -93,12 +91,10 @@ public class MessageFragment extends Fragment implements DownloadListener{
 
     private void updateList() {
         List<GotyeChatTarget> sessions = mApi.getSessionList();
+
         Log.d("offLine", "List--sessions" + sessions);
 
-        mTarget = new GotyeChatTarget();
-        mTarget.name = fixName;
-        mTarget.title = getString(R.string.new_friend);
-
+        mTarget = new GotyeUser(fixName);
         if (sessions == null) {
             sessions = new ArrayList<GotyeChatTarget>();
             sessions.add(mTarget);
@@ -106,7 +102,8 @@ public class MessageFragment extends Fragment implements DownloadListener{
             sessions.add(0, mTarget);
         }
         if (mAdapter == null) {
-            mAdapter = new MessageListAdapter(MessageFragment.this, sessions);
+            mVerification = new MessageListAdapter().new Verification();
+            mAdapter = new MessageListAdapter(MessageFragment.this, sessions, mVerification);
             mListView.setAdapter(mAdapter);
         } else {
             mAdapter.setData(sessions);
@@ -131,16 +128,16 @@ public class MessageFragment extends Fragment implements DownloadListener{
                                     long arg3) {
                 GotyeChatTarget target =  mAdapter.getItem(arg2);
                 //TODO:fixName = "通知列表"
-                if (target.name.equals(fixName)) {
+                if (target.getName().equals(fixName)) {
                     Intent i = new Intent(getActivity(), FriendsApplicationActivity.class);
                     startActivity(i);
                 } else {
                     /**
                      * 下面这句是用来标记消息为已读的
                      */
-                    GotyeAPI.getInstance().markMeeagesAsread(target);
+                    GotyeAPI.getInstance().markMessagesAsRead(target);
                     //单人聊天
-                    if (target.type == GotyeChatTargetType.GotyeChatTargetTypeUser) {
+                    if (target.getType() == GotyeChatTargetType.GotyeChatTargetTypeUser) {
                         Log.e(TAG, "------------p2p chat-------------");
                         Intent toChat = new Intent(getActivity(),ChatPage.class);
                         toChat.putExtra("user",  target);
@@ -148,12 +145,12 @@ public class MessageFragment extends Fragment implements DownloadListener{
                         // updateList();
                     }
                     //聊天室聊天
-                    else if (target.type == GotyeChatTargetType.GotyeChatTargetTypeRoom) {
+                    else if (target.getType() == GotyeChatTargetType.GotyeChatTargetTypeRoom) {
                         Intent toChat = new Intent(getActivity(),ChatPage.class);
                         toChat.putExtra("room",  target);
                         startActivity(toChat);
                         //群组聊天
-                    } else if (target.type == GotyeChatTargetType.GotyeChatTargetTypeGroup) {
+                    } else if (target.getType() == GotyeChatTargetType.GotyeChatTargetTypeGroup) {
                         Intent toChat = new Intent(getActivity(),ChatPage.class);
                         toChat.putExtra("group",  target);
                         startActivity(toChat);
@@ -196,7 +193,7 @@ public class MessageFragment extends Fragment implements DownloadListener{
                 if (position == 0)
                     return false;
                 GotyeChatTarget target = mAdapter.getItem(position);
-                mApi.deleteSession(target);
+                mApi.deleteSession(target, false);
                 updateList();
                 return true;
             default:
@@ -206,8 +203,6 @@ public class MessageFragment extends Fragment implements DownloadListener{
     }
 
     private void getFriendApplication() {
-
-
         Map<String, String> requestMap = new HashMap<String, String>();
         requestMap.put(HttpConstants.GetAsk.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
 
@@ -240,9 +235,9 @@ public class MessageFragment extends Fragment implements DownloadListener{
                                     application.setCreate_time(create_time);
                                     application.setImg_url(img_url);
 
-                                    mTarget.hasNewMsg = true;
-                                    mTarget.newFriend = application;
-                                    mTarget.title = getString(R.string.verify_msg);
+                                    mVerification.hasNewMsg = true;
+                                    mVerification.newFriend = application;
+                                    mVerification.title = getString(R.string.verify_msg);
                                     mAdapter.notifyDataSetChanged();
                                     mBroadcastIntent.setAction(PublicConstant.CHAT_HAS_NEW_MSG);
                                     getActivity().sendBroadcast(mBroadcastIntent);

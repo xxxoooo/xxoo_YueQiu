@@ -204,8 +204,8 @@ public class ContactFragment extends Fragment {
                                         mMapArgument.put(DatabaseConstant.FriendsTable.IMG_URL, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.IMG_URL));
                                         mMapArgument.put(DatabaseConstant.FriendsTable.LAST_MESSAGE, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.LAST_MESSAGE));
                                         mMapArgument.put(DatabaseConstant.FriendsTable.DATETIME, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.DATETIME));
-                                        mContactsDao.insertContact(mMapArgument);
-                                        mContactsDao.updateContact(mMapArgument);
+//                                        mContactsDao.insertContact(mMapArgument);
+//                                        mContactsDao.updateContact(mMapArgument);
                                         ContactsList.Contacts contacts = contactsList.new Contacts();
                                         contacts.setUser_id(list_data.getJSONObject(j).getInt("user_id"));
                                         contacts.setGroup_id(list_data.getJSONObject(j).getInt("group_id"));

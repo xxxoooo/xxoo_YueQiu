@@ -1,14 +1,11 @@
 package com.yueqiu;
 
 import android.app.Application;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.TaskStackBuilder;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.gotye.api.GotyeAPI;
@@ -135,7 +132,7 @@ public class YueQiuApp extends Application implements LoginListener {
         //异常拦截记录
         CrashApplication.getInstance(this).onCreate();
         //初始化
-        GotyeAPI.getInstance().init(getApplicationContext(), APPKEY, PACKAGENAME);
+        GotyeAPI.getInstance().init(getApplicationContext(), APPKEY);
 
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
 
@@ -194,7 +191,7 @@ public class YueQiuApp extends Application implements LoginListener {
             }
 //            registerListener();
             Toast.makeText(this, getString(R.string.im_login_other_device), Toast.LENGTH_SHORT).show();
-        } else if (code == GotyeStatusCode.CODE_NETWORD_DISCONNECTED) {
+        } else if (code == GotyeStatusCode.CODE_NETWORK_DISCONNECTED) {
             Toast.makeText(this, getString(R.string.im_user_offline), Toast.LENGTH_SHORT).show();
         }
     }
@@ -209,8 +206,13 @@ public class YueQiuApp extends Application implements LoginListener {
     public void onLogin(int code, GotyeUser currentLoginUser) {
     }
 
+    @Override
+    public void onReconnecting(int i, GotyeUser gotyeUser) {
+
+    }
+
     public void registerListener() {
-        GotyeAPI.getInstance().addListerer(this);
+        GotyeAPI.getInstance().addListener(this);
     }
 
 }

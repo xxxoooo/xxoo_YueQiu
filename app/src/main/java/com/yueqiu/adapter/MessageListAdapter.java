@@ -23,7 +23,6 @@ import com.gotye.api.GotyeUser;
 import com.yueqiu.R;
 import com.yueqiu.bean.FriendsApplication;
 import com.yueqiu.constant.HttpConstants;
-import com.yueqiu.dao.ContactsDao;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.fragment.chatbar.MessageFragment;
 import com.yueqiu.util.ImageCache;
@@ -38,13 +37,17 @@ public class MessageListAdapter extends BaseAdapter {
 	private GotyeAPI api;
     private String mContent;
     private ImageLoader mImageLoader;
+    private Verification mVerification;
 
-	public MessageListAdapter(MessageFragment mMessageFragment,List<GotyeChatTarget> sessions) {
+	public MessageListAdapter(MessageFragment mMessageFragment,List<GotyeChatTarget> sessions,
+                              Verification verification) {
 		this.mMessageFragment = mMessageFragment;
 		this.sessions = sessions;
 		this.api = GotyeAPI.getInstance();
         mImageLoader = VolleySingleton.getInstance().getImgLoader();
+        mVerification = verification;
 	}
+    public MessageListAdapter(){}
 
     static class ViewHolder {
 		ImageView state_icon;
@@ -61,7 +64,7 @@ public class MessageListAdapter extends BaseAdapter {
 	@Override
 	public GotyeChatTarget getItem(int arg0) {
 		// TODO Auto-generated method stub
-		return sessions.get(arg0);
+		return sessions.get(arg0 );
 	}
 
 	@Override
@@ -80,7 +83,7 @@ public class MessageListAdapter extends BaseAdapter {
 	public int getItemViewType(int position) {
 		// TODO Auto-generated method stub
 		GotyeChatTarget t = sessions.get(position);
-		if (t.name.equals(MessageFragment.fixName)) {
+		if (t.getName().equals(MessageFragment.fixName)) {
 			return 0;
 		} else {
 			return 1;
@@ -110,16 +113,16 @@ public class MessageListAdapter extends BaseAdapter {
 		final GotyeChatTarget session =  getItem(arg0);
 		Log.e("MessageListAdapter init view", "session = " + session);
 		if (getItemViewType(arg0)==0) {
-			viewHolder.title.setText(session.title);//session.name
+			viewHolder.title.setText(mVerification.title);//session.name
 
-            if(session.newFriend == null) {
+            if(mVerification.newFriend == null) {
                 viewHolder.content.setVisibility(View.GONE);
                 viewHolder.time.setVisibility(View.GONE);
             }else{
                 viewHolder.content.setVisibility(View.VISIBLE);
-                viewHolder.content.setText(mMessageFragment.getActivity().getString(R.string.ask_for_friend,session.newFriend.getUsername()));
+                viewHolder.content.setText(mMessageFragment.getActivity().getString(R.string.ask_for_friend,mVerification.newFriend.getUsername()));
                 viewHolder.time.setVisibility(View.VISIBLE);
-                viewHolder.time.setText(session.newFriend.getCreate_time());
+                viewHolder.time.setText(mVerification.newFriend.getCreate_time());
             }
 			viewHolder.icon.setDefaultImageResId(R.drawable.message);
 //            if(session.hasNewMsg) {
@@ -160,39 +163,39 @@ public class MessageListAdapter extends BaseAdapter {
 				content = mMessageFragment.getString(R.string.invent_msg);
 			}
 
-			if (session.type == GotyeChatTargetType.GotyeChatTargetTypeUser) {
-				GotyeUser user = api.requestUserInfo(session.name, false);
+			if (session.getType() == GotyeChatTargetType.GotyeChatTargetTypeUser) {
+				GotyeUser user = api.requestUserInfo(session.getName(), false);
 				if (user != null) {
 					if (TextUtils.isEmpty(user.getNickname())) {
-						title = mMessageFragment.getString(R.string.good_friend) + user.name;
+						title = mMessageFragment.getString(R.string.good_friend) + user.getName();
 					} else {
 						title = mMessageFragment.getString(R.string.good_friend) + user.getNickname();
 					}
 				} else {
-					title = mMessageFragment.getString(R.string.good_friend)+ session.name;
+					title = mMessageFragment.getString(R.string.good_friend)+ session.getName();
 				}
-			} else if (session.type == GotyeChatTargetType.GotyeChatTargetTypeRoom) {
-				GotyeRoom room = api.requestRoomInfo(session.Id, false);
+			} else if (session.getType() == GotyeChatTargetType.GotyeChatTargetTypeRoom) {
+				GotyeRoom room = api.requestRoomInfo(session.getId(), false);
 				if (room != null) {
 					if (TextUtils.isEmpty(room.getRoomName())) {
-						title = mMessageFragment.getString(R.string.chatbar_room) + room.Id;
+						title = mMessageFragment.getString(R.string.chatbar_room) + room.getId();
 					} else {
 						title = mMessageFragment.getString(R.string.chatbar_room) + room.getRoomName();
 					}
 				} else {
-					title = mMessageFragment.getString(R.string.chatbar_room) + session.Id;
+					title = mMessageFragment.getString(R.string.chatbar_room) + session.getId();
 				}
 
-			} else if (session.type == GotyeChatTargetType.GotyeChatTargetTypeGroup) {
-				GotyeGroup group = api.requestGroupInfo(session.Id, false);
+			} else if (session.getType() == GotyeChatTargetType.GotyeChatTargetTypeGroup) {
+				GotyeGroup group = api.requestGroupInfo(session.getId(), false);
 				if (group != null) {
 					if (TextUtils.isEmpty(group.getGroupName())) {
-						title = mMessageFragment.getString(R.string.chatbar_group) + group.Id;
+						title = mMessageFragment.getString(R.string.chatbar_group) + group.getId();
 					} else {
 						title = mMessageFragment.getString(R.string.chatbar_group) + group.getGroupName();
 					}
 				} else {
-					title = mMessageFragment.getString(R.string.chatbar_group) + session.Id;
+					title = mMessageFragment.getString(R.string.chatbar_group) + session.getId();
 				}
 
 			}
@@ -210,7 +213,7 @@ public class MessageListAdapter extends BaseAdapter {
 	}
 
     private void setUserPhoto(NetworkImageView imgView, GotyeChatTarget target) {
-        String user = target.name;
+        String user = target.getName();
         String photoName = DaoFactory.getContacts(mMessageFragment.getActivity()).getContactByName(user).getImg_url();
         String url = HttpConstants.IMG_BASE_URL + photoName;
         imgView.setDefaultImageResId(R.drawable.default_head);
@@ -219,22 +222,22 @@ public class MessageListAdapter extends BaseAdapter {
     }
 
 	private void setIcon(NetworkImageView imgView, GotyeChatTarget target) {
-		if (target.type == GotyeChatTargetType.GotyeChatTargetTypeUser) {
-			GotyeUser user = api.requestUserInfo(target.name, true);
+		if (target.getType() == GotyeChatTargetType.GotyeChatTargetTypeUser) {
+			GotyeUser user = api.requestUserInfo(target.getName(), true);
 			if (user == null) {
 				return;
 			} else if (user.getIcon() != null) {
 				ImageCache.getInstance().setIcom(imgView,
 						user.getIcon().getPath(), user.getIcon().getUrl());
 			}
-		} else if (target.type == GotyeChatTargetType.GotyeChatTargetTypeRoom) {
-			GotyeRoom room = api.requestRoomInfo(target.Id, false);
+		} else if (target.getType() == GotyeChatTargetType.GotyeChatTargetTypeRoom) {
+			GotyeRoom room = api.requestRoomInfo(target.getId(), false);
 			if (room != null && room.getIcon() != null) {
 				ImageCache.getInstance().setIcom(imgView,
 						room.getIcon().getPath(), room.getIcon().getUrl());
 			}
 		} else {
-			GotyeGroup group = api.requestGroupInfo(target.Id, false);
+			GotyeGroup group = api.requestGroupInfo(target.getId(), false);
 			if (group == null) {
 				return;
 			} else if (group.getIcon() != null) {
@@ -250,4 +253,12 @@ public class MessageListAdapter extends BaseAdapter {
 		this.sessions = sessions;
 		notifyDataSetChanged();
 	}
+
+    public class Verification {
+        public boolean hasNewMsg;
+
+        public FriendsApplication newFriend;
+
+        public String title;
+    }
 }

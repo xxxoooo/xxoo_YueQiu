@@ -111,7 +111,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         setContentView(R.layout.activity_chat_container);
         mInputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         mCurrentLoginUser = api.getCurrentLoginUser();
-        api.addListerer(this);
+        api.addListener(this);
         mUser = (GotyeUser) getIntent().getSerializableExtra("user");
         mRoom = (GotyeRoom) getIntent().getSerializableExtra("room");
         mGroup = (GotyeGroup) getIntent().getSerializableExtra("group");
@@ -129,7 +129,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 api.activeSession(mRoom);
                 loadData();
                 api.getLocalMessages(mRoom, true);
-                GotyeRoom temp = api.requestRoomInfo(mRoom.Id, true);
+                GotyeRoom temp = api.requestRoomInfo(mRoom.getId(), true);
                 if (temp != null && !TextUtils.isEmpty(temp.getRoomName())) {
                     mActionBar.setTitle(getString(R.string.chat_room) + temp.getRoomName());
                 }
@@ -224,7 +224,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
         if (mUser != null) {
             mChatType = 0;
-            mActionBar.setTitle(getString(R.string.and) + mUser.name + getString(R.string.chat));
+            mActionBar.setTitle(getString(R.string.and) + mUser.getName() + getString(R.string.chat));
         } else if (mRoom != null) {
             mChatType = 1;
             mActionBar.setTitle(getString(R.string.chat_room) + mRoom.getRoomID());
@@ -300,7 +300,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 // TODO Auto-generated method stub
                 final GotyeMessage message = mAdapter.getItem(arg2);
                 mPullListView.setTag(message);
-                if (message.getSender().name.equals(mCurrentLoginUser.getName())) {
+                if (message.getSender().getName().equals(mCurrentLoginUser.getName())) {
                     return false;
                 }
                 mPullListView.showContextMenu();
@@ -313,7 +313,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             public void onCreateContextMenu(ContextMenu conMenu,
                                             View arg1, ContextMenu.ContextMenuInfo arg2) {
                 final GotyeMessage message = (GotyeMessage) mPullListView.getTag();
-                if (message.getSender().name.equals(mCurrentLoginUser.name)) {
+                if (message.getSender().getName().equals(mCurrentLoginUser.getName())) {
                     return;
                 }
                 MenuItem m = conMenu.add(0, 0, 0, getString(R.string.report));
@@ -346,6 +346,8 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             api.downloadMessage(msg);
         }
         mAdapter.refreshData(messages);
+        //检查离线消息
+        api.beginRcvOfflineMessge();
     }
 
     //发送文本消息
@@ -433,49 +435,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         scrollToBottom();
     }
 
-//    private void showExtension(boolean isShow) {
-//        if (isShow) {
-//            mHandler.sendEmptyMessage(isDisplayInputMethod ? DISPLAY_INPUT_METHOD : UNDISPLAY_INPUT_METHOD);
-//        } else {
-//            mExtension.setVisibility(View.GONE);
-//            mEmotionToggle.setVisibility(View.GONE);
-//        }
-//    }
-//
-//    Handler mHandler = new Handler() {
-//        @Override
-//        public void handleMessage(Message msg) {
-//            super.handleMessage(msg);
-//            switch (msg.what) {
-//                case DISPLAY_INPUT_METHOD:
-//                    mInputMethodManager.hideSoftInputFromWindow(textMessage.getWindowToken(), 0);
-//                    mHandler.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            showExtensionDetail();
-//                        }
-//                    }, 300);
-//                    break;
-//                case UNDISPLAY_INPUT_METHOD:
-//                    showExtensionDetail();
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }
-//    };
-
-//    private void showExtensionDetail() {
-//        if (isDisplayPlugin) {
-//            mExtension.setVisibility(View.VISIBLE);
-//            mEmotionToggle.setVisibility(View.GONE);
-//        }
-//        if (isDisplayEmoji) {
-//            mEmotionToggle.setVisibility(View.VISIBLE);
-//            mExtension.setVisibility(View.GONE);
-//        }
-//    }
-
     @Override
     protected void onDestroy() {
         // TODO Auto-generated method stub
@@ -506,9 +465,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         super.onResume();
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(0);
-        boolean isIMOnline = api.isOnline();
-        if (!isIMOnline)
-            Utils.showToast(this, getString(R.string.im_user_offline));
     }
 
     @Override
@@ -686,13 +642,13 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 mPullListView.setSelection(mAdapter.getCount());
             }
         } else if (mChatType == 1) {
-            if (message.getReceiver().Id == mRoom.getRoomID()) {
+            if (message.getReceiver().getId() == mRoom.getRoomID()) {
                 // message.senderUser = user;
                 mAdapter.addMsgToBottom(message);
                 mPullListView.setSelection(mAdapter.getCount());
             }
         } else if (mChatType == 2) {
-            if (message.getReceiver().Id == mGroup.getGroupID()) {
+            if (message.getReceiver().getId() == mGroup.getGroupID()) {
                 mAdapter.addMsgToBottom(message);
                 mPullListView.setSelection(mAdapter.getCount());
             }
@@ -701,8 +657,8 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     }
 
     private boolean isMyMessage(GotyeMessage message) {
-        if (message.getSender() != null && mUser.getName().equals(message.getSender().name)
-                && mCurrentLoginUser.name.equals(message.getReceiver().name)) {
+        if (message.getSender() != null && mUser.getName().equals(message.getSender().getName())
+                && mCurrentLoginUser.getName().equals(message.getReceiver().getName())) {
             return true;
         } else {
             return false;
@@ -716,24 +672,24 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     }
 
 
-    @Override
-    public void onGetHistoryMessageList(int code, List<GotyeMessage> list) {
-
-        if (mChatType == 1) {
-            List<GotyeMessage> listmessages = api.getLocalMessages(mRoom, false);
-
-            if (listmessages != null) {
-                for (GotyeMessage temp : listmessages) {
-                    api.downloadMessage(temp);
-                }
-                mAdapter.refreshData(listmessages);
-            } else {
-                Utils.showToast(this, getString(R.string.no_history));
-            }
-        }
-        mAdapter.notifyDataSetInvalidated();
-        mPullListView.onRefreshComplete();
-    }
+//    @Override
+//    public void onGetHistoryMessageList(int code, List<GotyeMessage> list) {
+//
+//        if (mChatType == 1) {
+//            List<GotyeMessage> listmessages = api.getLocalMessages(mRoom, false);
+//
+//            if (listmessages != null) {
+//                for (GotyeMessage temp : listmessages) {
+//                    api.downloadMessage(temp);
+//                }
+//                mAdapter.refreshData(listmessages);
+//            } else {
+//                Utils.showToast(this, getString(R.string.no_history));
+//            }
+//        }
+//        mAdapter.notifyDataSetInvalidated();
+//        mPullListView.onRefreshComplete();
+//    }
 
     @Override
     public void onRequestUserInfo(int code, GotyeUser user) {
@@ -809,6 +765,44 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     public void onDecodeMessage(int code, GotyeMessage message) {
         // TODO Auto-generated method stub
         super.onDecodeMessage(code, message);
+    }
+
+    @Override
+    public void onGetMessageList(int i, List<GotyeMessage> gotyeMessages) {
+        if (mChatType == 0) {
+            List<GotyeMessage> listmessages = api.getLocalMessages(mUser, false);
+            if (listmessages != null) {
+                mAdapter.refreshData(listmessages);
+            } else {
+                Utils.showToast(this, "没有历史记录");
+            }
+        }else if (mChatType == 1){
+            List<GotyeMessage> listmessages = api.getLocalMessages(mRoom, false);
+            if (listmessages != null) {
+                mAdapter.refreshData(listmessages);
+            } else {
+                Utils.showToast(this, "没有历史记录");
+            }
+        }else if (mChatType == 2){
+            List<GotyeMessage> listmessages = api.getLocalMessages(mGroup, false);
+            if (listmessages != null) {
+                mAdapter.refreshData(listmessages);
+            } else {
+                Utils.showToast(this, "没有历史记录");
+            }
+        }
+        mAdapter.notifyDataSetInvalidated();
+        scrollToBottom();
+    }
+
+    @Override
+    public void onOutputAudioData(byte[] bytes) {
+
+    }
+
+    @Override
+    public void onGetCustomerService(int i, GotyeUser gotyeUser, int i2, String s) {
+
     }
 
     @Override

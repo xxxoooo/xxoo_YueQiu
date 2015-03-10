@@ -179,7 +179,7 @@ public class ChatMessageAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
         if (holder.tv_userId != null) {
-            holder.tv_userId.setText(message.getSender().name);
+            holder.tv_userId.setText(message.getSender().getName());
         }
 
         switch (message.getType()) {
@@ -213,7 +213,7 @@ public class ChatMessageAdapter extends BaseAdapter {
         }
 //        setIcon(holder.head_iv, message.getSender().name);
         //设置头像
-        setUserPhoto(holder, message.getSender().name);
+        setUserPhoto(holder, message.getSender().getName());
         return convertView;
     }
 
@@ -424,7 +424,7 @@ public class ChatMessageAdapter extends BaseAdapter {
     }
 
     private int getDirect(GotyeMessage message) {
-        if (message.getSender().name.equals(currentLoginName)) {
+        if (message.getSender().getName().equals(currentLoginName)) {
             return MESSAGE_DIRECT_SEND;
         } else {
             return MESSAGE_DIRECT_RECEIVE;
