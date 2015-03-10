@@ -76,9 +76,11 @@ public class UserDaoImpl implements UserDao{
         values.put(DatabaseConstant.UserTable.COST,map.get(DatabaseConstant.UserTable.COST) == null ?
                 "" : map.get(DatabaseConstant.UserTable.COST));
         values.put(DatabaseConstant.UserTable.MY_TYPE,map.get(DatabaseConstant.UserTable.MY_TYPE) == null ?
-                "" : map.get(DatabaseConstant.UserTable.MY_TYPE));
+                "1" : map.get(DatabaseConstant.UserTable.MY_TYPE));
         values.put(DatabaseConstant.UserTable.WORK_LIVE,map.get(DatabaseConstant.UserTable.WORK_LIVE) == null ?
                 "" : map.get(DatabaseConstant.UserTable.WORK_LIVE));
+        values.put(DatabaseConstant.UserTable.ZIZHI,map.get(DatabaseConstant.UserTable.ZIZHI) == null ?
+                4 : Integer.valueOf(map.get(DatabaseConstant.UserTable.ZIZHI)));
 
         SQLiteDatabase db = mDBUtils.getWritableDatabase();
         long result = -1;
@@ -160,6 +162,7 @@ public class UserDaoImpl implements UserDao{
             info.setCost(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.COST)));
             info.setMy_type(Integer.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.MY_TYPE))));
             info.setWork_live(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.WORK_LIVE)));
+            info.setZizhi(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.ZIZHI)));
         }
         cursor.close();
         return info;

@@ -7,7 +7,7 @@
                 android:orientation="horizontal"
                 android:padding="8dp">
 
-    <ImageView
+    <com.yueqiu.view.CustomNetWorkImageView
         android:id="@+id/icon"
         android:layout_width="50dp"
         android:layout_height="50dp"

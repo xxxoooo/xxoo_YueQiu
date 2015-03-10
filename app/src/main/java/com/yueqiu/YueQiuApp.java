@@ -2,10 +2,13 @@ package com.yueqiu;
 
 import android.app.Application;
 import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
@@ -15,6 +18,8 @@ import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeStatusCode;
 import com.gotye.api.GotyeUser;
 import com.gotye.api.listener.LoginListener;
+import com.gotye.api.listener.UserListener;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.bean.Identity;
@@ -30,20 +35,23 @@ import com.yueqiu.util.AppUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by wangyun on 15/1/4.
  */
-public class YueQiuApp extends Application implements LoginListener {
+public class YueQiuApp extends Application implements LoginListener,UserListener{
     private static final String TAG = "YueQiuApp";
     public static UserInfo sUserInfo = new UserInfo();
     private SharedPreferences mSharedPreferences;
+    private SharedPreferences.Editor mEditor;
 
     // 由于Volley的官方推荐构建方式是定义成全局的Singleton模式，用于保存唯一的RequestQueue来加速图片的加载，所以我们在这里创建了全局的Context
     private static Context sAppContext;
@@ -81,6 +89,8 @@ public class YueQiuApp extends Application implements LoginListener {
 
     public static int sBottomHeight;
 
+    public GotyeAPI mApi;
+
     public Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -111,19 +121,38 @@ public class YueQiuApp extends Application implements LoginListener {
         YueQiuApp.sUserInfo.setBallAge("");
         YueQiuApp.sUserInfo.setIdol("");
         YueQiuApp.sUserInfo.setIdol_name("");
+        YueQiuApp.sUserInfo.setCost("");
+        YueQiuApp.sUserInfo.setMy_type(1);
+        YueQiuApp.sUserInfo.setWork_live("");
+        YueQiuApp.sUserInfo.setZizhi(4);
+
+        mEditor.putString(DatabaseConstant.UserTable.USERNAME, getString(R.string.guest));
+        mEditor.putString(DatabaseConstant.UserTable.IMG_URL,"");
+        mEditor.putInt(DatabaseConstant.UserTable.SEX,-1);
+        mEditor.putString(DatabaseConstant.UserTable.USER_ID, "0");
+        mEditor.putString(DatabaseConstant.UserTable.IMG_URL, "");
+        mEditor.putString(DatabaseConstant.UserTable.NICK,"");
+        mEditor.putString(DatabaseConstant.UserTable.PHONE, "");
+        mEditor.putString(DatabaseConstant.UserTable.DISTRICT,"");
+        mEditor.putInt(DatabaseConstant.UserTable.LEVEL,-1);
+        mEditor.putInt(DatabaseConstant.UserTable.BALL_TYPE,-1);
+        mEditor.putInt(DatabaseConstant.UserTable.BALLARM,-1);
+        mEditor.putInt(DatabaseConstant.UserTable.USERDTYPE,-1);
+        mEditor.putString(DatabaseConstant.UserTable.BALLAGE,"");
+        mEditor.putString(DatabaseConstant.UserTable.IDOL,"");
+        mEditor.putString(DatabaseConstant.UserTable.IDOL_NAME,"");
+        mEditor.putString(DatabaseConstant.UserTable.COST,"");
+        mEditor.putInt(DatabaseConstant.UserTable.MY_TYPE,1);
+        mEditor.putString(DatabaseConstant.UserTable.WORK_LIVE,"");
+        mEditor.putInt(DatabaseConstant.UserTable.ZIZHI,4);
+        mEditor.apply();
 
     }
 
     private void jumpToIndexPage() {
-        String str = AppUtil.getCurrentActivityName(sAppContext);
-//        if (!str.equals("com.yueqiu.BilliardNearbyActivity")) {
-            Intent intent = new Intent(this, BilliardNearbyActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
-//        } else {
-//            //更新首页的UI
-//
-//        }
+        Intent intent = new Intent(this, BilliardNearbyActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
 
     }
 
@@ -135,9 +164,11 @@ public class YueQiuApp extends Application implements LoginListener {
         //异常拦截记录
         CrashApplication.getInstance(this).onCreate();
         //初始化
-        GotyeAPI.getInstance().init(getApplicationContext(), APPKEY, PACKAGENAME);
+        mApi = GotyeAPI.getInstance();
+        mApi.init(getApplicationContext(), APPKEY, PACKAGENAME);
 
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
+        mEditor = mSharedPreferences.edit();
 
         sUserInfo.setUsername(mSharedPreferences.getString(DatabaseConstant.UserTable.USERNAME, getString(R.string.guest)));
         sUserInfo.setUser_id(Integer.valueOf(mSharedPreferences.getString(DatabaseConstant.UserTable.USER_ID, "0")));
@@ -147,6 +178,7 @@ public class YueQiuApp extends Application implements LoginListener {
 
         sAppContext = getApplicationContext();
         registerListener();
+
     }
 
     public static Context getAppContext() {
@@ -156,19 +188,30 @@ public class YueQiuApp extends Application implements LoginListener {
     public void logout() {
         Map<String, String> map = new HashMap<String, String>();
         map.put(DatabaseConstant.UserTable.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
-        String result = HttpUtil.urlClient(HttpConstants.LogoutConstant.URL,
-                map, HttpConstants.RequestMethod.GET);
-        try {
-            JSONObject resultJson = new JSONObject(result);
-            int rtCode = resultJson.getInt("code");
-            if (rtCode == HttpConstants.ResponseCode.NORMAL) {
-                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_SUCCESS);
-            } else {
-                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_FAILED);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        HttpUtil.requestHttp(HttpConstants.LogoutConstant.URL,
+                map, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+                        try {
+                            int rtCode = response.getInt("code");
+                            if (rtCode == HttpConstants.ResponseCode.NORMAL) {
+                                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_SUCCESS);
+                            } else {
+                                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_FAILED);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                    }
+                });
+
+
     }
 
 
@@ -183,16 +226,10 @@ public class YueQiuApp extends Application implements LoginListener {
             return;//已经退出
         if (code == GotyeStatusCode.CODE_FORCELOGOUT) {
             if (Utils.networkAvaiable(this)) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        logout();
-                    }
-                }).start();
+                logout();
             } else {
                 Toast.makeText(this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
             }
-//            registerListener();
             Toast.makeText(this, getString(R.string.im_login_other_device), Toast.LENGTH_SHORT).show();
         } else if (code == GotyeStatusCode.CODE_NETWORD_DISCONNECTED) {
             Toast.makeText(this, getString(R.string.im_user_offline), Toast.LENGTH_SHORT).show();
@@ -210,7 +247,64 @@ public class YueQiuApp extends Application implements LoginListener {
     }
 
     public void registerListener() {
-        GotyeAPI.getInstance().addListerer(this);
+        mApi.addListerer(this);
     }
+
+    @Override
+    public void onRequestUserInfo(int code, GotyeUser user) {
+
+    }
+
+    @Override
+    public void onModifyUserInfo(int code, GotyeUser user) {
+        Log.e("cao","onModifyUserInfo callback");
+        if (code == 0) {
+            Log.d("cao","change icon success");
+        }else{
+            Log.d("cao","wo ri ni ma code is ->" + code);
+        }
+    }
+
+    @Override
+    public void onSearchUserList(int code, List<GotyeUser> mList, int pagerIndex) {
+
+    }
+
+    @Override
+    public void onAddFriend(int code, GotyeUser user) {
+
+    }
+
+    @Override
+    public void onGetFriendList(int code, List<GotyeUser> mList) {
+
+    }
+
+    @Override
+    public void onAddBlocked(int code, GotyeUser user) {
+
+    }
+
+    @Override
+    public void onRemoveFriend(int code, GotyeUser user) {
+
+    }
+
+    @Override
+    public void onRemoveBlocked(int code, GotyeUser user) {
+
+    }
+
+    @Override
+    public void onGetBlockedList(int code, List<GotyeUser> mList) {
+
+    }
+
+    @Override
+    public void onGetProfile(int code, GotyeUser user) {
+        Log.e("cao", "PhotoSetupFragment onGetProfile callback>>> code = " + code + " user = " + user);
+    }
+
+
 
 }

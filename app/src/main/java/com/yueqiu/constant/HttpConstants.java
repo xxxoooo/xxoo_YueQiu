@@ -310,6 +310,8 @@ public class HttpConstants
     {
         public static final String URL = "/friend/getList";
 
+        public static final String ALL_URL = "/friend/getAll";
+
         //请求参数：位置坐标
         public static final String USER_ID = "user_id";
         public static final String GROUP_ID = "group_id";

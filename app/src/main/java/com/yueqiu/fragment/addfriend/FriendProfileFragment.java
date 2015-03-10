@@ -29,6 +29,7 @@ import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import org.apache.http.Header;
 import org.json.JSONException;
@@ -45,7 +46,7 @@ public class FriendProfileFragment extends Fragment {
     private FragmentManager mFragmentManager;
     private ActionBar mActionBar;
     private Button mButton;
-    private NetworkImageView mImageView;
+    private CustomNetWorkImageView mImageView;
     private TextView mAccountTextView, mGenderTextView,
             mNickNameTextView, mDistrictTextView, mLevelTextView,
             mBallTypeTextView, mUsedTypeTextView, mBallArmTextView;
@@ -111,7 +112,7 @@ public class FriendProfileFragment extends Fragment {
     }
 
     private void initView(View view) {
-        mImageView = (NetworkImageView) view.findViewById(R.id.friend_profile_photo);
+        mImageView = (CustomNetWorkImageView) view.findViewById(R.id.friend_profile_photo);
         mAccountTextView = (TextView) view.findViewById(R.id.friend_profile_account);
         mGenderTextView = (TextView) view.findViewById(R.id.friend_profile_gender);
         mNickNameTextView = (TextView) view.findViewById(R.id.friend_profile_nick_name);

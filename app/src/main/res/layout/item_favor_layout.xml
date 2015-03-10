@@ -10,7 +10,7 @@
     android:background="@drawable/published_item_bg"
     android:layout_weight="4">
 
-    <com.android.volley.toolbox.NetworkImageView
+    <com.yueqiu.view.CustomNetWorkImageView
         android:id="@+id/favor_item_image"
         android:layout_width="@dimen/listview_item_user_photo_width"
         android:layout_height="@dimen/listview_item_user_photo_height"
@@ -23,7 +23,7 @@
         android:id="@+id/favor_title"
         style="@style/ListItemTvStyle"
         android:layout_marginLeft="10dp"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:layout_toRightOf="@+id/favor_item_image"
         android:layout_alignTop="@+id/favor_item_image"
         android:layout_toLeftOf="@+id/favor_time"
@@ -32,18 +32,16 @@
         />
     <TextView
         android:id="@+id/favor_content"
-        android:layout_below="@+id/favor_title"
         android:layout_alignLeft="@+id/favor_title"
         android:ellipsize="end"
-        android:textSize="14sp"
+        android:textSize="15sp"
         style="@style/TimeTextStyle"
         android:singleLine="true"
         android:layout_marginTop="5dp"
-        android:layout_alignBottom="@+id/favor_item_image"
         android:layout_toRightOf="@+id/favor_item_image"
         android:layout_toLeftOf="@+id/favor_time"
         android:layout_marginRight="3dp"
-
+        android:layout_alignBottom="@+id/favor_item_image"
         />
     <TextView
         android:id="@+id/favor_time"

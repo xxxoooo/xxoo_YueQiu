@@ -319,7 +319,7 @@ public class PublishedFragment extends SlideMenuBasicFragment implements Adapter
             mListView.setAdapter(mPublishedAdapter);
             mPublishedAdapter.notifyDataSetChanged();
             if(mLoadMore && !mList.isEmpty()){
-                mListView.setSelection(mCurrPosition);
+                mListView.setSelection(mCurrPosition - 1);
             }
         }
     };

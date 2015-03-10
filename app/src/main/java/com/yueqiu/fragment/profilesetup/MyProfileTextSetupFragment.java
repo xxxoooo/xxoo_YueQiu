@@ -22,6 +22,10 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.gotye.api.GotyeAPI;
+import com.gotye.api.GotyeGender;
+import com.gotye.api.GotyeUser;
+import com.gotye.api.listener.UserListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
@@ -38,6 +42,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,6 +64,8 @@ public class MyProfileTextSetupFragment extends Fragment {
     private ProgressBar mPreProgress;
     private TextView mPreTextView;
     private Drawable mProgressDrawable;
+    private GotyeAPI mApi;
+    private GotyeUser mGotyeUser;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile_setup, container, false);
@@ -77,6 +84,9 @@ public class MyProfileTextSetupFragment extends Fragment {
         mPreProgress.setIndeterminateDrawable(mProgressDrawable);
         mPreProgress.getIndeterminateDrawable().setBounds(bounds);
 
+
+        mApi = GotyeAPI.getInstance();
+        mGotyeUser = mApi.getCurrentLoginUser();
 
         Bundle args = getArguments();
         if(mText.equals(getString(R.string.nick_name))){
@@ -129,7 +139,7 @@ public class MyProfileTextSetupFragment extends Fragment {
         switch(item.getItemId()){
             case R.id.setup_confirm:
                 if(mText.equals(getString(R.string.nick_name))){
-                    submitNickName();
+                    submitAttr();
                 }else if(mText.equals(getString(R.string.region))){
                     submitAttr();
                 }else if(mText.equals(getString(R.string.play_age))){
@@ -202,6 +212,8 @@ public class MyProfileTextSetupFragment extends Fragment {
                 mParamMap.put(HttpConstants.SetAttr.MONEYS, mEditText.getText().toString());
             } else if (mText.equals(getString(R.string.profession_experiences))) {
                 mParamMap.put(HttpConstants.SetAttr.WORK_LIVE, mEditText.getText().toString());
+            } else if (mText.equals(getString(R.string.nick_name))){
+                mParamMap.put(HttpConstants.SetNickName.NICKNAME,mEditText.getText().toString());
             }
 
 
@@ -237,6 +249,17 @@ public class MyProfileTextSetupFragment extends Fragment {
 
     }
 
+    private void modifyUser() {
+        int split = YueQiuApp.sUserInfo.getImg_url().lastIndexOf("/");
+        String img_url = YueQiuApp.sUserInfo.getImg_url().substring(split + 1);
+        mGotyeUser.setNickname(YueQiuApp.sUserInfo.getNick() + "|" + img_url);
+
+        mGotyeUser.setGender(YueQiuApp.sUserInfo.getSex() == 1 ? GotyeGender.Male : GotyeGender.Femal);
+        Log.e("cao", " text modify mGotyeUser = " + mGotyeUser);
+        int result = mApi.modifyUserInfo(mGotyeUser, null);
+
+        Log.d("cao","text modify result" + result);
+    }
 
     private Handler mHandler = new Handler(){
         @Override
@@ -250,6 +273,8 @@ public class MyProfileTextSetupFragment extends Fragment {
                         mEditor.putString(DatabaseConstant.UserTable.NICK,mEditText.getText().toString());
                         mEditor.apply();
                         YueQiuApp.sUserInfo.setNick(mEditText.getText().toString());
+
+                        modifyUser();
                     }else if(mText.equals(getString(R.string.region))){
                         mEditor.putString(DatabaseConstant.UserTable.DISTRICT,mEditText.getText().toString());
                         mEditor.apply();
@@ -284,10 +309,15 @@ public class MyProfileTextSetupFragment extends Fragment {
                     getActivity().overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                     break;
                 case PublicConstant.REQUEST_ERROR:
-                    Utils.showToast(getActivity(),getString(R.string.http_request_error));
+                    if(msg.obj == null){
+                        Utils.showToast(getActivity(), (String) msg.obj);
+                    }else {
+                        Utils.showToast(getActivity(), getString(R.string.http_request_error));
+                    }
                     break;
 
             }
+
         }
     };
 
@@ -301,4 +331,6 @@ public class MyProfileTextSetupFragment extends Fragment {
             throw new ClassCastException(activity.toString() + " must implement MyProfileSetupListener!");
         }
     }
+
+
 }

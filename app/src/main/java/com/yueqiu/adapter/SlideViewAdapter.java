@@ -46,7 +46,7 @@ public class SlideViewAdapter extends BaseAdapter {
         this.mContext = context;
         this.mList = list;
         this.mInflater = LayoutInflater.from(context);
-        mImgLoader = VolleySingleton.getInstance().getImgLoader();
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
 
     }
 
@@ -108,6 +108,7 @@ public class SlideViewAdapter extends BaseAdapter {
                     convertView = mInflater.inflate(R.layout.item_more_account_layout, null);
                     accountHolder = new ViewAccountHolder();
                     accountHolder.image = (ImageView) convertView.findViewById(R.id.account_image);
+                    accountHolder.label = (ImageView) convertView.findViewById(R.id.account_label);
                     accountHolder.name = (TextView) convertView.findViewById(R.id.account_name);
                     accountHolder.login = (TextView) convertView.findViewById(R.id.slide_login);
                     convertView.setTag(accountHolder);
@@ -124,26 +125,14 @@ public class SlideViewAdapter extends BaseAdapter {
                     embedResId = R.drawable.lable_coach;
                 }
 
+                accountHolder.label.setVisibility(View.GONE);
+
                 int user_id = accountItem.getUserId();
                 if(user_id > 0){
                     accountHolder.login.setVisibility(View.GONE);
                     accountHolder.name.setVisibility(View.VISIBLE);
                     accountHolder.name.setText(accountItem.getName());
                     final String img = accountItem.getImg();
-                    // the following are the source bitmap we need to get from network service
-//                   if(img.equals("")){
-//                       source = BitmapFactory.decodeResource(mContext.getResources(),R.drawable.head_img);
-//                   }else {
-//                       try {
-//                           byte[] bitmapArray;
-//                           bitmapArray = Base64.decode(img, Base64.DEFAULT);
-//                           source = BitmapFactory.decodeByteArray(bitmapArray, 0, bitmapArray.length);
-//                       } catch (Exception e) {
-//                           e.printStackTrace();
-//                       }
-//                   }
-//                   String img_test = "http://byu1145240001.my3w.com/image/11.png";
-//
                     String img_url = "http://" + img;
                    final int finallyEmbedResId = embedResId;
                    if (! TextUtils.isEmpty(img))
@@ -156,16 +145,19 @@ public class SlideViewAdapter extends BaseAdapter {
                                    public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate)
                                    {
                                        Bitmap sourceBitmap = response.getBitmap();
+
                                        if (null != sourceBitmap)
                                        {
                                            Log.d("wy","bitmap is not null");
-                                           Log.d(TAG_1, " the embeded resource id : " + finallyEmbedResId + ", and the source are: " + sourceBitmap);
+//                                           Bitmap sourceRound = ImgUtil.toRoundCorner(sourceBitmap,8);
                                            accountHolder.image.setImageBitmap(ImgUtil.embedBitmap(mContext.getResources(), sourceBitmap, finallyEmbedResId));
+//                                           accountHolder.image.setImageBitmap(sourceBitmap);
                                        } else
                                        {
                                            Log.d("wy","bitmap is null");
                                            Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
                                            accountHolder.image.setImageBitmap(ImgUtil.embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
+//                                           accountHolder.image.setImageBitmap(tempSourceBitmap);
                                        }
                                    }
 
@@ -173,25 +165,24 @@ public class SlideViewAdapter extends BaseAdapter {
                                    public void onErrorResponse(VolleyError error)
                                    {
                                         Log.d(TAG_1, " some error happened, and the detailed error info are: " + error.toString());
-                                       // TODO: 当我们传递的URL为空的时候，就会发生这个错误。
-                                       // TODO: 我们也可以在这里设置当获取用户头像失败时我们应该加载的系统默认图片
-                                       // TODO: 如果不满意我们在onResponse()方法加载系统默认图片的做法，我们就在这里加载，
-
-
                                    }
                                },
-                               400,
-                               400
+                               mContext.getResources().getDimensionPixelOffset(R.dimen.accoutn_photo_height),
+                               mContext.getResources().getDimensionPixelOffset(R.dimen.accoutn_photo_height)
                        );
                    } else
                    {
                        // 现在是没有Url的情况，即服务器端传递到的url为空的情况，我们需要在这里直接加载我们的默认图片
                        Bitmap tempSourceBitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.head_img);
                        accountHolder.image.setImageBitmap(ImgUtil.embedBitmap(mContext.getResources(), tempSourceBitmap, finallyEmbedResId));
+//                       accountHolder.image.setImageBitmap(tempSourceBitmap);
                    }
+//                    accountHolder.label.setVisibility(View.VISIBLE);
+//                    accountHolder.label.setImageResource(embedResId);
 
                } else {
                    accountHolder.name.setVisibility(View.GONE);
+                   accountHolder.label.setVisibility(View.GONE);
                    accountHolder.login.setVisibility(View.VISIBLE);
                    accountHolder.login.setOnClickListener(new View.OnClickListener() {
                        @Override
@@ -236,6 +227,7 @@ public class SlideViewAdapter extends BaseAdapter {
 
     private class ViewAccountHolder{
         ImageView image;
+        ImageView label;
         TextView  name;
         TextView  golden;
         TextView login;

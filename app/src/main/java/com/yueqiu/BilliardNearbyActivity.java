@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -41,6 +42,7 @@ import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeStatusCode;
 import com.gotye.api.GotyeUser;
 import com.gotye.api.listener.LoginListener;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.activity.DateIssueActivity;
 import com.yueqiu.activity.FavorActivity;
 import com.yueqiu.activity.SearchResultActivity;
@@ -70,6 +72,7 @@ import com.yueqiu.util.Utils;
 import com.yueqiu.view.menudrawer.MenuDrawer;
 import com.yueqiu.view.menudrawer.Position;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -112,6 +115,8 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
+
+    private SearchView mSearchView;
 
     // 这个变量用于保存每次当SearchActivity被切换到别的地方的时候，回来的时候，还能确保我们回到最后一次滑动到的Fragment的position
     private static int sPagerPos = 0;
@@ -211,9 +216,10 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
             GotyeAPI.getInstance().addListerer(this);
             login();
         } else {
-            Log.e(TAG, "IM已经退出了！！！");
-            resetUSerInfo();
+            Log.e(TAG, "IM已经退出了");
+            resetUserInfo();
         }
+
     }
 
     @Override
@@ -302,6 +308,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
      */
     @Override
     public void onLogout(int code) {
+
 //        GotyeAPI.getInstance().logout();
 ////        if (code == GotyeStatusCode.CODE_FORCELOGOUT) {
 ////            Toast.makeText(this, getString(R.string.im_login_other_device), Toast.LENGTH_SHORT).show();
@@ -426,11 +433,11 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         getMenuInflater().inflate(R.menu.billiard_search, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         //ToDo:不起作用，得重新找方法
 
         int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
-        EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
+        EditText searchEditText = (EditText) mSearchView.findViewById(searchSrcTextId);
         searchEditText.setTextColor(Color.WHITE);
         searchEditText.setHintTextColor(Color.LTGRAY);
 
@@ -441,11 +448,11 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 //        View searchPlate = searchView.findViewById(searchSrcTextId);
 //        searchPlate.setBackgroundResource(R.drawable.edit_test);
 
-        searchView.setIconifiedByDefault(false);
+        mSearchView.setIconifiedByDefault(false);
         try {
             Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
             searchField.setAccessible(true);
-            ImageView searchHintIcon = (ImageView) searchField.get(searchView);
+            ImageView searchHintIcon = (ImageView) searchField.get(mSearchView);
             searchHintIcon.setImageResource(R.drawable.search);
         } catch (NoSuchFieldException e) {
             Log.d(TAG, " Exception happened while we retrieving the mSearchHintIcon, and the reason goes to : " + e.toString());
@@ -625,12 +632,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                         if (!checkUserId())
                             return;
                         if (Utils.networkAvaiable(BilliardNearbyActivity.this)) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    logout();
-                                }
-                            }).start();
+                           logout();
                         } else {
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
                         }
@@ -653,7 +655,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case YueQiuApp.LOGOUT_SUCCESS:
-                    resetUSerInfo();
+                    resetUserInfo();
                     GotyeAPI.getInstance().logout();
                     Toast.makeText(BilliardNearbyActivity.this, getString(R.string.logout_success), Toast.LENGTH_SHORT).show();
                     break;
@@ -667,26 +669,48 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private void logout() {
         Map<String, String> map = new HashMap<String, String>();
         map.put(DatabaseConstant.UserTable.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
-        String result = HttpUtil.urlClient(HttpConstants.LogoutConstant.URL,
-                map, HttpConstants.RequestMethod.GET);
-        try {
-            JSONObject resultJson = new JSONObject(result);
-            int rtCode = resultJson.getInt("code");
-            if (rtCode == HttpConstants.ResponseCode.NORMAL) {
-                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_SUCCESS);
-            } else {
-                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_FAILED);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        HttpUtil.requestHttp(HttpConstants.LogoutConstant.URL,
+                map, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+                        try {
+                            int rtCode = response.getInt("code");
+                            if (rtCode == HttpConstants.ResponseCode.NORMAL) {
+                                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_SUCCESS);
+                            } else {
+                                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_FAILED);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                    }
+                });
     }
 
-    private void resetUSerInfo() {
+    private void resetUserInfo() {
         YueQiuApp.sUserInfo.setImg_url("");
         YueQiuApp.sUserInfo.setUsername(getString(R.string.guest));
         YueQiuApp.sUserInfo.setUser_id(0);
         YueQiuApp.sUserInfo.setPhone("");
+        YueQiuApp.sUserInfo.setNick("");
+        YueQiuApp.sUserInfo.setDistrict("");
+        YueQiuApp.sUserInfo.setLevel(-1);
+        YueQiuApp.sUserInfo.setBall_type(-1);
+        YueQiuApp.sUserInfo.setBallArm(-1);
+        YueQiuApp.sUserInfo.setUsedType(-1);
+        YueQiuApp.sUserInfo.setBallAge("");
+        YueQiuApp.sUserInfo.setIdol("");
+        YueQiuApp.sUserInfo.setIdol_name("");
+        YueQiuApp.sUserInfo.setCost("");
+        YueQiuApp.sUserInfo.setMy_type(1);
+        YueQiuApp.sUserInfo.setWork_live("");
+        YueQiuApp.sUserInfo.setZizhi(4);
 
         mEditor.putString(DatabaseConstant.UserTable.USERNAME, getString(R.string.guest));
         mEditor.putString(DatabaseConstant.UserTable.IMG_URL,"");
@@ -703,6 +727,10 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         mEditor.putString(DatabaseConstant.UserTable.BALLAGE,"");
         mEditor.putString(DatabaseConstant.UserTable.IDOL,"");
         mEditor.putString(DatabaseConstant.UserTable.IDOL_NAME,"");
+        mEditor.putString(DatabaseConstant.UserTable.COST,"");
+        mEditor.putInt(DatabaseConstant.UserTable.MY_TYPE,1);
+        mEditor.putString(DatabaseConstant.UserTable.WORK_LIVE,"");
+        mEditor.putInt(DatabaseConstant.UserTable.ZIZHI,4);
         mEditor.apply();
 
 

@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 
 import com.yueqiu.adapter.SplashScreenPagerAdapter;
@@ -32,6 +33,12 @@ public class YueQiuSplashScreen extends FragmentActivity implements SplashScreen
     {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION| View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
+
+
         NearbyParamsPreference preference = NearbyParamsPreference.getInstance();
 
         // TODO: 目前不需要判断是否是第一次启动，也就是每次都显示那三个页面

@@ -8,7 +8,7 @@
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:minHeight="?android:attr/listPreferredItemHeight">
-            <com.android.volley.toolbox.NetworkImageView
+            <com.yueqiu.view.CustomNetWorkImageView
                 android:id="@+id/account_iv"
                 android:layout_alignParentLeft="true"
                 android:layout_marginRight="10dp"

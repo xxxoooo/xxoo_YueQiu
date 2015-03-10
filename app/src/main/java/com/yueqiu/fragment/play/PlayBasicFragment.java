@@ -420,32 +420,43 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                         }
                     }
                     break;
-                case PublicConstant.TIME_OUT:
-                    Utils.showToast(mActivity, mActivity.getString(R.string.http_request_time_out));
-                    if(mList.isEmpty()) {
-                        setEmptyViewVisible();
-                    }
-                    break;
+//                case PublicConstant.TIME_OUT:
+//                    Utils.showToast(mActivity, mActivity.getString(R.string.http_request_time_out));
+//                    if(mList.isEmpty()) {
+//                        setEmptyViewVisible();
+//                    }
+//                    break;
                 case PublicConstant.REQUEST_ERROR:
-                    if(null == msg.obj){
-                        Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
-                    }else{
-                        Utils.showToast(mActivity, (String) msg.obj);
-                    }
+
                     if(mList.isEmpty()) {
                         setEmptyViewVisible();
+                        if(null == msg.obj){
+                            mEmptyView.setText(mActivity.getString(R.string.http_request_error));
+                        }else{
+                            mEmptyView.setText((String) msg.obj);
+                        }
+                    }else{
+                        if(null == msg.obj){
+                            Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
+                        }else{
+                            Utils.showToast(mActivity, (String) msg.obj);
+                        }
                     }
                     break;
                 case PublicConstant.NO_NETWORK:
-                    Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
-                    if(mList.isEmpty())
+
+                    if(mList.isEmpty()) {
                         setEmptyViewVisible();
+                        mEmptyView.setText(mActivity.getString(R.string.network_not_available));
+                    }else{
+                        Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
+                    }
                     break;
             }
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
             if(mLoadMore && !mList.isEmpty()){
-                mListView.setSelection(mCurrPosition);
+                mListView.setSelection(mCurrPosition - 1);
             }
         }
     };

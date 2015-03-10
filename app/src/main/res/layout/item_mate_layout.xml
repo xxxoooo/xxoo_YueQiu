@@ -10,7 +10,7 @@
     <!-- 用于显示用户当前的头像，这里我们可以用一个BitmapUtil来实现，
          即每次显示用户的头像的时候会有本地缓存，而不是每次都进行网络请求，
          同时还要进行一些缓存，ListView滑动过程当中顺便缓存和清理 -->
-    <com.android.volley.toolbox.NetworkImageView
+    <com.yueqiu.view.CustomNetWorkImageView
         android:layout_width="@dimen/listview_item_user_photo_width"
         android:layout_height="@dimen/listview_item_user_photo_height"
         android:id="@+id/img_mate_subfragment_listitem_photo"
@@ -65,7 +65,6 @@
         android:layout_alignTop="@id/tv_mate_subfragment_listitem_gender"
         android:ellipsize="end"
         android:singleLine="true"
-        android:layout_toLeftOf="@+id/tv_mate_subfragment_listitem_distance_meter"
         />
     <TextView
         style="@style/TimeTextStyle"

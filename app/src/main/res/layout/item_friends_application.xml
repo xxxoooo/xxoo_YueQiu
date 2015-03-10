@@ -38,7 +38,7 @@
         android:minHeight="?android:attr/listPreferredItemHeight">
 
 
-        <com.android.volley.toolbox.NetworkImageView
+        <com.yueqiu.view.CustomNetWorkImageView
             android:id="@+id/friends_application_icon"
             android:layout_marginLeft="10dp"
             android:layout_alignParentLeft="true"

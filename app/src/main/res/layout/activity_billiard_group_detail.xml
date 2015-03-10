@@ -15,7 +15,7 @@
         android:layout_height="0dp"
         android:layout_weight="1.2"
         android:padding="5dp">
-        <com.android.volley.toolbox.NetworkImageView
+        <com.yueqiu.view.CustomNetWorkImageView
             android:id="@+id/billiard_group_detail_img"
             android:layout_width="@dimen/listview_item_user_photo_width"
             android:layout_height="@dimen/listview_item_user_photo_height"

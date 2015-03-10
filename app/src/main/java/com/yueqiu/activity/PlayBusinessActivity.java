@@ -330,32 +330,43 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
                         }
                     }
                     break;
-                case PublicConstant.TIME_OUT:
-                    Utils.showToast(PlayBusinessActivity.this, getString(R.string.http_request_time_out));
-                    if(mList.isEmpty()) {
-                        setEmptyViewVisible();
-                    }
-                    break;
+//                case PublicConstant.TIME_OUT:
+//                    Utils.showToast(PlayBusinessActivity.this, getString(R.string.http_request_time_out));
+//                    if(mList.isEmpty()) {
+//                        setEmptyViewVisible();
+//                    }
+//                    break;
                 case PublicConstant.REQUEST_ERROR:
-                    if(null == msg.obj){
-                        Utils.showToast(PlayBusinessActivity.this,getString(R.string.http_request_error));
-                    }else{
-                        Utils.showToast(PlayBusinessActivity.this, (String) msg.obj);
-                    }
+
                     if(mList.isEmpty()) {
                         setEmptyViewVisible();
+                        if(null == msg.obj){
+                            mEmptyView.setText(getString(R.string.http_request_error));
+                        }else{
+                            mEmptyView.setText((String) msg.obj);
+                        }
+                    }else{
+                        if(null == msg.obj){
+                            Utils.showToast(PlayBusinessActivity.this,getString(R.string.http_request_error));
+                        }else{
+                            Utils.showToast(PlayBusinessActivity.this, (String) msg.obj);
+                        }
                     }
                     break;
                 case PublicConstant.NO_NETWORK:
-                    Utils.showToast(PlayBusinessActivity.this,getString(R.string.network_not_available));
-                    if(mList.isEmpty())
+
+                    if(mList.isEmpty()) {
                         setEmptyViewVisible();
+                        mEmptyView.setText(getString(R.string.network_not_available));
+                    }else{
+                        Utils.showToast(PlayBusinessActivity.this,getString(R.string.network_not_available));
+                    }
                     break;
             }
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
             if(mLoadMore && !mList.isEmpty()){
-                mListView.setSelection(mCurrPosition);
+                mListView.setSelection(mCurrPosition - 1);
             }
         }
     };

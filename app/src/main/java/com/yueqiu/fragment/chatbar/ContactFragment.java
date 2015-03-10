@@ -15,8 +15,11 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeChatTarget;
+import com.gotye.api.GotyeGender;
 import com.gotye.api.GotyeUser;
+import com.gotye.api.Icon;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
@@ -61,6 +64,8 @@ public class ContactFragment extends Fragment {
     private Map<String, String> mMapArgument = new HashMap<String, String>();
 //    private ContactsDao mContactsDao;
     private List<GotyeChatTarget> mTargets;
+    private GotyeUser mGotyeUser;
+    private GotyeAPI mApi;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,6 +78,7 @@ public class ContactFragment extends Fragment {
                              Bundle savedInstanceState) {
         mContext = getActivity();
         mBaseView = inflater.inflate(R.layout.fragment_chatbar_contact, null);
+        mApi = GotyeAPI.getInstance();
         findView();
         init();
         initData();
@@ -101,13 +107,19 @@ public class ContactFragment extends Fragment {
                 //TODO:传入待聊天好友的userid
                 if (TextUtils.isEmpty(contacts.getUsername()))
                     return false;
+
+                //TODO:逻辑还要变
                 Intent intent = new Intent(getActivity(), ChatPage.class);
-                intent.putExtra("user", new GotyeUser(contacts.getUsername()));
+                GotyeUser user = new GotyeUser(contacts.getUsername());
+//                modifyUser(user,contacts.getImg_url(),contacts.getUsername(),Integer.valueOf(contacts.getSex()));
+
+                intent.putExtra("user", user);
                 intent.putExtra("from", 200);
 //                intent.putExtra(MessageFragment.FRIEND_USER_ID, contacts.getUser_id());//fake date
 //                intent.putExtra(MessageFragment.FRIEND_USER_NAME, contacts.getUsername());
                 startActivity(intent);
                 getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+
                 return true;
             }
         });
@@ -123,6 +135,7 @@ public class ContactFragment extends Fragment {
             return;
         }
         getContactList();
+//        getAllContact();
     }
 
     /**
@@ -243,9 +256,6 @@ public class ContactFragment extends Fragment {
                     mExpAdapter.setData(mMaps);
                     mExpAdapter.notifyDataSetChanged();
                     break;
-                case PublicConstant.TIME_OUT:
-                    Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
-                    break;
                 case PublicConstant.REQUEST_ERROR:
                     if (null == msg.obj) {
                         Utils.showToast(getActivity(), getString(R.string.http_request_error));
@@ -262,4 +272,16 @@ public class ContactFragment extends Fragment {
 
         }
     };
+
+    private void modifyUser(GotyeUser user,String img_url,String nickName,int gender) {
+        int split = img_url.lastIndexOf("/");
+        String url = YueQiuApp.sUserInfo.getImg_url().substring(split + 1);
+        user.setNickname(nickName + ":" + url);
+
+        user.setGender(gender == 1 ? GotyeGender.Male : GotyeGender.Femal);
+        Log.e("cao", " contact modify mGotyeUser = " + user);
+        int result = mApi.modifyUserInfo(user, null);
+
+        Log.d("cao","contact modify result" + result);
+    }
 }

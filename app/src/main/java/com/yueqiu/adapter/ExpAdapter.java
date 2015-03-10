@@ -17,6 +17,7 @@ import com.yueqiu.bean.RecentChat;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 import com.yueqiu.view.contacts.IphoneTreeView;
 
 import java.lang.ref.SoftReference;
@@ -103,7 +104,7 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
             holder = new ChildHolder();
             holder.nameView = (TextView) convertView.findViewById(R.id.contact_list_item_name);
             holder.feelView = (TextView) convertView.findViewById(R.id.cpntact_list_item_state);
-            holder.iconView = (NetworkImageView) convertView.findViewById(R.id.icon);
+            holder.iconView = (CustomNetWorkImageView) convertView.findViewById(R.id.icon);
             holder.date = (TextView) convertView.findViewById(R.id.contact_list_item_time);
             convertView.setTag(holder);
         } else {
@@ -191,7 +192,7 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
     class ChildHolder {
         TextView nameView;
         TextView feelView;
-        NetworkImageView iconView;
+        CustomNetWorkImageView iconView;
         TextView date;
     }
 

@@ -4,16 +4,22 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.yueqiu.R;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
+import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 /**
  * 球厅详情Activity，现在应要求需要改成WebView的实现形式
@@ -22,6 +28,9 @@ import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 public class BilliardsRoomWebViewActivity extends Activity
 {
     private static final String TAG = "BilliardsRoomWebViewActivity";
+    private ProgressBar mPreProgress;
+    private TextView mPreTextView;
+    private Drawable mProgressDrawable;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -29,6 +38,14 @@ public class BilliardsRoomWebViewActivity extends Activity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_billiards_room_web_view);
+
+        mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
+        mPreTextView = (TextView) findViewById(R.id.pre_text);
+
+        mProgressDrawable = new FoldingCirclesDrawable.Builder(this).build();
+        Rect bounds = mPreProgress.getIndeterminateDrawable().getBounds();
+        mPreProgress.setIndeterminateDrawable(mProgressDrawable);
+        mPreProgress.getIndeterminateDrawable().setBounds(bounds);
         // TODO: 我们最好在这里提供一个默认的Url，但是这个Url的内容还需要制定需求的SX来提供
         String pageUrl = getIntent().getStringExtra(NearbyFragmentsCommonUtils.KEY_ROOM_WEBVIEW_PAGE_URL);
 
@@ -39,6 +56,9 @@ public class BilliardsRoomWebViewActivity extends Activity
 
         webSettings.setJavaScriptEnabled(true);
 
+
+        mPreProgress.setVisibility(View.VISIBLE);
+        mPreTextView.setVisibility(View.VISIBLE);
         webView.loadUrl(pageUrl);
     }
     private ActionBar mActionBar;
@@ -53,13 +73,20 @@ public class BilliardsRoomWebViewActivity extends Activity
         }
     }
 
-    private static class WebViewClientImpl extends WebViewClient
+    private  class WebViewClientImpl extends WebViewClient
     {
         private Activity mActivity;
 
         public WebViewClientImpl(Activity activity)
         {
             this.mActivity = activity;
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+            mPreProgress.setVisibility(View.GONE);
+            mPreTextView.setVisibility(View.GONE);
         }
     }
 

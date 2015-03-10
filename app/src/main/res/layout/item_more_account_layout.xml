@@ -10,9 +10,18 @@
 
     <ImageView
         android:id="@+id/account_image"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_centerInParent="true"/>
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/head_img"
+        />
+    <ImageView
+        android:id="@+id/account_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/lable_friend"
+        android:layout_alignBottom="@+id/account_image"
+        android:layout_alignRight="@+id/account_image"/>
 
     <TextView
         android:id="@+id/account_name"

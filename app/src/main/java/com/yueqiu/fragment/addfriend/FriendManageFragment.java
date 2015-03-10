@@ -49,6 +49,8 @@ import java.util.Map;
  */
 public class FriendManageFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "FriendManageFragment";
+    private static final int HANDLE_SUCCESS = 42;
+    private static final int SEND_SUCCES = 43;
     private ActionBar mActionBar;
     private FragmentManager mFragmentManager;
     private Fragment mFragment;
@@ -170,8 +172,7 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
 //                if (whoCreate == 0)
 //                    ((FriendsApplicationActivity) getActivity()).switchFragment(FriendsApplicationActivity.sFriendsApplication);
 //                else getActivity().finish();
-                mFragmentManager.beginTransaction()
-                        .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
+                mFragmentManager.beginTransaction().setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
                         .remove(this).commit();
                 mFragmentManager.popBackStackImmediate();
                 Utils.dismissInputMethod(getActivity(), mEditText);
@@ -190,9 +191,7 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
             case R.id.send:
                 //发送好友请求
                 sendRequest();
-                getActivity().finish();
-                getActivity().overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
-                Utils.dismissInputMethod(getActivity(), mEditText);
+
                 return true;
             default:
                 Utils.dismissInputMethod(getActivity(), mEditText);
@@ -204,6 +203,12 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
      * post请求
      */
     private void sendRequest() {
+
+        if(mLabel == 0){
+            Utils.showToast(getActivity(),getString(R.string.please_select_group));
+            return;
+        }
+
         Map<String, String> requestMap = new HashMap<String, String>();
         requestMap.put(HttpConstants.FriendManage.MY_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));//
         requestMap.put(HttpConstants.FriendManage.ASK_ID, mFriendUserId);
@@ -215,7 +220,28 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
         paramMap.put(PublicConstant.URL, HttpConstants.FriendManage.URL);
         paramMap.put(PublicConstant.METHOD, HttpConstants.RequestMethod.POST);
         if (Utils.networkAvaiable(getActivity())) {
-            new FriendManageAsyncTask(requestMap, null, null).execute(paramMap);
+            HttpUtil.requestHttp(HttpConstants.FriendManage.URL,requestMap,HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                    super.onSuccess(statusCode, headers, response);
+                    Log.d("wy","friend send response ->" + response);
+                    try {
+                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                            mHandler.sendEmptyMessage(SEND_SUCCES);
+                        } else {
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                    super.onFailure(statusCode, headers, responseString, throwable);
+                    mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                }
+            });
         } else {
             Toast.makeText(getActivity(), getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
         }
@@ -226,11 +252,11 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
      */
     private void handleRequest() {
 
-        mComment = mEditText.getText().toString();
-        if(TextUtils.isEmpty(mComment)){
-            Utils.showToast(getActivity(),getString(R.string.please_write_comment));
-            return;
-        }
+//        mComment = mEditText.getText().toString();
+//        if(TextUtils.isEmpty(mComment)){
+//            Utils.showToast(getActivity(),getString(R.string.please_write_comment));
+//            return;
+//        }
 
         if(mLabel == 0){
             Utils.showToast(getActivity(),getString(R.string.please_select_group));
@@ -242,17 +268,18 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
         requestMap.put(HttpConstants.AskManage.GROUP_ID, String.valueOf(mGroupId + 1));
         requestMap.put(HttpConstants.AskManage.REMARK, mComment);
         requestMap.put(HttpConstants.AskManage.TAG, String.valueOf(mLabel));
+        Log.d("wy","friend manager request ->" + requestMap);
 
         if(Utils.networkAvaiable(getActivity())) {
             HttpUtil.requestHttp(HttpConstants.AskManage.URL, requestMap, HttpConstants.RequestMethod.POST, new JsonHttpResponseHandler() {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);
-                    Log.d("wy","friends manager response ->" + response);
+                    Log.d("wy","friends handle manager response ->" + response);
                     try{
                         if(!response.isNull("code")){
                             if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
-                                mHandler.sendEmptyMessage(PublicConstant.GET_SUCCESS);
+                                mHandler.sendEmptyMessage(HANDLE_SUCCESS);
                             }else{
                                 mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
                             }
@@ -311,57 +338,37 @@ public class FriendManageFragment extends Fragment implements View.OnClickListen
         }
     }
 
-    private class FriendManageAsyncTask extends AsyncTaskUtil<String> {
-
-        public FriendManageAsyncTask(Map<String, String> map, ProgressBar progressBar, TextView textView) {
-            super(map);
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onPostExecute(JSONObject jsonObject) {
-            if (jsonObject == null) {
-                return;//接口有问题
-            }
-
-            try {
-                Log.e(TAG, "jsonObject = " + jsonObject);
-                if (jsonObject.getInt("code") != HttpConstants.ResponseCode.NORMAL) {
-                    Log.d(TAG, "好友管理请求发送失败！->" + jsonObject.getString("msg"));
-                } else {
-                    Log.d(TAG, "好友管理请求发送成功");
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             switch(msg.what){
-                case PublicConstant.GET_SUCCESS:
-                    Utils.showToast(getActivity(),getString(R.string.you_are_friends));
-                    FriendsApplicationFragment applicationFragment = new FriendsApplicationFragment();
-                    Bundle args = new Bundle();
-                    args.putString(FriendProfileFragment.USER_NAME_KEY,mFriendUsername);
-                    applicationFragment.setArguments(args);
-                    mFragmentManager.beginTransaction()
-                        .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
-                        .replace(R.id.fragment_container, applicationFragment)
-                        .commit();
-                    break;
                 case PublicConstant.REQUEST_ERROR:
                     if (null == msg.obj) {
                         Utils.showToast(getActivity(), getString(R.string.http_request_error));
                     } else {
                         Utils.showToast(getActivity(), (String) msg.obj);
                     }
+                    break;
+                case HANDLE_SUCCESS:
+                    Utils.showToast(getActivity(),getString(R.string.you_are_friends));
+                    FriendsApplicationFragment applicationFragment = new FriendsApplicationFragment();
+                    Bundle args = new Bundle();
+                    args.putString(FriendProfileFragment.USER_NAME_KEY,mFriendUsername);
+                    applicationFragment.setArguments(args);
+                    mFragmentManager.beginTransaction()
+                            .setCustomAnimations(R.anim.push_right_in, R.anim.push_right_out)
+                            .replace(R.id.fragment_container, applicationFragment)
+                            .commit();
+                    Intent intent = new Intent();
+                    intent.setAction(PublicConstant.CHAT_HAS_NO_MSG);
+                    getActivity().sendBroadcast(intent);
+                    break;
+                case SEND_SUCCES:
+                    getActivity().finish();
+                    getActivity().overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                    Utils.dismissInputMethod(getActivity(), mEditText);
                     break;
             }
         }

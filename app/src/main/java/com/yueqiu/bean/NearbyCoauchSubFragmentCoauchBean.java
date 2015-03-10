@@ -162,8 +162,10 @@ public class NearbyCoauchSubFragmentCoauchBean implements Parcelable
         int hash = 3;
         try
         {
-            int userId = Integer.parseInt(this.getId());
-            hash *= userId;
+            hash = 17 * mId.hashCode();
+            hash = 17 * mUserName.hashCode();
+            hash = 17 * mUserDistance.hashCode();
+            hash = 17 * mBilliardKind.hashCode();
         } catch (final Exception e)
         {
             Log.d(TAG, " exception happened while we parse the userId, " + e.toString());
@@ -182,7 +184,7 @@ public class NearbyCoauchSubFragmentCoauchBean implements Parcelable
         } else
         {
             NearbyCoauchSubFragmentCoauchBean thatObj = (NearbyCoauchSubFragmentCoauchBean) object;
-            if (thatObj.getId().equals(this.getId()) && thatObj.getUserPhoto().equals(this.getUserPhoto())
+            if (thatObj.getId().equals(this.getId())
                     && thatObj.getUserName().equals(this.getUserName())
                     && thatObj.getUserDistance().equals(this.getUserDistance())
                     && thatObj.getmBilliardKind().equals(this.getmBilliardKind()))

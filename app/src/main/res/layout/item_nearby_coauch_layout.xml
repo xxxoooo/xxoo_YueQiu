@@ -6,7 +6,7 @@
     android:padding="10dp">
 
     <!-- 用于SearchActivity当中的教练Fragment当中的listView每一个item的布局文件-->
-    <com.android.volley.toolbox.NetworkImageView
+    <com.yueqiu.view.CustomNetWorkImageView
         android:layout_marginTop="4dp"
         android:layout_width="@dimen/listview_item_user_photo_width"
         android:layout_height="@dimen/listview_item_user_photo_height"

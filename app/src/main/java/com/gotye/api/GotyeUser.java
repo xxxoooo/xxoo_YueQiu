@@ -108,7 +108,7 @@ public class GotyeUser extends GotyeChatTarget{
 	@Override
 	public String toString() {
 		return "GotyeUser [gender=" + gender + ", icon=" + icon + ", name="
-				+ name + ", nickname=" + nickname + "]";
+				+ name + ", nickname=" + nickname +  ", info" + info + "]";
 	}
 	
 	public static GotyeUser jsonToUser(String jsonUser){

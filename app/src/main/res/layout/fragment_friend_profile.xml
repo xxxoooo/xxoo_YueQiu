@@ -45,7 +45,7 @@
                         android:layout_centerVertical="true"
                         android:text="@string/photo"/>
 
-                    <com.android.volley.toolbox.NetworkImageView
+                    <com.yueqiu.view.CustomNetWorkImageView
                         android:id="@+id/friend_profile_photo"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
@@ -80,7 +80,7 @@
                         android:layout_marginRight="10dp"
                         android:layout_centerVertical="true"
                         android:layout_alignParentRight="true"
-                        android:text="dkijeoijiode"/>
+                        />
                 </RelativeLayout>
 
                 <View

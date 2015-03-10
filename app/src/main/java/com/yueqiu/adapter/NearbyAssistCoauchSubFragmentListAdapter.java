@@ -14,6 +14,7 @@ import com.yueqiu.bean.NearbyAssistCoauchSubFragmentBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class NearbyAssistCoauchSubFragmentListAdapter extends BaseAdapter
             convertView = mInflater.inflate(R.layout.item_nearby_assistcoauch_layout, parent, false);
             viewHolder = new ViewHolder();
 
-            viewHolder.mPhoto = (NetworkImageView) convertView.findViewById(R.id.img_assistcoauch_subfragment_listitem_photo);
+            viewHolder.mPhoto = (CustomNetWorkImageView) convertView.findViewById(R.id.img_assistcoauch_subfragment_listitem_photo);
             viewHolder.mNickname = (TextView) convertView.findViewById(R.id.tv_assistcoauch_subfragment_listitem_name);
             viewHolder.mGender = (TextView) convertView.findViewById(R.id.tv_assistcoauch_subfragment_listitem_gender);
             viewHolder.mKinds = (TextView) convertView.findViewById(R.id.tv_assistcoauch_subfragment_listitem_kinds);
@@ -112,7 +113,7 @@ public class NearbyAssistCoauchSubFragmentListAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        private NetworkImageView mPhoto;
+        private CustomNetWorkImageView mPhoto;
         private TextView mNickname, mGender, mKinds, mPrice, mDistance;
     }
 }

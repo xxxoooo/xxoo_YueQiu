@@ -49,6 +49,7 @@ import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.apache.http.Header;
@@ -69,7 +70,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
     private View mPraiseView,mReplyView;
     private TextView mTvYueqiu, mTvYueqiuCircle, mTvFriendCircle,
             mTvWeichat, mTvQQZone, mTvTencentWeibo, mTvSinaWeibo, mTvRenren;
-    private NetworkImageView mOwnerImg;//mExtraImg;
+    private CustomNetWorkImageView mOwnerImg;//mExtraImg;
     private TextView mOwnerTv,mOwnerSexTv,mReadCountTv,mCreateTimeTv,mPaiseCountTv,
             mReplyCountTv;//mTitleTv,mContentTv;
 //    private LinearLayout mContentContainer;
@@ -119,7 +120,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
         mPraiseView = findViewById(R.id.billiard_group_praise_view);
         mReplyView = findViewById(R.id.billiard_group_reply_view);
 
-        mOwnerImg = (NetworkImageView) findViewById(R.id.billiard_group_detail_img);
+        mOwnerImg = (CustomNetWorkImageView) findViewById(R.id.billiard_group_detail_img);
         mOwnerImg.setDefaultImageResId(R.drawable.default_head);
         mOwnerImg.setErrorImageResId(R.drawable.default_head);
 

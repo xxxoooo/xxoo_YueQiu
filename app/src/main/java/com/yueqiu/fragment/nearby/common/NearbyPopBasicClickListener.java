@@ -136,7 +136,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         String posVal = String.valueOf(position);
 //                        final String priceStr = String.valueOf(posVal + 1);
                         mParamsPreference.setAScouchPrice(mContext, posVal);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_PRICE_FILTERED, posVal).sendToTarget();
+                        mUIEventsHandler.obtainMessage(
+                                BilliardsNearbyAssistCoauchFragment.GET_LOCATION,
+                                BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_PRICE_FILTERED,
+                                0,
+                                posVal).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -160,7 +164,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         String posVal = String.valueOf(position);
 //                        final String clazzStr = String.valueOf(posVal + 1);
                         mParamsPreference.setAScouchLevel(mContext, posVal);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETREIVE_INFO_WITH_KINDS_FILTERED, posVal).sendToTarget();
+                        mUIEventsHandler.obtainMessage(
+                                BilliardsNearbyAssistCoauchFragment.GET_LOCATION,
+                                BilliardsNearbyAssistCoauchFragment.RETREIVE_INFO_WITH_KINDS_FILTERED,
+                                0,
+                                posVal).sendToTarget();
 
                         mPopupWindow.dismiss();
                     }
@@ -191,7 +199,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         String posVal = String.valueOf(position);
 //                        final String levelStr = String.valueOf(posVal + 1);
                         mParamsPreference.setAScouchLevel(mContext, posVal);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_LEVEL_FILTERED, posVal).sendToTarget();
+                        mUIEventsHandler.obtainMessage(
+                                BilliardsNearbyAssistCoauchFragment.GET_LOCATION,
+                                BilliardsNearbyAssistCoauchFragment.RETRIEVE_INFO_WITH_LEVEL_FILTERED,
+                                0,
+                                posVal).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -282,7 +294,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                     {
                         String posVal = String.valueOf(position);
                         mParamsPreference.setCouchLevel(mContext,posVal);
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyCoachFragment.RETRIEVE_COAUCH_WITH_LEVEL_FILTERED, posVal).sendToTarget();
+                        mUIEventsHandler.obtainMessage(
+                                BilliardsNearbyCoachFragment.GET_LOCATION,
+                                BilliardsNearbyCoachFragment.RETRIEVE_COAUCH_WITH_LEVEL_FILTERED,
+                                0,
+                                posVal).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -379,7 +395,11 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
 //                        String specifiedDate = formatter.format(calendar.getTime());
                         mParamsPreference.setDatingPublishedDate(mContext, posVal);
 
-                        mUIEventsHandler.obtainMessage(BilliardsNearbyDatingFragment.RETRIEVE_DATA_WITH_DATE_FILTERED, posVal).sendToTarget();
+                        mUIEventsHandler.obtainMessage(
+                                BilliardsNearbyDatingFragment.GET_LOCATION,
+                                BilliardsNearbyDatingFragment.RETRIEVE_DATA_WITH_DATE_FILTERED,
+                                0,
+                                posVal).sendToTarget();
                         mPopupWindow.dismiss();
                     }
                 });
@@ -414,6 +434,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         final int posVal = position;
                         String regionStr = regionStrList[posVal];
                         mParamsPreference.setRoomRegion(mContext, regionStr);
+                        mParamsPreference.setRoomRange(mContext,"");
                         Log.d(TAG, " inside the popupBase click listener, and the params we transfer are : " + regionStr);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_REGION_FILTERED, regionStr).sendToTarget();
                         // 当我们选择了一个条目之后，就需要将popupWindow dismiss掉
@@ -473,6 +494,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         }
                         String priceStr = String.valueOf(priceSort);
                         mParamsPreference.setRoomPrice(mContext, priceStr);
+                        mParamsPreference.setRoomRange(mContext,"");
                         mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_PRICE_FILTERED, priceStr).sendToTarget();
                         mPopupWindow.dismiss();
                     }
@@ -501,6 +523,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                         int apprisalValSort = posVal + 2;
                         String apprisalStr = String.valueOf(apprisalValSort);
                         mParamsPreference.setRoomApprisal(mContext, apprisalStr);
+                        mParamsPreference.setRoomRange(mContext,"");
                         Log.d(TAG, " inside the FilterOnClickListener --> the apprisal sort value we get from user are : " + apprisalValSort);
                         mUIEventsHandler.obtainMessage(BilliardsNearbyRoomFragment.REQUEST_ROOM_INFO_APPRISAL_FILTERED, apprisalStr).sendToTarget();
                         mPopupWindow.dismiss();

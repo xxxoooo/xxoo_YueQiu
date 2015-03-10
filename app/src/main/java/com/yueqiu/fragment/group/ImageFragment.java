@@ -75,11 +75,13 @@ public class ImageFragment extends DialogFragment {
         }
         int imageWidth = image.getIntrinsicWidth();
         int imageHeight = image.getIntrinsicHeight();
+
         RelativeLayout.LayoutParams params;
         int viewWidth,viewHeight;
         if(imageWidth < 300){
             viewWidth = 300;
-        }else{
+        }
+        else{
             viewWidth = RelativeLayout.LayoutParams.WRAP_CONTENT;
         }
 

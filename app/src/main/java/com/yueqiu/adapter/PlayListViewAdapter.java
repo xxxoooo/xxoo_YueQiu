@@ -18,6 +18,7 @@ import com.yueqiu.bean.PlayInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.io.InputStream;
 import java.util.List;
@@ -62,7 +63,7 @@ public class PlayListViewAdapter extends BaseAdapter {
             holder.tv_content = (TextView)view.findViewById(R.id.activities_lv_item_tv_activities_time);
             holder.tv_time_day = (TextView)view.findViewById(R.id.activities_lv_item_tv_time_day);
             holder.tv_time_hour = (TextView)view.findViewById(R.id.activities_lv_item_tv_time_hour);
-            holder.photo = (NetworkImageView) view.findViewById(R.id.activities_lv_item_iv_head);
+            holder.photo = (CustomNetWorkImageView) view.findViewById(R.id.activities_lv_item_iv_head);
             view.setTag(holder);
         }
         else
@@ -89,6 +90,6 @@ public class PlayListViewAdapter extends BaseAdapter {
         public  TextView tv_content;
         public  TextView tv_time_day;
         public  TextView tv_time_hour;
-        public  NetworkImageView photo;
+        public CustomNetWorkImageView photo;
     }
 }

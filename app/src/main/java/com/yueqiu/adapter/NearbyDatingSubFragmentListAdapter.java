@@ -13,6 +13,7 @@ import com.yueqiu.R;
 import com.yueqiu.bean.NearbyDatingSubFragmentDatingBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,7 @@ public class NearbyDatingSubFragmentListAdapter extends BaseAdapter
             convertView = mInflater.inflate(R.layout.item_nearby_dating_layout, parent, false);
             viewHolder = new ViewHolder();
 
-            viewHolder.mUserPhoto = (NetworkImageView) convertView.findViewById(R.id.img_dating_subfragment_listitem_photo);
+            viewHolder.mUserPhoto = (CustomNetWorkImageView) convertView.findViewById(R.id.img_dating_subfragment_listitem_photo);
             viewHolder.mUserNickname = (TextView) convertView.findViewById(R.id.tv_dating_subfragment_listitem_nickname);
             viewHolder.mUserDeclareation = (TextView) convertView.findViewById(R.id.tv_dating_subfragment_listitem_declareation);
             viewHolder.mUserDistance = (TextView) convertView.findViewById(R.id.tv_dating_subfragment_listitem_distance_meter);
@@ -95,7 +96,7 @@ public class NearbyDatingSubFragmentListAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        public NetworkImageView mUserPhoto;
+        public CustomNetWorkImageView mUserPhoto;
         public TextView mUserNickname, mUserDeclareation, mUserDistance;
     }
 

@@ -143,7 +143,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     // 以下是我们用于跟踪page的值的请求(用于大众点评的分页请求过程)
     private int mPage = 1;
     private LocationManagerProxy mLocationManagerProxy;
-
+    private int mCurrentPos;
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -229,21 +229,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
         }
 
 
-        mWorkerThread = new WorkerHandlerThread(mPage);
-        mLoadMore = false;
-        mRefresh = false;
-        if (mWorkerThread.getState() == Thread.State.NEW)
-        {
-            Log.d(TAG, " the mWorkerThread has been started in the onCreateView ");
-            // 这里的WorkThread必须调用了start()方法之后，位于WorkThread当中的workHandler才可以正常工作
-            mWorkerThread.start();
-        }
-        if (!Utils.networkAvaiable(mContext))
-        {
-            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
-        }
+
         // 开启用于获取地理位置的服务
-        getActivity().startService(new Intent(getActivity(), LocationUtil.class));
+//        getActivity().startService(new Intent(getActivity(), LocationUtil.class));
 
         return mView;
     }
@@ -332,6 +320,19 @@ public class BilliardsNearbyRoomFragment extends Fragment
     public void onResume()
     {
         super.onResume();
+        mWorkerThread = new WorkerHandlerThread(mPage);
+        mLoadMore = false;
+        mRefresh = false;
+        if (mWorkerThread.getState() == Thread.State.NEW)
+        {
+            Log.d(TAG, " the mWorkerThread has been started in the onCreateView ");
+            // 这里的WorkThread必须调用了start()方法之后，位于WorkThread当中的workHandler才可以正常工作
+            mWorkerThread.start();
+        }
+        if (!Utils.networkAvaiable(mContext))
+        {
+            mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
+        }
 //        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, new IntentFilter(LocationUtil.BROADCAST_FILTER));
     }
 
@@ -421,6 +422,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
         requestParams.put("has_coupon", 0 + "");
         requestParams.put("page", page + "");
 
+        Log.d("wy","room requestParams->" + requestParams);
         mUIEventsHandler.sendEmptyMessage(SET_PULLREFRESH_DISABLE);
 
         HttpUtil.dpRequestHttp(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams,new JsonHttpResponseHandler(){
@@ -581,6 +583,14 @@ public class BilliardsNearbyRoomFragment extends Fragment
     {
         mCallback.closePopupWindow();
 
+        if (mWorkerThread != null)
+        {
+            mWorkerThread.interrupt();
+            mWorkerThread = null;
+        }
+
+        // 每当用户退出时，我们需要重新将所有的筛选的参数置空，这样当用户再次进入时就可以得到所有的信息列表
+
 //        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
         super.onPause();
     }
@@ -595,13 +605,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     @Override
     public void onDestroy()
     {
-        if (mWorkerThread != null)
-        {
-            mWorkerThread.interrupt();
-            mWorkerThread = null;
-        }
-
-        // 每当用户退出时，我们需要重新将所有的筛选的参数置空，这样当用户再次进入时就可以得到所有的信息列表
+        //TODO:还需再确定到底是onDestroy时清空还是onPause时清空
         sParamsPreference.setRoomApprisal(mContext, "");
         sParamsPreference.setRoomPrice(mContext, "");
         sParamsPreference.setRoomRegion(mContext, "");
@@ -709,9 +713,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     if (mRoomList.isEmpty())
                     {
                         Log.d(TAG, " inside the room fragment UIEventsHandler --> have send the message to load the Empty TextView ");
-
-                        final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
-                        setEmptyViewVisible(range);
+                        setEmptyViewVisible();
                     } else
                     {
                         if (mRefresh)
@@ -795,30 +797,36 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 case PublicConstant.REQUEST_ERROR:
                     Bundle errorData = msg.getData();
                     String errorMsg = errorData.getString(KEY_REQUEST_ERROR_MSG_ROOM);
-                    if (! TextUtils.isEmpty(errorMsg))
-                    {
-                        Log.d(TAG, " the error data we get are : " + errorMsg);
-                        Utils.showToast(mContext, errorMsg);
-                    } else {
-                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
-                    }
 
                     if (mRoomList.isEmpty())
                     {
                         Log.d(TAG, " the room list we get are : " + mRoomList.size());
-                        final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
-                        setEmptyViewVisible(range);
+                        setEmptyViewVisible();
+                        if (! TextUtils.isEmpty(errorMsg))
+                        {
+                           mEmptyView.setText(errorMsg);
+                        } else {
+                            mEmptyView.setText(mContext.getString(R.string.http_request_error));
+                        }
+                    }else{
+                        if (! TextUtils.isEmpty(errorMsg))
+                        {
+                            Log.d(TAG, " the error data we get are : " + errorMsg);
+                            Utils.showToast(mContext, errorMsg);
+                        } else {
+                            Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
+                        }
                     }
 
                     break;
                 case PublicConstant.NO_NETWORK:
                     hideProgress();
-
-                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     if (mRoomList.isEmpty())
                     {
-                        final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
-                        setEmptyViewVisible(range);
+                        setEmptyViewVisible();
+                        mEmptyView.setText(mContext.getString(R.string.network_not_available));
+                    }else{
+                        Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     }
                     break;
 
@@ -826,8 +834,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     setEmptyViewGone();
                     if (mRoomList.isEmpty())
                     {
-                        final int range = TextUtils.isEmpty(sParamsPreference.getRoomRange(mContext)) ? 1000 : Integer.parseInt(sParamsPreference.getRoomRange(mContext));
-                        setEmptyViewVisible(range);
+                        setEmptyViewVisible();
                     } else
                     {
                         if (mLoadMore)
@@ -842,6 +849,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     break;
             }
             mSearchRoomAdapter.notifyDataSetChanged();
+            if(mLoadMore && !mRoomList.isEmpty()){
+                mRoomListView.getRefreshableView().setSelection(mCurrentPos - 1 );
+            }
         }
     };
 
@@ -849,13 +859,13 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private TextView mEmptyView;
     // 我们通过将disable的值设置为false来进行加载EmptyView
     // 通过将disable的值设置为true来隐藏emptyView
-    private void setEmptyViewVisible(final int rangeNum)
+    private void setEmptyViewVisible()
     {
         mEmptyView = new TextView(mContext);
         mEmptyView.setGravity(Gravity.CENTER);
         mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
         mEmptyView.setTextColor(mContext.getResources().getColor(R.color.md__defaultBackground));
-        mEmptyView.setText(mContext.getString(R.string.search_activity_roomfragment_empty_tv_str, rangeNum));
+        mEmptyView.setText(mContext.getString(R.string.search_activity_roomfragment_empty_tv_str));
         mRoomListView.setEmptyView(mEmptyView);
     }
 
@@ -1108,6 +1118,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
             if (mBeforeCount != mAfterCount && !mRefresh)
                 mPage += 1;
             mRefresh = false;
+            mCurrentPos = mRoomList.size();
             if (Utils.networkAvaiable(mContext))
             {
                 // TODO: 我们在这里进行网络更新的请求

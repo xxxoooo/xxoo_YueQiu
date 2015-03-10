@@ -145,7 +145,6 @@ public abstract class SlideMenuBasicFragment extends Fragment {
             try {
                 if(!response.isNull("code")) {
                     if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                        if (response.getJSONObject("result") != null) {
                             List<T> list = setBeanByJSON(response);
                             if(list.isEmpty()){
                                 mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
@@ -153,9 +152,6 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                                 mHandler.obtainMessage(PublicConstant.GET_SUCCESS, list).sendToTarget();
                             }
 
-                        }else{
-                            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-                        }
                     }
                     else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
                         mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
@@ -171,6 +167,7 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+                Log.d("wy","wocanima");
             }
         }
 
@@ -203,25 +200,35 @@ public abstract class SlideMenuBasicFragment extends Fragment {
                     }
                     break;
                 case PublicConstant.REQUEST_ERROR:
-                    if(null == msg.obj){
-                        Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
+
+                    if(mList.isEmpty()) {
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+                        if(null == msg.obj){
+                            mEmptyView.setText(mActivity.getString(R.string.http_request_error));
+                        }else{
+                            mEmptyView.setText((String) msg.obj);
+                        }
                     }else{
-                        Utils.showToast(mActivity, (String) msg.obj);
-                    }
-                    if(mList.isEmpty()) {
-                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
-                    }
-                    break;
-                case PublicConstant.TIME_OUT:
-                    Utils.showToast(mActivity,mActivity.getString(R.string.http_request_time_out));
-                    if(mList.isEmpty()) {
-                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+                        if(null == msg.obj){
+                            Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
+                        }else{
+                            Utils.showToast(mActivity, (String) msg.obj);
+                        }
                     }
                     break;
+//                case PublicConstant.TIME_OUT:
+//                    Utils.showToast(mActivity,mActivity.getString(R.string.http_request_time_out));
+//                    if(mList.isEmpty()) {
+//                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+//                    }
+//                    break;
                 case PublicConstant.NO_NETWORK:
-                    Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
-                    if(mList.isEmpty())
-                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty,mEmptyTypeStr));
+                    if(mList.isEmpty()) {
+                        setEmptyViewVisible(mActivity.getString(R.string.your_published_info_is_empty, mEmptyTypeStr));
+                        mEmptyView.setText(mActivity.getString(R.string.network_not_available));
+                    }else{
+                        Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
+                    }
                     break;
             }
         }

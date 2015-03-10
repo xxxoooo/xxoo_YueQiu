@@ -1,6 +1,7 @@
 package com.yueqiu.fragment.addfriend;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -45,6 +46,7 @@ import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 import com.yueqiu.view.pullrefresh.PullToRefreshListView;
@@ -93,7 +95,7 @@ public class FriendsApplicationFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if(Utils.networkAvaiable(getActivity())){
-            getFriendApplication();//todo:logic confirm
+            getFriendApplication();
         }else{
             Toast.makeText(getActivity(), getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
         }
@@ -191,6 +193,7 @@ public class FriendsApplicationFragment extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                Log.d("wy","friends application response ->" + response);
                 try {
                     if(!response.isNull("code")) {
                         if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
@@ -210,6 +213,7 @@ public class FriendsApplicationFragment extends Fragment {
                                     String username = list_data.getJSONObject(i).getString("username");
                                     String create_time = list_data.getJSONObject(i).getString("create_time");
                                     String img_url = list_data.getJSONObject(i).getString("img_url");
+                                    int isAgree = list_data.getJSONObject(i).getInt("state");
 
                                     if(mAgreedUsername != null && mAgreedUsername.equals(username)){
                                         application.setIsAgree(AGREED);
@@ -221,6 +225,7 @@ public class FriendsApplicationFragment extends Fragment {
                                     application.setUsername(username);
                                     application.setCreate_time(create_time);
                                     application.setImg_url(img_url);
+                                    application.setIsAgree(isAgree);
 
                                     map.put(username,application);
                                 }
@@ -262,6 +267,7 @@ public class FriendsApplicationFragment extends Fragment {
                 case PublicConstant.GET_SUCCESS:
                     LinkedHashMap<String,FriendsApplication> map = (LinkedHashMap<String, FriendsApplication>) msg.obj;
                     Iterator iterator = map.entrySet().iterator();
+                    boolean isEmpty = mList.isEmpty();
                     while (iterator.hasNext()) {
                         Map.Entry<String,FriendsApplication> entry = (Map.Entry<String,FriendsApplication>) iterator.next();
                         if(mList.contains(entry.getValue())){
@@ -271,7 +277,11 @@ public class FriendsApplicationFragment extends Fragment {
                                 mList.add(index,entry.getValue());
                             }
                         }else{
-                            mList.add(entry.getValue());
+                            if(!isEmpty && Integer.valueOf(entry.getValue().getId()) > Integer.valueOf(mList.get(0).getId())){
+                                mList.add(0,entry.getValue());
+                            }else {
+                                mList.add(entry.getValue());
+                            }
                         }
                     }
                     mMyAdapter.notifyDataSetChanged();
@@ -363,7 +373,7 @@ public class FriendsApplicationFragment extends Fragment {
             if (convertView == null) {
                 convertView = mLayoutInflater.inflate(R.layout.item_friends_application, null);
                 viewHolder = new ViewHolder();
-                viewHolder.mImageView = (NetworkImageView) convertView.findViewById(R.id.friends_application_icon);
+                viewHolder.mImageView = (CustomNetWorkImageView) convertView.findViewById(R.id.friends_application_icon);
                 viewHolder.mAccount = (TextView) convertView.findViewById(R.id.friends_application_username);
                 viewHolder.mMessage = (TextView) convertView.findViewById(R.id.friends_application_message);
                 viewHolder.mSendTime = (TextView) convertView.findViewById(R.id.friends_application_time);
@@ -406,7 +416,7 @@ public class FriendsApplicationFragment extends Fragment {
         }
 
         final class ViewHolder {
-            public NetworkImageView mImageView;
+            public CustomNetWorkImageView mImageView;
             public TextView mAccount;
             public TextView mMessage;
             public TextView mSendTime;

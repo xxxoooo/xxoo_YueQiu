@@ -9,7 +9,16 @@
     android:padding="10dp"
     android:background="@drawable/published_item_bg"
     android:layout_weight="4">
-    <com.android.volley.toolbox.NetworkImageView
+    <!--<com.android.volley.toolbox.NetworkImageView-->
+        <!--android:id="@+id/partin_item_image"-->
+        <!--android:layout_width="@dimen/listview_item_user_photo_width"-->
+        <!--android:layout_height="@dimen/listview_item_user_photo_height"-->
+        <!--android:layout_marginTop="8dp"-->
+        <!--android:layout_marginBottom="8dp"-->
+        <!--android:layout_alignParentLeft="true"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:src="@drawable/default_head"/>-->
+    <com.yueqiu.view.CustomNetWorkImageView
         android:id="@+id/partin_item_image"
         android:layout_width="@dimen/listview_item_user_photo_width"
         android:layout_height="@dimen/listview_item_user_photo_height"
@@ -21,25 +30,25 @@
     <TextView
         android:id="@+id/partin_title"
         style="@style/ListItemTvStyle"
-        android:layout_alignTop="@+id/published_item_image"
-        android:layout_toRightOf="@+id/published_item_image"
+        android:layout_alignTop="@+id/partin_item_image"
+        android:layout_toRightOf="@+id/partin_item_image"
         android:layout_marginLeft="10dp"
-        android:textSize="16sp"
+        android:textSize="18sp"
         android:ellipsize="end"
         android:singleLine="true"
         android:layout_toLeftOf="@+id/published_time"
         />
     <TextView
         android:id="@+id/partin_content"
-        android:layout_below="@+id/published_title"
-        android:layout_alignLeft="@+id/published_title"
-        android:layout_alignBottom="@+id/published_item_image"
+        android:layout_alignLeft="@+id/partin_title"
         android:ellipsize="end"
-        android:textSize="14sp"
+        android:textSize="15sp"
         style="@style/TimeTextStyle"
         android:singleLine="true"
         android:layout_toLeftOf="@+id/published_time"
         android:layout_marginRight="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_alignBottom="@+id/partin_item_image"
         />
     <TextView
         android:id="@+id/partin_time"

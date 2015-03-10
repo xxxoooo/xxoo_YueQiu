@@ -28,6 +28,9 @@ public class ContactsList {
         private String img_url;
         private String content;
         private String create_time;
+        private String sex;
+        private String phone;
+        private String district;
 
 
         public void setUsername(String username) {
@@ -77,6 +80,30 @@ public class ContactsList {
 
         public String getCreate_time() {
             return create_time;
+        }
+
+        public String getSex() {
+            return sex;
+        }
+
+        public void setSex(String sex) {
+            this.sex = sex;
+        }
+
+        public String getPhone() {
+            return phone;
+        }
+
+        public void setPhone(String phone) {
+            this.phone = phone;
+        }
+
+        public String getDistrict() {
+            return district;
+        }
+
+        public void setDistrict(String district) {
+            this.district = district;
         }
     }
 

@@ -33,6 +33,9 @@
     <dimen name="listview_item_user_photo_width">62dp</dimen>
     <dimen name="listview_item_user_photo_height">62dp</dimen>
 
+    <dimen name="account_photo_width">75dp</dimen>
+    <dimen name="accoutn_photo_height">75dp</dimen>
+
     <dimen name="friend_listview_divider_height">10dp</dimen>
 
 

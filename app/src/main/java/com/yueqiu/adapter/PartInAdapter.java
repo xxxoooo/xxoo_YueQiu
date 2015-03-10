@@ -17,6 +17,7 @@ import com.yueqiu.bean.PartInInfo;
 import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.List;
 
@@ -61,7 +62,7 @@ public class PartInAdapter extends BaseAdapter{
         if(convertView == null){
             convertView = mInflater.inflate(R.layout.item_part_in,null);
             holder = new ViewHolder();
-            holder.image = (NetworkImageView) convertView.findViewById(R.id.partin_item_image);
+            holder.image = (CustomNetWorkImageView) convertView.findViewById(R.id.partin_item_image);
             holder.title = (TextView) convertView.findViewById(R.id.partin_title);
             holder.content = (TextView) convertView.findViewById(R.id.partin_content);
             holder.dateTime = (TextView) convertView.findViewById(R.id.partin_time);
@@ -86,7 +87,8 @@ public class PartInAdapter extends BaseAdapter{
     }
 
     class ViewHolder{
-        NetworkImageView image;
+//        NetworkImageView image;
+        CustomNetWorkImageView image;
         TextView title;
         TextView  content;
         TextView  dateTime;

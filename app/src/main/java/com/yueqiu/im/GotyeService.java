@@ -45,14 +45,14 @@ public class GotyeService extends Service implements NotifyListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null) {
-            if (ACTION_INIT.equals(intent.getAction())) {
-                GotyeAPI.getInstance().init(getBaseContext(),
-                        YueQiuApp.APPKEY, YueQiuApp.PACKAGENAME);
-            }
-        }
+        Log.d("wy","gotye service");
+//        if (intent != null) {
+//            if (ACTION_INIT.equals(intent.getAction())) {
+        GotyeAPI.getInstance().init(getBaseContext(),YueQiuApp.APPKEY, YueQiuApp.PACKAGENAME);
+//            }
+//        }
         GotyeAPI.getInstance().addListerer(this);
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     @Override
@@ -81,8 +81,7 @@ public class GotyeService extends Service implements NotifyListener {
 
         Intent intent = new Intent(this, ChatBarActivity.class);
         intent.putExtra("notify", 1);
-        PendingIntent pendingIntent =
-                TaskStackBuilder.create(this)
+        PendingIntent pendingIntent =TaskStackBuilder.create(this)
                         .addNextIntentWithParentStack(intent)
                         .getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -99,6 +98,7 @@ public class GotyeService extends Service implements NotifyListener {
      */
     @Override
     public void onReceiveMessage(int code, GotyeMessage message, boolean unRead) {
+        Log.d("wy"," service mReceive");
         String msg = null;
 
         if (message.getType() == GotyeMessageType.GotyeMessageTypeText) {

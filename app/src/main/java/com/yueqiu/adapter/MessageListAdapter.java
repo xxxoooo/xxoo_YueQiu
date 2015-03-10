@@ -1,6 +1,7 @@
 package com.yueqiu.adapter;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeChatTarget;
 import com.gotye.api.GotyeChatTargetType;
@@ -20,9 +23,12 @@ import com.gotye.api.GotyeRoom;
 import com.gotye.api.GotyeUser;
 import com.yueqiu.R;
 import com.yueqiu.bean.FriendsApplication;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.chatbar.MessageFragment;
 import com.yueqiu.util.ImageCache;
 import com.yueqiu.util.TimeUtil;
+import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.List;
 
@@ -31,15 +37,18 @@ public class MessageListAdapter extends BaseAdapter {
 	private List<GotyeChatTarget> sessions;
 	private GotyeAPI api;
     private String mContent;
+    private ImageLoader mImgLoader;
 
 	public MessageListAdapter(MessageFragment mMessageFragment,List<GotyeChatTarget> sessions) {
 		this.mMessageFragment = mMessageFragment;
 		this.sessions = sessions;
 		this.api = GotyeAPI.getInstance();
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
 	}
 
     static class ViewHolder {
-		ImageView icon,state_icon;
+        CustomNetWorkImageView icon;
+		ImageView state_icon;
 		TextView title, content, time, count;
 	}
 
@@ -87,7 +96,7 @@ public class MessageListAdapter extends BaseAdapter {
 			view = LayoutInflater.from(mMessageFragment.getActivity()).inflate(
 					R.layout.item_delete, null);
 			viewHolder = new ViewHolder();
-			viewHolder.icon = (ImageView) view.findViewById(R.id.icon);
+			viewHolder.icon = (CustomNetWorkImageView) view.findViewById(R.id.icon);
             viewHolder.state_icon = (ImageView) view.findViewById(R.id.message_state_icon);
 			viewHolder.title = (TextView) view.findViewById(R.id.title_tx);
 			viewHolder.content = (TextView) view.findViewById(R.id.content_tx);
@@ -112,7 +121,7 @@ public class MessageListAdapter extends BaseAdapter {
                 viewHolder.time.setVisibility(View.VISIBLE);
                 viewHolder.time.setText(session.newFriend.getCreate_time());
             }
-			viewHolder.icon.setImageResource(R.drawable.message);
+			viewHolder.icon.setDefaultImageResId(R.drawable.message);
             if(session.hasNewMsg) {
                 viewHolder.state_icon.setVisibility(View.VISIBLE);
             }else{
@@ -128,14 +137,14 @@ public class MessageListAdapter extends BaseAdapter {
 			}
 
 		} else {
-			String title = "", content = "";
+			String title = "", content = "",img_url="",nicknameStr,nick;
 			viewHolder.content.setVisibility(View.VISIBLE);
+            viewHolder.state_icon.setVisibility(View.GONE);
+
 			GotyeMessage lastMsg = api.getLastMessage(session);
-            Log.e("ddd", "lastMsg  = " + lastMsg );
-			String lastMsgTime = TimeUtil
-					.dateToMessageTime(lastMsg.getDate() * 1000);
+			String lastMsgTime = TimeUtil.dateToMessageTime(lastMsg.getDate() * 1000);
 			viewHolder.time.setText(lastMsgTime);
-			setIcon(viewHolder.icon, session);
+//			setIcon(viewHolder.icon, session);
 			if (lastMsg.getType() == GotyeMessageType.GotyeMessageTypeText) {
 				content = mMessageFragment.getString(R.string.text_msg) + lastMsg.getText();
 			} else if (lastMsg.getType() == GotyeMessageType.GotyeMessageTypeImage) {
@@ -149,13 +158,27 @@ public class MessageListAdapter extends BaseAdapter {
 			}
 
 			if (session.type == GotyeChatTargetType.GotyeChatTargetTypeUser) {
-				GotyeUser user = api.requestUserInfo(session.name, false);
+				GotyeUser user = api.requestUserInfo(session.name, true);
+                Log.d("cao","message adapter user nickname ->" + user.getNickname());
+
+
 				if (user != null) {
 					if (TextUtils.isEmpty(user.getNickname())) {
 						title = mMessageFragment.getString(R.string.good_friend) + user.name;
 					} else {
-						title = mMessageFragment.getString(R.string.good_friend) + user.getNickname();
+                        nicknameStr = user.getNickname();
+                        int splitIndex = nicknameStr.lastIndexOf("|");
+                        if(splitIndex != -1) {
+                            nick = nicknameStr.substring(0, splitIndex);
+                            img_url = nicknameStr.substring(splitIndex + 1);
+
+                            Log.d("cao","message adapter nick is -> " + nick);
+                        }else{
+                            nick = nicknameStr;
+                        }
+                        title = mMessageFragment.getString(R.string.good_friend) + nick;
 					}
+                    Log.d("cao","message adapter img_url ->" + img_url);
 				} else {
 					title = mMessageFragment.getString(R.string.good_friend)+ session.name;
 				}
@@ -186,6 +209,9 @@ public class MessageListAdapter extends BaseAdapter {
 			}
 			viewHolder.title.setText(title);
 			viewHolder.content.setText(content);
+            viewHolder.icon.setDefaultImageResId(R.drawable.default_head);
+            Log.d("wy","caonidaye ->" + HttpConstants.IMG_BASE_URL + img_url);
+            viewHolder.icon.setImageUrl(HttpConstants.IMG_BASE_URL  + img_url,mImgLoader);
 			int count = api.getUnreadMsgcounts(session);
 			if (count > 0) {
 				viewHolder.count.setVisibility(View.VISIBLE);
@@ -205,8 +231,7 @@ public class MessageListAdapter extends BaseAdapter {
 				return;
 			} else if (user.getIcon() != null) {
                 Log.e("ddd", " image url = " + user.getIcon().getUrl() + "   image path" + user.getIcon().getPath());
-				ImageCache.getInstance().setIcom(imgView,
-						user.getIcon().getPath(), user.getIcon().getUrl());
+				ImageCache.getInstance().setIcom(imgView,user.getIcon().getPath(), user.getIcon().getUrl());
 			}
 		} else if (target.type == GotyeChatTargetType.GotyeChatTargetTypeRoom) {
 			GotyeRoom room = api.requestRoomInfo(target.Id, false);

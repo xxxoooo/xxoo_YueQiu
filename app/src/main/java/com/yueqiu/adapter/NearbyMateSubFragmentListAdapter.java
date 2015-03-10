@@ -14,6 +14,7 @@ import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,7 @@ public class NearbyMateSubFragmentListAdapter extends BaseAdapter
             convertView = mInflater.inflate(R.layout.item_mate_layout, parent, false);
             viewHolder = new ViewHolder();
 
-            viewHolder.mUserPhoto = (NetworkImageView) convertView.findViewById(R.id.img_mate_subfragment_listitem_photo);
+            viewHolder.mUserPhoto = (CustomNetWorkImageView) convertView.findViewById(R.id.img_mate_subfragment_listitem_photo);
             viewHolder.mUserNickName = (TextView) convertView.findViewById(R.id.tv_mate_subfragment_listitem_nickname);
             viewHolder.mUserGender = (TextView) convertView.findViewById(R.id.tv_mate_subfragment_listitem_gender);
             viewHolder.mUserDistanceMeter = (TextView) convertView.findViewById(R.id.tv_mate_subfragment_listitem_distance_meter);
@@ -119,7 +120,7 @@ public class NearbyMateSubFragmentListAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        public NetworkImageView mUserPhoto;
+        public CustomNetWorkImageView mUserPhoto;
         public TextView mUserNickName, mUserGender, mUserDistanceMeter, mUserDistrict;
     }
 }

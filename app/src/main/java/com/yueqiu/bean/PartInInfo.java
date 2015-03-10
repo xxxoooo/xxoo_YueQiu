@@ -16,6 +16,7 @@ public class PartInInfo implements ISlideMenuBasic{
     private String img_url;
     private String username;
     private boolean checked;
+    private int rid;
 
     public int getUser_id() {
         return user_id;
@@ -89,6 +90,14 @@ public class PartInInfo implements ISlideMenuBasic{
         this.checked = checked;
     }
 
+    public int getRid() {
+        return rid;
+    }
+
+    public void setRid(int rid) {
+        this.rid = rid;
+    }
+
     @Override
     public boolean equals(Object o) {
         PartInInfo info = (PartInInfo) o;
@@ -131,6 +140,7 @@ public class PartInInfo implements ISlideMenuBasic{
         Bundle arg = new Bundle();
         arg.putBoolean("checked",checked);
         dest.writeBundle(arg);
+        dest.writeInt(rid);
     }
 
     public static final Creator<PartInInfo> CREATOR = new Creator<PartInInfo>() {
@@ -153,6 +163,7 @@ public class PartInInfo implements ISlideMenuBasic{
         content = in.readString();
         dateTime = in.readString();
         checked = in.readBundle().getBoolean("checked");
+        rid = in.readInt();
     }
 
     public PartInInfo(){}

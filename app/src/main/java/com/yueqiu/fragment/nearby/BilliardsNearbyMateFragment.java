@@ -248,18 +248,7 @@ public class BilliardsNearbyMateFragment extends Fragment
 
         mLoadMore = false;
         mRefresh = false;
-        mWorker = new BackgroundWorker(mStartNum, mEndNum);
-        if (mWorker.getState() == Thread.State.NEW)
-        {
-            Log.d(TAG_2, " 1. the mWorker has started ");
-            mWorker.start();
-        }
 
-        if (! Utils.networkAvaiable(mContext))
-        {
-            // 我们的数据请求只是发生于网络可行的情况下
-            mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
-        }
 
         return mView;
     }
@@ -274,7 +263,18 @@ public class BilliardsNearbyMateFragment extends Fragment
     public void onResume()
     {
         super.onResume();
+        mWorker = new BackgroundWorker(mStartNum, mEndNum);
+        if (mWorker.getState() == Thread.State.NEW)
+        {
+            Log.d(TAG_2, " 1. the mWorker has started ");
+            mWorker.start();
+        }
 
+        if (! Utils.networkAvaiable(mContext))
+        {
+            // 我们的数据请求只是发生于网络可行的情况下
+            mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
+        }
     }
 
     @Override
@@ -539,6 +539,12 @@ public class BilliardsNearbyMateFragment extends Fragment
                             }else {
                                 mUserList.add(mateBean);
                             }
+                        }else{
+                            int index = mUserList.indexOf(mateBean);
+                            if(!mateBean.getUserPhotoUrl().equals(mUserList.get(index).getUserPhotoUrl())){
+                                mUserList.remove(index);
+                                mUserList.add(index,mateBean);
+                            }
                         }
                         // TODO: ------------------------UNCOMMENT LATER------------------------------------------
 //                        if (!mDBList.isEmpty())
@@ -591,12 +597,14 @@ public class BilliardsNearbyMateFragment extends Fragment
                 // TODO: ------------------------UNCOMMENT LATER------------------------------------------
                 case NO_NETWORK:
                     setEmptyViewGone();
-                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
+
 
                     if (mUserList.isEmpty())
                     {
-                        Log.d("scguo_tag", "load emptyView 3");
                         setEmptyVewVisible();
+                        mEmptyView.setText(mContext.getString(R.string.network_not_available));
+                    }else{
+                        Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     }
 
                     mRefresh = false;
@@ -652,25 +660,24 @@ public class BilliardsNearbyMateFragment extends Fragment
 
                     break;
 
-                case PublicConstant.TIME_OUT:
-                    setEmptyViewGone();
-                    // 超时之后的处理策略
-                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
-                    if (mUserList.isEmpty())
-                    {
-                        Log.d("scguo_tag", "load emptyView 5");
-                        setEmptyVewVisible();
-                    }
-                    hideProgress();
-                    mRefresh = false;
-                    mLoadMore = false;
-                    break;
+//                case PublicConstant.TIME_OUT:
+//                    setEmptyViewGone();
+//                    // 超时之后的处理策略
+//                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
+//                    if (mUserList.isEmpty())
+//                    {
+//                        Log.d("scguo_tag", "load emptyView 5");
+//                        setEmptyVewVisible();
+//                    }
+//                    hideProgress();
+//                    mRefresh = false;
+//                    mLoadMore = false;
+//                    break;
 
                 case PublicConstant.NO_RESULT:
                     setEmptyViewGone();
                     if (mUserList.isEmpty())
                     {
-                        Log.d("scguo_tag", "load emptyView 6");
                         setEmptyVewVisible();
                     } else
                     {
@@ -690,18 +697,26 @@ public class BilliardsNearbyMateFragment extends Fragment
                     Bundle errorData = msg.getData();
                     String errorInfo = errorData.getString(KEY_REQUEST_ERROR_MSG);
                     Log.d(TAG, " inside the UIEventsProcessingHandler --> have exception while we make the network request, and the error msg : " + errorInfo);
-                    if (! TextUtils.isEmpty(errorInfo))
-                    {
-                        Utils.showToast(mContext, errorInfo);
-                    } else
-                    {
-                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
-                    }
+
 
                     if (mUserList.isEmpty())
                     {
-                        Log.d("scguo_tag", " fuck goes here ! load emptyView 7");
                         setEmptyVewVisible();
+                        if (! TextUtils.isEmpty(errorInfo))
+                        {
+                            mEmptyView.setText(errorInfo);
+                        } else
+                        {
+                            mEmptyView.setText(mContext.getString(R.string.http_request_error));
+                        }
+                    }else{
+                        if (! TextUtils.isEmpty(errorInfo))
+                        {
+                            Utils.showToast(mContext, errorInfo);
+                        } else
+                        {
+                            Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
+                        }
                     }
 
                     mRefresh = false;
@@ -771,6 +786,9 @@ public class BilliardsNearbyMateFragment extends Fragment
                     break;
             }
             mMateListAdapter.notifyDataSetChanged();
+            if(mLoadMore && !mUserList.isEmpty()){
+                mSubFragmentListView.getRefreshableView().setSelection(mCurrentPos - 1);
+            }
         }
     };
 

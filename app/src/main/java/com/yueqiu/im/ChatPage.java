@@ -39,7 +39,9 @@ import com.gotye.api.PathUtil;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
+import com.yueqiu.BilliardNearbyActivity;
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.OnKeyboardHideListener;
 import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.ProgressDialogUtil;
@@ -195,13 +197,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 }
             }
         });
-//        //用于判断当前屏幕是否显示了软键盘
-//        pullListView.setOnResizeListener(new CustomListView.OnResizeListener() {
-//            @Override
-//            public void onResize(int w, int h, int oldw, int oldh) {
-////                isDisplayInputMethod = !isShowExtension;
-//            }
-//        });
     }
 
     private void initView() {
@@ -222,7 +217,23 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
         if (mUser != null) {
             mChatType = 0;
-            mActionBar.setTitle(getString(R.string.and) + mUser.name + getString(R.string.chat));
+            String title;
+            if(mUser.getNickname() == null){
+
+                title = mUser.getName();
+            }else{
+                String nicknameStr = mUser.getNickname();
+                String nick;
+                int splitIndex = nicknameStr.lastIndexOf("|");
+                if(splitIndex != -1) {
+                    nick = nicknameStr.substring(0, splitIndex);
+                    String img_url = nicknameStr.substring(splitIndex + 1);
+                }else{
+                    nick = nicknameStr;
+                }
+                title = nick;
+            }
+            mActionBar.setTitle(getString(R.string.and) + title + getString(R.string.chat));
         } else if (mRoom != null) {
             mChatType = 1;
             mActionBar.setTitle(getString(R.string.chat_room) + mRoom.getRoomID());
@@ -352,6 +363,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             GotyeMessage toSend;
             if (mChatType == 0) {
                 toSend = GotyeMessage.createTextMessage(mCurrentLoginUser, mUser,text);
+                Log.d("wy","send to user img_url ->" + mUser);
             } else if (mChatType == 1) {
                 toSend = GotyeMessage.createTextMessage(mCurrentLoginUser, mRoom,text);
             } else {
@@ -375,6 +387,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             }
 
             int code = api.sendMessage(toSend);
+            Log.d("wy","send code ->" + code);
             mAdapter.addMsgToBottom(toSend);
             scrollToBottom();
 //            sendUserDataMessage("userdata message".getBytes(), "text#text");
@@ -429,48 +442,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         scrollToBottom();
     }
 
-//    private void showExtension(boolean isShow) {
-//        if (isShow) {
-//            mHandler.sendEmptyMessage(isDisplayInputMethod ? DISPLAY_INPUT_METHOD : UNDISPLAY_INPUT_METHOD);
-//        } else {
-//            mExtension.setVisibility(View.GONE);
-//            mEmotionToggle.setVisibility(View.GONE);
-//        }
-//    }
-//
-//    Handler mHandler = new Handler() {
-//        @Override
-//        public void handleMessage(Message msg) {
-//            super.handleMessage(msg);
-//            switch (msg.what) {
-//                case DISPLAY_INPUT_METHOD:
-//                    mInputMethodManager.hideSoftInputFromWindow(textMessage.getWindowToken(), 0);
-//                    mHandler.postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            showExtensionDetail();
-//                        }
-//                    }, 300);
-//                    break;
-//                case UNDISPLAY_INPUT_METHOD:
-//                    showExtensionDetail();
-//                    break;
-//                default:
-//                    break;
-//            }
-//        }
-//    };
-
-//    private void showExtensionDetail() {
-//        if (isDisplayPlugin) {
-//            mExtension.setVisibility(View.VISIBLE);
-//            mEmotionToggle.setVisibility(View.GONE);
-//        }
-//        if (isDisplayEmoji) {
-//            mEmotionToggle.setVisibility(View.VISIBLE);
-//            mExtension.setVisibility(View.GONE);
-//        }
-//    }
 
     @Override
     protected void onDestroy() {
@@ -503,8 +474,13 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(0);
         boolean isIMOnline = api.isOnline();
-        if (!isIMOnline)
+        if (!isIMOnline) {
             Utils.showToast(this, getString(R.string.im_user_offline));
+            YueQiuApp app = (YueQiuApp)getApplicationContext();
+//            app.resetUSerInfo();
+            app.logout();
+
+        }
     }
 
     @Override
@@ -523,10 +499,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.chat_container_open_emotion:
-//                isDisplayEmoji = true;
-//                isDisplayPlugin = false;
-//                showExtension(true);
-//                isShowExtension = true;
                 mIsDisplayPlugin = false;
                 if (mIsDisplayEmoji) {
                     mEmotionToggle.setVisibility(View.GONE);
@@ -541,7 +513,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 }
                 break;
             case R.id.chat_container_open_assist_toggle:
-//              mIsDisplayEmoji = false;
                 if (mIsDisplayPlugin) {
                     mExtension.setVisibility(View.GONE);
                     mIsDisplayPlugin = false;
@@ -553,24 +524,10 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                         mOnKeyHideListener.onKeyBoardHide();
                     }
                 }
-//                isDisplayEmoji = false;
-//                isDisplayPlugin = !isDisplayPlugin;
-//                showExtension(isDisplayPlugin);
-//
-//                isShowExtension = isDisplayPlugin;
-                break;
             case R.id.chat_container_text_ed:
-//                isDisplayPlugin = false;
-//                isDisplayEmoji = false;
                 mTextMessage.setFocusable(true);
-//                showExtension(false);
-//                isShowExtension = false;
                 break;
             case R.id.chat_container_send_btn:
-//                sendMessage();
-//                if (isShowExtension) {
-//                    showExtension(false);
-//                }
                 sendTextMessage(mTextMessage.getText().toString());
                 mTextMessage.setText("");
                 break;
@@ -589,9 +546,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     }
 
     private void takePic() {
-//        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
-//        intent.setType("image/*");
-        Log.e("ddd", "isOnline? before send img  " + api.isOnline());
         Intent albumIntent = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(albumIntent, REQUEST_PIC);
     }
@@ -677,6 +631,15 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     public void onReceiveMessage(int code, GotyeMessage message) {
         Log.d("ddd", "Chatpage onReceiveMessage>>>> code= " + code + " message = " + message);
         // GotyeChatManager.getInstance().insertChatMessage(message);
+        GotyeUser user = api.requestUserInfo(message.getReceiver().name,true);
+        String title;
+        if(user.getNickname() == null){
+            title = user.getName();
+        }else{
+            title = user.getNickname();
+        }
+        mActionBar.setTitle(getString(R.string.and) + title + getString(R.string.chat));
+
         if (mChatType == 0) {
             if (isMyMessage(message)) {
                 // msg.senderUser = user;

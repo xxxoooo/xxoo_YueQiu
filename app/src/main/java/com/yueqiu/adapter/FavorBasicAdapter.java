@@ -15,6 +15,7 @@ import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.ISlideMenuBasic;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.List;
 
@@ -55,7 +56,7 @@ public class FavorBasicAdapter extends BaseAdapter {
         if(convertView == null){
             convertView = mInflater.inflate(R.layout.item_favor_layout,null);
             holder = new ViewHolder();
-            holder.imageView = (NetworkImageView) convertView.findViewById(R.id.favor_item_image);
+            holder.imageView = (CustomNetWorkImageView) convertView.findViewById(R.id.favor_item_image);
             holder.title = (TextView) convertView.findViewById(R.id.favor_title);
             holder.content = (TextView) convertView.findViewById(R.id.favor_content);
             holder.dateTime = (TextView) convertView.findViewById(R.id.favor_time);
@@ -80,7 +81,7 @@ public class FavorBasicAdapter extends BaseAdapter {
     }
 
     class ViewHolder{
-        NetworkImageView imageView;
+        CustomNetWorkImageView imageView;
         TextView  title;
         TextView  content;
         TextView  dateTime;

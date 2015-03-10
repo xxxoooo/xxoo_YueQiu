@@ -6,7 +6,7 @@
     android:paddingTop="10dp"
     android:background="@drawable/list_group_item_background">
 
-    <com.android.volley.toolbox.NetworkImageView
+    <com.yueqiu.view.CustomNetWorkImageView
         android:id="@+id/icon"
         android:layout_width="62dp"
         android:layout_height="62dp"

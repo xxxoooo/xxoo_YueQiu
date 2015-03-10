@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,15 +16,20 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
 import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeMessage;
 import com.gotye.api.GotyeMessageType;
 import com.gotye.api.GotyeUser;
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
+import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.BitmapUtil;
 import com.yueqiu.util.ImageCache;
 import com.yueqiu.util.TimeUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.io.File;
 import java.util.List;
@@ -52,6 +58,9 @@ public class ChatMessageAdapter extends BaseAdapter {
     private GotyeAPI api;
     private Handler mHandler = new Handler();
     private int checkImgMsgCount;//点击图片消息查看大图,计次
+    private ImageLoader mImgLoader;
+
+    private String mReceiveImgUrl;
 
     public ChatMessageAdapter(ChatPage activity, List<GotyeMessage> messageList) {
         this.chatPage = activity;
@@ -59,6 +68,7 @@ public class ChatMessageAdapter extends BaseAdapter {
         inflater = activity.getLayoutInflater();
         api = GotyeAPI.getInstance();
         currentLoginName = api.getCurrentLoginUser().getName();
+        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
     }
 
     public void addMsgToBottom(GotyeMessage msg) {
@@ -169,7 +179,23 @@ public class ChatMessageAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
         if (holder.tv_userId != null) {
-            holder.tv_userId.setText(message.getSender().name);
+            String name ;
+            GotyeUser user = api.requestUserInfo(message.getSender().name,true);
+            if(user.getNickname() != null){
+                String nick;
+                String nicknameStr = user.getNickname();
+                int splitIndex = nicknameStr.lastIndexOf("|");
+                if(splitIndex != -1) {
+                    nick = nicknameStr.substring(0, splitIndex);
+                    mReceiveImgUrl = nicknameStr.substring(splitIndex + 1);
+                }else{
+                    nick = nicknameStr;
+                }
+                name = nick;
+            }else{
+                name = user.getName();
+            }
+            holder.tv_userId.setText(name);
         }
 
         switch (message.getType()) {
@@ -185,8 +211,7 @@ public class ChatMessageAdapter extends BaseAdapter {
                 break;
         }
 
-        TextView timestamp = (TextView) convertView
-                .findViewById(R.id.timestamp);
+        TextView timestamp = (TextView) convertView.findViewById(R.id.timestamp);
 
         if (position == 0) {
             timestamp.setText(TimeUtil.dateToMessageTime(message.getDate() * 1000));
@@ -201,7 +226,17 @@ public class ChatMessageAdapter extends BaseAdapter {
                 timestamp.setVisibility(View.GONE);
             }
         }
-        setIcon(holder.head_iv, message.getSender().name);
+
+        if(getDirect(message) == MESSAGE_DIRECT_SEND){
+            ((CustomNetWorkImageView)holder.head_iv).setDefaultImageResId(R.drawable.default_head);
+            ((CustomNetWorkImageView)holder.head_iv).setImageUrl("http://" + YueQiuApp.sUserInfo.getImg_url(),mImgLoader);
+            Log.d("wy","message sender info - >" + api.getCurrentLoginUser().getInfo());
+            Log.d("wy","message sender name - >" + api.getCurrentLoginUser().getName());
+        }else {
+//            setIcon(holder.head_iv, message.getSender().name);
+            ((CustomNetWorkImageView)holder.head_iv).setDefaultImageResId(R.drawable.default_head);
+            ((CustomNetWorkImageView)holder.head_iv).setImageUrl(HttpConstants.IMG_BASE_URL +  mReceiveImgUrl,mImgLoader);
+        }
         return convertView;
     }
 

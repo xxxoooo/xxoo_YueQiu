@@ -15,6 +15,7 @@ import com.yueqiu.bean.NearbyPeopleInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.List;
 
@@ -51,7 +52,7 @@ public class AddAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = mInflater.inflate(R.layout.item_chatbar_account, null);
             viewHolder = new ViewHolder();
-            viewHolder.mImageView = (NetworkImageView) convertView.findViewById(R.id.chatbar_item_account_iv);
+            viewHolder.mImageView = (CustomNetWorkImageView) convertView.findViewById(R.id.chatbar_item_account_iv);
             viewHolder.mNickName = (TextView) convertView.findViewById(R.id.chatbar_item_account_tv);
             viewHolder.mGender = (TextView) convertView.findViewById(R.id.chatbar_item_gender_tv);
             viewHolder.mDistrict = (TextView) convertView.findViewById(R.id.chatbar_item_district_tv);
@@ -77,7 +78,7 @@ public class AddAdapter extends BaseAdapter {
     }
 
     final class ViewHolder {
-        public NetworkImageView mImageView;
+        public CustomNetWorkImageView mImageView;
         public TextView mNickName;
         public TextView mGender;
         public TextView mDistrict;

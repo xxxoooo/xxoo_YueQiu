@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.gotye.api.listener.GotyeListener;
 import com.gotye.api.listener.NotifyListener;
@@ -568,8 +569,7 @@ public final class GotyeAPI {
 			if (len > 0) {
 				sessionList = new ArrayList<GotyeChatTarget>();
 				for (int i = 0; i < len; i++) {
-					sessionList
-							.add(Utils.jsonToSession(array.getJSONObject(i)));
+					sessionList.add(Utils.jsonToSession(array.getJSONObject(i)));
 				}
 			}
 		} catch (JSONException e) {
@@ -936,6 +936,7 @@ public final class GotyeAPI {
 					jsonMessage = sendText(message.getReceiver().name,
 							message.getReceiver().type.ordinal(),
 							message.getText(), extraData, len);
+                    Log.d("wy","message.getRecever->" + message.getReceiver());
 				} else {
 					String tar = String.valueOf(message.getReceiver().Id);
 					jsonMessage = sendText(tar,

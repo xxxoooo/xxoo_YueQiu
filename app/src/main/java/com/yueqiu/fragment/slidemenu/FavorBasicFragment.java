@@ -193,7 +193,9 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                 } else {
                     for (int i = 0; i < list_data.length(); i++) {
                         FavorInfo itemInfo = new FavorInfo();
+                        //现数据表
                         itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
+                        //源数据表
                         itemInfo.setRid(list_data.getJSONObject(i).getInt("rid"));
                         itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
                         itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
@@ -275,20 +277,20 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                     for(FavorInfo info : list){
                         if (!mList.contains(info)) {
 
-//                            if(!mIsListEmpty && Integer.valueOf(((FavorInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
-//                                mList.add(0,info);
-//                            }else {
-//                                mList.add(info);
-//                            }
-                            if(mRefresh && !mIsListEmpty) {
+                            if(!mIsListEmpty && Integer.valueOf(((FavorInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
                                 mList.add(0,info);
-                            }else{
-                                if(mIsSavedInstance){
-                                    mList.add(0,info);
-                                }else{
-                                    mList.add(info);
-                                }
+                            }else {
+                                mList.add(info);
                             }
+//                            if(mRefresh && !mIsListEmpty) {
+//                                mList.add(0,info);
+//                            }else{
+//                                if(mIsSavedInstance){
+//                                    mList.add(0,info);
+//                                }else{
+//                                    mList.add(info);
+//                                }
+//                            }
                         }
                         //////////////////////////////////////////////////////
                         //TODO:下面的逻辑是用来更新缓存的，不过目前先不需要缓存
@@ -342,7 +344,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
             if(mLoadMore && !mList.isEmpty()){
-                mListView.setSelection(mCurrPosition);
+                mListView.setSelection(mCurrPosition - 1);
             }
         }
     };

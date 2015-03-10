@@ -447,21 +447,22 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
                 case PublicConstant.REQUEST_ERROR:
 
                     if(mList.isEmpty()) {
-//                        if(null == msg.obj){
-//                            mEmptyTypeStr = mActivity.getString(R.string.http_request_error);
-//                        }else{
-//                            mEmptyTypeStr = (String) msg.obj;
-//                        }
+
                         setEmptyViewVisible();
+                        if(null == msg.obj){
+                            mEmptyView.setText(mActivity.getString(R.string.http_request_error));
+                        }else{
+                            mEmptyView.setText((String) msg.obj);
+                        }
                    }else{
                         setmEmptyViewGone();
+                        if(null == msg.obj){
+                            Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
+                        }else{
+                            Utils.showToast(mActivity, (String) msg.obj);
+                        }
+                    }
 
-                    }
-                    if(null == msg.obj){
-                        Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
-                    }else{
-                        Utils.showToast(mActivity, (String) msg.obj);
-                    }
                     break;
                 case PublicConstant.NO_RESULT:
                     if(mList.isEmpty()) {
@@ -489,7 +490,7 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
             if(mLoadMore && !mList.isEmpty()){
-                mListView.setSelection(mCurrPosition);
+                mListView.setSelection(mCurrPosition - 1);
             }
         }
     };

@@ -40,6 +40,7 @@ import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.apache.http.Header;
@@ -65,7 +66,7 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
     private TextView mTitleTv,mTypeTv,mAddressTv,mBeginTimeTv,mEndTimeTv,
             mModuleTv,mContactTv,mPhoneTv,mContentTv,mPreText;
     private Button mJoin;
-    private NetworkImageView mHeadImgIv;
+    private CustomNetWorkImageView mHeadImgIv;
     private PlayDao mPlayDao;
     private ProgressBar mPreProgressBar;
     private Drawable mProgressDrawable;
@@ -223,41 +224,41 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
     }
 
     private PlayInfo setDetailInfoByJSON(JSONObject object){
-        PlayInfo info = new PlayInfo();
+        mPlayInfo = new PlayInfo();
         try{
             JSONObject result = object.getJSONObject("result");
-            info.setTable_id(result.getString("id"));
+            mPlayInfo.setTable_id(result.getString("id"));
             //TODO:u_img_url是头像
-            info.setImg_url(result.getString("u_img_url"));
-            info.setTitle(result.getString("title"));
-            info.setUsername(result.getString("username"));
-            info.setCreate_time(mCreateTime);
-            info.setType(result.getString("type"));
-            info.setBegin_time(result.getString("begin_time"));
-            info.setEnd_time(result.getString("end_time"));
-            info.setModel(result.getString("model"));
-            info.setContent(result.getString("content"));
-            info.setAddress(result.getString("address"));
-            info.setContact(result.getString("name"));
-            info.setPhone(result.getString("phone"));
+            mPlayInfo.setImg_url(result.getString("u_img_url"));
+            mPlayInfo.setTitle(result.getString("title"));
+            mPlayInfo.setUsername(result.getString("username"));
+            mPlayInfo.setCreate_time(mCreateTime);
+            mPlayInfo.setType(result.getString("type"));
+            mPlayInfo.setBegin_time(result.getString("begin_time"));
+            mPlayInfo.setEnd_time(result.getString("end_time"));
+            mPlayInfo.setModel(result.getString("model"));
+            mPlayInfo.setContent(result.getString("content"));
+            mPlayInfo.setAddress(result.getString("address"));
+            mPlayInfo.setContact(result.getString("name"));
+            mPlayInfo.setPhone(result.getString("phone"));
             //TODO:img_url是上传的图片
-            info.setExtra_img(result.getString("img_url"));
+            mPlayInfo.setExtra_img(result.getString("img_url"));
             if(mPlayType != PublicConstant.PLAY_BUSSINESS) {
-                info.setSex(result.getString("sex"));
-                info.setLook_num(result.getInt("look_num"));
+                mPlayInfo.setSex(result.getString("sex"));
+                mPlayInfo.setLook_num(result.getInt("look_num"));
                 JSONArray join_list = result.getJSONArray("join_list");
                 for (int i = 0; i < join_list.length(); i++) {
                     UserInfo user = new UserInfo();
                     user.setUsername(join_list.getJSONObject(i).getString("username"));
                     user.setImg_url(join_list.getJSONObject(i).getString("img_url"));
                     user.setUser_id(Integer.parseInt(join_list.getJSONObject(i).getString("user_id")));
-                    info.mJoinList.add(user);
+                    mPlayInfo.mJoinList.add(user);
                 }
             }
         }catch(JSONException e){
             e.printStackTrace();
         }
-        return info;
+        return mPlayInfo;
     }
 
 
@@ -385,6 +386,12 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
                         Utils.showToast(PlayDetailActivity.this, getString(R.string.store_success));
                         break;
                     case PublicConstant.JOIN_SUCCESS:
+                        UserInfo user = new UserInfo();
+                        user.setUsername(YueQiuApp.sUserInfo.getUsername());
+                        user.setImg_url(YueQiuApp.sUserInfo.getImg_url());
+                        user.setUser_id(YueQiuApp.sUserInfo.getUser_id());
+                        mPlayInfo.mJoinList.add(user);
+                        mJoinAdapter.notifyDataSetChanged();
                         Intent joinIntent = new Intent(PublicConstant.SLIDE_PART_IN_ACTION);
                         sendBroadcast(joinIntent);
                         Utils.showToast(PlayDetailActivity.this, getString(R.string.join_success));

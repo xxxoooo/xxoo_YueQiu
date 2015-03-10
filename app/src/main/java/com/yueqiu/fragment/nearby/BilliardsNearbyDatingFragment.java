@@ -195,19 +195,9 @@ public class BilliardsNearbyDatingFragment extends Fragment
             mUIEventsHandler.obtainMessage(PublicConstant.USE_CACHE, mCachedDatingList).sendToTarget();
         }
 
-
-        mBackgroundHandler = new BackgroundWorkerHandler(mStarNum, mEndNum);
         mLoadMore = false;
         mRefresh = false;
-        // 我们仅在网络可行的情况下进行网络请求，减少不必要的网络请求
-        if (mBackgroundHandler.getState() == Thread.State.NEW)
-        {
-            Log.d(TAG, " in the onCreateView --> start the background handler ");
-            mBackgroundHandler.start();
-        }
-        if (! Utils.networkAvaiable(getActivity())){
-            mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
-        }
+
         return mView;
     }
 
@@ -224,6 +214,17 @@ public class BilliardsNearbyDatingFragment extends Fragment
     @Override
     public void onResume()
     {
+        mBackgroundHandler = new BackgroundWorkerHandler(mStarNum, mEndNum);
+
+        // 我们仅在网络可行的情况下进行网络请求，减少不必要的网络请求
+        if (mBackgroundHandler.getState() == Thread.State.NEW)
+        {
+            Log.d(TAG, " in the onCreateView --> start the background handler ");
+            mBackgroundHandler.start();
+        }
+        if (! Utils.networkAvaiable(getActivity())){
+            mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
+        }
         super.onResume();
     }
 
@@ -232,6 +233,13 @@ public class BilliardsNearbyDatingFragment extends Fragment
     {
         Log.d(TAG, " the onPause method has been called ");
         mCallback.closePopupWindow();
+
+        if (null != mBackgroundHandler)
+        {
+            Log.d(TAG, " we need to stop the Background Handler ");
+            mBackgroundHandler.interrupt();
+            mBackgroundHandler = null;
+        }
         super.onPause();
     }
 
@@ -245,12 +253,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
     @Override
     public void onDestroy()
     {
-        if (null != mBackgroundHandler)
-        {
-            Log.d(TAG, " we need to stop the Background Handler ");
-            mBackgroundHandler.interrupt();
-            mBackgroundHandler = null;
-        }
+
 
         // 将所有的筛选参数置空
         sParamsPreference.setDatingPublishedDate(mContext, "");
@@ -539,6 +542,12 @@ public class BilliardsNearbyDatingFragment extends Fragment
 //                                    mDatingList.add(datingBean);
 //                                }
 //                            }
+                        }else{
+                            int index = mDatingList.indexOf(datingBean);
+                            if(!datingBean.getUserPhoto().equals(mDatingList.get(index).getUserPhoto())){
+                                mDatingList.remove(index);
+                                mDatingList.add(index,datingBean);
+                            }
                         }
                     }
                     mAfterCount = mDatingList.size();
@@ -585,18 +594,21 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     if (mDatingList.isEmpty())
                     {
                         setEmptyViewVisible();
+                        mEmptyView.setText(mContext.getString(R.string.network_not_available));
+                    }else{
+                        Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     }
-                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
+
 
                     break;
-                case PublicConstant.TIME_OUT:
-                    // 超时之后的处理策略
-                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
-                    if (mDatingList.isEmpty()) {
-                        setEmptyViewVisible();
-                    }
-                    hideProgress();
-                    break;
+//                case PublicConstant.TIME_OUT:
+//                    // 超时之后的处理策略
+//                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
+//                    if (mDatingList.isEmpty()) {
+//                        setEmptyViewVisible();
+//                    }
+//                    hideProgress();
+//                    break;
                 case PublicConstant.NO_RESULT:
                     if (mDatingList.isEmpty()) {
                         setEmptyViewVisible();
@@ -612,17 +624,27 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 case PublicConstant.REQUEST_ERROR:
                     Bundle errorData = msg.getData();
                     String errorInfo = errorData.getString(KEY_REQUEST_ERROR_DATING);
-                    if (! TextUtils.isEmpty(errorInfo))
-                    {
-                        Utils.showToast(mContext, errorInfo);
-                    } else
-                    {
-                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
-                    }
 
                     if (mDatingList.isEmpty())
                     {
                         setEmptyViewVisible();
+                        if (! TextUtils.isEmpty(errorInfo))
+                        {
+                            mEmptyView.setText(errorInfo);
+                        } else
+                        {
+                            mEmptyView.setText(mContext.getString(R.string.http_request_error));
+                        }
+
+                    }else{
+                        if (! TextUtils.isEmpty(errorInfo))
+                        {
+                            Utils.showToast(mContext, errorInfo);
+                        } else
+                        {
+                            Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
+                        }
+
                     }
 
                     hideProgress();
@@ -700,6 +722,9 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
             }
             mDatingListAdapter.notifyDataSetChanged();
+            if(mLoadMore && !mDatingList.isEmpty()){
+                mDatingListView.getRefreshableView().setSelection(mCurrentPos - 1);
+            }
         }
     };
 

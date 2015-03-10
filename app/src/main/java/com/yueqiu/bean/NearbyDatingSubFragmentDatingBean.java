@@ -121,8 +121,9 @@ public class NearbyDatingSubFragmentDatingBean implements Parcelable
         int hash = 3;
         try
         {
-            int idVal = Integer.parseInt(this.getId());
-            hash *= idVal;
+            hash = 17 * mId.hashCode();
+            hash = 17 * mUserName.hashCode();
+            hash = 17 * mUserDeclare.hashCode();
         } catch (final Exception e)
         {
             Log.d(TAG, " exception happened while parse the id value : " + e.toString());
@@ -142,7 +143,6 @@ public class NearbyDatingSubFragmentDatingBean implements Parcelable
         {
             NearbyDatingSubFragmentDatingBean thatObj = (NearbyDatingSubFragmentDatingBean) object;
             if (thatObj.getId().equals(this.getId()) && thatObj.getUserName().equals(this.getUserName())
-                    && thatObj.getUserPhoto().equals(this.getUserPhoto())
                     && thatObj.getUserDeclare().equals(this.getUserDeclare()))
             {
                 result = true;

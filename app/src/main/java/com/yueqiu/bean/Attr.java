@@ -16,6 +16,7 @@ public enum Attr {
     IDOL_NAME,
     COST,
     MY_TYPE,
-    WORK_LIVE;
+    WORK_LIVE,
+    ZIZHI;
 
 }
