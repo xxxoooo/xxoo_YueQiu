@@ -108,6 +108,7 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
     private List<IssueImageView> mAddViewList = new ArrayList<IssueImageView>();
     private GotyeAPI api;
     private GotyeUser mGotyeUser;
+    private String mUpdataToImPhotoPath;
 
     @Override
     public void onAttach(Activity activity) {
@@ -168,9 +169,9 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         api = GotyeAPI.getInstance();
-        api.addListerer(this);
+        api.addListener(this);
         mGotyeUser = api.getCurrentLoginUser();
-        api.requestUserInfo(mGotyeUser.name, true);
+        api.requestUserInfo(mGotyeUser.getName(), true);
 
     }
 
@@ -244,10 +245,9 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onModifyUserInfo(int code, GotyeUser user) {
-        Log.e("ddd","onModifyUserInfo callback");
         if (code == 0) {
             Log.e("ddd", "Im 用户头像修改成功！！");
-            Utils.showToast(getActivity(), "Im 用户头像修改成功！！");
+//            Utils.showToast(getActivity(), "Im 用户头像修改成功！！");
         } else {
         }
     }
@@ -289,7 +289,6 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
 
     @Override
     public void onGetProfile(int code, GotyeUser user) {
-        Log.e("ddd", "PhotoSetupFragment onGetProfile callback>>> code = " + code + " user = " + user);
     }
 
     private class DefaultImageFragment extends DialogFragment {
@@ -408,7 +407,6 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
         } else if (view instanceof IssueImageView) {
             final BitmapBean bean = ((IssueImageView) view).getBitmapBean();
             final String imgFilePath = bean.imgFilePath;
-            Log.e("ddd", "imgFilePath = " + imgFilePath);
             Uri imgUri = bean.imgUri;
 //            if(imgFilePath != null){
 //                mUploadBitmap = ImgUtil.getOriginBitmapByPath(mActivity,imgFilePath);
@@ -462,12 +460,13 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                                         if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
                                             if (response.getString("result") != null) {
                                                 //TODO:upload IM service
-                                                new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        setIMUserPhoto(imgFilePath);
-                                                    }
-                                                }).start();
+                                                mUpdataToImPhotoPath = imgFilePath;
+//                                                new Thread(new Runnable() {
+//                                                    @Override
+//                                                    public void run() {
+//                                                        setIMUserPhoto(imgFilePath);
+//                                                    }
+//                                                }).start();
                                                 mHandler.obtainMessage(PublicConstant.GET_SUCCESS).sendToTarget();
                                             } else {
                                                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
@@ -561,12 +560,13 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                                             if (response.getJSONObject("result") != null) {
                                                 String img_url = response.getJSONObject("result").getString("s_img_url");
                                                 //TODO:上传IM服务器
-                                                new Thread(new Runnable() {
-                                                    @Override
-                                                    public void run() {
-                                                        setIMUserPhoto(filePath);
-                                                    }
-                                                }).start();
+                                                mUpdataToImPhotoPath = filePath;
+//                                                new Thread(new Runnable() {
+//                                                    @Override
+//                                                    public void run() {
+//                                                        setIMUserPhoto(filePath);
+//                                                    }
+//                                                }).start();
                                                 mHandler.obtainMessage(PublicConstant.GET_SUCCESS, img_url).sendToTarget();
                                             } else {
                                                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
@@ -622,14 +622,9 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
 
     private void modifyUserIcon(String smallImagePath) {
         mGotyeUser.setInfo("too young, too simple, too naive");// 修改扩展信息
-        mGotyeUser.setNickname(mGotyeUser.name);
-        Log.e("ddd", "icon = " + mGotyeUser.getIcon());
+        mGotyeUser.setNickname(mGotyeUser.getName());
         mGotyeUser.setIcon(mGotyeUser.getIcon());
-        Log.e("ddd", "name = " + mGotyeUser.name + "  info = " + mGotyeUser.getInfo() + " gender = " + mGotyeUser.getGender());
-        Log.e("ddd", "smallImagePath = " + smallImagePath);
-        Log.e("ddd", "mGotyeUser = " + mGotyeUser);
-        int result = api.modifyUserInfo(mGotyeUser, smallImagePath);
-        Log.e("ddd", "IM upload result = " + result);
+        int result = api.requestModifyUserInfo(mGotyeUser, smallImagePath);
     }
 
 
@@ -639,8 +634,9 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
             super.handleMessage(msg);
             switch (msg.what) {
                 case PublicConstant.GET_SUCCESS:
+                    //update im user photo
+                    setIMUserPhoto(mUpdataToImPhotoPath);
                     String img_url = (String) msg.obj;
-                    Log.e("ddd", "img_url = " + img_url);
                     mEditor.putString(DatabaseConstant.UserTable.IMG_URL, img_url);
                     mEditor.apply();
 

@@ -32,6 +32,10 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationListener;
+import com.amap.api.location.LocationManagerProxy;
+import com.amap.api.location.LocationProviderProxy;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.activity.BilliardsRoomWebViewActivity;
@@ -138,6 +142,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private int mBeforeCount, mAfterCount;
     // 以下是我们用于跟踪page的值的请求(用于大众点评的分页请求过程)
     private int mPage = 1;
+    private LocationManagerProxy mLocationManagerProxy;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
@@ -243,36 +248,91 @@ public class BilliardsNearbyRoomFragment extends Fragment
         return mView;
     }
 
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver()
-    {
-        @Override
-        public void onReceive(Context context, Intent intent)
-        {
-            Bundle bundle = intent.getExtras();
-            boolean isTimeout = bundle.getBoolean(LocationUtil.ISTIMEOUT_KEY);
-            if (isTimeout)
-            {
-                hideProgress();
-            } else
-            {
-                Location location = bundle.getParcelable(LocationUtil.LOCATION_KEY);
-                double latitude = location.getLatitude();
-                double longitude = location.getLongitude();
-                // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
-                sParamsPreference.ensurePreference(mContext);
-                sParamsPreference.setRoomLati(mContext, (float) latitude);
-                sParamsPreference.setRoomLongi(mContext, (float) longitude);
+//    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver()
+//    {
+//        @Override
+//        public void onReceive(Context context, Intent intent)
+//        {
+//            Bundle bundle = intent.getExtras();
+//            boolean isTimeout = bundle.getBoolean(LocationUtil.ISTIMEOUT_KEY);
+//            if (isTimeout)
+//            {
+//                hideProgress();
+//            } else
+//            {
+//                Location location = bundle.getParcelable(LocationUtil.LOCATION_KEY);
+//                double latitude = location.getLatitude();
+//                double longitude = location.getLongitude();
+//                // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
+//                sParamsPreference.ensurePreference(mContext);
+//                sParamsPreference.setRoomLati(mContext, (float) latitude);
+//                sParamsPreference.setRoomLongi(mContext, (float) longitude);
+//
+//                mUIEventsHandler.sendEmptyMessage(LOCATION_HAS_GOT);
+//            }
+//        }
+//    };
+    public void getLocation() {
 
-                mUIEventsHandler.sendEmptyMessage(LOCATION_HAS_GOT);
-            }
-        }
-    };
+        mLocationManagerProxy = LocationManagerProxy.getInstance(getActivity());
+
+        //此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
+        //注意设置合适的定位时间的间隔，并且在合适时间调用removeUpdates()方法来取消定位请求
+        //在定位结束后，在合适的生命周期调用destroy()方法
+        //其中如果间隔时间为-1，则定位只定一次
+        mLocationManagerProxy.requestLocationData(
+                LocationProviderProxy.AMapNetwork, -1, 15, new AMapLocationListener() {
+                    @Override
+                    public void onLocationChanged(AMapLocation aMapLocation) {
+                        if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
+                            //获取位置信息
+                            double latitude = aMapLocation.getLatitude();
+                            double longitude = aMapLocation.getLongitude();
+
+                            Log.d("wy","latitude ->" + latitude);
+                            Log.d("wy","longitude ->" + longitude);
+                            // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
+                            sParamsPreference.ensurePreference(mContext);
+                            sParamsPreference.setRoomLati(mContext, (float) latitude);
+                            sParamsPreference.setRoomLongi(mContext, (float) longitude);
+
+                            Bundle args = new Bundle();
+                            args.putFloat("lat", (float) latitude);
+                            args.putFloat("lng", (float) longitude);
+                            mUIEventsHandler.obtainMessage(LOCATION_HAS_GOT,args).sendToTarget();
+
+                        }
+                    }
+
+                    @Override
+                    public void onLocationChanged(Location location) {
+
+                    }
+
+                    @Override
+                    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                    }
+
+                    @Override
+                    public void onProviderEnabled(String provider) {
+
+                    }
+
+                    @Override
+                    public void onProviderDisabled(String provider) {
+
+                    }
+                });
+
+            mLocationManagerProxy.setGpsEnable(false);
+    }
 
     @Override
     public void onResume()
     {
         super.onResume();
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, new IntentFilter(LocationUtil.BROADCAST_FILTER));
+//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, new IntentFilter(LocationUtil.BROADCAST_FILTER));
     }
 
     @Override
@@ -521,7 +581,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     {
         mCallback.closePopupWindow();
 
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
+//        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
         super.onPause();
     }
 
@@ -680,7 +740,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     // 我们现在的策略是当用户点击了popupWindow上的选项之后，我们并不是直接开始进行数据请求，
                     // 而是首先开始打开位置获取服务，然后直到位置获取成功之后通过广播通知到我们，然后我们再在
                     // 收到通知的广播内通过Handler发送Event通知我们现在才是可以真正的进行数据请求工作了
-                    getActivity().startService(new Intent(getActivity(), LocationUtil.class));
+//                    getActivity().startService(new Intent(getActivity(), LocationUtil.class));
+                    getLocation();
                     showProgress();
 
                     break;

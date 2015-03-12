@@ -275,12 +275,12 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         }
         if (! TextUtils.isEmpty(priceParam))
         {
-            requestParams.put("price", priceParam);
+            requestParams.put("money", priceParam);
         }
 
-        if (! TextUtils.isEmpty("clazz"))
+        if (! TextUtils.isEmpty("class"))
         {
-            requestParams.put("clazz", clazzParam);
+            requestParams.put("class", clazzParam);
         }
 
         if (! TextUtils.isEmpty("level"))

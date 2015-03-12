@@ -19,12 +19,14 @@
     <TextView
         style="@style/ListItemTvStyle"
         android:id="@+id/tv_assistcoauch_subfragment_listitem_name"
-        android:text="@string/search_coauch_sub_fragment_listitem_username"
         android:layout_toRightOf="@id/img_assistcoauch_subfragment_listitem_photo"
         android:layout_alignTop="@+id/img_assistcoauch_subfragment_listitem_photo"
         android:layout_marginTop="3dp"
         android:layout_marginLeft="15dp"
-        android:textSize="18sp"
+        android:textSize="16sp"
+        android:layout_toLeftOf="@+id/tv_assistcoauch_subfragment_listitem_distance"
+        android:singleLine="true"
+        android:ellipsize="end"
         />
 
     <TextView
@@ -37,7 +39,7 @@
         android:layout_alignBottom="@+id/img_assistcoauch_subfragment_listitem_photo"
         android:layout_toRightOf="@+id/img_assistcoauch_subfragment_listitem_photo"
         android:padding="4dp"
-        android:layout_marginLeft="15dp"
+        android:layout_marginLeft="13dp"
         android:drawablePadding="3dp"
         />
 
@@ -50,7 +52,7 @@
         android:layout_alignBottom="@id/tv_assistcoauch_subfragment_listitem_gender"
         android:padding="4dp"
         android:layout_marginLeft="7dp"
-        android:textSize="14sp"
+        android:textSize="13sp"
         />
 
 
@@ -62,12 +64,11 @@
         style="@style/TimeTextStyle"
         android:id="@+id/tv_assistcoauch_subfragment_listitem_price"
         android:background="@drawable/textview_withdrawable_bg"
-        android:text="@string/search_assistcaouch_subfragment_listitem_price"
         android:layout_toRightOf="@id/tv_assistcoauch_subfragment_listitem_kinds"
         android:layout_alignBottom="@id/tv_assistcoauch_subfragment_listitem_kinds"
         android:padding="4dp"
         android:layout_marginLeft="7dp"
-        android:textSize="14sp"
+        android:textSize="13sp"
         />
 
     <TextView

@@ -22,16 +22,17 @@
         android:id="@+id/tv_dating_subfragment_listitem_nickname"
         android:layout_toRightOf="@id/img_dating_subfragment_listitem_photo"
         android:layout_alignTop="@+id/img_dating_subfragment_listitem_photo"
-        android:text="@string/search_coauch_sub_fragment_listitem_username"
         android:textSize="18sp"
         android:layout_marginLeft="15dp"
         android:layout_marginTop="3dp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:layout_toLeftOf="@+id/tv_dating_subfragment_listitem_distance_meter"
         />
     
     <TextView
         style="@style/TimeTextStyle"
         android:id="@+id/tv_dating_subfragment_listitem_declareation"
-        android:text="@string/search_dating_sub_fragment_listitem_user_declar"
         android:textSize="14sp"
         android:layout_alignBottom="@+id/img_dating_subfragment_listitem_photo"
         android:layout_toRightOf="@id/img_dating_subfragment_listitem_photo"
@@ -40,6 +41,7 @@
         android:layout_marginBottom="3dp"
         android:ellipsize="end"
         android:singleLine="true"
+        android:layout_toLeftOf="@+id/tv_dating_subfragment_listitem_distance_meter"
         />
 
     <TextView

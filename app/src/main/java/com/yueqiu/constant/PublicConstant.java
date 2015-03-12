@@ -14,6 +14,9 @@ public class PublicConstant {
     public static final String SLIDE_PUBLISH_ACTION = "com.yueqiu.slide.publish.update";
     public static final String SLIDE_ACCOUNT_ACTION = "com.yueqiu.slide.account.update";
 
+    public static final String CHAT_HAS_NEW_MSG = "com.yueqiu.chat.has_new_msg";
+    public static final String CHAT_HAS_NO_MSG = "com.yueqiu.chat.has_no_msg";
+
     public static final String IMG_URL = "img_url";
     public static final String PLAY_TYPE = "play_type";
     public static final String SEARCH_TYPE = "search_type";
@@ -88,6 +91,7 @@ public class PublicConstant {
     public static final int SEARCH_PUBLISH          = 9;
     public static final int SEARCH_JOIN             = 10;
     public static final int SEARCH_BUSINESS_PLAY    = 11;
+    public static final int SEARCH_FRIEND           = 12;
 
 
 }

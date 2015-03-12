@@ -222,7 +222,8 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
                 UserInfo user = new UserInfo();
                 user.setUsername(comment_list.getJSONObject(i).getString("username"));
                 user.setImg_url(comment_list.getJSONObject(i).getString("u_img_url"));
-                user.setSex(Integer.parseInt(comment_list.getJSONObject(i).getString("sex")));
+                String sex = comment_list.getJSONObject(i).getString("sex");
+                user.setSex(Integer.parseInt(sex.equals("null") ? "1" : sex));
                 user.setContent(comment_list.getJSONObject(i).getString("content"));
                 user.setComment_time(comment_list.getJSONObject(i).getString("create_time"));
                 info.mCommentList.add(user);

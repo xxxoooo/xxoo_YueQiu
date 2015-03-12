@@ -165,7 +165,6 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
 
     @Override
     public void onPageSelected(int i) {
-        Log.e("ddd", "onPageSelected>>>i = " + i);
         if (mEmojiTabLastSelectedIndex == i) {
             return;
         }
@@ -208,7 +207,6 @@ public class EmojiconsFragment extends Fragment implements ViewPager.OnPageChang
         @Override
         public Fragment getItem(int i)
         {
-            Log.e("ddd", "current position = " + i);
             return fragments.get(i);
         }
 

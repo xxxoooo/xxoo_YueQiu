@@ -2,6 +2,7 @@ package com.yueqiu.fragment.play;
 
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -18,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -156,6 +158,9 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
         }else{
             mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
         }
+
+//        ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+//                .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
     }
 
     private void initView()
@@ -563,7 +568,8 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                     args.putString(PublicConstant.SEARCH_KEYWORD, query);
                     intent.putExtras(args);
                     startActivity(intent);
-
+                    ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 
                 }else{
                     Utils.showToast(mActivity,getString(R.string.network_not_available));

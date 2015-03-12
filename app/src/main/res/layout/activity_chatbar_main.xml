@@ -1,79 +1,105 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:orientation="vertical"
               android:background="@android:color/white">
 
     <FrameLayout
         android:id="@+id/chatbar_fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"/>
+        android:layout_above="@+id/chat_bar_bottom_view"/>
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/chat_bar_bottom_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:weightSum="3"
         android:layout_alignParentBottom="true">
-
-        <RadioGroup
-            android:id="@+id/radioGroup1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="3">
-
-
-            <RadioButton
-                android:id="@+id/radio0"
-                android:layout_width="0dp"
+        <RelativeLayout
+            android:id="@+id/chat_bar_msg_re"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/billiard_search_radio_bg">
+            <TextView
+                android:id="@+id/chat_bar_msg_tv"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:button="@null"
-                android:gravity="center_horizontal"
-                android:textColor="@color/white"
-                android:drawableTop="@drawable/news"
-                android:checked="true"
                 android:text="@string/btn_liaoba_message"
-                android:background="@drawable/billiard_search_radio_bg"
-                />
-
-            <RadioButton
-                android:id="@+id/radio1"
-                android:layout_width="0dp"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:id="@+id/chat_bar_msg_icon"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:button="@null"
-                android:gravity="center_horizontal"
-                android:drawableTop="@drawable/contact"
+                android:layout_above="@+id/chat_bar_msg_tv"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/news"/>
+            <TextView
+                android:id="@+id/chat_bar_unread_count"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/has_msg"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/chat_bar_msg_icon"
+                android:layout_marginTop="2dp"
+                android:layout_marginLeft="5dp"
+                android:visibility="gone"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/chat_bar_contact_re"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/billiard_search_radio_bg">
+            <TextView
+                android:id="@+id/chat_bar_contact_tv"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:text="@string/btn_liaoba_contact"
-                android:background="@drawable/billiard_search_radio_bg"/>
-
-            <RadioButton
-                android:id="@+id/radio2"
-                android:layout_width="0dp"
+                android:textSize="16sp"
+                android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:id="@+id/chat_bar_contact_icon"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:button="@null"
-                android:gravity="center_horizontal"
-                android:drawableTop="@drawable/add_buddy"
+                android:layout_above="@+id/chat_bar_contact_tv"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/contact"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/chat_bar_add_re"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/billiard_search_radio_bg">
+            <TextView
+                android:id="@+id/chat_bar_add_tv"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:text="@string/btn_liaoba_add_friend"
-                android:background="@drawable/billiard_search_radio_bg"/>
-        </RadioGroup>
-
-        <TextView
-            android:id="@+id/new_msg_tip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="100dp"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/tab_unread_bg"
-            android:gravity="center"
-            android:visibility="gone"
-            android:text="1"
-            android:textColor="@color/white"/>
-    </RelativeLayout>
+                android:textSize="16sp"
+                android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:id="@+id/chat_bar_add_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/chat_bar_add_tv"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/add_buddy"/>
+        </RelativeLayout>
+    </LinearLayout>
 
 
-</LinearLayout>
+
+
+
+
+</RelativeLayout>

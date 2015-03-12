@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,15 +16,22 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
 import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeMessage;
 import com.gotye.api.GotyeMessageType;
 import com.gotye.api.GotyeUser;
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
+import com.yueqiu.bean.UserInfo;
+import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.util.BitmapUtil;
 import com.yueqiu.util.ImageCache;
 import com.yueqiu.util.TimeUtil;
 import com.yueqiu.util.Utils;
+import com.yueqiu.util.VolleySingleton;
 
 import java.io.File;
 import java.util.List;
@@ -52,6 +60,7 @@ public class ChatMessageAdapter extends BaseAdapter {
     private GotyeAPI api;
     private Handler mHandler = new Handler();
     private int checkImgMsgCount;//点击图片消息查看大图,计次
+    private ImageLoader mImageLoader;
 
     public ChatMessageAdapter(ChatPage activity, List<GotyeMessage> messageList) {
         this.chatPage = activity;
@@ -59,6 +68,7 @@ public class ChatMessageAdapter extends BaseAdapter {
         inflater = activity.getLayoutInflater();
         api = GotyeAPI.getInstance();
         currentLoginName = api.getCurrentLoginUser().getName();
+        mImageLoader = VolleySingleton.getInstance().getImgLoader();//volley
     }
 
     public void addMsgToBottom(GotyeMessage msg) {
@@ -143,14 +153,14 @@ public class ChatMessageAdapter extends BaseAdapter {
             convertView = createViewByMessage(message, position);
             if (message.getType() == GotyeMessageType.GotyeMessageTypeImage) {
                 holder.iv = ((ImageView) convertView.findViewById(R.id.iv_sendPicture));
-                holder.head_iv = (ImageView) convertView.findViewById(R.id.iv_userhead);
+                holder.head_iv = (NetworkImageView) convertView.findViewById(R.id.iv_userhead);
                 holder.tv = (TextView) convertView.findViewById(R.id.percentage);
                 holder.pb = (ProgressBar) convertView.findViewById(R.id.progressBar);
                 holder.staus_iv = (ImageView) convertView.findViewById(R.id.msg_status);
                 holder.tv_userId = (TextView) convertView.findViewById(R.id.tv_userid);
             } else if (message.getType() == GotyeMessageType.GotyeMessageTypeAudio) {
                 holder.iv = ((ImageView) convertView.findViewById(R.id.iv_voice));
-                holder.head_iv = (ImageView) convertView.findViewById(R.id.iv_userhead);
+                holder.head_iv = (NetworkImageView) convertView.findViewById(R.id.iv_userhead);
                 holder.tv = (TextView) convertView.findViewById(R.id.tv_length);
                 holder.pb = (ProgressBar) convertView.findViewById(R.id.pb_sending);
                 holder.staus_iv = (ImageView) convertView.findViewById(R.id.msg_status);
@@ -159,7 +169,7 @@ public class ChatMessageAdapter extends BaseAdapter {
             } else {
                 holder.pb = (ProgressBar) convertView.findViewById(R.id.pb_sending);
                 holder.staus_iv = (ImageView) convertView.findViewById(R.id.msg_status);
-                holder.head_iv = (ImageView) convertView.findViewById(R.id.iv_userhead);
+                holder.head_iv = (NetworkImageView) convertView.findViewById(R.id.iv_userhead);
                 // 这里是文字内容
                 holder.tv = (TextView) convertView.findViewById(R.id.tv_chatcontent);
                 holder.tv_userId = (TextView) convertView.findViewById(R.id.tv_userid);
@@ -169,7 +179,7 @@ public class ChatMessageAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
         if (holder.tv_userId != null) {
-            holder.tv_userId.setText(message.getSender().name);
+            holder.tv_userId.setText(message.getSender().getName());
         }
 
         switch (message.getType()) {
@@ -201,8 +211,28 @@ public class ChatMessageAdapter extends BaseAdapter {
                 timestamp.setVisibility(View.GONE);
             }
         }
-        setIcon(holder.head_iv, message.getSender().name);
+//        setIcon(holder.head_iv, message.getSender().name);
+        //设置头像
+        setUserPhoto(holder, message.getSender().getName());
         return convertView;
+    }
+
+    private void setUserPhoto(ViewHolder holder, String userName) {
+        holder.head_iv.setDefaultImageResId(R.drawable.default_head);
+        holder.head_iv.setErrorImageResId(R.drawable.default_head);
+        String url = getUserPhotoUrl(userName);
+        holder.head_iv.setImageUrl(url, mImageLoader);
+    }
+
+    private String getUserPhotoUrl(String userName) {
+        if (userName.equals(currentLoginName)) {
+            UserInfo userInfo = DaoFactory.getUser(chatPage)
+                    .getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+            return "http://" + userInfo.getImg_url();
+        } else {
+            String photoName = DaoFactory.getContacts(chatPage).getContactByName(userName).getImg_url();
+            return HttpConstants.IMG_BASE_URL + photoName;
+        }
     }
 
     /**
@@ -313,7 +343,7 @@ public class ChatMessageAdapter extends BaseAdapter {
 
     private ImageCache cache = ImageCache.getInstance();
 
-    private void setIcon(ImageView iconView, String name) {
+    private void setIcon(NetworkImageView iconView, String name) {
         Bitmap bmp = cache.get(name);
         if (bmp != null) {
             iconView.setImageBitmap(bmp);
@@ -331,6 +361,7 @@ public class ChatMessageAdapter extends BaseAdapter {
                         cache.put(name, bmp);
                     } else {
                         iconView.setImageResource(R.drawable.default_head);
+                        int code = api.downloadMedia(user.getIcon().url);
                     }
                 }
             } else {
@@ -338,7 +369,6 @@ public class ChatMessageAdapter extends BaseAdapter {
             }
         }
     }
-
 
 
     //TODO:在handleImageMessage里调用
@@ -367,7 +397,7 @@ public class ChatMessageAdapter extends BaseAdapter {
                     intent.putExtra(ShowBigImage.EXTRA_URI, uri);
                     chatPage.startActivity(intent);
                 } else {
-                    if (!Utils.networkAvaiable(chatPage)){
+                    if (!Utils.networkAvaiable(chatPage)) {
                         Utils.showToast(chatPage, "当前网络不可用，请检查网络后重试！");
                         return;
                     }
@@ -380,7 +410,7 @@ public class ChatMessageAdapter extends BaseAdapter {
                                 intent.putExtra(ShowBigImage.EXTRA_TIMEOUT, true);
                                 chatPage.startActivity(intent);
                                 checkImgMsgCount = 0;
-                            }else {
+                            } else {
                                 checkImgMsgCount += 1;
                                 onClick(v);
                             }
@@ -394,7 +424,7 @@ public class ChatMessageAdapter extends BaseAdapter {
     }
 
     private int getDirect(GotyeMessage message) {
-        if (message.getSender().name.equals(currentLoginName)) {
+        if (message.getSender().getName().equals(currentLoginName)) {
             return MESSAGE_DIRECT_SEND;
         } else {
             return MESSAGE_DIRECT_RECEIVE;
@@ -421,7 +451,7 @@ public class ChatMessageAdapter extends BaseAdapter {
         TextView tv;
         ProgressBar pb;
         ImageView staus_iv;
-        ImageView head_iv;
+        com.android.volley.toolbox.NetworkImageView head_iv;
         TextView tv_userId;
         ImageView playBtn;
         TextView timeLength;

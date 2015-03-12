@@ -258,11 +258,11 @@ public class BilliardsNearbyCoachFragment extends Fragment
         // 我们直接在请求方法内部进行关于请求参数的可行性判断
         if (! TextUtils.isEmpty(clazzRequest))
         {
-            requestParams.put("clazz", clazzRequest);
+            requestParams.put("class", clazzRequest);
         }
         if (! TextUtils.isEmpty(levelRequest))
         {
-            requestParams.put("level", levelRequest);
+            requestParams.put("zizhi", levelRequest);
         }
 
         // 将经纬度作为参数添加上
@@ -270,6 +270,8 @@ public class BilliardsNearbyCoachFragment extends Fragment
         requestParams.put("lng", String.valueOf(lng));
         requestParams.put("start_no", startNo + "");
         requestParams.put("end_no", endNo + "");
+
+        Log.d("wy","coach request param ->" + requestParams);
 
         final List<NearbyCoauchSubFragmentCoauchBean> cacheCoauchList = new ArrayList<NearbyCoauchSubFragmentCoauchBean>();
 
@@ -316,8 +318,9 @@ public class BilliardsNearbyCoachFragment extends Fragment
                                                     userName,
                                                     NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex),
                                                     String.valueOf(range),
-                                                    NearbyFragmentsCommonUtils.parseCoauchLevel(mContext, level),
-                                                    NearbyFragmentsCommonUtils.parseBilliardsKinds(mContext, kinds));
+                                                    NearbyFragmentsCommonUtils.parseCoachZizhi(mContext, level),
+                                                    NearbyFragmentsCommonUtils.parseBilliardsKinds(mContext, kinds),
+                                                    district);
 
                                             cacheCoauchList.add(coauchBean);
                                         }
@@ -702,6 +705,36 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 {
                     super.handleMessage(msg);
                     switch (msg.what) {
+//<<<<<<< HEAD
+//                        case RETRIEVE_ALL_COAUCH_INFO:
+//                            // 通知UIHandler开始显示Dialog
+//                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
+//                            Bundle numData = msg.getData();
+//                            final int startNum = numData.getInt(KEY_REQUEST_START_NUM);
+//                            final int endNum = numData.getInt(KEY_REQUEST_END_NUM);
+//                            String cacheClazz = sParamsPreference.getCouchClazz(mContext);
+//                            String cacheLevel = sParamsPreference.getCouchLevel(mContext);
+//                            retrieveInitialCoauchInfo(cacheClazz, cacheLevel, startNum, endNum);
+//
+//                            break;
+//                        case RETRIEVE_COAUCH_WITH_CLASS_FILTERED:
+//                            String clazz = (String) msg.obj;
+//                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
+//                            Log.d(TAG, " inside the BackgroundThread --> the clazz string we get in the CouachFragment are : " + clazz);
+//                            String clazzCacheLevel = sParamsPreference.getCouchLevel(mContext);
+//                            // 我们每次的筛选都要从零开始请求最新的数据
+//                            retrieveInitialCoauchInfo(clazz, clazzCacheLevel, 0, 9);
+//
+//                            break;
+//                        case RETRIEVE_COAUCH_WITH_LEVEL_FILTERED:
+//                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
+//                            String level = (String) msg.obj;
+//                            Log.d(TAG, " inside the BackgroundThread --> the level string we get in the CoauchFragment are : " + level);
+//                            String levelCacheClazz = sParamsPreference.getCouchClazz(mContext);
+//                            // 同样的道理，我们筛选的数据请求都要从零开始重新请求
+//                            retrieveInitialCoauchInfo(levelCacheClazz, level, 0, 9);
+
+
 //                        case RETRIEVE_ALL_COAUCH_INFO:
 //                            // 通知UIHandler开始显示Dialog
 //                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);

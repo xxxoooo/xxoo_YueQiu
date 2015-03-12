@@ -17,7 +17,6 @@
         android:layout_width="82dp"
         android:layout_height="82dp"
         android:id="@+id/img_room_subfragment_listitem_photo"
-        android:src="@drawable/hall_default"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:padding="1dp"
@@ -26,13 +25,15 @@
     <TextView
         style="@style/ListItemTvStyle"
         android:id="@+id/tv_room_subfragment_listitem_roomname"
-        android:text="@string/search_room_sub_fragment_listitem_roomname"
         android:layout_toRightOf="@id/img_room_subfragment_listitem_photo"
-        android:layout_marginTop="3dp"
+        android:layout_toLeftOf="@+id/tv_room_subfragment_listitem_roomdistance"
+        android:layout_alignTop="@+id/img_room_subfragment_listitem_photo"
+        android:layout_marginTop="5dp"
         android:layout_marginLeft="4dp"
         android:textColor="@color/md__defaultBackground"
-        android:textSize="18sp"
-
+        android:textSize="16sp"
+        android:ellipsize="end"
+        android:singleLine="true"
         />
 
     <!--用于评级的ratingBar，这里我们默认显示的级别是4.5级-->
@@ -47,6 +48,7 @@
         android:numStars="5"
         android:rating="4.5"
         android:layout_marginTop="3dp"
+        android:layout_alignTop="@+id/tv_room_subfragment_listitem_roomdistance"
         />
     <View
         android:id="@+id/search_room_divider"
@@ -64,7 +66,7 @@
         style="@style/TimeTextStyle"
         android:layout_toRightOf="@+id/search_room_divider"
         android:text="@string/search_room_sub_fragment_price_indi"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:layout_below="@id/tv_room_subfragment_listitem_roomname"
         android:layout_marginLeft="4dp"
         android:layout_alignTop="@+id/rating_room_subfragment_listitem_rating"
@@ -74,8 +76,7 @@
         style="@style/TimeTextStyle"
         android:layout_alignTop="@id/tv_price_indi"
         android:layout_toRightOf="@id/tv_price_indi"
-        android:text="36"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:id="@+id/tv_room_subfragment_listitem_roomprice"
         />
 
@@ -83,13 +84,14 @@
     <TextView
         style="@style/TimeTextStyle"
         android:id="@+id/tv_room_subfragment_listitem_roomaddress"
-        android:text="@string/search_room_sub_fragment_listitem_roomaddress"
         android:layout_toRightOf="@id/img_room_subfragment_listitem_photo"
-        android:layout_below="@id/rating_room_subfragment_listitem_rating"
         android:layout_alignLeft="@+id/rating_room_subfragment_listitem_rating"
+        android:layout_alignBottom="@+id/img_room_subfragment_listitem_photo"
         android:layout_marginRight="40dp"
-        android:layout_marginTop="3dp"
-        android:textSize="14sp"
+        android:textSize="13sp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:layout_marginBottom="8dp"
         />
 
     <TextView
@@ -97,7 +99,6 @@
         style="@style/TimeTextStyle"
         android:layout_marginTop="30dp"
         android:layout_alignParentRight="true"
-        android:text="@string/search_room_sub_fragment_listitem_roomdistance"
         android:layout_centerVertical="true"
         />
 </RelativeLayout>

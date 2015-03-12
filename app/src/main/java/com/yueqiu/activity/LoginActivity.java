@@ -87,6 +87,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                     if(!mUserDao.queryUserId(map)){
                         mUserDao.insertUserInfo(map);
                     }
+                    saveUser(map.get(DatabaseConstant.UserTable.USERNAME), null);
                     finish();
                     overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                     break;
@@ -247,28 +248,11 @@ public class LoginActivity extends Activity implements View.OnClickListener{
             }
         });
     }
-//    @Override
-//    public void onLogout(int code) {
-//
-//    }
-//
-//    @Override
-//    public void onLogin(int code, GotyeUser currentLoginUser) {
-//        Log.e("gotyeapi", "onLogin-->callback   code = " + code);
-//        // 判断登陆是否成功
-//        if (code == GotyeStatusCode.CODE_OK) {
-//            saveUser(mUserName, mPwd);
-//
-//            Intent toService = new Intent(this, GotyeService.class);
-//            startService(toService);
-//            Log.d(TAG, "登录时。。IM服务启动");
-//        } else {
-//            Log.d(TAG, "登录时。。IM服务启动失败，code = " + code);
-//            // 失败,可根据code定位失败原因
-////            Toast.makeText(this, "IM系统登录失败....", Toast.LENGTH_SHORT).show();
-//        }
-//    }
 
+
+    /**
+     * 存取登录的IM账户，保证Service销毁重启
+     */
     private static final String CONFIG = "chatbar_login_config";
 
     public void saveUser(String name, String password) {

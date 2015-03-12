@@ -15,7 +15,7 @@
             android:layout_height="match_parent"
             android:background="@color/devide_line"
             android:orientation="vertical"
-            android:weightSum="7"
+            android:weightSum="8"
             >
 
             <LinearLayout
@@ -24,7 +24,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_weight="5"
+                android:layout_weight="6"
                 android:background="@drawable/login_shape"
                 android:orientation="vertical"
                 android:weightSum="11">
@@ -336,7 +336,8 @@
                         android:src="@drawable/emotion_bg"
                         android:layout_marginRight="5dp"
                         android:layout_marginBottom="5dp"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"/>
                 </RelativeLayout>
 
 

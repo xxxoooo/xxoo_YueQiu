@@ -54,7 +54,7 @@ public class PublishedBasicAdapter extends BaseAdapter {
         if(convertView == null){
             convertView = mInflater.inflate(R.layout.item_published_info,null);
             holder = new ViewHolder();
-            holder.image = (NetworkImageView) convertView.findViewById(R.id.published_item_image);
+//            holder.image = (NetworkImageView) convertView.findViewById(R.id.published_item_image);
             holder.title = (TextView) convertView.findViewById(R.id.published_title);
             holder.content = (TextView) convertView.findViewById(R.id.published_content);
             holder.dateTime = (TextView) convertView.findViewById(R.id.published_time);
@@ -69,7 +69,7 @@ public class PublishedBasicAdapter extends BaseAdapter {
         }else{
             holder.whole_bg.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.published_item_bg));
         }
-        holder.image.setVisibility(View.GONE);
+//        holder.image.setVisibility(View.GONE);
         holder.title.setText(((PublishedInfo)mList.get(position)).getTitle());
         holder.content.setText(((PublishedInfo)mList.get(position)).getContent());
         holder.dateTime.setText(((PublishedInfo)mList.get(position)).getDateTime());
@@ -77,7 +77,7 @@ public class PublishedBasicAdapter extends BaseAdapter {
     }
 
     class ViewHolder{
-        NetworkImageView image;
+//        NetworkImageView image;
         TextView  title;
         TextView  content;
         TextView  dateTime;

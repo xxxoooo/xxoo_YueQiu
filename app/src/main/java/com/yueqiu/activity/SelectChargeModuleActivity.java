@@ -73,12 +73,15 @@ public class SelectChargeModuleActivity extends Activity implements View.OnClick
         mIntent = new Intent();
         switch(v.getId()){
             case R.id.activity_charge_module_free:
+                mChargeModule = MODULE_FREE;
                 mIntent.putExtra(MODULE_KEY,MODULE_FREE);
                 break;
             case R.id.activity_charge_module_pay:
+                mChargeModule = MODULE_PAY;
                 mIntent.putExtra(MODULE_KEY,MODULE_PAY);
                 break;
             case R.id.activity_charge_module_aa:
+                mChargeModule = MODULE_AA;
                 mIntent.putExtra(MODULE_KEY,MODULE_AA);
                 break;
         }

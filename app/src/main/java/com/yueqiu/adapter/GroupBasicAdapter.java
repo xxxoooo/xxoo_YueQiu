@@ -1,6 +1,7 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +16,8 @@ import com.rockerhieu.emojicon.EmojiconTextView;
 import com.yueqiu.R;
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.util.BitmapUtil;
+import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.VolleySingleton;
 
 import java.util.List;

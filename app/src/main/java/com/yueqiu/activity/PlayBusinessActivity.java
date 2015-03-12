@@ -19,6 +19,7 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -74,7 +75,8 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
     private List<PlayInfo> mInsertList = new ArrayList<PlayInfo>();
     private List<PlayInfo> mUpdateList = new ArrayList<PlayInfo>();
     private List<PlayInfo> mCacheList = new ArrayList<PlayInfo>();
-
+    private SearchView mSearchView;
+    private boolean mIsListEmpty;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +115,13 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
+    }
 
     private void initView(){
         mPullToRefreshListView = (PullToRefreshListView)findViewById(R.id.activity_activities_lv);
@@ -254,10 +263,16 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
                      * 这两个值是用来判断更新了多少条
                      */
                     mBeforeCount = mList.size();
+                    mIsListEmpty = mList.isEmpty();
                     List<PlayInfo> list = (List<PlayInfo>) msg.obj;
                     for(PlayInfo info : list){
-                        if(!mList.contains(info)){
-                            mList.add(info);
+                        if (!mList.contains(info)) {
+
+                            if(!mIsListEmpty && Integer.valueOf(mList.get(0).getTable_id()) < Integer.valueOf(info.getTable_id())){
+                                mList.add(0,info);
+                            }else {
+                                mList.add(info);
+                            }
                         }
                         //TODO:下面的逻辑是用来更新缓存的，不过目前先不需要缓存
                         //TODO:如果后期功能需要加缓存再加回来，目前的逻辑暂时没问题
@@ -381,18 +396,18 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         getMenuInflater().inflate(R.menu.billiard_search, menu);
 
         SearchManager searchManager =(SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
-        EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
+        EditText searchEditText = (EditText) mSearchView.findViewById(searchSrcTextId);
         searchEditText.setTextColor(Color.WHITE);
         searchEditText.setHintTextColor(Color.LTGRAY);
 
         // 用于改变SearchView当中的icon
-        searchView.setIconifiedByDefault(false);
+        mSearchView.setIconifiedByDefault(false);
         try {
             Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
             searchField.setAccessible(true);
-            ImageView searchHintIcon = (ImageView) searchField.get(searchView);
+            ImageView searchHintIcon = (ImageView) searchField.get(mSearchView);
             searchHintIcon.setImageResource(R.drawable.search);
         } catch (NoSuchFieldException e)
         {
@@ -401,7 +416,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
         {
             e.printStackTrace();
         }
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
@@ -412,9 +427,12 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
                     args.putString(PublicConstant.SEARCH_KEYWORD, query);
                     intent.putExtras(args);
                     startActivity(intent);
+                    ((InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 }else{
                     Utils.showToast(PlayBusinessActivity.this,getString(R.string.network_not_available));
                 }
+                mSearchView.clearFocus();
                 return true;
             }
 

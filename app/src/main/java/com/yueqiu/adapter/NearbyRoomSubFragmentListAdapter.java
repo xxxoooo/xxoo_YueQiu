@@ -17,6 +17,7 @@ import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
 import com.yueqiu.util.VolleySingleton;
 
 import java.awt.font.TextAttribute;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,7 +94,10 @@ public class NearbyRoomSubFragmentListAdapter extends BaseAdapter
         viewHolder.mRoomLevel.setRating(item.getLevel());
         viewHolder.mRoomLevel.setStepSize(0.02f); // 我们接受到的rating的值的总数为100，但是我们只有5个星星，所以我们每次移动的步骤就是5/100=0.02
 
-        viewHolder.mRoomDistance.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, item.getDistance()));
+        long distance = Long.valueOf(item.getDistance());
+        long show_distance = distance / 1000 ;
+
+        viewHolder.mRoomDistance.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, show_distance));
         viewHolder.mRoomAddress.setText(item.getDetailedAddress());
         viewHolder.mRoomPrice.setText(String.valueOf(item.getPrice()));
         Log.d(TAG, " the rating level for the room item are : " + item.getLevel() + ", and the distance we get are : " + item.getDistance()

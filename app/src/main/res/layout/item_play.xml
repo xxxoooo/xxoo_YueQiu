@@ -3,7 +3,7 @@
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-    android:padding="8dp"
+        android:padding="8dp"
         >
         <com.android.volley.toolbox.NetworkImageView
             android:id="@+id/activities_lv_item_iv_head"
@@ -28,17 +28,18 @@
             android:id="@+id/linearLayout2">
             <TextView
                 android:id="@+id/activities_lv_item_tv_title"
-                android:text="斯诺克台球聚会"
-                android:textSize="18sp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textSize="16sp"
                 android:textColor="@color/md__defaultBackground"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                />
             <TextView
                 android:id="@+id/activities_lv_item_tv_activities_time"
-                android:text="星台球馆"
+                android:ellipsize="end"
                 android:textColor="@color/md__defaultBackground"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:singleLine="true"
                 style="@style/TimeTextStyle"
 

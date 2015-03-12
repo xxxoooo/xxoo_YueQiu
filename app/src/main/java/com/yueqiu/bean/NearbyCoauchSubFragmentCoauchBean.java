@@ -23,10 +23,11 @@ public class NearbyCoauchSubFragmentCoauchBean implements Parcelable
     private String mUserDistance;
     private String mUserLevel;
     private String mBilliardKind;
+    private String mDistrict;
 
     public NearbyCoauchSubFragmentCoauchBean(){}
 
-    public NearbyCoauchSubFragmentCoauchBean(String id, String photo, String name, String gender, String distance, String level, String kind)
+    public NearbyCoauchSubFragmentCoauchBean(String id, String photo, String name, String gender, String distance, String level, String kind,String district)
     {
         this.mId = id;
         this.mUserPhoto = photo;
@@ -35,7 +36,7 @@ public class NearbyCoauchSubFragmentCoauchBean implements Parcelable
         this.mUserDistance = distance;
         this.mUserLevel = level;
         this.mBilliardKind = kind;
-
+        this.mDistrict = district;
     }
 
     public String getId()
@@ -108,6 +109,13 @@ public class NearbyCoauchSubFragmentCoauchBean implements Parcelable
         this.mUserName = userName;
     }
 
+    public String getDistrict() {
+        return mDistrict;
+    }
+
+    public void setDistrict(String district) {
+        this.mDistrict = district;
+    }
 
     // 提供将我们得到的Json数据转换成Java bean的util方法
     private static final String JSON_IMG_URL = "img_url"; // 头像的url
@@ -117,6 +125,7 @@ public class NearbyCoauchSubFragmentCoauchBean implements Parcelable
     private static final String JSON_SEX = "sex"; // 性别
     private static final String JSON_USERNAME = "username"; // 昵称
     private static final String JSON_USER_ID = "user_id"; // 用户id(这个字段我们在这里暂时用不到)
+    private static final String JSON_DISTRICT = "district";
 
     public JSONObject toJson() throws JSONException
     {
@@ -143,8 +152,8 @@ public class NearbyCoauchSubFragmentCoauchBean implements Parcelable
         mUserDistance = String.valueOf(jsonObject.get(JSON_RANGE));
         mUserLevel = String.valueOf(jsonObject.get(JSON_LEVEL));
         mBilliardKind = String.valueOf(jsonObject.get(JSON_CLASS));
-
-        return new NearbyCoauchSubFragmentCoauchBean(mId, mUserPhoto, mUserName, mUserGender, mUserDistance, mUserLevel, mBilliardKind);
+        mDistrict = String.valueOf(jsonObject.get(JSON_DISTRICT));
+        return new NearbyCoauchSubFragmentCoauchBean(mId, mUserPhoto, mUserName, mUserGender, mUserDistance, mUserLevel, mBilliardKind,mDistrict);
     }
 
     @Override
@@ -214,6 +223,7 @@ public class NearbyCoauchSubFragmentCoauchBean implements Parcelable
         dest.writeString(mUserDistance);
         dest.writeString(mUserLevel);
         dest.writeString(mBilliardKind);
+        dest.writeString(mDistrict);
     }
 
     public static final Creator<NearbyDatingSubFragmentDatingBean> CREATOR = new Creator<NearbyDatingSubFragmentDatingBean>()
@@ -240,6 +250,7 @@ public class NearbyCoauchSubFragmentCoauchBean implements Parcelable
         this.mUserDistance = source.readString();
         this.mUserLevel = source.readString();
         this.mBilliardKind = source.readString();
+        this.mDistrict = source.readString();
     }
 
 }

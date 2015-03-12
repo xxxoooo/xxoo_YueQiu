@@ -115,7 +115,12 @@ public class VerificationFragment extends Fragment {
         mPhoto = (NetworkImageView) v.findViewById(R.id.account_iv);
         mAccountTextView = (TextView) v.findViewById(R.id.account_tv);
         mGenderTextView = (TextView) v.findViewById(R.id.gender_tv);
-        mDistrictTextView = (TextView) v.findViewById(R.id.district_tv);
+        if(mDistrict.equals("")) {
+            mDistrictTextView = (TextView) v.findViewById(R.id.district_tv);
+            mDistrictTextView.setVisibility(View.VISIBLE);
+        }else{
+            mDistrictTextView.setVisibility(View.GONE);
+        }
         mAccountTextView.setText(mAccount);
         mGenderTextView.setText(mGender);
         mDistrictTextView.setText(mDistrict);
@@ -178,7 +183,7 @@ public class VerificationFragment extends Fragment {
 
                             Log.d(TAG, "好友请求发送失败！->" + response.getString("msg"));
                         } else {
-                            mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();

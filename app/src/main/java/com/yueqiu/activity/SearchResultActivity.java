@@ -12,6 +12,7 @@ import android.os.Bundle;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.adapter.AddAdapter;
 import com.yueqiu.adapter.FavorBasicAdapter;
 import com.yueqiu.adapter.GroupBasicAdapter;
 import com.yueqiu.adapter.NearbyAssistCoauchSubFragmentListAdapter;
@@ -30,6 +31,7 @@ import com.yueqiu.bean.NearbyAssistCoauchSubFragmentBean;
 import com.yueqiu.bean.NearbyCoauchSubFragmentCoauchBean;
 import com.yueqiu.bean.NearbyDatingSubFragmentDatingBean;
 import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
+import com.yueqiu.bean.NearbyPeopleInfo;
 import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
 import com.yueqiu.bean.PartInInfo;
 import com.yueqiu.bean.PlayInfo;
@@ -37,6 +39,7 @@ import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.slidemenu.SlideMenuBasicFragment;
@@ -55,6 +58,8 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -96,6 +101,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
     private String mEmptyTypeStr;
     private BaseAdapter mAdapter;
     private boolean mRefresh, mLoadMore, mIsListEmpty;
+    private int mBeforeCount,mAfterCount;
 
     private Map<String, String> mParams = new HashMap<String, String>();
     private ArrayList<PlayInfo> mPlayList = new ArrayList<PlayInfo>();
@@ -111,6 +117,8 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
     private ArrayList<NearbyAssistCoauchSubFragmentBean> mNearbyASList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
     private ArrayList<NearbyCoauchSubFragmentCoauchBean> mNearbyCoauchList = new ArrayList<NearbyCoauchSubFragmentCoauchBean>();
     private ArrayList<NearbyRoomSubFragmentRoomBean> mNearbyRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
+
+    private ArrayList<NearbyPeopleInfo.SearchPeopleItemInfo> mFriendList = new ArrayList<NearbyPeopleInfo.SearchPeopleItemInfo>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,18 +149,11 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
         mReceiveTypeParam = intent.getExtras().getInt(PublicConstant.TYPE, -1);
     }
 
-    private void initActionBar() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.billiard_search, menu);
 
-        mActionBar = getActionBar();
-
-        View customSearchView = LayoutInflater.from(this).inflate(R.layout.custom_actionbar_layout, null);
-        int searchViewWidth = getResources().getDimensionPixelSize(R.dimen.search_view_width);
-        if (searchViewWidth == 0) {
-            searchViewWidth = ActionBar.LayoutParams.MATCH_PARENT;
-        }
-        ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(searchViewWidth, ActionBar.LayoutParams.WRAP_CONTENT);
-        mSearchView = (SearchView) customSearchView.findViewById(R.id.search_view);
-        mSearchView.setIconified(true);
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
         EditText searchEditText = (EditText) mSearchView.findViewById(searchSrcTextId);
         searchEditText.setTextColor(Color.WHITE);
@@ -170,24 +171,46 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(mSearchView.getWindowToken(), 0);
-
-        View backView = customSearchView.findViewById(R.id.back_menu_item);
-        backView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-
-//        mSearchView.setOnCloseListener(this);
         mSearchView.setQuery(mQueryResult, false);
         mSearchView.setOnQueryTextListener(this);
-        mActionBar.setCustomView(customSearchView, layoutParams);
+
+        return true;
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case android.R.id.home:
+                finish();
+                break;
+        }
+        return true;
+    }
+
+    private void initActionBar() {
+
+        mActionBar = getActionBar();
+//        View customSearchView = LayoutInflater.from(this).inflate(R.layout.custom_actionbar_layout, null);
+//        int searchViewWidth = getResources().getDimensionPixelSize(R.dimen.search_view_width);
+//        if (searchViewWidth == 0) {
+//            searchViewWidth = ActionBar.LayoutParams.MATCH_PARENT;
+//        }
+//        ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(searchViewWidth, ActionBar.LayoutParams.WRAP_CONTENT);
+//        mSearchView = (SearchView) customSearchView.findViewById(R.id.search_view);
+//        View backView = customSearchView.findViewById(R.id.back_menu_item);
+//        backView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                finish();
+//            }
+//        });
+//        mSearchView.setOnCloseListener(this);
+
+//        mActionBar.setCustomView(customSearchView, layoutParams);
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setDisplayShowCustomEnabled(true);
+        mActionBar.setTitle(getString(R.string.btn_back));
     }
 
     private void initView() {
@@ -251,7 +274,10 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                 mAdapter = new GroupBasicAdapter(this, mGroupList);
                 break;
             case PublicConstant.SEARCH_BUSINESS_PLAY:
-
+                mAdapter = new PlayListViewAdapter(this,mBusinessList);
+                break;
+            case PublicConstant.SEARCH_FRIEND:
+                mAdapter = new AddAdapter(this,mFriendList);
                 break;
         }
     }
@@ -269,7 +295,48 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
      */
     @Override
     public boolean onQueryTextSubmit(String query) {
+        switch (mSearchType) {
+            case PublicConstant.SEARCH_NEARBY_MATE:
+                mNearbyMateList.clear();
+                break;
+            case PublicConstant.SEARCH_NEARBY_DATE:
+                mNearbyDatingList.clear();
+                break;
+            case PublicConstant.SEARCH_NEARBY_COACH:
+                mNearbyCoauchList.clear();
+                break;
+            case PublicConstant.SEARCH_NEARBY_ASSITANT:
+                mNearbyASList.clear();
+                break;
+            case PublicConstant.SEARCH_NEARBY_ROOM:
+                mNearbyRoomList.clear();
+                break;
+            case PublicConstant.SEARCH_FAVOR:
+                mFavorList.clear();
+                break;
+            case PublicConstant.SEARCH_JOIN:
+                mJoinList.clear();
+                break;
+            case PublicConstant.SEARCH_PUBLISH:
+                mPublishedList.clear();
+                break;
+            case PublicConstant.SEARCH_PLAY:
+                mPlayList.clear();
+                break;
+            case PublicConstant.SEARCH_GROUP:
+                mGroupList.clear();
+                break;
+            case PublicConstant.SEARCH_BUSINESS_PLAY:
+                mBusinessList.clear();
+                break;
+            case PublicConstant.SEARCH_FRIEND:
+                mFriendList.clear();
+                break;
+        }
+        mAdapter.notifyDataSetChanged();
         mQueryResult = query;
+        ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
         requestSearch();
         return true;
     }
@@ -327,6 +394,9 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                 break;
             case PublicConstant.SEARCH_BUSINESS_PLAY:
                 searchBussinessPlay();
+                break;
+            case PublicConstant.SEARCH_FRIEND:
+                searchFriend();
                 break;
         }
     }
@@ -977,6 +1047,59 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
         });
     }
 
+    private void searchFriend(){
+
+        mPreProgressBar.setVisibility(View.VISIBLE);
+        mPreTextView.setVisibility(View.VISIBLE);
+
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(HttpConstants.SearchPeopleByKeyword.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));//
+        map.put(HttpConstants.SearchPeopleByKeyword.KEYWORDS, mQueryResult);
+
+
+        HttpUtil.requestHttp(HttpConstants.SearchPeopleByKeyword.URL, map, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","add friend response ->" + response);
+                try{
+                    if (!response.isNull("code")) {
+                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                            NearbyPeopleInfo searchPeople = new NearbyPeopleInfo();
+                            JSONArray list_data = response.getJSONObject("result").getJSONArray("list_data");
+                            for (int i = 0; i < list_data.length(); i++) {
+                                NearbyPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
+                                itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
+                                itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
+                                itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
+                                itemInfo.setSex(list_data.getJSONObject(i).getInt("sex"));
+                                itemInfo.setDistrict(list_data.getJSONObject(i).getString("district"));
+                                searchPeople.mList.add(itemInfo);
+                            }
+                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, searchPeople).sendToTarget();
+                        } else if (response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
+                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                        } else if (response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT) {
+                            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                        } else {
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, response.getString("msg")).sendToTarget();
+                        }
+                    } else {
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+            }
+        });
+    }
+
     private Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -1010,6 +1133,9 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                 case PublicConstant.NO_RESULT:
                     if(mAdapter.getCount() == 0){
                         setEmptyViewVisible();
+                        if(mSearchType == PublicConstant.SEARCH_FRIEND){
+                            mEmptyView.setText(mEmptyTypeStr);
+                        }
                     }else{
                         Utils.showToast(SearchResultActivity.this,getString(R.string.no_search_info, mEmptyTypeStr));
                     }
@@ -1223,7 +1349,8 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                                             NearbyFragmentsCommonUtils.parseGenderStr(SearchResultActivity.this, sex),
                                             String.valueOf(range),
                                             NearbyFragmentsCommonUtils.parseCoauchLevel(SearchResultActivity.this, level),
-                                            NearbyFragmentsCommonUtils.parseBilliardsKinds(SearchResultActivity.this, kinds));
+                                            NearbyFragmentsCommonUtils.parseBilliardsKinds(SearchResultActivity.this, kinds),
+                                            district);
 
                                     coauchList.add(coauchBean);
                                 }
@@ -1539,6 +1666,29 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                     DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_ABBREV_ALL);
 
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
+
+            mLoadMore = true;
+            if(mEmptyView.getVisibility() == View.VISIBLE){
+                mEmptyView.setVisibility(View.GONE);
+            }
+            if(mBeforeCount != mAfterCount && mRefresh){
+                mStart = mEnd + (mAfterCount - mBeforeCount);
+                mEnd += 10 + (mAfterCount - mBeforeCount);
+            }else{
+                mStart = mEnd + 1;
+                mEnd += 10;
+            }
+            mRefresh = false;
+            if(Utils.networkAvaiable(SearchResultActivity.this)){
+                mParams.put(HttpConstants.GroupList.STAR_NO,String.valueOf(mStart));
+                mParams.put(HttpConstants.GroupList.END_NO,String.valueOf(mEnd));
+                requestSearch();
+            }
+            //TODO:由于目前不需要缓存，所以当没有网络时，就直接toast无网络
+            //TODO:如果后面需要缓存，再替换成注释掉的代码
+            else{
+                mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
+            }
         }
     };
 
@@ -1567,7 +1717,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                 mEmptyTypeStr = getString(R.string.nearby_billiard_mate_str);
                 break;
             case PublicConstant.SEARCH_NEARBY_DATE:
-                mEmptyTypeStr = getString(R.string.billiard_dating);
+                mEmptyTypeStr = getString(R.string.billiard_dating) + getString(R.string.info);
                 break;
             case PublicConstant.SEARCH_NEARBY_COACH:
                 mEmptyTypeStr = getString(R.string.nearby_billiard_coauch_str);
@@ -1626,13 +1776,16 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                 mEmptyTypeStr = getString(R.string.issue) + getString(R.string.of) + publishStr + getString(R.string.info);
                 break;
             case PublicConstant.SEARCH_PLAY:
-                mEmptyTypeStr  = getString(R.string.play);
+                mEmptyTypeStr  = getString(R.string.play) + getString(R.string.info);
                 break;
             case PublicConstant.SEARCH_GROUP:
-                mEmptyTypeStr = getString(R.string.billiard_group);
+                mEmptyTypeStr = getString(R.string.billiard_group) + getString(R.string.info);
                 break;
             case PublicConstant.SEARCH_BUSINESS_PLAY:
-                mEmptyTypeStr = getString(R.string.business_play);
+                mEmptyTypeStr = getString(R.string.business_play) + getString(R.string.info);
+                break;
+            case PublicConstant.SEARCH_FRIEND:
+                mEmptyTypeStr = getString(R.string.no_good_buddy);
                 break;
         }
     }
@@ -1758,6 +1911,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
 
                 break;
             case PublicConstant.SEARCH_FAVOR:
+                mBeforeCount = mFavorList.size();
                 mIsListEmpty = mFavorList.isEmpty();
                 List<FavorInfo> favorList = (List<FavorInfo>) msg.obj;
                 for(FavorInfo info : favorList){
@@ -1776,11 +1930,13 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                     }
 
                 }
+                mAfterCount = mFavorList.size();
                 if(mFavorList.isEmpty()){
                     setEmptyViewVisible();
                 }
                 break;
             case PublicConstant.SEARCH_JOIN:
+                mBeforeCount = mJoinList.size();
                 mIsListEmpty = mJoinList.isEmpty();
                 List<PartInInfo> joinList = (List<PartInInfo>) msg.obj;
                 for(PartInInfo info : joinList){
@@ -1797,11 +1953,13 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         mJoinList.add(info);
                     }
                 }
+                mAfterCount = mJoinList.size();
                 if(mJoinList.isEmpty()){
                     setEmptyViewVisible();
                 }
                 break;
             case PublicConstant.SEARCH_PUBLISH:
+                mBeforeCount = mPublishedList.size();
                 mIsListEmpty = mPublishedList.isEmpty();
                 List<PublishedInfo> publishedInfoList = (List<PublishedInfo>) msg.obj;
                 for(PublishedInfo info : publishedInfoList){
@@ -1813,12 +1971,13 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         }
                     }
                 }
+                mBeforeCount = mPublishedList.size();
                 if(mPublishedList.isEmpty()){
                     setEmptyViewVisible();
                 }
                 break;
             case PublicConstant.SEARCH_PLAY:
-
+                mBeforeCount = mPlayList.size();
                 mIsListEmpty = mPlayList.isEmpty();
                 List<PlayInfo> playList = (List<PlayInfo>) msg.obj;
                 for(PlayInfo info : playList){
@@ -1831,12 +1990,14 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         }
                     }
                 }
+                mBeforeCount = mPlayList.size();
                 if(mPlayList.isEmpty()){
                     setEmptyViewVisible();
                 }
 
                 break;
             case PublicConstant.SEARCH_GROUP:
+                mBeforeCount = mGroupList.size();
                 mIsListEmpty = mGroupList.isEmpty();
                 List<GroupNoteInfo> groupList = (List<GroupNoteInfo>) msg.obj;
                 for(GroupNoteInfo info : groupList){
@@ -1850,21 +2011,37 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         }
                     }
                 }
-
+                mAfterCount = mGroupList.size();
                 if(mGroupList.isEmpty()) {
                     setEmptyViewVisible();
                 }
                 break;
             case PublicConstant.SEARCH_BUSINESS_PLAY:
-                List<PlayInfo> businessList = (List<PlayInfo>) msg.obj;
-                for(PlayInfo info : businessList){
-                    if(!mBusinessList.contains(info)){
-                        mBusinessList.add(info);
+                mBeforeCount = mBusinessList.size();
+                mIsListEmpty = mBusinessList.isEmpty();
+                List<PlayInfo> list = (List<PlayInfo>) msg.obj;
+                for(PlayInfo info : list){
+                    if (!mBusinessList.contains(info)) {
+
+                        if(!mIsListEmpty && Integer.valueOf(mBusinessList.get(0).getTable_id()) < Integer.valueOf(info.getTable_id())){
+                            mBusinessList.add(0,info);
+                        }else {
+                            mBusinessList.add(info);
+                        }
                     }
                 }
+                mAfterCount = mBusinessList.size();
                 if(mBusinessList.isEmpty()){
                     setEmptyViewVisible();
                 }
+                break;
+            case PublicConstant.SEARCH_FRIEND:
+                NearbyPeopleInfo searchPeopleInfo = (NearbyPeopleInfo) msg.obj;
+                mFriendList.addAll(searchPeopleInfo.mList);
+                if (mFriendList.size() > 0)
+                    mEmptyView.setVisibility(View.GONE);
+                else
+                    mEmptyView.setVisibility(View.VISIBLE);
                 break;
         }
     }
@@ -1875,7 +2052,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
         switch(mSearchType){
             case PublicConstant.SEARCH_NEARBY_MATE:
                 // 不处理(助教的信息只是用于展示，并没有点击之后的处理)
-                break;
+                return;
             case PublicConstant.SEARCH_NEARBY_DATE:
                 // 点击之后跳转到约球详情Activity当中
                 mListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -1897,14 +2074,29 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                 break;
             case PublicConstant.SEARCH_NEARBY_COACH:
                 // 不处理(助教的信息只是用于展示，并没有点击之后的处理)
-                break;
+                return;
             case PublicConstant.SEARCH_NEARBY_ASSITANT:
                 // 不处理(助教的信息只是用于展示，并没有点击之后的处理)
-                break;
+                return;
             case PublicConstant.SEARCH_NEARBY_ROOM:
-                // TODO: 球厅的搜索暂时还没有提供解决方法
-                // TODO: 在解决了搜索的途径之后我们再考虑解决方案
-
+                NearbyRoomSubFragmentRoomBean bean = mNearbyRoomList.get(position - 1);
+//                Bundle bundle = new Bundle();
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getRoomPhotoUrl());
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getRoomName());
+//                bundle.putFloat(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, bean.getLevel());
+//                bundle.putDouble(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, bean.getPrice());
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_TAG, bean.getRoomTag());
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, bean.getDetailedAddress());
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO, bean.getRoomInfo());
+//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, bean.getRoomPhone());
+//
+//                // set the arguments into the bundle, and transferred into the RoomDetailedActivity
+//                Intent intent = new Intent(mContext, NearbyBilliardRoomActivity.class);
+//                intent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, bundle);
+//
+//                mContext.startActivity(intent);
+                intent = new Intent(this, BilliardsRoomWebViewActivity.class);
+                intent.putExtra(NearbyFragmentsCommonUtils.KEY_ROOM_WEBVIEW_PAGE_URL, bean.getRoomDetailPageUrl());
                 break;
             case PublicConstant.SEARCH_FAVOR:
                 FavorInfo info = (FavorInfo) mAdapter.getItem(position-1);
@@ -2018,6 +2210,13 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                 args.putInt(DatabaseConstant.PlayTable.TABLE_ID,Integer.parseInt(BusinessInfo.getTable_id()));
                 args.putString(DatabaseConstant.PlayTable.CREATE_TIME,BusinessInfo.getCreate_time());
                 args.putString(DatabaseConstant.PlayTable.TYPE,BusinessInfo.getType());
+                break;
+            case PublicConstant.SEARCH_FRIEND:
+                intent = new Intent(this, RequestAddFriendActivity.class);
+                int friendUserId = mFriendList.get(position-1).getUser_id();
+                String username = mFriendList.get(position-1).getUsername();
+                intent.putExtra(AddPersonFragment.FRIEND_INFO_USER_ID, friendUserId);
+                intent.putExtra(AddPersonFragment.FRIEND_INFO_USERNAME, username);
                 break;
         }
         intent.putExtras(args);

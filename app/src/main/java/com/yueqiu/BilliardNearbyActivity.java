@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,12 +21,16 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -68,6 +73,8 @@ import com.yueqiu.view.menudrawer.Position;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -127,7 +134,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                 getString(R.string.nearby_billiard_dating_str),
                 getString(R.string.nearby_billiard_assist_coauch_str),
                 getString(R.string.nearby_billiard_coauch_str),
-                getString(R.string.nearby_billiard_coauch_str)};
+                getString(R.string.nearby_billiard_room_str)};
         mMenuDrawer = MenuDrawer.attach(this, MenuDrawer.Type.BEHIND, Position.LEFT, MenuDrawer.MENU_DRAG_WINDOW);
         mMenuDrawer.setContentView(R.layout.activity_nearby_billiard);
         mMenuDrawer.setMenuView(R.layout.slide_drawer_layout);
@@ -173,6 +180,15 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         setupTabs();
         initDrawer();
 
+        ViewTreeObserver observer = mGroup.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                YueQiuApp.sBottomHeight = mGroup.getHeight();
+                Log.d("wy", "bottom height ->" + YueQiuApp.sBottomHeight);
+            }
+        });
+
         IntentFilter filter = new IntentFilter();
         filter.addAction(PublicConstant.SLIDE_PART_IN_ACTION);
         filter.addAction(PublicConstant.SLIDE_FAVOR_ACTION);
@@ -186,13 +202,11 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     @Override
     protected void onResume() {
         super.onResume();
-//        setupTabs();
-//        initDrawer();
         mNearbyRadio.setChecked(true);
         mViewPager.setCurrentItem(sPagerPos);
         if (checkUserId()) {
             //登录IM
-            GotyeAPI.getInstance().addListerer(this);
+            GotyeAPI.getInstance().addListener(this);
             login();
         } else {
             Log.e(TAG, "IM已经退出了！！！");
@@ -268,14 +282,10 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
      * 登录IM
      */
     private void login() {
-        if (!GotyeAPI.getInstance().isOnline()) {
-            int i = GotyeAPI.getInstance().login(YueQiuApp.sUserInfo.getUsername(), null);
-            // 根据返回的code判断
-            if (i == GotyeStatusCode.CODE_OK) {
-                // 已经登陆
-                onLogin(i, null);
-                GotyeAPI.getInstance().removeListener(this);
-            }
+        int loginState = GotyeAPI.getInstance().getOnLineState();
+        Log.e(TAG, "login -> login state -> " + loginState);
+        if (loginState == 0) {
+            GotyeAPI.getInstance().login(YueQiuApp.sUserInfo.getUsername(), null);
         }
     }
 
@@ -286,22 +296,6 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
      */
     @Override
     public void onLogout(int code) {
-//        GotyeAPI.getInstance().logout();
-////        if (code == GotyeStatusCode.CODE_FORCELOGOUT) {
-////            Toast.makeText(this, getString(R.string.im_login_other_device), Toast.LENGTH_SHORT).show();
-////        } else if (code == GotyeStatusCode.CODE_NETWORD_DISCONNECTED) {
-////            Toast.makeText(this, getString(R.string.im_user_offline), Toast.LENGTH_SHORT).show();
-////        }
-//        if (Utils.networkAvaiable(BilliardNearbyActivity.this)) {
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    logout();
-//                }
-//            }).start();
-//        } else {
-//            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
-//        }
     }
 
     /**
@@ -314,16 +308,34 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     public void onLogin(int code, GotyeUser currentLoginUser) {
         Log.e(TAG, ">>>>>>>>>>>>>>>>>Billiardnearbayactivity------onLogin<<<<<<<<<<<<<<<<<<");
         // 判断登陆是否成功
-        if (code == GotyeStatusCode.CODE_OK) {
+        if (code == GotyeStatusCode.CODE_OK
+                || code == GotyeStatusCode.CODE_OFFLINELOGIN_SUCCESS
+                || code == GotyeStatusCode.CODE_RELOGIN_SUCCESS) {
             //由于掉线YueQiuApp类中的监听器会被迫remove掉，这里登录成功在注册一次
             ((YueQiuApp) YueQiuApp.getAppContext()).registerListener();
             Log.e(TAG, ">>>>>>>>>>>>>>>>>Billiardnearbayactivity-onLogin-CODE_OK<<<<<<<<<<<<<<<<<<");
-            Intent toService = new Intent(this, GotyeService.class);
-            startService(toService);
-            Log.d(TAG, "IM登录成功");
+
+            if (code == GotyeStatusCode.CODE_OFFLINELOGIN_SUCCESS) {
+                Toast.makeText(this, "您当前处于离线状态", Toast.LENGTH_SHORT).show();
+            } else if (code == GotyeStatusCode.CODE_OK) {
+                Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show();
+                Intent toService = new Intent(this, GotyeService.class);
+                startService(toService);
+            }
         } else {
             // 失败,可根据code定位失败原因
             Log.d(TAG, "IM登录失败");
+            Toast.makeText(this, "登录失败 code=" + code, Toast.LENGTH_SHORT)
+                    .show();
+        }
+
+
+    }
+
+    @Override
+    public void onReconnecting(int i, GotyeUser gotyeUser) {
+        if (i == 0) {
+            Log.d(TAG, "current user " + gotyeUser.getName() + " ReLogin success by network available!!");
         }
     }
 
@@ -469,7 +481,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private void initDrawer() {
 
         //mItemList.clear();
-        Log.d("wy","YueQiu img_url ->" + YueQiuApp.sUserInfo.getImg_url());
+        Log.d("wy", "YueQiu img_url ->" + YueQiuApp.sUserInfo.getImg_url());
         SlideAccountItemISlide accountItem = new SlideAccountItemISlide(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
                 100, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id());
         mItemList.add(accountItem);
@@ -673,20 +685,20 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         YueQiuApp.sUserInfo.setPhone("");
 
         mEditor.putString(DatabaseConstant.UserTable.USERNAME, getString(R.string.guest));
-        mEditor.putString(DatabaseConstant.UserTable.IMG_URL,"");
-        mEditor.putInt(DatabaseConstant.UserTable.SEX,-1);
+        mEditor.putString(DatabaseConstant.UserTable.IMG_URL, "");
+        mEditor.putInt(DatabaseConstant.UserTable.SEX, -1);
         mEditor.putString(DatabaseConstant.UserTable.USER_ID, "0");
         mEditor.putString(DatabaseConstant.UserTable.IMG_URL, "");
-        mEditor.putString(DatabaseConstant.UserTable.NICK,"");
+        mEditor.putString(DatabaseConstant.UserTable.NICK, "");
         mEditor.putString(DatabaseConstant.UserTable.PHONE, "");
-        mEditor.putString(DatabaseConstant.UserTable.DISTRICT,"");
-        mEditor.putInt(DatabaseConstant.UserTable.LEVEL,-1);
-        mEditor.putInt(DatabaseConstant.UserTable.BALL_TYPE,-1);
-        mEditor.putInt(DatabaseConstant.UserTable.BALLARM,-1);
-        mEditor.putInt(DatabaseConstant.UserTable.USERDTYPE,-1);
-        mEditor.putString(DatabaseConstant.UserTable.BALLAGE,"");
-        mEditor.putString(DatabaseConstant.UserTable.IDOL,"");
-        mEditor.putString(DatabaseConstant.UserTable.IDOL_NAME,"");
+        mEditor.putString(DatabaseConstant.UserTable.DISTRICT, "");
+        mEditor.putInt(DatabaseConstant.UserTable.LEVEL, -1);
+        mEditor.putInt(DatabaseConstant.UserTable.BALL_TYPE, -1);
+        mEditor.putInt(DatabaseConstant.UserTable.BALLARM, -1);
+        mEditor.putInt(DatabaseConstant.UserTable.USERDTYPE, -1);
+        mEditor.putString(DatabaseConstant.UserTable.BALLAGE, "");
+        mEditor.putString(DatabaseConstant.UserTable.IDOL, "");
+        mEditor.putString(DatabaseConstant.UserTable.IDOL_NAME, "");
         mEditor.apply();
 
 
@@ -767,6 +779,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
             }
         }
     };
+
 
 }
 

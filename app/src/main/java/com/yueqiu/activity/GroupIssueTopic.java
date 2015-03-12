@@ -53,6 +53,7 @@ import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.BitmapBean;
 import com.yueqiu.bean.OnKeyboardHideListener;
 import com.yueqiu.bean.SlideOtherItemISlide;
+import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.group.ImageFragment;
@@ -97,7 +98,7 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
     private EditText    mTitleEdit;
     private EmojiconEditText mContentEdit;
     private TextView    mTopicTypeTv,mTakePhoto,mSelectPhoto,mDeletePhoto;
-    private ImageView   mIvExpression,mBackExpression;//TODO:图片按下的效果
+//    private ImageView   mBackExpression;//mIvExpression;//TODO:图片按下的效果
     private IssueImageView mIvAddImg;
     private View        mLinearType;
 //    private GridView    mGridView;
@@ -165,11 +166,11 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
                 Log.d(TAG,"keyboard height is ->" + mKeyboardHeight);
                 //TODO:有问题，oldTop最后也有可能大于keyheight
                 if(mExpressionNewTop > mKeyboardHeight && mKeyboardHeight > rect.top){
-                    mBackExpression.setVisibility(View.VISIBLE);
-                    mIvExpression.setVisibility(View.INVISIBLE);
+//                    mBackExpression.setVisibility(View.VISIBLE);
+//                    mIvExpression.setVisibility(View.INVISIBLE);
                 }else{
-                    mBackExpression.setVisibility(View.INVISIBLE);
-                    mIvExpression.setVisibility(View.VISIBLE);
+//                    mBackExpression.setVisibility(View.INVISIBLE);
+//                    mIvExpression.setVisibility(View.VISIBLE);
                 }
 
                 if(mIsKeyboardShow){
@@ -229,9 +230,9 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
         mEmotionContainer = (FrameLayout) findViewById(R.id.topic_emotion_container);
         mAddImgContainer = (LinearLayout) findViewById(R.id.topic_img_container);
 
-        mIvExpression = (ImageView) findViewById(R.id.group_issue_express);
+//        mIvExpression = (ImageView) findViewById(R.id.group_issue_express);
         mIvAddImg = (IssueImageView) findViewById(R.id.group_issue_add_img);
-        mBackExpression = (ImageView) findViewById(R.id.topic_backup_expression);
+//        mBackExpression = (ImageView) findViewById(R.id.topic_backup_expression);
 
         mPreText = (TextView) findViewById(R.id.pre_text);
         mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
@@ -248,8 +249,8 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
 
         mLinearType.setOnClickListener(this);
         mIvAddImg.setOnClickListener(this);
-        mIvExpression.setOnClickListener(this);
-        mBackExpression.setOnClickListener(this);
+//        mIvExpression.setOnClickListener(this);
+//        mBackExpression.setOnClickListener(this);
 
         mIvAddImg.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -486,6 +487,8 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
                 }else{
                     intent.putExtra(GroupSelectTopicTypeActivity.TOPIC_TYPE_KEY,GroupSelectTopicTypeActivity.OTHER);
                 }
+//                intent.putExtra(DatabaseConstant.GroupInfo.TITLE,mTitleEdit.getText().toString());
+//                intent.putExtra(DatabaseConstant.GroupInfo.CONTENT,mContentEdit.getText().toString());
                 startActivityForResult(intent,0);
                 overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
                 break;
@@ -612,6 +615,9 @@ public class GroupIssueTopic extends FragmentActivity implements View.OnClickLis
             }else{
                 mTopicTypeTv.setText(getString(R.string.billiard_other));
             }
+//            mTitleEdit.setText(data.getStringExtra(DatabaseConstant.GroupInfo.TITLE));
+//            mContentEdit.setText(data.getStringExtra(DatabaseConstant.GroupInfo.CONTENT));
+
         }
         //capture photo from camera
         else if(requestCode == CAMERA_REQUEST && resultCode == RESULT_OK){
