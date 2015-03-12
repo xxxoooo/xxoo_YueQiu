@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
@@ -37,6 +36,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sina.weibo.sdk.api.share.IWeiboShareAPI;
+import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.tencent.connect.common.Constants;
 import com.tencent.connect.share.QzoneShare;
 import com.tencent.open.t.Weibo;
@@ -615,9 +616,18 @@ public class Utils
 
                         break;
                     case R.id.img_search_dating_detail_share_sinaweibo:
-                        Intent sinaIntent = new Intent(context, WeiboShareActionCompleteActivity.class);
-                        sinaIntent.putExtra(PublicConstant.SHARE_TO_SINA_BITMAP, bitmap);
-                        context.startActivity(sinaIntent);
+                        IWeiboShareAPI weiboShareAPI = WeiboShareSDK.createWeiboAPI(context, HttpConstants.WEIBO_APP_KEY);
+                        if (weiboShareAPI.isWeiboAppInstalled())
+                        {
+                            // 新浪微博已经安装，我们可以启动进行微博分享的具体过程了
+                            Intent sinaIntent = new Intent(context, WeiboShareActionCompleteActivity.class);
+                            sinaIntent.putExtra(PublicConstant.SHARE_TO_SINA_BITMAP, bitmap);
+                            context.startActivity(sinaIntent);
+                        } else
+                        {
+                            // 新浪微博并没有安装，我们需要告诉用户安装客户端之后再进行分享
+                            Toast.makeText(context, context.getString(R.string.weibo_need_to_install_first), Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case R.id.img_search_dating_detail_share_renren:
                         if (null != renRenShareManager && renRenShareManager.isRenrenClientInstalled())
