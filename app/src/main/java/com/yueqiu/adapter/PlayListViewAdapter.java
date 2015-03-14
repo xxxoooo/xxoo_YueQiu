@@ -74,7 +74,7 @@ public class PlayListViewAdapter extends BaseAdapter {
         holder.tv_content.setText(mList.get(i).getContent().toString().trim());
         holder.photo.setDefaultImageResId(R.drawable.default_head);
         holder.photo.setErrorImageResId(R.drawable.default_head);
-        holder.photo.setImageUrl(HttpConstants.IMG_BASE_URL + mList.get(i).getImg_url(), mImgLoader);
+        holder.photo.setImageUrl("http://" + mList.get(i).getImg_url(), mImgLoader);
         String times[] = mList.get(i).getCreate_time().split(" ");
 
 

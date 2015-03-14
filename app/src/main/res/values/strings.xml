@@ -12,7 +12,7 @@
     <string name="billiard_equipment">装备</string>
     <string name="billiard_other">其他</string>
     <string name="billiard_time">时间</string>
-    <string name="billiard_poplarity">人气</string>
+    <string name="billiard_popularity">人气</string>
     <string name="billiard_search">附近</string>
     <string name="billiard_key_serach">关键字搜索</string>
     <string name="billiard_post">发表</string>
@@ -557,5 +557,7 @@
     <string name="title_activity_launcher">LauncherActivity</string>
     <string name="who_i_am">我是<xliff:g id="number" example="15">%1$s</xliff:g></string>
     <string name="sure">确定</string>
+    <string name="data_from_dazhong">列表数据来自大众点评</string>
+    <string name="ask_already_null">好友申请列表已经为空</string>
 
 </resources>

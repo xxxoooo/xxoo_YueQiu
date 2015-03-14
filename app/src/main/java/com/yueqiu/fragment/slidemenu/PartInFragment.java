@@ -185,7 +185,9 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
     protected void requestResult() {
 
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreText.setVisibility(View.VISIBLE);
+        if(mList.isEmpty()) {
+            mPreText.setVisibility(View.VISIBLE);
+        }
 
         mParamsMap.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
         mParamsMap.put(HttpConstants.Published.TYPE,mType);

@@ -40,12 +40,17 @@
 
                 <TextView
                     android:id="@+id/tv_search_room_detailed_name"
-                    android:textSize="18sp"
+                    android:textSize="16sp"
                     android:padding="4dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
                     android:layout_centerVertical="true"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@+id/ratingbar_search_room_detailed_ratingbar"
+
                     />
 
                 <TextView
@@ -78,9 +83,14 @@
             android:id="@+id/info_coll_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_weight="0.9"
             android:padding="5dp">
-
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
             <TextView
                 style="@style/SearchRoomActivityTvStyle"
                 android:id="@+id/tv_search_room_per_people_price_indi"
@@ -95,11 +105,12 @@
                 />
 
             <TextView
-                android:layout_below="@id/tv_search_room_per_people_price_indi"
+                android:layout_below="@id/tv_search_room_per_people_price"
                 style="@style/SearchRoomActivityTvStyle"
                 android:id="@+id/tv_search_room_tag_indi"
                 android:text="@string/search_room_detailedactivity_tag_indi"
                 android:drawableLeft="@drawable/tag_indicator"
+                android:layout_marginTop="5dp"
                 />
 
             <TextView
@@ -109,11 +120,12 @@
                 android:layout_below="@id/tv_search_room_per_people_price_indi"/>
 
             <TextView
-                android:layout_below="@id/tv_search_room_tag_indi"
+                android:layout_below="@id/tv_search_room_tag"
                 style="@style/SearchRoomActivityTvStyle"
                 android:id="@+id/tv_search_room_address_indi"
                 android:drawableLeft="@drawable/location_indicator"
-                android:text="@string/search_room_detailedactivity_address_indi"/>
+                android:text="@string/search_room_detailedactivity_address_indi"
+                android:layout_marginTop="5dp"/>
 
             <TextView
                 android:layout_below="@id/tv_search_room_tag_indi"
@@ -126,7 +138,8 @@
                 style="@style/SearchRoomActivityTvStyle"
                 android:id="@+id/search_room_phone_indi"
                 android:text="@string/search_room_detailedactivity_phone_indi"
-                android:drawableLeft="@drawable/phone_indicator"/>
+                android:drawableLeft="@drawable/phone_indicator"
+                android:layout_marginTop="5dp"/>
 
             <!--注意我们把以下的字符串声明成了电话号码的形式，这是很重要的-->
             <TextView
@@ -136,19 +149,19 @@
                 android:layout_toRightOf="@id/search_room_phone_indi"
                 android:autoLink="phone"
                 />
-
+                </RelativeLayout>
+            </ScrollView>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/devide_line"
                 android:text="@string/search_room_detailedactivity_detailed_info_separator"
                 android:textStyle="normal"
-                android:textSize="18sp"
+                android:textSize="17sp"
                 android:textColor="@color/md__defaultBackground"
                 android:padding="5dp"
-                android:layout_margin="2dp"
-                android:layout_below="@id/search_room_phone_indi"
                 android:id="@+id/tv_separator"
+                android:layout_alignParentBottom="true"
                 />
         </RelativeLayout>
 

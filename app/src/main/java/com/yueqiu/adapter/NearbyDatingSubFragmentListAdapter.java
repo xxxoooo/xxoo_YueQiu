@@ -84,10 +84,17 @@ public class NearbyDatingSubFragmentListAdapter extends BaseAdapter
         {
             viewHolder.mUserPhoto.setDefaultImageResId(R.drawable.default_head);
             viewHolder.mUserPhoto.setErrorImageResId(R.drawable.default_head);
-            viewHolder.mUserPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + bean.getUserPhoto(), mImgLoader);
+            viewHolder.mUserPhoto.setImageUrl("http://" + bean.getUserPhoto(), mImgLoader);
 
             viewHolder.mUserNickname.setText(bean.getUserName());
-            viewHolder.mUserDistance.setText(mContext.getString(R.string.in_meter,bean.getUserDistance()));
+
+            long distance = Long.valueOf(bean.getUserDistance());
+            float show_distance = distance / 1000 ;
+            if(show_distance > 10) {
+                viewHolder.mUserDistance.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, show_distance));
+            }else{
+                viewHolder.mUserDistance.setText(mContext.getString(R.string.in_meter,bean.getUserDistance()));
+            }
             viewHolder.mUserDeclareation.setText(bean.getUserDeclare());
         }
 

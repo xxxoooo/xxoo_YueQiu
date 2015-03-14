@@ -7,10 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -76,6 +76,7 @@ public class YueQiuApp extends Application implements LoginListener,UserListener
     public static Map<PlayIdentity, PlayInfo> sPlayMap = new LinkedHashMap<PlayIdentity, PlayInfo>();
 
 
+    public static Bitmap sScreenBitmap;
     //IM APPKEY
     public static final String APPKEY = "007b7931-bd77-4aec-876f-47f6f9b58db2";
     public static final String PACKAGENAME = "com.yueqiu";
@@ -164,8 +165,7 @@ public class YueQiuApp extends Application implements LoginListener,UserListener
         //异常拦截记录
         CrashApplication.getInstance(this).onCreate();
         //初始化
-        mApi = GotyeAPI.getInstance();
-        mApi.init(getApplicationContext(), APPKEY, PACKAGENAME);
+        GotyeAPI.getInstance().init(getApplicationContext(), APPKEY);
 
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
@@ -231,8 +231,10 @@ public class YueQiuApp extends Application implements LoginListener,UserListener
                 Toast.makeText(this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
             }
             Toast.makeText(this, getString(R.string.im_login_other_device), Toast.LENGTH_SHORT).show();
-        } else if (code == GotyeStatusCode.CODE_NETWORD_DISCONNECTED) {
-            Toast.makeText(this, getString(R.string.im_user_offline), Toast.LENGTH_SHORT).show();
+        } else if (code == GotyeStatusCode.CODE_NETWORK_DISCONNECTED) {
+//            Toast.makeText(this, getString(R.string.im_user_offline), Toast.LENGTH_SHORT).show();
+//            resetUSerInfo();
+//            jumpToIndexPage();
         }
     }
 
@@ -246,8 +248,14 @@ public class YueQiuApp extends Application implements LoginListener,UserListener
     public void onLogin(int code, GotyeUser currentLoginUser) {
     }
 
+    @Override
+    public void onReconnecting(int i, GotyeUser gotyeUser) {
+
+    }
+
     public void registerListener() {
-        mApi.addListerer(this);
+
+        GotyeAPI.getInstance().addListener(this);
     }
 
     @Override
@@ -259,9 +267,9 @@ public class YueQiuApp extends Application implements LoginListener,UserListener
     public void onModifyUserInfo(int code, GotyeUser user) {
         Log.e("cao","onModifyUserInfo callback");
         if (code == 0) {
-            Log.d("cao","change icon success");
+            Log.d("cao","change icon success user is ->" + user);
         }else{
-            Log.d("cao","wo ri ni ma code is ->" + code);
+            Log.d("cao", "wo ri ni ma code is ->" + code);
         }
     }
 

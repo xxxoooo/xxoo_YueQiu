@@ -70,6 +70,9 @@ public class FriendsApplicationFragment extends Fragment {
     private static final String TAG = "FriendsApplicationFragment";
     private static final int AGREED = 1;
     private static final int UNAGREED = 0;
+    private static final int CLEAR_SUCCESS = 10;
+    private static final int CLEAR_FAILURE = 11;
+    private static final int CLEAR_NO_RESULT = 12;
     private PullToRefreshListView mPullToRefreshListView;
     private ListView mListView;
     private TextView mEmptyView, mProgressBarText;
@@ -80,6 +83,7 @@ public class FriendsApplicationFragment extends Fragment {
     private static final int GET_ASK_SUCCESS = 0;
     private int applicationId;
     private List<FriendsApplication> mList = new ArrayList<FriendsApplication>();
+    private List<FriendsApplication> mTempList = new ArrayList<FriendsApplication>();
     private String mAgreedUsername;
 //    private ApplicationDao mApplicationDao;
 
@@ -147,6 +151,7 @@ public class FriendsApplicationFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         Utils.setFragmentActivityMenuColor(getActivity());
         getActivity().getMenuInflater().inflate(R.menu.clear, menu);
+
     }
 
     @Override
@@ -157,8 +162,11 @@ public class FriendsApplicationFragment extends Fragment {
                 getActivity().overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
                 return true;
             case R.id.qiuyou_application_clear:
-                mList.clear();
-                mMyAdapter.notifyDataSetChanged();
+                if(!mList.isEmpty()) {
+                    clearAsk();
+                }else{
+                    Utils.showToast(getActivity(),getActivity().getString(R.string.ask_already_null));
+                }
                 //清理数据库数据
 //                mApplicationDao.clearData();
                 return true;
@@ -167,11 +175,53 @@ public class FriendsApplicationFragment extends Fragment {
         }
     }
 
+    private void clearAsk(){
+
+        showProgressBar(true);
+        mTempList.addAll(mList);
+        mList.clear();
+        mMyAdapter.notifyDataSetChanged();
+        Map<String,String> param = new HashMap<String, String>();
+        param.put(HttpConstants.ClearAsk.USER_ID,String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+        Log.d("wy","clear param ->" + param);
+        HttpUtil.requestHttp(HttpConstants.ClearAsk.URL,param,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","clear response ->" + response);
+                try{
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            mHandler.sendEmptyMessage(CLEAR_SUCCESS);
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                            mHandler.sendEmptyMessage(CLEAR_NO_RESULT);
+                        }
+                        else{
+                            mHandler.obtainMessage(CLEAR_FAILURE,response.getString("msg")).sendToTarget();
+                        }
+                    }else{
+                        mHandler.sendEmptyMessage(CLEAR_FAILURE);
+                    }
+                }catch(JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.sendEmptyMessage(CLEAR_FAILURE);
+            }
+        });
+    }
+
     private void showProgressBar(boolean isShow) {
         mEmptyView.setVisibility(View.GONE);
         if (isShow) {
             mProgressBar.setVisibility(View.VISIBLE);
-            mProgressBarText.setVisibility(View.VISIBLE);
+            if(mList.isEmpty()) {
+                mProgressBarText.setVisibility(View.VISIBLE);
+            }
         } else {
             mProgressBar.setVisibility(View.GONE);
             mProgressBarText.setVisibility(View.GONE);
@@ -309,6 +359,24 @@ public class FriendsApplicationFragment extends Fragment {
                         }
                     }
 
+                    break;
+                case CLEAR_SUCCESS:
+                    mList.clear();
+                    mMyAdapter.notifyDataSetChanged();
+                    showEmptyView(true);
+                    break;
+                case CLEAR_FAILURE:
+                    mList.clear();
+                    mList.addAll(mTempList);
+                    mMyAdapter.notifyDataSetChanged();
+                    if(msg.obj == null){
+                        Utils.showToast(getActivity(), getString(R.string.http_request_error));
+                    }else{
+                        Utils.showToast(getActivity(), (String) msg.obj);
+                    }
+                    break;
+                case CLEAR_NO_RESULT:
+                    Utils.showToast(getActivity(),getActivity().getString(R.string.ask_already_null));
                     break;
                 default:
                     break;

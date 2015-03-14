@@ -168,7 +168,6 @@ public class NearbyBilliardsDatingActivity extends Activity
     private static final int JOIN_ACTIVITY = 1 << 1;
     private static final int RETRIEVE_DATING_DETAILED_INFO = 1 << 2;
     private static final int SET_DATING_DETAILED_INFO = 1 << 3;
-//    private static final int SHOW_TOAST = 1 << 4;
     private static final int JOIN_SUCCESS = 1 << 5;
     private static final int ADD_TO_FAVOR_SUCCESS = 1 << 6;
     private static final int ADD_TO_FAVOR_FAILURE = 1 << 8;
@@ -316,18 +315,12 @@ public class NearbyBilliardsDatingActivity extends Activity
     private static final String KEY_APPOINT_ID = "appointId"; // 活动的ID
     private static final String KEY_SEX = "sex";
     private static final String KEY_LOOK_NUM = "lookNum";
-    private static final String KEY_USER_NAME = "userName";
-    private static final String KEY_TIME_1 = "time1";
-    private static final String KEY_TIME_2 = "time2";
     private static final String KEY_CREATE_TIME = "createTime";
     private static final String KEY_TITLE_INFO = "titleInfo";
     private static final String KEY_ADDRESS = "address";
     private static final String KEY_START_TIME = "startTime";
     private static final String KEY_END_TIME = "endTime";
     private static final String KEY_MODEL = "model";
-    private static final String KEY_CONTACT = "contact";
-    private static final String KEY_CONTACT_PHONENUM = "phoneNum";
-    private static final String KEY_ACTIVITY_INTRO = "activityIntro";
     private static final String KEY_IMG_URL = "img_url";
 
 //    private static final String KEY_TOAST_MSG = "toastContent";
@@ -597,7 +590,8 @@ public class NearbyBilliardsDatingActivity extends Activity
                 mHandler.sendEmptyMessage(ADD_TO_FAVOR);
                 return true;
             case R.id.search_room_action_share:
-                Dialog dlg = Utils.showSheet(this, Utils.getCurrentScreenShot(mRoomView));
+                YueQiuApp.sScreenBitmap = Utils.getCurrentScreenShot(mRoomView);
+                Dialog dlg = Utils.showSheet(this, YueQiuApp.sScreenBitmap);
                 dlg.show();
                 return true;
             case android.R.id.home:
@@ -608,23 +602,6 @@ public class NearbyBilliardsDatingActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
 
-
-    // TODO: 用于完成台球厅分享的网络的请求处理过程
-    private void shareBilliardsRoomRequest(String shareTarget)
-    {
-
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////
-    // TODO: 以下只是我们加载的临时测试数据，在正式测试通过之后就可以直接删除了
-    private void initGridList()
-    {
-        int i;
-        for (i = 0; i < 5; ++i)
-        {
-            mFollowList.add(new NearbyDatingDetailedAlreadyBean("", "", "温柔的语-11111"));
-        }
-    }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {

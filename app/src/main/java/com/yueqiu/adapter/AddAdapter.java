@@ -63,7 +63,7 @@ public class AddAdapter extends BaseAdapter {
         }
         viewHolder.mImageView.setDefaultImageResId(R.drawable.default_head);
         viewHolder.mImageView.setErrorImageResId(R.drawable.default_head);
-        viewHolder.mImageView.setImageUrl(HttpConstants.IMG_BASE_URL + mList.get(position).getImg_url(), mImageLoader);
+        viewHolder.mImageView.setImageUrl("http://" + mList.get(position).getImg_url(), mImageLoader);
         viewHolder.mNickName.setText(mList.get(position).getUsername());
         viewHolder.mGender.setText(mList.get(position).getSex() == 1 ? mContext.getString(R.string.man) : mContext.getString(R.string.woman));
         viewHolder.mGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, NearbyFragmentsCommonUtils.parseGenderDrawable(mList.get(position).getSex() == 1 ? "男" : "女"), 0);

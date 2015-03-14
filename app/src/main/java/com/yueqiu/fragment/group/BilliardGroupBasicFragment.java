@@ -84,10 +84,11 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
     private String mEmptyTypeStr;
     private GroupInfoDao mGroupDao;
     private int mGroupType;
-    private int mStart_no = 0,mEnd_no = 9;
+    private int mStart_no = 0,mEnd_no = 9,mTimeStart = 0,mTimeEnd = 9,mPopStart = 0,mPopEnd = 9;
     private int mBeforeCount,mAfterCount;
     private int mCurrPosition;
     private boolean mRefresh,mLoadMore,mIsSavedInstance,mIsListEmpty;
+    private boolean mTimeDesc,mPopularityDesc,mNormal;
 
     private Map<String,Integer> mParamMap = new HashMap<String, Integer>();
     private Map<String,String> mUrlAndMethodMap = new HashMap<String, String>();
@@ -95,7 +96,8 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
     private List<GroupNoteInfo> mCacheList;
     private List<GroupNoteInfo> mInsertList = new ArrayList<GroupNoteInfo>();
     private List<GroupNoteInfo> mUpdateList = new ArrayList<GroupNoteInfo>();
-
+    private Map<String,String> mTimeParam = new HashMap<String, String>();
+    private Map<String,String> mPopParam = new HashMap<String, String>();
     private SearchView mSearchView;
 
     @Override
@@ -121,6 +123,9 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
         mGroupType = args.getInt("type");
         mGroupDao = DaoFactory.getGroupDao(mActivity);
         mAdapter = new GroupBasicAdapter(mActivity,mList);
+        mNormal = true;
+        mPopularityDesc = false;
+        mTimeDesc = false;
         initView();
         setEmptyTypeStr();
 
@@ -167,7 +172,15 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
-            requestGroup();
+            if(mNormal) {
+                requestGroup();
+            }
+            if(mTimeDesc){
+                getGroupByTime();
+            }
+            if(mPopularityDesc){
+                getGroupByPop();
+            }
         }else{
             mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
         }
@@ -180,7 +193,7 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
     private void initView(){
 
         mGroup = (RadioGroup) mView.findViewById(R.id.billiard_radio_group);
-        ((RadioButton)mGroup.findViewById(R.id.billiard_time_sort)).setChecked(true);
+//        ((RadioButton)mGroup.findViewById(R.id.billiard_time_sort)).setChecked(true);
         mPreText = (TextView) mView.findViewById(R.id.pre_text);
         mPreProgress = (ProgressBar) mView.findViewById(R.id.pre_progress);
         mPullToRefreshListView = (PullToRefreshListView) mView.findViewById(R.id.billiard_group_listview);
@@ -199,14 +212,18 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 switch (checkedId){
                     case R.id.billiard_time_sort:
-                        Collections.sort(mList,new TimeComparator());
+//                        Collections.sort(mList,new TimeComparator());
                         //TODO:更新adapter
+                        mList.clear();
                         mAdapter.notifyDataSetChanged();
+                        getGroupByTime();
                         break;
                     case R.id.billiard_popularity_sort:
-                        Collections.sort(mList,new PopularityComparator());
+//                        Collections.sort(mList,new PopularityComparator());
                         //TODO:更新adapter
+                        mList.clear();
                         mAdapter.notifyDataSetChanged();
+                        getGroupByPop();
                         break;
                 }
             }
@@ -214,6 +231,131 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
 
         mListView.setOnItemClickListener(this);
     }
+
+    private void getGroupByTime(){
+
+        mTimeDesc = true;
+        mPopularityDesc = false;
+        mNormal = false;
+
+        if(mGroupType != PublicConstant.GROUP_ALL) {
+            mTimeParam.put(HttpConstants.GroupList.TYPE, String.valueOf(mGroupType));
+        }
+
+        mTimeParam.put(HttpConstants.GroupList.STAR_NO,String.valueOf(mTimeStart));
+        mTimeParam.put(HttpConstants.GroupList.END_NO,String.valueOf(mTimeEnd));
+        mTimeParam.put(HttpConstants.GroupList.TIME,"desc");
+
+        mPreProgress.setVisibility(View.VISIBLE);
+        mPreText.setVisibility(View.VISIBLE);
+
+        Log.d("group","time desc param ->" + mTimeParam);
+
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
+
+        HttpUtil.requestHttp(HttpConstants.GroupList.URL,mTimeParam,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("group","time desc group response ->" + response);
+                try {
+                    if (!response.isNull("code")) {
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            if(response.getJSONObject("result") != null){
+                                List<GroupNoteInfo> list = setGroupInfoByJSON(response);
+                                if(list.isEmpty()){
+                                    mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                                }else {
+                                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS, list).sendToTarget();
+                                }
+                            }else{
+                                mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                            }
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                        }
+                    } else {
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                    }
+                }catch(JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+            }
+        });
+    }
+
+    private void getGroupByPop(){
+
+        mPopularityDesc = true;
+        mTimeDesc = false;
+        mNormal = false;
+
+        if (mGroupType != PublicConstant.GROUP_ALL){
+            mPopParam.put(HttpConstants.GroupList.TYPE, String.valueOf(mGroupType));
+        }
+        mPopParam.put(HttpConstants.GroupList.STAR_NO,String.valueOf(mPopStart));
+        mPopParam.put(HttpConstants.GroupList.END_NO,String.valueOf(mPopEnd));
+        mPopParam.put(HttpConstants.GroupList.WEIGHT,"desc");
+
+        mPreProgress.setVisibility(View.VISIBLE);
+        mPreText.setVisibility(View.VISIBLE);
+
+        Log.d("group","pop desc param ->" + mPopParam);
+
+        mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
+
+        HttpUtil.requestHttp(HttpConstants.GroupList.URL,mPopParam,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("group","popularity desc group response ->" + response);
+                try {
+                    if (!response.isNull("code")) {
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            if(response.getJSONObject("result") != null){
+                                List<GroupNoteInfo> list = setGroupInfoByJSON(response);
+                                if(list.isEmpty()){
+                                    mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                                }else {
+                                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS, list).sendToTarget();
+                                }
+                            }else{
+                                mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                            }
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
+                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
+                        }else if(response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
+                            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
+                        }else{
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
+                        }
+                    } else {
+                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+                    }
+                }catch(JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
+            }
+        });
+
+    }
+
     private void setEmptyTypeStr(){
         switch(mGroupType){
             case PublicConstant.GROUP_GET_MASTER:
@@ -256,6 +398,10 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
     private void requestGroup(){
 
 
+        mNormal = true;
+        mTimeDesc = false;
+        mPopularityDesc = false;
+
         if(mGroupType != PublicConstant.GROUP_ALL) {
             mParamMap.put(HttpConstants.GroupList.TYPE, mGroupType);
         }
@@ -263,7 +409,9 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
         mParamMap.put(HttpConstants.GroupList.END_NO,mEnd_no);
 
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreText.setVisibility(View.VISIBLE);
+        if(mList.isEmpty()) {
+            mPreText.setVisibility(View.VISIBLE);
+        }
 
         mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
 
@@ -529,10 +677,22 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
                 mEmptyView.setVisibility(View.GONE);
             }
             if(Utils.networkAvaiable(mActivity)){
+                if(mNormal) {
+                    mParamMap.put(HttpConstants.GroupList.STAR_NO, 0);
+                    mParamMap.put(HttpConstants.GroupList.END_NO, 9);
+                    requestGroup();
+                }
+                if(mTimeDesc){
+                    mTimeParam.put(HttpConstants.GroupList.STAR_NO, String.valueOf(0));
+                    mTimeParam.put(HttpConstants.GroupList.END_NO,String.valueOf(9));
+                    getGroupByTime();
+                }
 
-                mParamMap.put(HttpConstants.GroupList.STAR_NO,0);
-                mParamMap.put(HttpConstants.GroupList.END_NO,9);
-                requestGroup();
+                if(mPopularityDesc){
+                    mPopParam.put(HttpConstants.GroupList.STAR_NO,String.valueOf(0));
+                    mPopParam.put(HttpConstants.GroupList.END_NO,String.valueOf(9));
+                    getGroupByPop();
+                }
             }else{
                 mHandler.sendEmptyMessage(PublicConstant.NO_NETWORK);
             }
@@ -556,19 +716,49 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
              * start，end应该相应的增加
              */
             if(mBeforeCount != mAfterCount && mRefresh){
-                mStart_no = mEnd_no + (mAfterCount - mBeforeCount);
-                mEnd_no += 10 + (mAfterCount - mBeforeCount);
+                if(mNormal) {
+                    mStart_no = mEnd_no + (mAfterCount - mBeforeCount);
+                    mEnd_no += 10 + (mAfterCount - mBeforeCount);
+                }
+                if(mTimeDesc){
+                    mTimeStart = mTimeEnd + (mAfterCount - mBeforeCount);
+                    mTimeEnd += 10 + (mAfterCount - mBeforeCount);
+                }
+                if(mPopularityDesc){
+                    mPopStart = mPopEnd + (mAfterCount - mBeforeCount);
+                    mPopEnd += 10 + (mAfterCount - mBeforeCount);
+                }
             }else{
-                mStart_no = mEnd_no + 1;
-                mEnd_no += 10;
+                if(mNormal) {
+                    mStart_no = mEnd_no + 1;
+                    mEnd_no += 10;
+                }
+                if(mTimeDesc){
+                    mTimeStart = mTimeEnd + 1;
+                    mTimeEnd += 10;
+                }
+                if(mPopularityDesc){
+                    mPopStart = mPopEnd + 1;
+                    mPopEnd += 10;
+                }
             }
-            Log.d("wy","start_no is ->" + mStart_no);
-            Log.d("wy","end_no is ->" + mEnd_no);
             mRefresh = false;
             if(Utils.networkAvaiable(mActivity)){
-                mParamMap.put(HttpConstants.GroupList.STAR_NO,mStart_no);
-                mParamMap.put(HttpConstants.GroupList.END_NO,mEnd_no);
-                requestGroup();
+                if(mNormal) {
+                    mParamMap.put(HttpConstants.GroupList.STAR_NO, mStart_no);
+                    mParamMap.put(HttpConstants.GroupList.END_NO, mEnd_no);
+                    requestGroup();
+                }
+                if(mTimeDesc){
+                    mTimeParam.put(HttpConstants.GroupList.STAR_NO,String.valueOf(mTimeStart));
+                    mTimeParam.put(HttpConstants.GroupList.END_NO,String.valueOf(mTimeEnd));
+                    getGroupByTime();
+                }
+                if(mPopularityDesc){
+                    mPopParam.put(HttpConstants.GroupList.STAR_NO,String.valueOf(mPopStart));
+                    mPopParam.put(HttpConstants.GroupList.END_NO,String.valueOf(mPopEnd));
+                    getGroupByPop();
+                }
             }
             //TODO:由于目前不需要缓存，所以当没有网络时，就直接toast无网络
             //TODO:如果后面需要缓存，再替换成注释掉的代码

@@ -47,7 +47,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,12 +63,16 @@ public class MessageFragment extends Fragment implements DownloadListener{
     private ActionBar mActionBar;
     public static final String FRIEND_USER_ID = "com.yueqiu.fragment.chatbar.MessageFragment.friend_user_id";
     public static final String FRIEND_USER_NAME = "com.yueqiu.fragment.chatbar.MessageFragment.friend_user_name";
-    public static final String fixName = "通知列表";//验证消息
+    public static final String fixName = "验证消息";//验证消息
     private GotyeAPI mApi = GotyeAPI.getInstance();
-    private MessageListAdapter mAdapter;
+    public MessageListAdapter mAdapter;
     private GotyeChatTarget mTarget;
     private Intent mBroadcastIntent;
+
+    private MessageListAdapter.Verification mVerification;
     private int mIsAgree;
+    private  List<GotyeChatTarget> mSessions;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,9 +89,12 @@ public class MessageFragment extends Fragment implements DownloadListener{
         }
         mListView = (ListView) view.findViewById(R.id.chatbar_message_lv_account);
         registerForContextMenu(mListView);
-        mTarget = new GotyeChatTarget();
-        mTarget.name = fixName;
-        mTarget.title = getString(R.string.new_friend);
+
+        mTarget = new GotyeUser(fixName);
+        mVerification = new MessageListAdapter.Verification();
+        mVerification.hasNewMsg = false;
+        mVerification.newFriend = null;
+        mVerification.title = getString(R.string.new_friend);
 
         return view;
     }
@@ -96,8 +102,7 @@ public class MessageFragment extends Fragment implements DownloadListener{
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("wy","onResume");
-        mApi.addListerer(this);
+        mApi.addListener(this);
         updateList();
         setListener();
         if(Utils.networkAvaiable(getActivity())) {
@@ -105,21 +110,25 @@ public class MessageFragment extends Fragment implements DownloadListener{
         }
     }
 
-    private void updateList() {
-        List<GotyeChatTarget> sessions = mApi.getSessionList();
-        Log.d("wy", "List--sessions" + sessions);
 
-        if (sessions == null) {
-            sessions = new ArrayList<GotyeChatTarget>();
-            sessions.add(mTarget);
+    private void updateList() {
+       mSessions = mApi.getSessionList();
+
+        Log.d("offLine", "List--sessions" + mSessions);
+
+        if (mSessions == null) {
+            mSessions = new ArrayList<GotyeChatTarget>();
+            mSessions.add(mTarget);
         } else {
-            sessions.add(0, mTarget);
+            mSessions.add(0, mTarget);
+
         }
         if (mAdapter == null) {
-            mAdapter = new MessageListAdapter(MessageFragment.this, sessions);
+            mAdapter = new MessageListAdapter(MessageFragment.this, mSessions);
+            mAdapter.setVertification(mVerification);
             mListView.setAdapter(mAdapter);
         } else {
-            mAdapter.setData(sessions);
+            mAdapter.setData(mSessions);
         }
 
     }
@@ -135,19 +144,19 @@ public class MessageFragment extends Fragment implements DownloadListener{
                                     long arg3) {
                 GotyeChatTarget target =  mAdapter.getItem(arg2);
                 //TODO:fixName = "通知列表"
-                if (target.name.equals(fixName)) {
+                if (target.getName().equals(fixName)) {
                     Intent i = new Intent(getActivity(), FriendsApplicationActivity.class);
                     startActivity(i);
                 } else {
                     /**
                      * 下面这句是用来标记消息为已读的
                      */
-                    GotyeAPI.getInstance().markMeeagesAsread(target);
+                    GotyeAPI.getInstance().markMessagesAsRead(target);
                     //单人聊天
-                    if (target.type == GotyeChatTargetType.GotyeChatTargetTypeUser) {
+                    if (target.getType() == GotyeChatTargetType.GotyeChatTargetTypeUser) {
                         Log.e(TAG, "------------p2p chat-------------");
                         Intent toChat = new Intent(getActivity(),ChatPage.class);
-                        GotyeUser user = mApi.requestUserInfo(target.name,true);
+                        GotyeUser user = mApi.requestUserInfo(target.getName(),true);
                         toChat.putExtra("user",  user);
                         startActivity(toChat);
 
@@ -157,12 +166,12 @@ public class MessageFragment extends Fragment implements DownloadListener{
                         // updateList();
                     }
                     //聊天室聊天
-                    else if (target.type == GotyeChatTargetType.GotyeChatTargetTypeRoom) {
+                    else if (target.getType() == GotyeChatTargetType.GotyeChatTargetTypeRoom) {
                         Intent toChat = new Intent(getActivity(),ChatPage.class);
                         toChat.putExtra("room",  (GotyeRoom)target);
                         startActivity(toChat);
                         //群组聊天
-                    } else if (target.type == GotyeChatTargetType.GotyeChatTargetTypeGroup) {
+                    } else if (target.getType() == GotyeChatTargetType.GotyeChatTargetTypeGroup) {
                         Intent toChat = new Intent(getActivity(),ChatPage.class);
                         toChat.putExtra("group",  (GotyeGroup)target);
                         startActivity(toChat);
@@ -183,8 +192,6 @@ public class MessageFragment extends Fragment implements DownloadListener{
 
     @Override
     public void onDownloadMedia(int code, String path, String url) {
-        Log.e("ddd", "头像图片下载回调");
-        Log.e("ddd", "code = " + code + " path = " + path + "  url = " + url);
         mAdapter.notifyDataSetChanged();
     }
 
@@ -208,7 +215,7 @@ public class MessageFragment extends Fragment implements DownloadListener{
                 if (position == 0)
                     return false;
                 GotyeChatTarget target = mAdapter.getItem(position);
-                mApi.deleteSession(target);
+                mApi.deleteSession(target, false);
                 updateList();
                 return true;
             default:
@@ -218,8 +225,6 @@ public class MessageFragment extends Fragment implements DownloadListener{
     }
 
     private void getFriendApplication() {
-
-
         Map<String, String> requestMap = new HashMap<String, String>();
         requestMap.put(HttpConstants.GetAsk.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
 
@@ -240,16 +245,14 @@ public class MessageFragment extends Fragment implements DownloadListener{
                             } else {
                                 JSONArray list_data = result.getJSONArray("list_data");
                                 if(list_data.length() >= 1) {
-                                    for (int i = 0 ; i < list_data.length() ; i++){
+                                    for(int i=0;i<list_data.length();i++) {
                                         FriendsApplication application = new FriendsApplication();
-                                        String id = list_data.getJSONObject(0).getString("id");
-                                        String nick = list_data.getJSONObject(0).getString("nick");
-                                        String username = list_data.getJSONObject(0).getString("username");
-                                        String create_time = list_data.getJSONObject(0).getString("create_time");
-                                        String img_url = list_data.getJSONObject(0).getString("img_url");
-                                        mIsAgree = list_data.getJSONObject(0).getInt("state");
-
-
+                                        String id = list_data.getJSONObject(i).getString("id");
+                                        String nick = list_data.getJSONObject(i).getString("nick");
+                                        String username = list_data.getJSONObject(i).getString("username");
+                                        String create_time = list_data.getJSONObject(i).getString("create_time");
+                                        String img_url = list_data.getJSONObject(i).getString("img_url");
+                                        mIsAgree = list_data.getJSONObject(i).getInt("state");
                                         application.setId(id);
                                         application.setNick(nick);
                                         application.setUsername(username);
@@ -257,23 +260,36 @@ public class MessageFragment extends Fragment implements DownloadListener{
                                         application.setImg_url(img_url);
                                         application.setIsAgree(mIsAgree);
 
-                                        if(mIsAgree == UNAGREE){
-                                            mTarget.hasNewMsg = true;
-                                            mTarget.newFriend = application;
-                                            mTarget.title = getString(R.string.verify_msg);
-                                            mAdapter.notifyDataSetChanged();
+                                        if (mIsAgree == UNAGREE) {
+                                            mVerification.hasNewMsg = true;
+                                            mVerification.newFriend = application;
+                                            mVerification.title = getString(R.string.verify_msg);
+//
+//                                            mSessions.remove(0);
+//                                            GotyeUser user = new GotyeUser(fixName);
+//                                            mSessions.add(0,user);
+                                            mAdapter.setVertification(mVerification);
                                             mBroadcastIntent.setAction(PublicConstant.CHAT_HAS_NEW_MSG);
                                             getActivity().sendBroadcast(mBroadcastIntent);
                                             break;
                                         }
-
                                     }
                                     if(mIsAgree == AGREE){
-                                        mTarget.hasNewMsg = false;
-                                        mTarget.newFriend = null;
-                                        mTarget.title = getString(R.string.new_friend);
-                                        mAdapter.notifyDataSetChanged();
+
+                                        mVerification.hasNewMsg = false;
+                                        mVerification.newFriend = null;
+                                        mVerification.title = getActivity().getString(R.string.new_friend);
+
+//
+//                                        mSessions.remove(0);
+//                                        GotyeUser user = new GotyeUser(fixName);
+//                                        mSessions.add(0,user);
+
+                                        mAdapter.setVertification(mVerification);
+                                        mBroadcastIntent.setAction(PublicConstant.CHAT_HAS_NO_MSG);
+                                        getActivity().sendBroadcast(mBroadcastIntent);
                                     }
+
                                 }
                             }
                         }
@@ -292,4 +308,5 @@ public class MessageFragment extends Fragment implements DownloadListener{
         });
 
     }
+
 }

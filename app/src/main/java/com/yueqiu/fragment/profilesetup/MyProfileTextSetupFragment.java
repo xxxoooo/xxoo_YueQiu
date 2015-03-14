@@ -256,7 +256,7 @@ public class MyProfileTextSetupFragment extends Fragment {
 
         mGotyeUser.setGender(YueQiuApp.sUserInfo.getSex() == 1 ? GotyeGender.Male : GotyeGender.Femal);
         Log.e("cao", " text modify mGotyeUser = " + mGotyeUser);
-        int result = mApi.modifyUserInfo(mGotyeUser, null);
+        int result = mApi.requestModifyUserInfo(mGotyeUser, null);
 
         Log.d("cao","text modify result" + result);
     }

@@ -23,7 +23,9 @@ import com.gotye.api.GotyeMessageType;
 import com.gotye.api.GotyeUser;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+
 import com.yueqiu.constant.HttpConstants;
+import com.yueqiu.bean.UserInfo;
 import com.yueqiu.util.BitmapUtil;
 import com.yueqiu.util.ImageCache;
 import com.yueqiu.util.TimeUtil;
@@ -58,9 +60,11 @@ public class ChatMessageAdapter extends BaseAdapter {
     private GotyeAPI api;
     private Handler mHandler = new Handler();
     private int checkImgMsgCount;//点击图片消息查看大图,计次
-    private ImageLoader mImgLoader;
+
 
     private String mReceiveImgUrl;
+
+    private ImageLoader mImageLoader;
 
     public ChatMessageAdapter(ChatPage activity, List<GotyeMessage> messageList) {
         this.chatPage = activity;
@@ -68,7 +72,9 @@ public class ChatMessageAdapter extends BaseAdapter {
         inflater = activity.getLayoutInflater();
         api = GotyeAPI.getInstance();
         currentLoginName = api.getCurrentLoginUser().getName();
-        this.mImgLoader = VolleySingleton.getInstance().getImgLoader();
+
+        mImageLoader = VolleySingleton.getInstance().getImgLoader();//volley
+
     }
 
     public void addMsgToBottom(GotyeMessage msg) {
@@ -153,14 +159,14 @@ public class ChatMessageAdapter extends BaseAdapter {
             convertView = createViewByMessage(message, position);
             if (message.getType() == GotyeMessageType.GotyeMessageTypeImage) {
                 holder.iv = ((ImageView) convertView.findViewById(R.id.iv_sendPicture));
-                holder.head_iv = (ImageView) convertView.findViewById(R.id.iv_userhead);
+                holder.head_iv = (CustomNetWorkImageView) convertView.findViewById(R.id.iv_userhead);
                 holder.tv = (TextView) convertView.findViewById(R.id.percentage);
                 holder.pb = (ProgressBar) convertView.findViewById(R.id.progressBar);
                 holder.staus_iv = (ImageView) convertView.findViewById(R.id.msg_status);
                 holder.tv_userId = (TextView) convertView.findViewById(R.id.tv_userid);
             } else if (message.getType() == GotyeMessageType.GotyeMessageTypeAudio) {
                 holder.iv = ((ImageView) convertView.findViewById(R.id.iv_voice));
-                holder.head_iv = (ImageView) convertView.findViewById(R.id.iv_userhead);
+                holder.head_iv = (CustomNetWorkImageView) convertView.findViewById(R.id.iv_userhead);
                 holder.tv = (TextView) convertView.findViewById(R.id.tv_length);
                 holder.pb = (ProgressBar) convertView.findViewById(R.id.pb_sending);
                 holder.staus_iv = (ImageView) convertView.findViewById(R.id.msg_status);
@@ -169,7 +175,7 @@ public class ChatMessageAdapter extends BaseAdapter {
             } else {
                 holder.pb = (ProgressBar) convertView.findViewById(R.id.pb_sending);
                 holder.staus_iv = (ImageView) convertView.findViewById(R.id.msg_status);
-                holder.head_iv = (ImageView) convertView.findViewById(R.id.iv_userhead);
+                holder.head_iv = (CustomNetWorkImageView) convertView.findViewById(R.id.iv_userhead);
                 // 这里是文字内容
                 holder.tv = (TextView) convertView.findViewById(R.id.tv_chatcontent);
                 holder.tv_userId = (TextView) convertView.findViewById(R.id.tv_userid);
@@ -180,9 +186,10 @@ public class ChatMessageAdapter extends BaseAdapter {
         }
         if (holder.tv_userId != null) {
             String name ;
-            GotyeUser user = api.requestUserInfo(message.getSender().name,true);
+            GotyeUser user = api.requestUserInfo(message.getSender().getName(),true);
+            String nick;
+
             if(user.getNickname() != null){
-                String nick;
                 String nicknameStr = user.getNickname();
                 int splitIndex = nicknameStr.lastIndexOf("|");
                 if(splitIndex != -1) {
@@ -191,7 +198,11 @@ public class ChatMessageAdapter extends BaseAdapter {
                 }else{
                     nick = nicknameStr;
                 }
-                name = nick;
+                if(TextUtils.isEmpty(nick)){
+                    name = user.getName();
+                }else{
+                    name = nick;
+                }
             }else{
                 name = user.getName();
             }
@@ -218,8 +229,7 @@ public class ChatMessageAdapter extends BaseAdapter {
             timestamp.setVisibility(View.VISIBLE);
         } else {
             //两条消息时间离得如果稍长，显示时间
-            if (TimeUtil.needShowTime(message.getDate(), messageList.get(position
-                    - 1).getDate())) {
+            if (TimeUtil.needShowTime(message.getDate(), messageList.get(position- 1).getDate())) {
                 timestamp.setText(TimeUtil.toLocalTimeString(message.getDate() * 1000));
                 timestamp.setVisibility(View.VISIBLE);
             } else {
@@ -229,16 +239,34 @@ public class ChatMessageAdapter extends BaseAdapter {
 
         if(getDirect(message) == MESSAGE_DIRECT_SEND){
             ((CustomNetWorkImageView)holder.head_iv).setDefaultImageResId(R.drawable.default_head);
-            ((CustomNetWorkImageView)holder.head_iv).setImageUrl("http://" + YueQiuApp.sUserInfo.getImg_url(),mImgLoader);
-            Log.d("wy","message sender info - >" + api.getCurrentLoginUser().getInfo());
-            Log.d("wy","message sender name - >" + api.getCurrentLoginUser().getName());
+            ((CustomNetWorkImageView)holder.head_iv).setImageUrl("http://" + YueQiuApp.sUserInfo.getImg_url(),mImageLoader);
         }else {
 //            setIcon(holder.head_iv, message.getSender().name);
             ((CustomNetWorkImageView)holder.head_iv).setDefaultImageResId(R.drawable.default_head);
-            ((CustomNetWorkImageView)holder.head_iv).setImageUrl(HttpConstants.IMG_BASE_URL +  mReceiveImgUrl,mImgLoader);
+            ((CustomNetWorkImageView)holder.head_iv).setImageUrl(HttpConstants.IMG_BASE_URL +  mReceiveImgUrl,mImageLoader);
+            Log.d("cao","message receiver img_url ->" + mReceiveImgUrl);
         }
+
         return convertView;
     }
+
+//    private void setUserPhoto(ViewHolder holder, String userName) {
+//        holder.head_iv.setDefaultImageResId(R.drawable.default_head);
+//        holder.head_iv.setErrorImageResId(R.drawable.default_head);
+//        String url = getUserPhotoUrl(userName);
+//        holder.head_iv.setImageUrl(url, mImageLoader);
+//    }
+
+//    private String getUserPhotoUrl(String userName) {
+//        if (userName.equals(currentLoginName)) {
+//            UserInfo userInfo = DaoFactory.getUser(chatPage)
+//                    .getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+//            return "http://" + userInfo.getImg_url();
+//        } else {
+//            String photoName = DaoFactory.getContacts(chatPage).getContactByName(userName).getImg_url();
+//            return HttpConstants.IMG_BASE_URL + photoName;
+//        }
+//    }
 
     /**
      * 处理图片类型item的方法
@@ -284,8 +312,7 @@ public class ChatMessageAdapter extends BaseAdapter {
      * @param holder
      * @param position
      */
-    private void handleTextMessage(GotyeMessage message, ViewHolder holder,
-                                   final int position) {
+    private void handleTextMessage(GotyeMessage message, ViewHolder holder,final int position) {
         // 设置内容
         String extraData = message.getExtraData() == null ? null : new String(message.getExtraData());
         if (extraData != null) {
@@ -348,37 +375,36 @@ public class ChatMessageAdapter extends BaseAdapter {
 
     private ImageCache cache = ImageCache.getInstance();
 
-    private void setIcon(ImageView iconView, String name) {
-        Bitmap bmp = cache.get(name);
-        if (bmp != null) {
-            iconView.setImageBitmap(bmp);
-        } else {
-            GotyeUser user = api.requestUserInfo(name, false);
-            if (user != null && user.getIcon() != null) {
-                bmp = cache.get(user.getIcon().path);
-                if (bmp != null) {
-                    iconView.setImageBitmap(bmp);
-                    cache.put(name, bmp);
-                } else {
-                    bmp = BitmapUtil.getBitmap(user.getIcon().getPath());
-                    if (bmp != null) {
-                        iconView.setImageBitmap(bmp);
-                        cache.put(name, bmp);
-                    } else {
-                        iconView.setImageResource(R.drawable.default_head);
-                    }
-                }
-            } else {
-                iconView.setImageResource(R.drawable.default_head);
-            }
-        }
-    }
-
+//    private void setIcon(NetworkImageView iconView, String name) {
+//        Bitmap bmp = cache.get(name);
+//        if (bmp != null) {
+//            iconView.setImageBitmap(bmp);
+//        } else {
+//            GotyeUser user = api.requestUserInfo(name, false);
+//            if (user != null && user.getIcon() != null) {
+//                bmp = cache.get(user.getIcon().path);
+//                if (bmp != null) {
+//                    iconView.setImageBitmap(bmp);
+//                    cache.put(name, bmp);
+//                } else {
+//                    bmp = BitmapUtil.getBitmap(user.getIcon().getPath());
+//                    if (bmp != null) {
+//                        iconView.setImageBitmap(bmp);
+//                        cache.put(name, bmp);
+//                    } else {
+//                        iconView.setImageResource(R.drawable.default_head);
+//                        int code = api.downloadMedia(user.getIcon().url);
+//                    }
+//                }
+//            } else {
+//                iconView.setImageResource(R.drawable.default_head);
+//            }
+//        }
+//    }
 
 
     //TODO:在handleImageMessage里调用
-    private void setImageMessage(ImageView msgImageView,
-                                 final GotyeMessage msg, ViewHolder holder) {
+    private void setImageMessage(ImageView msgImageView,final GotyeMessage msg, ViewHolder holder) {
         Bitmap cacheBm = cache.get(msg.getMedia().getPath());
         if (cacheBm != null) {
             msgImageView.setImageBitmap(cacheBm);
@@ -402,7 +428,7 @@ public class ChatMessageAdapter extends BaseAdapter {
                     intent.putExtra(ShowBigImage.EXTRA_URI, uri);
                     chatPage.startActivity(intent);
                 } else {
-                    if (!Utils.networkAvaiable(chatPage)){
+                    if (!Utils.networkAvaiable(chatPage)) {
                         Utils.showToast(chatPage, "当前网络不可用，请检查网络后重试！");
                         return;
                     }
@@ -415,7 +441,7 @@ public class ChatMessageAdapter extends BaseAdapter {
                                 intent.putExtra(ShowBigImage.EXTRA_TIMEOUT, true);
                                 chatPage.startActivity(intent);
                                 checkImgMsgCount = 0;
-                            }else {
+                            } else {
                                 checkImgMsgCount += 1;
                                 onClick(v);
                             }
@@ -429,7 +455,7 @@ public class ChatMessageAdapter extends BaseAdapter {
     }
 
     private int getDirect(GotyeMessage message) {
-        if (message.getSender().name.equals(currentLoginName)) {
+        if (message.getSender().getName().equals(currentLoginName)) {
             return MESSAGE_DIRECT_SEND;
         } else {
             return MESSAGE_DIRECT_RECEIVE;
@@ -456,7 +482,7 @@ public class ChatMessageAdapter extends BaseAdapter {
         TextView tv;
         ProgressBar pb;
         ImageView staus_iv;
-        ImageView head_iv;
+        CustomNetWorkImageView head_iv;
         TextView tv_userId;
         ImageView playBtn;
         TextView timeLength;

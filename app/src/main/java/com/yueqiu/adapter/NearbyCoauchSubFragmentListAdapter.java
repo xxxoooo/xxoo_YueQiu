@@ -94,14 +94,20 @@ public class NearbyCoauchSubFragmentListAdapter extends BaseAdapter
         }
 
         viewHolder.mKinds.setText(bean.getmBilliardKind());
-        viewHolder.mDistance.setText(mContext.getString(R.string.in_meter, bean.getUserDistance()));
+        long distance = Long.valueOf(bean.getUserDistance());
+        float show_distance = distance / 1000 ;
+        if(show_distance > 10) {
+            viewHolder.mDistance.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, show_distance));
+        }else{
+            viewHolder.mDistance.setText(mContext.getString(R.string.in_meter,bean.getUserDistance()));
+        }
         viewHolder.mGender.setText(bean.getUserGender());
         viewHolder.mGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, NearbyFragmentsCommonUtils.parseGenderDrawable(bean.getUserGender()), 0);
         viewHolder.mGender.setCompoundDrawablePadding(6);
         viewHolder.mName.setText(bean.getUserName());
         viewHolder.mPhoto.setDefaultImageResId(R.drawable.default_head);
         viewHolder.mPhoto.setErrorImageResId(R.drawable.default_head);
-        viewHolder.mPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + bean.getUserPhoto(), mImgLoader);
+        viewHolder.mPhoto.setImageUrl("http://" + bean.getUserPhoto(), mImgLoader);
 
         return convertView;
     }

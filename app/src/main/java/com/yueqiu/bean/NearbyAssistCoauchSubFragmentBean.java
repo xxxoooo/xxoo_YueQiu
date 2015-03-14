@@ -177,8 +177,7 @@ public class NearbyAssistCoauchSubFragmentBean implements Parcelable
         } else
         {
             NearbyAssistCoauchSubFragmentBean thatObj = (NearbyAssistCoauchSubFragmentBean) object;
-            if (thatObj.getUserId().equals(this.getUserId()) && thatObj.getName().equals(this.getName())
-                    && thatObj.getDistance().equals(this.getDistance()))
+            if (thatObj.getUserId().equals(this.getUserId()))
             {
                 result = true;
             }

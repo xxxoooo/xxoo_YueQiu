@@ -53,9 +53,9 @@ public class SendImageMessageTask extends AsyncTask<String, String, String> {
 		createMessage = GotyeMessage.createImageMessage(GotyeAPI.getInstance()
                 .getCurrentLoginUser(), target, imagePath);
 		createMessage.getMedia().setPath_ex(imagePath);
-        Log.e("ddd", "sending message: createmessage = " + createMessage);
+        Log.e("cao", "sending message: createmessage = " + createMessage);
 		int code = GotyeAPI.getInstance().sendMessage(createMessage);
-        Log.e("ddd", "chat page send a image result: code = " + code);
+        Log.e("cao", "chat page send a image result: code = " + code);
 	}
 
 	@Override

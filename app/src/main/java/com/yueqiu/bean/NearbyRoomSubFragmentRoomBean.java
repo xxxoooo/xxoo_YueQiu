@@ -66,7 +66,7 @@ public class NearbyRoomSubFragmentRoomBean implements Parcelable
                                          String roomPhone, String roomTag, String roomInfo,
                                          String shopHours)
     {
-        new NearbyRoomSubFragmentRoomBean(roomId, roomPhoto, roomName,
+        this(roomId, roomPhoto, roomName,
             level, price, address, distance,
             roomPhone, roomTag, roomInfo,
             shopHours, "");

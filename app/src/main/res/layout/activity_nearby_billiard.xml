@@ -8,6 +8,7 @@
         android:id="@+id/search_parent_fragment_view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/search_parent_radio_group"
         />
     <RadioGroup
         android:id="@+id/search_parent_radio_group"
@@ -16,7 +17,7 @@
         android:layout_alignParentBottom="true"
         android:weightSum="4"
         android:orientation="horizontal"
-
+        android:visibility="invisible"
         >
         <RadioButton
             android:id="@+id/first_title_nearby"
@@ -29,41 +30,158 @@
             android:drawableTop="@drawable/near_icon"
             android:text="@string/tab_title_search"
             android:textColor="@android:color/white"
+            android:textSize="13sp"
             android:background="@drawable/billiard_search_radio_bg"/>
-        <RadioButton
-            android:id="@+id/first_title_chatbar"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:button="@null"
-            android:drawableTop="@drawable/chat_bar_icon"
-            android:text="@string/tab_title_chat_bar"
-            android:textColor="@android:color/white"
-            android:background="@drawable/billiard_search_radio_bg"/>
-        <RadioButton
-            android:id="@+id/first_title_activity"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:button="@null"
-            android:drawableTop="@drawable/active_icon"
-            android:text="@string/tab_title_activity"
-            android:textColor="@android:color/white"
-            android:background="@drawable/billiard_search_radio_bg"/>
-        <RadioButton
-            android:id="@+id/first_title_group"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:button="@null"
-            android:drawableTop="@drawable/group_icon"
-            android:text="@string/billiard_group"
-            android:textColor="@android:color/white"
-            android:background="@drawable/billiard_search_radio_bg"/>
+        <!--<RadioButton-->
+            <!--android:id="@+id/first_title_chatbar"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:gravity="center"-->
+            <!--android:button="@null"-->
+            <!--android:drawableTop="@drawable/chat_bar_icon"-->
+            <!--android:text="@string/tab_title_chat_bar"-->
+            <!--android:textColor="@android:color/white"-->
+            <!--android:textSize="13sp"-->
+            <!--android:background="@drawable/billiard_search_radio_bg"/>-->
+        <!--<RadioButton-->
+            <!--android:id="@+id/first_title_activity"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:gravity="center"-->
+            <!--android:button="@null"-->
+            <!--android:drawableTop="@drawable/active_icon"-->
+            <!--android:text="@string/tab_title_activity"-->
+            <!--android:textColor="@android:color/white"-->
+            <!--android:textSize="13sp"-->
+            <!--android:background="@drawable/billiard_search_radio_bg"/>-->
+        <!--<RadioButton-->
+            <!--android:id="@+id/first_title_group"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_weight="1"-->
+            <!--android:gravity="center"-->
+            <!--android:button="@null"-->
+            <!--android:drawableTop="@drawable/group_icon"-->
+            <!--android:text="@string/billiard_group"-->
+            <!--android:textColor="@android:color/white"-->
+            <!--android:textSize="13sp"-->
+            <!--android:background="@drawable/billiard_search_radio_bg"/>-->
         </RadioGroup>
+    <LinearLayout
+        android:id="@+id/nearby_chat_bar_bottom_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="4"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/search_parent_fragment_view_pager">
+        <RelativeLayout
+            android:id="@+id/nearby_bottom_re"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/billiard_search_radio_bg">
+            <TextView
+                android:id="@+id/nearby_tv"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/tab_title_search"
+                android:textColor="@android:color/white"
+                android:textSize="13sp"
+                android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:id="@+id/nearby_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/nearby_tv"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/near_icon"/>
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/nearby_chat_bar_re"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/billiard_search_radio_bg">
+            <TextView
+                android:id="@+id/nearby_chat_bar_tv"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:text="@string/tab_title_chat_bar"
+                android:textSize="13sp"
+                android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:id="@+id/nearby_chat_bar_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/nearby_chat_bar_tv"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/chat_bar_icon"/>
+
+            <TextView
+                android:id="@+id/nearby_chat_bar_unread_count"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:background="@drawable/has_msg"
+                android:layout_alignParentTop="true"
+                android:layout_toRightOf="@+id/nearby_chat_bar_icon"
+                android:layout_marginTop="2dp"
+                android:layout_marginLeft="5dp"
+                android:visibility="gone"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/nearby_play_re"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/billiard_search_radio_bg">
+            <TextView
+                android:id="@+id/nearby_play_tv"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:text="@string/tab_title_activity"
+                android:textSize="13sp"
+                android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:id="@+id/nearby_play_iv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/nearby_play_tv"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/active_icon"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/nearby_group_re"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/billiard_search_radio_bg">
+            <TextView
+                android:id="@+id/nearby_group_tv"
+                android:layout_alignParentBottom="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:text="@string/billiard_group"
+                android:textSize="13sp"
+                android:layout_centerHorizontal="true"/>
+            <ImageView
+                android:id="@+id/nearby_group_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/nearby_group_tv"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/group_icon"/>
+        </RelativeLayout>
+    </LinearLayout>
 
 
 </RelativeLayout>

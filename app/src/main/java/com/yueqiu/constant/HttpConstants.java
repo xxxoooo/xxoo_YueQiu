@@ -371,6 +371,16 @@ public class HttpConstants
     }
 
     /**
+     * 清空好友
+     */
+    public static final class ClearAsk{
+
+        public static final String URL = "/news/delList";
+
+        public static final String USER_ID = "user_id";
+    }
+
+    /**
      * 活动接口
      */
     public static class Play
@@ -453,6 +463,9 @@ public class HttpConstants
 
         public static final String KEYWORD = "keyword";
 
+        public static final String TIME = "time";
+
+        public static final String WEIGHT = "weight";
 
     }
 

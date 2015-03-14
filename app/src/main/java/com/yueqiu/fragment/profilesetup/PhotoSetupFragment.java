@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -111,6 +110,7 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
     private List<IssueImageView> mAddViewList = new ArrayList<IssueImageView>();
     private GotyeAPI api;
     private GotyeUser mGotyeUser;
+    private String mUpdataToImPhotoPath;
 
     @Override
     public void onAttach(Activity activity) {
@@ -164,10 +164,11 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
         mPhotoView.setOnClickListener(this);
 
         api = GotyeAPI.getInstance();
+
+//        api.addListener(this);
         mGotyeUser = api.getCurrentLoginUser();
-        GotyeUser user = api.requestUserInfo(mGotyeUser.getName(),true);
-        Log.d("cao","after user info and nickname" + user.getInfo() + user.getNickname());
-        Log.d("cao","current user info ->" + mGotyeUser.getInfo());
+        api.requestUserInfo(mGotyeUser.getName(), true);
+
 
 
 
@@ -242,7 +243,7 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
 
 
         @Override
-        public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        public View onCreateView(LayoutInflater inflater,  ViewGroup container, Bundle savedInstanceState) {
             final ImageView view = new ImageView(getActivity());
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             view.setLayoutParams(params);
@@ -438,6 +439,8 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                                                 String img_url = response.getJSONObject("result").getString("s_img_url");
                                                 //TODO:上传IM服务器
                                                 mHandler.obtainMessage(PublicConstant.GET_SUCCESS,img_url).sendToTarget();
+                                                //TODO:upload IM service
+                                                mUpdataToImPhotoPath = imgFilePath;
 
                                             } else {
                                                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
@@ -530,6 +533,8 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
                                         if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
                                             if (response.getJSONObject("result") != null) {
                                                 String img_url = response.getJSONObject("result").getString("s_img_url");
+                                                //TODO:上传IM服务器
+                                                mUpdataToImPhotoPath = filePath;
                                                 mHandler.obtainMessage(PublicConstant.GET_SUCCESS, img_url).sendToTarget();
                                             } else {
                                                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
@@ -578,17 +583,16 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
     }
 
 
+
     private void modifyUser() {
 
        int split = mPhotoImgUrl.lastIndexOf("/");
        String img_url = mPhotoImgUrl.substring(split + 1);
        mGotyeUser.setNickname(YueQiuApp.sUserInfo.getNick() + "|" + img_url);
-
-        mGotyeUser.setGender(YueQiuApp.sUserInfo.getSex() == 1 ? GotyeGender.Male : GotyeGender.Femal);
-        Log.e("cao", " modify mGotyeUser = " + mGotyeUser);
-        int result = api.modifyUserInfo(mGotyeUser, null);
-
-        Log.d("cao","modify result" + result);
+       mGotyeUser.setGender(YueQiuApp.sUserInfo.getSex() == 1 ? GotyeGender.Male : GotyeGender.Femal);
+       Log.e("cao", " modify mGotyeUser = " + mGotyeUser);
+       int result = api.requestModifyUserInfo(mGotyeUser, null);
+       Log.d("cao","modify result" + result);
     }
 
 
@@ -598,6 +602,7 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
             super.handleMessage(msg);
             switch (msg.what) {
                 case PublicConstant.GET_SUCCESS:
+                    //update im user photo
                     String img_url = (String) msg.obj;
                     mEditor.putString(DatabaseConstant.UserTable.IMG_URL, img_url);
                     mEditor.apply();

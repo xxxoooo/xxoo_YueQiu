@@ -57,6 +57,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -80,6 +81,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
     private PullToRefreshListView mCoauchListView;
 
     private Context mContext;
+    private SearchView mSearchView;
 
     @SuppressLint("ValidFragment")
     public BilliardsNearbyCoachFragment()
@@ -206,6 +208,9 @@ public class BilliardsNearbyCoachFragment extends Fragment
     public void onResume()
     {
         super.onResume();
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
         mWorker = new BackgroundWorkerThread(mStartNum, mEndNum);
         if (mWorker.getState() == Thread.State.NEW)
         {
@@ -495,12 +500,14 @@ public class BilliardsNearbyCoachFragment extends Fragment
 //                            }
                         }else{
                             int index = mCoauchList.indexOf(bean);
-                            if(!bean.getUserPhoto().equals(mCoauchList.get(index).getUserPhoto())){
+                            if(!bean.getUserPhoto().equals(mCoauchList.get(index).getUserPhoto()) ||
+                                    !bean.getUserName().equals(mCoauchList.get(index))){
                                 mCoauchList.remove(index);
                                 mCoauchList.add(index,bean);
                             }
                         }
                     }
+                    Collections.sort(mCoauchList,new DescComparator());
                     mAfterCount = mCoauchList.size();
                     // TODO: 在这里进行一下更新数据库的操作
                     if (mCoauchList.isEmpty())
@@ -694,7 +701,9 @@ public class BilliardsNearbyCoachFragment extends Fragment
     private void showProgress()
     {
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreTextView.setVisibility(View.VISIBLE);
+        if(mCoauchList.isEmpty()) {
+            mPreTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void hideProgress()
@@ -835,8 +844,8 @@ public class BilliardsNearbyCoachFragment extends Fragment
     {
         super.onCreateOptionsMenu(menu, inflater);
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索

@@ -330,7 +330,8 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
             overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
         }else if(id == R.id.billiard_detail_action_share)
         {
-            mShareDlg = Utils.showSheet(this, Utils.getCurrentScreenShot(mRootView));
+            YueQiuApp.sScreenBitmap = Utils.getCurrentScreenShot(mRootView);
+            mShareDlg = Utils.showSheet(this, YueQiuApp.sScreenBitmap);
             mShareDlg.show();
 
         }else if(id == R.id.billiard_detail_action_collect){
@@ -350,19 +351,28 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
 
     @Override
     public void onClick(View v) {
+        int user_id = YueQiuApp.sUserInfo.getUser_id();
         switch(v.getId()){
             case R.id.billiard_group_praise_view:
-                if(Utils.networkAvaiable(BilliardGroupDetailActivity.this)){
-                    praise();
-                }else{
-                    Utils.showToast(BilliardGroupDetailActivity.this,getString(R.string.network_not_available));
+                if(user_id < 1){
+                    Utils.showToast(this, getString(R.string.please_login_first));
+                }else {
+                    if (Utils.networkAvaiable(BilliardGroupDetailActivity.this)) {
+                        praise();
+                    } else {
+                        Utils.showToast(BilliardGroupDetailActivity.this, getString(R.string.network_not_available));
+                    }
                 }
                 break;
             case R.id.billiard_group_reply_view:
-                Intent intent = new Intent(BilliardGroupDetailActivity.this,GroupDetailReplyActivity.class);
-                intent.putExtra("id",mNoteId);
-                startActivityForResult(intent, REPLY_CODE);
-                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                if(user_id < 1){
+                    Utils.showToast(this, getString(R.string.please_login_first));
+                }else {
+                    Intent intent = new Intent(BilliardGroupDetailActivity.this, GroupDetailReplyActivity.class);
+                    intent.putExtra("id", mNoteId);
+                    startActivityForResult(intent, REPLY_CODE);
+                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                }
                 break;
         }
     }

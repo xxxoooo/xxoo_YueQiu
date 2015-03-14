@@ -16,7 +16,6 @@
             android:id="@+id/billiard_group_listview"/>
     </RelativeLayout>
     <RadioGroup
-
         android:id="@+id/billiard_radio_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,8 +31,7 @@
             android:button="@null"
             android:gravity="center"
             android:text="@string/billiard_time"
-            android:textSize="24sp"
-            android:checked="true"
+            android:textSize="18sp"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/md__defaultBackground"
             android:background="@drawable/billiard_group_radio_bg"/>
@@ -45,8 +43,8 @@
             android:layout_weight="1"
             android:button="@null"
             android:gravity="center"
-            android:text="@string/billiard_poplarity"
-            android:textSize="24sp"
+            android:text="@string/billiard_popularity"
+            android:textSize="18sp"
             android:textColor="@color/md__defaultBackground"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:background="@drawable/billiard_group_radio_bg"/>

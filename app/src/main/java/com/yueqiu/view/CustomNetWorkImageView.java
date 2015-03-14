@@ -35,6 +35,7 @@ public class CustomNetWorkImageView extends ImageView {
 
     public CustomNetWorkImageView(Context context) {
         this(context, null);
+
     }
 
     public CustomNetWorkImageView(Context context, AttributeSet attrs) {

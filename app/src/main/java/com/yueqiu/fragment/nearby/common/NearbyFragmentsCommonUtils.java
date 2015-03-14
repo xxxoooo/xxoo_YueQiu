@@ -157,12 +157,13 @@ public class NearbyFragmentsCommonUtils{
 //        Log.d(TAG, " the recommendation info we get are : " + rawResult);
 
 
-        final List<NearbyRoomSubFragmentRoomBean> cacheRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
+
 
         HttpUtil.requestHttp(HttpConstants.NearbyRoomRecommendation.URL, null, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                Log.d("caocao","recommend response ->" + response);
                 try
                 {
 //                    JSONObject initialJsonData = new JSONObject(rawResult);
@@ -172,6 +173,7 @@ public class NearbyFragmentsCommonUtils{
                         if (status == HttpConstants.ResponseCode.NORMAL) {
                             JSONArray resultJsonArr = response.getJSONArray("result");
                             final int count = resultJsonArr.length();
+                            List<NearbyRoomSubFragmentRoomBean> cacheRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
                             for (int i = 0; i < count; ++i) {
                                 JSONObject dataUnit = resultJsonArr.getJSONObject(i);
                                 String roomId = dataUnit.getString("id");
@@ -187,6 +189,8 @@ public class NearbyFragmentsCommonUtils{
                                 // TODO: 所以我们暂时先不管这两个字段了
                                 String roomLongitude = dataUnit.getString("lng");
                                 String roomLatitude = dataUnit.getString("lat");
+
+
 
                                 int roomLevelVal = 0;
                                 double roomPriceVal = 0;
@@ -211,9 +215,10 @@ public class NearbyFragmentsCommonUtils{
                                         roomShopHours // shopHours营业时间
                                 );
                                 cacheRoomList.add(roomItem);
-                                Log.d(TAG, " ----> the photo url we get for the recommendation are : " + roomItem.getRoomPhotoUrl() + "; "
+                                Log.d("lyxjb", " ----> the photo url we get for the recommendation are : " + roomItem.getRoomPhotoUrl() + "; "
                                         + roomAddress + "; " + roomLatitude + " ; " + roomLongitude + "; " + roomPrice
                                         + "; " + roomPriceVal);
+//                                Log.d("lyxjb","cacheRoomList ->" + cacheRoomList);
                             }
                             // 现在我们就需要将我们获得的数据传递出去
                             mInternalHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheRoomList).sendToTarget();
@@ -240,79 +245,6 @@ public class NearbyFragmentsCommonUtils{
 
 
 
-//        if (!TextUtils.isEmpty(rawResult))
-//        {
-//            try
-//            {
-//                JSONObject initialJsonData = new JSONObject(rawResult);
-//                Log.d(TAG, " the initial json data we get are : " + initialJsonData.toString());
-//                if(!initialJsonData.isNull("code")) {
-//                    final int status = initialJsonData.getInt("code");
-//                    if (status == HttpConstants.ResponseCode.NORMAL) {
-//                        JSONArray resultJsonArr = initialJsonData.getJSONArray("result");
-//                        final int count = resultJsonArr.length();
-//                        for (int i = 0; i < count; ++i) {
-//                            JSONObject dataUnit = resultJsonArr.getJSONObject(i);
-//                            String roomId = dataUnit.getString("id");
-//                            String photoUrl = dataUnit.getString("img_url");
-//                            String roomName = dataUnit.getString("name");
-//                            String roomAddress = dataUnit.getString("address");
-//                            String roomTelephone = dataUnit.getString("telephone");
-//                            String roomDetailInfo = dataUnit.getString("detail_info");
-//                            String roomPrice = dataUnit.getString("price");
-//                            String roomStarLevel = dataUnit.getString("overall_rating");
-//                            String roomShopHours = dataUnit.getString("shop_hours");
-//                            // TODO: 以下的关于球厅的经度和纬度信息我们暂时还不需要，而且球厅当中也没有定义关于经度纬度信息的详细的存放的位置
-//                            // TODO: 所以我们暂时先不管这两个字段了
-//                            String roomLongitude = dataUnit.getString("lng");
-//                            String roomLatitude = dataUnit.getString("lat");
-//
-//                            int roomLevelVal = 0;
-//                            double roomPriceVal = 0;
-//                            try {
-//                                // 我们需要将我们的room的评分的星级的总星级数目设置为100
-//                                roomLevelVal = Integer.parseInt(roomStarLevel);
-//                                roomPriceVal = Double.parseDouble(roomPrice);
-//                            } catch (final Exception e) {
-//                                Log.d(TAG, " exception happened while we parse the start number and the room price, cause to : " + e.toString());
-//                            }
-//                            NearbyRoomSubFragmentRoomBean roomItem = new NearbyRoomSubFragmentRoomBean(
-//                                    roomId, // room id
-//                                    photoUrl, // room photo
-//                                    roomName, // room name
-//                                    roomLevelVal, // room level
-//                                    roomPriceVal, // room price
-//                                    roomAddress, // room address
-//                                    "", // room distance(这个在最新版的接口当中被取消了)
-//                                    roomTelephone, // roomPhone
-//                                    "", // roomTag
-//                                    roomDetailInfo,// roomInfo
-//                                    roomShopHours // shopHours营业时间
-//                            );
-//                            cacheRoomList.add(roomItem);
-//                            Log.d(TAG, " ----> the photo url we get for the recommendation are : " + roomItem.getRoomPhotoUrl() + "; "
-//                                    + roomAddress + "; " + roomLatitude + " ; " + roomLongitude + "; " + roomPrice
-//                                    + "; " + roomPriceVal);
-//                        }
-//                        // 现在我们就需要将我们获得的数据传递出去
-//                        mInternalHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheRoomList).sendToTarget();
-//                    }
-//                }
-//                else{
-//                    mInternalHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
-//                }
-//            } catch (JSONException e)
-//            {
-//                // TODO: 我们在后期加入错误的原因，用于Toast的内容显示
-//                mInternalHandler.obtainMessage(DATA_RETRIEVE_FAILED, "").sendToTarget();
-//                e.printStackTrace();
-//                Log.d(TAG, " exception happened in parsing the room recommendation detailed information, and the detailed reason are : " + e.toString());
-//            }
-//        }
-//        //TODO:这应该加一个else判断吧？如果不加的话，之前的代码都没有return的地方，岂不是不管怎样都会执行DATA_RETRIEVE_DATA
-//        else {
-//            mInternalHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
-//        }
     }
 
     private static final int START_RETRIEVING_DATA = 1 << 1;
@@ -367,7 +299,7 @@ public class NearbyFragmentsCommonUtils{
                             imgView.setScaleType(ImageView.ScaleType.FIT_XY);
                             imgView.setDefaultImageResId(R.drawable.default_reommend_img);
                             imgView.setErrorImageResId(R.drawable.default_reommend_img);
-                            imgView.setImageUrl(roomItem.getRoomPhotoUrl(), mImgLoader);
+                            imgView.setImageUrl("http://" + roomItem.getRoomPhotoUrl(), mImgLoader);
                             imgView.setOnClickListener(new View.OnClickListener()
                             {
                                 @Override
@@ -378,7 +310,7 @@ public class NearbyFragmentsCommonUtils{
                                     Intent intent = new Intent(mContext, NearbyBilliardRoomActivity.class);
                                     Bundle imgRoomData = new Bundle();
 
-                                    imgRoomData.putString(KEY_ROOM_FRAGMENT_PHOTO, roomItem.getRoomPhotoUrl());
+                                    imgRoomData.putString(KEY_ROOM_FRAGMENT_PHOTO, "http://" + roomItem.getRoomPhotoUrl());
                                     imgRoomData.putString(KEY_ROOM_FRAGMENT_ADDRESS, roomItem.getDetailedAddress());
                                     imgRoomData.putString(KEY_ROOM_FRAGMENT_NAME, roomItem.getRoomName());
                                     imgRoomData.putDouble(KEY_ROOM_FRAGMENT_PRICE, roomItem.getPrice());

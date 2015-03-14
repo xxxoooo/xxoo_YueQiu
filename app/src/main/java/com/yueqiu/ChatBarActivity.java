@@ -34,6 +34,9 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 
+import com.gotye.api.GotyeChatTarget;
+import com.gotye.api.listener.ChatListener;
+import com.gotye.api.listener.LoginListener;
 import com.yueqiu.activity.SearchResultActivity;
 import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeGroup;
@@ -47,6 +50,7 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.chatbar.ContactFragment;
 import com.yueqiu.fragment.chatbar.MessageFragment;
+import com.yueqiu.im.GotyeService;
 import com.yueqiu.util.BeepManager;
 import com.yueqiu.util.BitmapUtil;
 import com.yueqiu.util.FileUtil;
@@ -56,12 +60,14 @@ import java.io.File;
 import java.io.IOException;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 /**
  * Created by doushuqi on 14/12/17.
  * 聊吧Activity
  */
-public class ChatBarActivity extends FragmentActivity implements NotifyListener,View.OnClickListener {
+public class ChatBarActivity extends FragmentActivity implements NotifyListener,
+        LoginListener, ChatListener, View.OnClickListener{
     private static final String TAG = "ChatBarActivity";
     private static final int MESSAGE = 1;
     private static final int CONTACT = 2;
@@ -75,7 +81,7 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
     private String mPassword;//暂时不需要密码
     private LinearLayout mBottomContainer;
     private TextView mUnreadCountTv;
-    private RelativeLayout mMsgView,mContactView,mAddPersonView;
+    private RelativeLayout mMsgView, mContactView, mAddPersonView;
 
     private BeepManager beep;
     private GotyeAPI api;
@@ -86,7 +92,7 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         api = GotyeAPI.getInstance();
-        api.addListerer(this);
+        api.addListener(this);
         setContentView(R.layout.activity_chatbar_main);
         beep = new BeepManager(this);
         beep.updatePrefs();
@@ -97,7 +103,7 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         IntentFilter filter = new IntentFilter();
         filter.addAction(PublicConstant.CHAT_HAS_NEW_MSG);
         filter.addAction(PublicConstant.CHAT_HAS_NO_MSG);
-        registerReceiver(mReceiver,filter);
+        registerReceiver(mReceiver, filter);
 
     }
 
@@ -114,19 +120,33 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         getBgColor();
         returnNotify = false;
         mainRefresh();
-        Log.e(TAG, "IM isOnline? " + GotyeAPI.getInstance().isOnline());
-        if (!GotyeAPI.getInstance().isOnline()){
-            Utils.showToast(this, getString(R.string.im_user_offline));
-            //TODO:如果掉线应该退出现在的账号
-            YueQiuApp app = (YueQiuApp)getApplicationContext();
-//            app.resetUSerInfo();
-            app.logout();
 
+        // -1   offline, API will reconnect when network becomes valid
+        // 0    not login or logout already
+        // 1    online
+        int loginState = api.getOnLineState();
+        Log.e("ddd", "ChatBarActivity -> login state -> " + loginState);
+        if (loginState == 0) {
+            Utils.showToast(this, getString(R.string.im_user_offline));
+            //需重新登录
+            api.login(YueQiuApp.sUserInfo.getPhone(), null);
+        } else {
+            Intent toService = new Intent(this, GotyeService.class);
+            startService(toService);
+            api.beginRcvOfflineMessge();
         }
 
         if(mSearchView != null){
             mSearchView.clearFocus();
+
         }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        Log.d(TAG, " notification called ");
+//        initView();
     }
 
     @Override
@@ -212,7 +232,7 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
     }
 
     private void initView() {
-        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,YueQiuApp.sBottomHeight);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, YueQiuApp.sBottomHeight);
         params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         mBottomContainer = (LinearLayout) findViewById(R.id.chat_bar_bottom_view);
         mBottomContainer.setWeightSum(3);
@@ -303,29 +323,6 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         super.onDestroy();
     }
 
-
-    private static final String CONFIG = "chatbar_login_config";
-
-    public void saveUser(String name, String password) {
-        SharedPreferences sp = getSharedPreferences(CONFIG,
-                Context.MODE_PRIVATE);
-        SharedPreferences.Editor edit = sp.edit();
-        edit.putString("username", name);
-        edit.putString("password", password);
-        edit.commit();
-    }
-
-    public static String[] getUser(Context context) {
-        SharedPreferences sp = context.getSharedPreferences(CONFIG,
-                Context.MODE_PRIVATE);
-        String name = sp.getString("username", null);
-        String password = sp.getString("password", null);
-        String[] user = new String[2];
-        user[0] = name;
-        user[1] = password;
-        return user;
-    }
-
     /**
      * 收到消息时的回调方法，这里该方法是主要是用来更新MessageFragment的界面
      *
@@ -339,22 +336,22 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
             return;
         }
         mMessageFragment.refresh();
-        Log.d("wy", "onReceiveMessage");
+        Log.d("ddd", "onReceiveMessage type = " + message.getReceiverType());
         if (unRead) {
 //            updateUnReadTip();
 
-            if (!api.isNewMsgNotify()) {
-                return;
-            }
-            if (message.getReceiverType() == 2) {
-                if (api.isNotReceiveGroupMsg()) {
-                    return;
-                }
-                if (api.isGroupDontdisturb(((GotyeGroup) message.getReceiver())
-                        .getGroupID())) {
-                    return;
-                }
-            }
+//            if (!api.isNewMsgNotify()) {
+//                return;
+//            }
+//            if (message.getReceiverType() == 2) {
+//                if (api.isNotReceiveGroupMsg()) {
+//                    return;
+//                }
+//                if (api.isGroupDontdisturb(((GotyeGroup) message.getReceiver())
+//                        .getGroupID())) {
+//                    return;
+//                }
+//            }
             beep.playBeepSoundAndVibrate();
         }
 
@@ -372,17 +369,63 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         mMessageFragment.refresh();
     }
 
+    @Override
+    public void onReceiveMessage(int i, GotyeMessage gotyeMessage) {
+    }
+
+    @Override
+    public void onDownloadMessage(int i, GotyeMessage gotyeMessage) {
+    }
+
+    @Override
+    public void onReleaseMessage(int i) {
+    }
+
+    @Override
+    public void onReport(int i, GotyeMessage gotyeMessage) {
+    }
+
+    @Override
+    public void onStartTalk(int i, boolean b, int i2, GotyeChatTarget gotyeChatTarget) {
+    }
+
+    @Override
+    public void onStopTalk(int i, GotyeMessage gotyeMessage, boolean b) {
+    }
+
+    @Override
+    public void onDecodeMessage(int i, GotyeMessage gotyeMessage) {
+    }
+
+    @Override
+    public void onGetMessageList(int i, List<GotyeMessage> gotyeMessages) {
+        //得到离线消息
+        if (i== 0) {
+            Log.d(TAG, "offline message receiver : gotyeMessage = " + gotyeMessages);
+            mainRefresh();
+        }
+    }
+
+    @Override
+    public void onOutputAudioData(byte[] bytes) {
+    }
+
+    @Override
+    public void onGetCustomerService(int i, GotyeUser gotyeUser, int i2, String s) {
+    }
+
     // 收到群邀请信息
     @Override
     public void onReceiveNotify(int code, GotyeNotify notify) {
-        if (returnNotify) {
-            return;
-        }
-        mMessageFragment.refresh();
+
+//        if (returnNotify) {
+//            return;
+//        }
+//        mMessageFragment.refresh();
 //        updateUnReadTip();
-        if (!api.isNotReceiveGroupMsg()) {
-            beep.playBeepSoundAndVibrate();
-        }
+//        if (!api.isNotReceiveGroupMsg()) {
+//            beep.playBeepSoundAndVibrate();
+//        }
     }
 
     @Override
@@ -390,7 +433,7 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         if (returnNotify) {
             return;
         }
-        api.deleteSession(user);
+        api.deleteSession(user, false);
         mMessageFragment.refresh();
 //        contactsFragment.refresh();
     }
@@ -452,30 +495,33 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
      */
     @Override
     public void onClick(View v) {
+
         if(mSearchView != null){
             mSearchView.clearFocus();
             mSearchView.setIconified(true);
         }
         switch(v.getId()){
+
             case R.id.chat_bar_msg_re:
                 switchFragment(MESSAGE);
                 mActionBar.setTitle(R.string.btn_liaoba_message);
-                setBottomBackgroud(mMsgView,mContactView,mAddPersonView);
+                setBottomBackgroud(mMsgView, mContactView, mAddPersonView);
                 break;
             case R.id.chat_bar_contact_re:
                 switchFragment(CONTACT);
                 mActionBar.setTitle(R.string.btn_liaoba_contact);
-                setBottomBackgroud(mContactView,mMsgView,mAddPersonView);
+                setBottomBackgroud(mContactView, mMsgView, mAddPersonView);
                 break;
             case R.id.chat_bar_add_re:
                 switchFragment(ADD_PERSON);
                  mActionBar.setTitle(R.string.btn_liaoba_add_friend);
                 setBottomBackgroud(mAddPersonView,mMsgView,mContactView);
+
                 break;
         }
     }
 
-    private void setBottomBackgroud(RelativeLayout greenView,RelativeLayout blackView1,RelativeLayout blackView2){
+    private void setBottomBackgroud(RelativeLayout greenView, RelativeLayout blackView1, RelativeLayout blackView2) {
         greenView.setBackgroundColor(getResources().getColor(R.color.actionbar_color));
         blackView1.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
         blackView2.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
@@ -511,4 +557,27 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
             }
         }
     };
+
+
+    @Override
+    public void onLogout(int i) {
+        Log.d(TAG, "IM logout!");
+    }
+
+    @Override
+    public void onLogin(int i, GotyeUser gotyeUser) {
+        if (i == 0) {
+            Log.d(TAG, "current user " + gotyeUser.getName() + " ReLogin success !!");
+            Intent toService = new Intent(this, GotyeService.class);
+            startService(toService);
+            api.beginRcvOfflineMessge();
+        }
+    }
+
+    @Override
+    public void onReconnecting(int i, GotyeUser gotyeUser) {
+        if (i == 0) {
+            Log.d(TAG, "current user " + gotyeUser.getName() + " ReLogin success by network available!!");
+        }
+    }
 }

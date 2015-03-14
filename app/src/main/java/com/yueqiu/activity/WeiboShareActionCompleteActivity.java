@@ -21,6 +21,7 @@ import com.sina.weibo.sdk.api.share.SendMessageToWeiboRequest;
 import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
 import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 
@@ -35,8 +36,9 @@ public class WeiboShareActionCompleteActivity extends Activity implements IWeibo
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        mSharedBitmap = getIntent().getParcelableExtra(PublicConstant.SHARE_TO_SINA_BITMAP);
-
+        Log.d("wy","aaa");
+//        mSharedBitmap = getIntent().getParcelableExtra(PublicConstant.SHARE_TO_SINA_BITMAP);
+        mSharedBitmap = YueQiuApp.sScreenBitmap;
         // 初始化WeiboShareSDK
         this.mWeiboShareApi = WeiboShareSDK.createWeiboAPI(this, HttpConstants.WEIBO_APP_KEY);
         // 将当前的应用注册到微博当中

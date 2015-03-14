@@ -23,5 +23,7 @@ public interface ContactsDao {
 
     public ContactsList.Contacts getContact(String userId);
 
+    public ContactsList.Contacts getContactByName(String userName);
+
     public HashMap<Integer, List<ContactsList.Contacts>> getContactList();
 }

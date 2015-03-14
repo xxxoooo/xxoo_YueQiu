@@ -82,6 +82,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     private List<PlayInfo> mInsertList = new ArrayList<PlayInfo>();
     private List<PlayInfo> mUpdateList = new ArrayList<PlayInfo>();
     private List<PlayInfo> mCacheList = new ArrayList<PlayInfo>();
+    private SearchView mSearchView;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -148,6 +149,9 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onResume() {
         super.onResume();
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
         /**
          * 如果网络正常，就向网络请求数据
          */
@@ -228,7 +232,9 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     private void requestPlay(){
 
         mPreProgressBar.setVisibility(View.VISIBLE);
-        mPreTextView.setVisibility(View.VISIBLE);
+        if(mList.isEmpty()) {
+            mPreTextView.setVisibility(View.VISIBLE);
+        }
 
         mParamMap.put(HttpConstants.Play.TYPE, mPlayType);
         mParamMap.put(HttpConstants.Play.START_NO,mStart);
@@ -567,8 +573,8 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索

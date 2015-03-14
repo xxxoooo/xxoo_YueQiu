@@ -79,7 +79,7 @@ public class PartInAdapter extends BaseAdapter{
         }
         holder.image.setDefaultImageResId(R.drawable.default_head);
         holder.image.setErrorImageResId(R.drawable.default_head);
-        holder.image.setImageUrl(HttpConstants.IMG_BASE_URL + ((PartInInfo) mList.get(position)).getImg_url(),mImgLoader);
+        holder.image.setImageUrl("http://" + ((PartInInfo) mList.get(position)).getImg_url(),mImgLoader);
         holder.title.setText(((PartInInfo) mList.get(position)).getTitle());
         holder.content.setText(((PartInInfo) mList.get(position)).getContent());
         holder.dateTime.setText(((PartInInfo) mList.get(position)).getDateTime());

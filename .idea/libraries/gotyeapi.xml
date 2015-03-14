@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="gotyeapi">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/app/libs/gotyeapi.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

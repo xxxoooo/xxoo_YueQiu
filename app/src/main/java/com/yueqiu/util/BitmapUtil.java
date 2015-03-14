@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 
 import com.gotye.api.PathUtil;
 
@@ -54,8 +55,7 @@ public class BitmapUtil {
 		int inSampleSize = 1;
 
 		if (height > reqHeight || width > reqWidth) {
-			final int heightRatio = Math.round((float) height
-					/ (float) reqHeight);
+			final int heightRatio = Math.round((float) height/ (float) reqHeight);
 			final int widthRatio = Math.round((float) width / (float) reqWidth);
 			inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
 		}
@@ -115,6 +115,7 @@ public class BitmapUtil {
 			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
 			bos.flush();
 			bos.close();
+            Log.d("cao","bitmap path ->" + file.getAbsolutePath());
 			return file.getAbsolutePath();
 		} catch (IOException e) {
 			e.printStackTrace();

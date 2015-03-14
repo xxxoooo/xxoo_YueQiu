@@ -167,8 +167,8 @@ public class SlideViewAdapter extends BaseAdapter {
                                         Log.d(TAG_1, " some error happened, and the detailed error info are: " + error.toString());
                                    }
                                },
-                               mContext.getResources().getDimensionPixelOffset(R.dimen.accoutn_photo_height),
-                               mContext.getResources().getDimensionPixelOffset(R.dimen.accoutn_photo_height)
+                               mContext.getResources().getDimensionPixelOffset(R.dimen.account_photo_height),
+                               mContext.getResources().getDimensionPixelOffset(R.dimen.account_photo_height)
                        );
                    } else
                    {

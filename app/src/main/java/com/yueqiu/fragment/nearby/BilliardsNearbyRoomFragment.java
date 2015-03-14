@@ -144,6 +144,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private int mPage = 1;
     private LocationManagerProxy mLocationManagerProxy;
     private int mCurrentPos;
+    private SearchView mSearchView;
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -197,24 +198,25 @@ public class BilliardsNearbyRoomFragment extends Fragment
                 // TODO: 只传递一个用于展示球厅详情的url就可以了
                 // TODO: 但是这个页面现在还是不要删除，因为制定需求的傻逼随时有可能要求改回来
                 NearbyRoomSubFragmentRoomBean bean = mRoomList.get(position - 1);
-//                Bundle bundle = new Bundle();
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getRoomPhotoUrl());
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getRoomName());
-//                bundle.putFloat(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, bean.getLevel());
-//                bundle.putDouble(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, bean.getPrice());
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_TAG, bean.getRoomTag());
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, bean.getDetailedAddress());
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO, bean.getRoomInfo());
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, bean.getRoomPhone());
-//
-//                // set the arguments into the bundle, and transferred into the RoomDetailedActivity
-//                Intent intent = new Intent(mContext, NearbyBilliardRoomActivity.class);
-//                intent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, bundle);
-//
-//                mContext.startActivity(intent);
-                Intent intent = new Intent(mContext, BilliardsRoomWebViewActivity.class);
-                intent.putExtra(NearbyFragmentsCommonUtils.KEY_ROOM_WEBVIEW_PAGE_URL, bean.getRoomDetailPageUrl());
+                Bundle bundle = new Bundle();
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getRoomPhotoUrl());
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getRoomName());
+                bundle.putFloat(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, bean.getLevel());
+                bundle.putDouble(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, bean.getPrice());
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_TAG, bean.getRoomTag());
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, bean.getDetailedAddress());
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO, bean.getRoomInfo());
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, bean.getRoomPhone());
+
+
+                // set the arguments into the bundle, and transferred into the RoomDetailedActivity
+                Intent intent = new Intent(mContext, NearbyBilliardRoomActivity.class);
+                intent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, bundle);
+
                 mContext.startActivity(intent);
+//                Intent intent = new Intent(mContext, BilliardsRoomWebViewActivity.class);
+//                intent.putExtra(NearbyFragmentsCommonUtils.KEY_ROOM_WEBVIEW_PAGE_URL, bean.getRoomDetailPageUrl());
+//                mContext.startActivity(intent);
             }
         });
 
@@ -264,10 +266,6 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
         mLocationManagerProxy = LocationManagerProxy.getInstance(getActivity());
 
-        //此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
-        //注意设置合适的定位时间的间隔，并且在合适时间调用removeUpdates()方法来取消定位请求
-        //在定位结束后，在合适的生命周期调用destroy()方法
-        //其中如果间隔时间为-1，则定位只定一次
         mLocationManagerProxy.requestLocationData(
                 LocationProviderProxy.AMapNetwork, -1, 15, new AMapLocationListener() {
                     @Override
@@ -320,12 +318,14 @@ public class BilliardsNearbyRoomFragment extends Fragment
     public void onResume()
     {
         super.onResume();
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
         mWorkerThread = new WorkerHandlerThread(mPage);
         mLoadMore = false;
         mRefresh = false;
         if (mWorkerThread.getState() == Thread.State.NEW)
         {
-            Log.d(TAG, " the mWorkerThread has been started in the onCreateView ");
             // 这里的WorkThread必须调用了start()方法之后，位于WorkThread当中的workHandler才可以正常工作
             mWorkerThread.start();
         }
@@ -880,7 +880,9 @@ public class BilliardsNearbyRoomFragment extends Fragment
 
     private void showProgress()
     {
-        mPreTextView.setVisibility(View.VISIBLE);
+        if(mRoomList.isEmpty()) {
+            mPreTextView.setVisibility(View.VISIBLE);
+        }
         mPreProgress.setVisibility(View.VISIBLE);
     }
 
@@ -1140,8 +1142,8 @@ public class BilliardsNearbyRoomFragment extends Fragment
     {
         super.onCreateOptionsMenu(menu, inflater);
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query)
             {

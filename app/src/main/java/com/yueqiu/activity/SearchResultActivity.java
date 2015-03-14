@@ -295,6 +295,9 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
      */
     @Override
     public boolean onQueryTextSubmit(String query) {
+        if(mEmptyView != null){
+            mEmptyView.setVisibility(View.GONE);
+        }
         switch (mSearchType) {
             case PublicConstant.SEARCH_NEARBY_MATE:
                 mNearbyMateList.clear();
@@ -1059,6 +1062,8 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
         map.put(HttpConstants.SearchPeopleByKeyword.KEYWORDS, mQueryResult);
 
 
+        Log.d("wy","search friend param ->" + map);
+
         HttpUtil.requestHttp(HttpConstants.SearchPeopleByKeyword.URL, map, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
@@ -1143,7 +1148,9 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                             mEmptyView.setText(mEmptyTypeStr);
                         }
                     }else{
-                        Utils.showToast(SearchResultActivity.this,getString(R.string.no_search_info, mEmptyTypeStr));
+                        if(!mLoadMore) {
+                            Utils.showToast(SearchResultActivity.this, getString(R.string.no_search_info, mEmptyTypeStr));
+                        }
                     }
                     break;
                 case PublicConstant.NO_NETWORK:

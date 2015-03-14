@@ -73,7 +73,7 @@ public class FavorBasicAdapter extends BaseAdapter {
         }
         holder.imageView.setDefaultImageResId(R.drawable.default_head);
         holder.imageView.setErrorImageResId(R.drawable.default_head);
-        holder.imageView.setImageUrl(HttpConstants.IMG_BASE_URL + ((FavorInfo) mList.get(position)).getImg_url(),mImgLoader);
+        holder.imageView.setImageUrl("http://" + ((FavorInfo) mList.get(position)).getImg_url(),mImgLoader);
         holder.title.setText(((FavorInfo)mList.get(position)).getTitle());
         holder.content.setText(((FavorInfo)mList.get(position)).getContent());
         holder.dateTime.setText(((FavorInfo)mList.get(position)).getCreateTime());

@@ -72,6 +72,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
     private static final String TAG = "BilliardsNearbyDatingFragment";
     private static final String TAG_2 = "dating_fragment";
     private Context mContext;
+    private SearchView mSearchView;
 
     public BilliardsNearbyDatingFragment()
     {
@@ -214,6 +215,9 @@ public class BilliardsNearbyDatingFragment extends Fragment
     @Override
     public void onResume()
     {
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
         mBackgroundHandler = new BackgroundWorkerHandler(mStarNum, mEndNum);
 
         // 我们仅在网络可行的情况下进行网络请求，减少不必要的网络请求
@@ -752,7 +756,9 @@ public class BilliardsNearbyDatingFragment extends Fragment
     {
         Log.d(TAG, " inside the showProgress internal method ");
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreText.setVisibility(View.VISIBLE);
+        if(mDatingList.isEmpty()) {
+            mPreText.setVisibility(View.VISIBLE);
+        }
     }
 
     private void hideProgress()
@@ -865,8 +871,8 @@ public class BilliardsNearbyDatingFragment extends Fragment
     {
         super.onCreateOptionsMenu(menu, inflater);
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索

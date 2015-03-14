@@ -112,7 +112,7 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
         }
         holder.iconView.setDefaultImageResId(R.drawable.default_head);
         holder.iconView.setErrorImageResId(R.drawable.default_head);
-        holder.iconView.setImageUrl(HttpConstants.IMG_BASE_URL + ((ContactsList.Contacts) getChild(groupPosition, childPosition)).getImg_url(),mImgLoader);
+        holder.iconView.setImageUrl("http://" + ((ContactsList.Contacts) getChild(groupPosition, childPosition)).getImg_url(),mImgLoader);
         holder.nameView.setText(((ContactsList.Contacts) getChild(groupPosition, childPosition)).getUsername());
         holder.feelView.setText(((ContactsList.Contacts) getChild(groupPosition, childPosition)).getContent());
         holder.date.setText(((ContactsList.Contacts) getChild(groupPosition, childPosition)).getCreate_time());

@@ -26,6 +26,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -176,6 +177,7 @@ public class BilliardsNearbyMateFragment extends Fragment
     private ArrayList<NearbyMateSubFragmentUserBean> mCachedMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
 
     public NearbyFragmentsCommonUtils.ControlPopupWindowCallback mPopupwindowCallback;
+    private SearchView mSearchView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -263,6 +265,9 @@ public class BilliardsNearbyMateFragment extends Fragment
     public void onResume()
     {
         super.onResume();
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
         mWorker = new BackgroundWorker(mStartNum, mEndNum);
         if (mWorker.getState() == Thread.State.NEW)
         {
@@ -541,7 +546,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                             }
                         }else{
                             int index = mUserList.indexOf(mateBean);
-                            if(!mateBean.getUserPhotoUrl().equals(mUserList.get(index).getUserPhotoUrl())){
+                            if(!mateBean.getUserPhotoUrl().equals(mUserList.get(index).getUserPhotoUrl())
+                                    || !mateBean.getUserNickName().equals(mUserList.get(index).getUserNickName())){
                                 mUserList.remove(index);
                                 mUserList.add(index,mateBean);
                             }
@@ -818,7 +824,9 @@ public class BilliardsNearbyMateFragment extends Fragment
     {
         Log.d(TAG, " showing the progress bar ");
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreTextView.setVisibility(View.VISIBLE);
+        if(mUserList.isEmpty()) {
+            mPreTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void hideProgress()
@@ -1174,9 +1182,9 @@ public class BilliardsNearbyMateFragment extends Fragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
-        super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//        super.onCreateOptionsMenu(menu, inflater);
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
@@ -1188,7 +1196,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                     args.putString(PublicConstant.SEARCH_KEYWORD, query);
                     intent.putExtras(args);
                     startActivity(intent);
-
+                    ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 
                 }else{
                     Utils.showToast(mContext,getString(R.string.network_not_available));

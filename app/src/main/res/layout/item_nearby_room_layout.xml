@@ -11,15 +11,14 @@
          其他带有本地缓存处理以及网络Http请求的缓存处理的类库来进行处理，
          加快每一个球厅的图片的加载速度 -->
     <!-- 用于显示球厅的photo -->
-    <com.android.volley.toolbox.NetworkImageView
+    <com.yueqiu.view.CustomRoomNetView
         android:scaleType="fitCenter"
         android:layout_marginTop="1dp"
-        android:layout_width="82dp"
-        android:layout_height="82dp"
+        android:layout_width="@dimen/account_photo_width"
+        android:layout_height="@dimen/account_photo_height"
         android:id="@+id/img_room_subfragment_listitem_photo"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
-        android:padding="1dp"
         />
 
     <TextView
@@ -29,7 +28,7 @@
         android:layout_toLeftOf="@+id/tv_room_subfragment_listitem_roomdistance"
         android:layout_alignTop="@+id/img_room_subfragment_listitem_photo"
         android:layout_marginTop="5dp"
-        android:layout_marginLeft="4dp"
+        android:layout_marginLeft="2dp"
         android:textColor="@color/md__defaultBackground"
         android:textSize="16sp"
         android:ellipsize="end"
@@ -56,8 +55,8 @@
         android:layout_height="wrap_content"
         android:background="@color/search_distance_color"
         android:layout_toRightOf="@+id/rating_room_subfragment_listitem_rating"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="4dp"
         android:layout_alignTop="@+id/rating_room_subfragment_listitem_rating"
         android:layout_alignBottom="@+id/rating_room_subfragment_listitem_rating"/>
 
@@ -66,9 +65,9 @@
         style="@style/TimeTextStyle"
         android:layout_toRightOf="@+id/search_room_divider"
         android:text="@string/search_room_sub_fragment_price_indi"
-        android:textSize="13sp"
+        android:textSize="12sp"
         android:layout_below="@id/tv_room_subfragment_listitem_roomname"
-        android:layout_marginLeft="4dp"
+        android:layout_marginLeft="1dp"
         android:layout_alignTop="@+id/rating_room_subfragment_listitem_rating"
         />
 
@@ -76,8 +75,10 @@
         style="@style/TimeTextStyle"
         android:layout_alignTop="@id/tv_price_indi"
         android:layout_toRightOf="@id/tv_price_indi"
-        android:textSize="13sp"
+        android:textSize="12sp"
         android:id="@+id/tv_room_subfragment_listitem_roomprice"
+        android:text="4000元"
+
         />
 
     <!--用于显示球厅的详细地址-->
@@ -91,7 +92,8 @@
         android:textSize="13sp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:layout_marginBottom="8dp"
+        android:text="海淀区中关村完全路河路68号紫金庄园"
+        android:layout_marginBottom="5dp"
         />
 
     <TextView
@@ -100,6 +102,8 @@
         android:layout_marginTop="30dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:text="44719千米以内"
+        android:textSize="10sp"
         />
 </RelativeLayout>
 

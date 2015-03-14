@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -168,6 +169,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                Log.d("wy","bussiness response ->" + response);
                 try{
                     if(!response.isNull("code")){
                         if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){

@@ -97,7 +97,6 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
         mImgLoader = VolleySingleton.getInstance().getImgLoader();
         Bundle args = getIntent().getExtras();
         mPlayType = args.getInt(PublicConstant.PLAY_TYPE);
-        Log.d("wy","play_type ->" + mPlayType);
         mTableId = args.getInt(DatabaseConstant.PlayTable.TABLE_ID);
         mCreateTime = args.getString(DatabaseConstant.PlayTable.CREATE_TIME);
 //        mInfoType = Integer.parseInt(args.getString(DatabaseConstant.PlayTable.TYPE));
@@ -291,9 +290,11 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
             } else {
                 mSexTv.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.female, 0);
             }
-            mJoinAdapter = new JoinListAdapter(this, info.mJoinList);
-            mPartInGridView.setAdapter(mJoinAdapter);
+
         }
+
+        mJoinAdapter = new JoinListAdapter(this, info.mJoinList);
+        mPartInGridView.setAdapter(mJoinAdapter);
 
         if(! TextUtils.isEmpty(info.getExtra_img())){
             mExtraImage.setImageUrl("http://" + info.getExtra_img(),mImgLoader);
@@ -445,7 +446,8 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
                 }
                 break;
             case R.id.menu_activities_share:
-                Dialog dlg = Utils.showSheet(this, Utils.getCurrentScreenShot(mRootView));
+                YueQiuApp.sScreenBitmap = Utils.getCurrentScreenShot(mRootView);
+                Dialog dlg = Utils.showSheet(this, YueQiuApp.sScreenBitmap);
                 dlg.show();
                 break;
         }
@@ -533,7 +535,12 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
     @Override
     public void onClick(View v) {
         if(Utils.networkAvaiable(this)) {
-            join();
+            int userId = YueQiuApp.sUserInfo.getUser_id();
+            if(userId < 1){
+                Utils.showToast(this,getString(R.string.please_login_first));
+            }else {
+                join();
+            }
         }else{
             Utils.showToast(this,getString(R.string.network_not_available));
         }

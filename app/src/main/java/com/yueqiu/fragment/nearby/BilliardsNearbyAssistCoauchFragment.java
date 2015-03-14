@@ -75,6 +75,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     // 用于展示助教信息的ListView
     private PullToRefreshListView mListView;
     private Context mContext;
+    private SearchView mSearchView;
 
     @SuppressLint("ValidFragment")
     public BilliardsNearbyAssistCoauchFragment()
@@ -204,6 +205,9 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     public void onResume()
     {
         super.onResume();
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
         mWorker = new BackgroundWorkerHandler(mStartNum, mEndNum);
         if (mWorker.getState() == Thread.State.NEW)
         {
@@ -519,7 +523,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 //                            }
                         }else{
                             int index = mAssistCoauchList.indexOf(asBean);
-                            if(!asBean.getPhoto().equals(mAssistCoauchList.get(index).getPhoto())){
+                            if(!asBean.getPhoto().equals(mAssistCoauchList.get(index).getPhoto())
+                                    || asBean.getName().equals(mAssistCoauchList.get(index).getName())){
                                 mAssistCoauchList.remove(index);
                                 mAssistCoauchList.add(index,asBean);
                             }
@@ -741,7 +746,9 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     private void showProgress()
     {
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreTextView.setVisibility(View.VISIBLE);
+        if(mAssistCoauchList.isEmpty()) {
+            mPreTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void hideProgress()
@@ -912,8 +919,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     {
         super.onCreateOptionsMenu(menu, inflater);
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索

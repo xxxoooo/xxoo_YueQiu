@@ -113,7 +113,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         setContentView(R.layout.activity_chat_container);
         mInputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         mCurrentLoginUser = api.getCurrentLoginUser();
-        api.addListerer(this);
+        api.addListener(this);
         mUser = (GotyeUser) getIntent().getSerializableExtra("user");
         mRoom = (GotyeRoom) getIntent().getSerializableExtra("room");
         mGroup = (GotyeGroup) getIntent().getSerializableExtra("group");
@@ -131,7 +131,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 api.activeSession(mRoom);
                 loadData();
                 api.getLocalMessages(mRoom, true);
-                GotyeRoom temp = api.requestRoomInfo(mRoom.Id, true);
+                GotyeRoom temp = api.requestRoomInfo(mRoom.getId(), true);
                 if (temp != null && !TextUtils.isEmpty(temp.getRoomName())) {
                     mActionBar.setTitle(getString(R.string.chat_room) + temp.getRoomName());
                 }
@@ -145,6 +145,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
 
     }
+
     private OnKeyboardHideListener mOnKeyHideListener = new OnKeyboardHideListener() {
         @Override
         public void onKeyBoardHide() {
@@ -161,6 +162,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             }
         }
     };
+
     private <T extends View> T $(int id) {
         return (T) findViewById(id);
     }
@@ -218,22 +220,26 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         if (mUser != null) {
             mChatType = 0;
             String title;
-            if(mUser.getNickname() == null){
-
-                title = mUser.getName();
-            }else{
+            if(!TextUtils.isEmpty(mUser.getNickname())) {
                 String nicknameStr = mUser.getNickname();
                 String nick;
                 int splitIndex = nicknameStr.lastIndexOf("|");
-                if(splitIndex != -1) {
+                if (splitIndex != -1) {
                     nick = nicknameStr.substring(0, splitIndex);
                     String img_url = nicknameStr.substring(splitIndex + 1);
-                }else{
+                } else {
                     nick = nicknameStr;
                 }
-                title = nick;
+                if (TextUtils.isEmpty(nick)) {
+                    title = mUser.getName();
+                } else {
+                    title = nick;
+                }
+            }else{
+                title = mUser.getName();
             }
             mActionBar.setTitle(getString(R.string.and) + title + getString(R.string.chat));
+
         } else if (mRoom != null) {
             mChatType = 1;
             mActionBar.setTitle(getString(R.string.chat_room) + mRoom.getRoomID());
@@ -309,7 +315,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 // TODO Auto-generated method stub
                 final GotyeMessage message = mAdapter.getItem(arg2);
                 mPullListView.setTag(message);
-                if (message.getSender().name.equals(mCurrentLoginUser.getName())) {
+                if (message.getSender().getName().equals(mCurrentLoginUser.getName())) {
                     return false;
                 }
                 mPullListView.showContextMenu();
@@ -318,23 +324,23 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         });
         mPullListView.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
 
-                @Override
-                public void onCreateContextMenu(ContextMenu conMenu,
-                                                    View arg1, ContextMenu.ContextMenuInfo arg2) {
-                    final GotyeMessage message = (GotyeMessage) mPullListView.getTag();
-                    if (message.getSender().name.equals(mCurrentLoginUser.name)) {
-                            return;
-                        }
-                    MenuItem m = conMenu.add(0, 0, 0, getString(R.string.report));
-                    m.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                           api.report(0, getString(R.string.report_content), message);
-                                return true;
-                        }
-                    });
+            @Override
+            public void onCreateContextMenu(ContextMenu conMenu,
+                                            View arg1, ContextMenu.ContextMenuInfo arg2) {
+                final GotyeMessage message = (GotyeMessage) mPullListView.getTag();
+                if (message.getSender().getName().equals(mCurrentLoginUser.getName())) {
+                    return;
                 }
+                MenuItem m = conMenu.add(0, 0, 0, getString(R.string.report));
+                m.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        api.report(0, getString(R.string.report_content), message);
+                        return true;
+                    }
+                });
+            }
         });
 
     }
@@ -355,19 +361,22 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             api.downloadMessage(msg);
         }
         mAdapter.refreshData(messages);
+        //检查离线消息
+        api.beginRcvOfflineMessge();
     }
 
     //发送文本消息
     private void sendTextMessage(String text) {
         if (!TextUtils.isEmpty(text)) {
             GotyeMessage toSend;
+            String url = mCurrentLoginUser.getIcon().getUrl();
+            Log.e("ddd", "ChatPage setTextMessage>>> url = " + url);
             if (mChatType == 0) {
                 toSend = GotyeMessage.createTextMessage(mCurrentLoginUser, mUser,text);
-                Log.d("wy","send to user img_url ->" + mUser);
             } else if (mChatType == 1) {
-                toSend = GotyeMessage.createTextMessage(mCurrentLoginUser, mRoom,text);
+                toSend = GotyeMessage.createTextMessage(mCurrentLoginUser, mRoom, text);
             } else {
-                toSend = GotyeMessage.createTextMessage(mCurrentLoginUser,mGroup, text);
+                toSend = GotyeMessage.createTextMessage(mCurrentLoginUser, mGroup, text);
             }
             String extraStr = null;
             if (text.contains("#")) {
@@ -442,7 +451,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         scrollToBottom();
     }
 
-
     @Override
     protected void onDestroy() {
         // TODO Auto-generated method stub
@@ -473,14 +481,15 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         super.onResume();
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(0);
-        boolean isIMOnline = api.isOnline();
-        if (!isIMOnline) {
+        int state = api.getOnLineState();
+        if (state == 0) {
             Utils.showToast(this, getString(R.string.im_user_offline));
             YueQiuApp app = (YueQiuApp)getApplicationContext();
 //            app.resetUSerInfo();
             app.logout();
 
         }
+
     }
 
     @Override
@@ -546,7 +555,8 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     }
 
     private void takePic() {
-        Intent albumIntent = new Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        Intent albumIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(albumIntent, REQUEST_PIC);
     }
 
@@ -565,7 +575,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 + +System.currentTimeMillis() + ".jpg");
         mCameraFile.getParentFile().mkdirs();
         startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(
-                        MediaStore.EXTRA_OUTPUT, Uri.fromFile(mCameraFile)),REQUEST_CAMERA);
+                MediaStore.EXTRA_OUTPUT, Uri.fromFile(mCameraFile)), REQUEST_CAMERA);
     }
 
     @Override
@@ -576,8 +586,8 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 Uri selectedImage = data.getData();
                 if (selectedImage != null) {
                     String path = FileUtil.uriToPath(this, selectedImage);
+                    Log.d("cao","image path is ->" + path);
                     if (null != path && !"".equals(path))
-                        Log.e("ddd", "chat page send image from album: path = " + path);
                         sendPicture(path);
                 }
             }
@@ -616,7 +626,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onSendMessage(int code, GotyeMessage message) {
-        Log.d("ddd", "Chatpage onSendMessage>>>> code= " + code + " message = " + message);
+        Log.d("cao", "chat page send message  code= " + code + " message = " + message);
         // GotyeChatManager.getInstance().insertChatMessage(message);
         mAdapter.updateMessage(message);
         if (message.getType() == GotyeMessageType.GotyeMessageTypeAudio) {
@@ -629,14 +639,27 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onReceiveMessage(int code, GotyeMessage message) {
-        Log.d("ddd", "Chatpage onReceiveMessage>>>> code= " + code + " message = " + message);
+        Log.d("cao", "chat page onReceiveMessage  code= " + code + " message = " + message);
         // GotyeChatManager.getInstance().insertChatMessage(message);
-        GotyeUser user = api.requestUserInfo(message.getReceiver().name,true);
+        GotyeUser user = api.requestUserInfo(message.getReceiver().getName(),true);
         String title;
-        if(user.getNickname() == null){
-            title = user.getName();
+        if(!TextUtils.isEmpty(user.getNickname())) {
+            String nicknameStr = user.getNickname();
+            Log.d("cao", "chat page receive message nicknameStr ->" + nicknameStr);
+            String nick;
+            int splitIndex = nicknameStr.lastIndexOf("|");
+            if (splitIndex != -1) {
+                nick = nicknameStr.substring(0, splitIndex);
+            } else {
+                nick = nicknameStr;
+            }
+            if (TextUtils.isEmpty(nick)) {
+                title = user.getName();
+            } else {
+                title = nick;
+            }
         }else{
-            title = user.getNickname();
+            title = user.getName();
         }
         mActionBar.setTitle(getString(R.string.and) + title + getString(R.string.chat));
 
@@ -647,13 +670,13 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 mPullListView.setSelection(mAdapter.getCount());
             }
         } else if (mChatType == 1) {
-            if (message.getReceiver().Id == mRoom.getRoomID()) {
+            if (message.getReceiver().getId() == mRoom.getRoomID()) {
                 // message.senderUser = user;
                 mAdapter.addMsgToBottom(message);
                 mPullListView.setSelection(mAdapter.getCount());
             }
         } else if (mChatType == 2) {
-            if (message.getReceiver().Id == mGroup.getGroupID()) {
+            if (message.getReceiver().getId() == mGroup.getGroupID()) {
                 mAdapter.addMsgToBottom(message);
                 mPullListView.setSelection(mAdapter.getCount());
             }
@@ -662,8 +685,8 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     }
 
     private boolean isMyMessage(GotyeMessage message) {
-        if (message.getSender() != null&& mUser.getName().equals(message.getSender().name)
-                && mCurrentLoginUser.name.equals(message.getReceiver().name)) {
+        if (message.getSender() != null && mUser.getName().equals(message.getSender().getName())
+                && mCurrentLoginUser.getName().equals(message.getReceiver().getName())) {
             return true;
         } else {
             return false;
@@ -672,30 +695,29 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onDownloadMessage(int code, GotyeMessage message) {
-
+        Log.d("ddd", "Chatpage onDownloadMessage callback>>>> code= " + code + " message = " + message);
         mAdapter.downloadDone(message);
-
     }
 
 
-    @Override
-    public void onGetHistoryMessageList(int code, List<GotyeMessage> list) {
-
-        if (mChatType == 1) {
-            List<GotyeMessage> listmessages = api.getLocalMessages(mRoom,false);
-
-            if (listmessages != null) {
-                for (GotyeMessage temp : listmessages) {
-                    api.downloadMessage(temp);
-                }
-                mAdapter.refreshData(listmessages);
-            } else {
-                Utils.showToast(this, getString(R.string.no_history));
-            }
-        }
-        mAdapter.notifyDataSetInvalidated();
-        mPullListView.onRefreshComplete();
-    }
+//    @Override
+//    public void onGetHistoryMessageList(int code, List<GotyeMessage> list) {
+//
+//        if (mChatType == 1) {
+//            List<GotyeMessage> listmessages = api.getLocalMessages(mRoom, false);
+//
+//            if (listmessages != null) {
+//                for (GotyeMessage temp : listmessages) {
+//                    api.downloadMessage(temp);
+//                }
+//                mAdapter.refreshData(listmessages);
+//            } else {
+//                Utils.showToast(this, getString(R.string.no_history));
+//            }
+//        }
+//        mAdapter.notifyDataSetInvalidated();
+//        mPullListView.onRefreshComplete();
+//    }
 
     @Override
     public void onRequestUserInfo(int code, GotyeUser user) {
@@ -774,6 +796,44 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     }
 
     @Override
+    public void onGetMessageList(int i, List<GotyeMessage> gotyeMessages) {
+        if (mChatType == 0) {
+            List<GotyeMessage> listmessages = api.getLocalMessages(mUser, false);
+            if (listmessages != null) {
+                mAdapter.refreshData(listmessages);
+            } else {
+                Utils.showToast(this, "没有历史记录");
+            }
+        }else if (mChatType == 1){
+            List<GotyeMessage> listmessages = api.getLocalMessages(mRoom, false);
+            if (listmessages != null) {
+                mAdapter.refreshData(listmessages);
+            } else {
+                Utils.showToast(this, "没有历史记录");
+            }
+        }else if (mChatType == 2){
+            List<GotyeMessage> listmessages = api.getLocalMessages(mGroup, false);
+            if (listmessages != null) {
+                mAdapter.refreshData(listmessages);
+            } else {
+                Utils.showToast(this, "没有历史记录");
+            }
+        }
+        mAdapter.notifyDataSetInvalidated();
+        scrollToBottom();
+    }
+
+    @Override
+    public void onOutputAudioData(byte[] bytes) {
+
+    }
+
+    @Override
+    public void onGetCustomerService(int i, GotyeUser gotyeUser, int i2, String s) {
+
+    }
+
+    @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         return false;
     }
@@ -837,9 +897,10 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         return true;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.chat_page_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.chat_page_menu, menu);
+//        return super.onCreateOptionsMenu(menu);
+//    }
 }

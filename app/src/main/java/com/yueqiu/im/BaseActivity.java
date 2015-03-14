@@ -81,12 +81,6 @@ public class BaseActivity extends FragmentActivity implements ChatListener,
 	}
 
 	@Override
-	public void onGetHistoryMessageList(int code, List<GotyeMessage> list) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void onRequestRoomInfo(int code, GotyeRoom room) {
 		// TODO Auto-generated method stub
 		
@@ -324,7 +318,22 @@ public class BaseActivity extends FragmentActivity implements ChatListener,
 		
 	}
 
-	@Override
+    @Override
+    public void onGetMessageList(int i, List<GotyeMessage> gotyeMessages) {
+
+    }
+
+    @Override
+    public void onOutputAudioData(byte[] bytes) {
+
+    }
+
+    @Override
+    public void onGetCustomerService(int i, GotyeUser gotyeUser, int i2, String s) {
+
+    }
+
+    @Override
 	public void onSendNotify(int code, GotyeNotify notify) {
 		// TODO Auto-generated method stub
 		

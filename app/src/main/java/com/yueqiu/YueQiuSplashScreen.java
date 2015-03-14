@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.View;
 import android.view.Window;
 
 import com.yueqiu.adapter.SplashScreenPagerAdapter;
@@ -33,64 +32,32 @@ public class YueQiuSplashScreen extends FragmentActivity implements SplashScreen
     {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION| View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
-
-
         NearbyParamsPreference preference = NearbyParamsPreference.getInstance();
 
         // TODO: 目前不需要判断是否是第一次启动，也就是每次都显示那三个页面
         // TODO: 如果需要添加判断的话，我们直接将下面的可以正常工作代码采用就可以了
-//        if (! preference.getFirstEnter(this))
-//        {
-//            // 我们之前已经看过这些简介界面了，这样我们就能直接进入到约球里面了
-//            Intent mainIntent = new Intent(YueQiuSplashScreen.this, BilliardNearbyActivity.class);
-//            YueQiuSplashScreen.this.startActivity(mainIntent);
-////            overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
-//            YueQiuSplashScreen.this.finish();
-//        } else
-//        {
-//            // 这是我们首次进入约球，我们需要加载SplashScreen当中
-//            setContentView(R.layout.activity_yue_qiu_splash_screen);
-//            Log.d(TAG, " set the swipe listener ");
-//            mViewPager = (SplashScreenViewPager) findViewById(R.id.splash_screen_view_pager);
-//            // 设置回调
-//            mViewPager.setOnSwipeOutLisener(YueQiuSplashScreen.this);
-//
-//            FragmentManager fragmentManager = getSupportFragmentManager();
-//            SplashScreenPagerAdapter fragmentPagerAdapter = new SplashScreenPagerAdapter(this, fragmentManager);
-//            mViewPager.setAdapter(fragmentPagerAdapter);
-//        }
+        if (! preference.getFirstEnter(this))
+        {
+            // 我们之前已经看过这些简介界面了，这样我们就能直接进入到约球里面了
+            Intent mainIntent = new Intent(YueQiuSplashScreen.this, BilliardNearbyActivity.class);
+            YueQiuSplashScreen.this.startActivity(mainIntent);
+//            overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
+            YueQiuSplashScreen.this.finish();
+        } else
+        {
+            // 这是我们首次进入约球，我们需要加载SplashScreen当中
+            setContentView(R.layout.activity_yue_qiu_splash_screen);
+            preference.setFirstEnterTag(this,true);
+            Log.d(TAG, " set the swipe listener ");
+            mViewPager = (SplashScreenViewPager) findViewById(R.id.splash_screen_view_pager);
+            // 设置回调
+            mViewPager.setOnSwipeOutLisener(YueQiuSplashScreen.this);
 
-        // 这是我们首次进入约球，我们需要加载SplashScreen当中
-        setContentView(R.layout.activity_yue_qiu_splash_screen);
-        Log.d(TAG, " set the swipe listener ");
-        mViewPager = (SplashScreenViewPager) findViewById(R.id.splash_screen_view_pager);
-        // 设置回调
-        mViewPager.setOnSwipeOutLisener(YueQiuSplashScreen.this);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            SplashScreenPagerAdapter fragmentPagerAdapter = new SplashScreenPagerAdapter(this, fragmentManager);
+            mViewPager.setAdapter(fragmentPagerAdapter);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        SplashScreenPagerAdapter fragmentPagerAdapter = new SplashScreenPagerAdapter(this, fragmentManager);
-        mViewPager.setAdapter(fragmentPagerAdapter);
-
-        // TODO: 我们可以在这里加入更多的初始化事件，比如加入数据库的初始化过程，
-        // TODO: 并不是只是机械的等待1000ms，这样有点浪费
-        // TODO: 或者我们也可以在这里加入网络的判断事件，判断用户是否已经登录，或者
-        // TODO: 是否是第一次进入本程序
-        // 以下这种方案不予采用了，改成了ViewPager的方式来实现
-//        new Handler().postDelayed(new Runnable()
-//        {
-//            @Override
-//            public void run()
-//            {
-//                Intent mainIntent = new Intent(YueQiuSplashScreen.this, BilliardNearbyActivity.class);
-//                YueQiuSplashScreen.this.startActivity(mainIntent);
-//                overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
-//                YueQiuSplashScreen.this.finish();
-//            }
-//        }, 850);
+        }
     }
 
     /**
@@ -100,14 +67,12 @@ public class YueQiuSplashScreen extends FragmentActivity implements SplashScreen
     public void onSwipeRightMost()
     {
         Log.d(TAG, " inside the splash screen, we have received the callback ");
-
         // 我们之前已经看过这些简介界面了，这样我们就能直接进入到约球里面了
         Intent mainIntent = new Intent(YueQiuSplashScreen.this, BilliardNearbyActivity.class);
 //        mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         mainIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         YueQiuSplashScreen.this.startActivity(mainIntent);
         overridePendingTransition(R.anim.push_bottom_in, R.anim.push_bottom_out);
-//        YueQiuSplashScreen.this.finish();
 
     }
 }

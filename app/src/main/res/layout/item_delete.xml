@@ -7,12 +7,15 @@
                 android:orientation="horizontal"
                 android:padding="8dp">
 
+
     <com.yueqiu.view.CustomNetWorkImageView
+
         android:id="@+id/icon"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_centerVertical="true"
         android:layout_margin="5dp"
+        android:scaleType="centerCrop"
         android:src="@drawable/default_head" />
 
     <ImageView

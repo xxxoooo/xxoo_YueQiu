@@ -68,6 +68,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
         outState.putBoolean(SAVE_FAVOR_REFRESH,mRefresh);
         outState.putBoolean(SAVE_FAVOR_LOAD_MORE,mLoadMore);
         outState.putBoolean(SAVE_FAVOR_INSTANCE,true);
+
     }
     
     @Override
@@ -167,7 +168,9 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
     protected void requestResult() {
 
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreText.setVisibility(View.VISIBLE);
+        if(mList.isEmpty()) {
+            mPreText.setVisibility(View.VISIBLE);
+        }
 
         mParamsMap.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
         mParamsMap.put(HttpConstants.Favor.TYPE,mType == 1 ? 1 : mType + 1);
