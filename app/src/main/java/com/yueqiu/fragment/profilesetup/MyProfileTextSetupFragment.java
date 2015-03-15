@@ -275,6 +275,9 @@ public class MyProfileTextSetupFragment extends Fragment {
                         YueQiuApp.sUserInfo.setNick(mEditText.getText().toString());
 
                         modifyUser();
+
+                        Intent broadIntent = new Intent(PublicConstant.SLIDE_ACCOUNT_ACTION);
+                        getActivity().sendBroadcast(broadIntent);
                     }else if(mText.equals(getString(R.string.region))){
                         mEditor.putString(DatabaseConstant.UserTable.DISTRICT,mEditText.getText().toString());
                         mEditor.apply();

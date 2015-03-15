@@ -628,6 +628,9 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     public void onSendMessage(int code, GotyeMessage message) {
         Log.d("cao", "chat page send message  code= " + code + " message = " + message);
         // GotyeChatManager.getInstance().insertChatMessage(message);
+        if(code == 300){
+            message.setStatus(GotyeMessage.STATUS_SENDFAILED);
+        }
         mAdapter.updateMessage(message);
         if (message.getType() == GotyeMessageType.GotyeMessageTypeAudio) {
             api.decodeMessage(message);

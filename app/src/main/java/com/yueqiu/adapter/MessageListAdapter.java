@@ -178,7 +178,7 @@ public class MessageListAdapter extends BaseAdapter {
 
 			if (session.getType() == GotyeChatTargetType.GotyeChatTargetTypeUser) {
 				GotyeUser user = api.requestUserInfo(session.getName(), true);
-
+                Log.d("cao","user is ->"+ user);
                 nicknameStr = user.getNickname();
                 if(!TextUtils.isEmpty(nicknameStr)) {
                     Log.d("wy", "message adapter nickStr ->" + nicknameStr);

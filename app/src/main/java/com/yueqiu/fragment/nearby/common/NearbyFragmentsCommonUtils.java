@@ -163,7 +163,6 @@ public class NearbyFragmentsCommonUtils{
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                Log.d("caocao","recommend response ->" + response);
                 try
                 {
 //                    JSONObject initialJsonData = new JSONObject(rawResult);
@@ -215,10 +214,6 @@ public class NearbyFragmentsCommonUtils{
                                         roomShopHours // shopHours营业时间
                                 );
                                 cacheRoomList.add(roomItem);
-                                Log.d("lyxjb", " ----> the photo url we get for the recommendation are : " + roomItem.getRoomPhotoUrl() + "; "
-                                        + roomAddress + "; " + roomLatitude + " ; " + roomLongitude + "; " + roomPrice
-                                        + "; " + roomPriceVal);
-//                                Log.d("lyxjb","cacheRoomList ->" + cacheRoomList);
                             }
                             // 现在我们就需要将我们获得的数据传递出去
                             mInternalHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheRoomList).sendToTarget();
@@ -258,6 +253,9 @@ public class NearbyFragmentsCommonUtils{
             super.handleMessage(msg);
             switch(msg.what){
                 case DATA_RETRIEVE_SUCCESS:
+
+                    mGalleryIndicatorGroup.removeAllViews();
+
                     //TODO:获取成功以后，不应该再显示那一行小字
                     mNoDataIndicatorText.setVisibility(View.INVISIBLE);
                     mGlobalRoomList = (List<NearbyRoomSubFragmentRoomBean>) msg.obj;
@@ -411,20 +409,12 @@ public class NearbyFragmentsCommonUtils{
         mNoDataIndicatorText = (TextView) parentView.findViewById(R.id.tv_gallery_view_pager_indication);
 
         mImgLoader = VolleySingleton.getInstance().getImgLoader();
-        new Thread(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Looper.prepare();
-                if(Utils.networkAvaiable(context)) {
-                    retrieveRecommdedRoomInfo();
-                }else{
-                    mInternalHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
-                }
-                Looper.loop();
-            }
-        }).start();
+
+        if(Utils.networkAvaiable(context)) {
+              retrieveRecommdedRoomInfo();
+        }else{
+              mInternalHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
+         }
     }
     // 通过得到的关于性别的字符串来解析成具体的男女的字符串
     public static String parseGenderStr(Context context, String sexVal)

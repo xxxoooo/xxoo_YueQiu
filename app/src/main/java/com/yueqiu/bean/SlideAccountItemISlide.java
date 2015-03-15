@@ -10,12 +10,14 @@ public class SlideAccountItemISlide implements ISlideListItem {
     private String mTitle;
     private String mImg;
     private int mUserId;
-    public SlideAccountItemISlide(String img, String name, int golden, String title, int userId){
+    private String mNickName;
+    public SlideAccountItemISlide(String img, String name, int golden, String title, int userId,String nickName){
         this.mImg = img;
         this.mName = name;
         this.mGolden = golden;
         this.mTitle = title;
         this.mUserId = userId;
+        this.mNickName = nickName;
     }
     @Override
     public int getType() {
@@ -54,5 +56,11 @@ public class SlideAccountItemISlide implements ISlideListItem {
         this.mUserId = userId;
     }
 
+    public String getmNickName() {
+        return mNickName;
+    }
 
+    public void setmNickName(String mNickName) {
+        this.mNickName = mNickName;
+    }
 }
