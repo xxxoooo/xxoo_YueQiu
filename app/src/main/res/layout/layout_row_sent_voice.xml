@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp" >
 
-        <com.android.volley.toolbox.NetworkImageView
+        <com.yueqiu.view.CustomNetWorkImageView
             android:id="@+id/iv_userhead"
             android:layout_width="50dp"
             android:layout_height="50dp"

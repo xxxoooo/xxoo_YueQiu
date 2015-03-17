@@ -1,11 +1,14 @@
 package com.yueqiu.fragment.nearby;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -72,6 +75,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
     private static final String TAG = "BilliardsNearbyDatingFragment";
     private static final String TAG_2 = "dating_fragment";
     private Context mContext;
+    private SearchView mSearchView;
 
     public BilliardsNearbyDatingFragment()
     {
@@ -195,19 +199,9 @@ public class BilliardsNearbyDatingFragment extends Fragment
             mUIEventsHandler.obtainMessage(PublicConstant.USE_CACHE, mCachedDatingList).sendToTarget();
         }
 
-
-        mBackgroundHandler = new BackgroundWorkerHandler(mStarNum, mEndNum);
         mLoadMore = false;
         mRefresh = false;
-        // 我们仅在网络可行的情况下进行网络请求，减少不必要的网络请求
-        if (mBackgroundHandler.getState() == Thread.State.NEW)
-        {
-            Log.d(TAG, " in the onCreateView --> start the background handler ");
-            mBackgroundHandler.start();
-        }
-        if (! Utils.networkAvaiable(getActivity())){
-            mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
-        }
+
         return mView;
     }
 
@@ -224,6 +218,23 @@ public class BilliardsNearbyDatingFragment extends Fragment
     @Override
     public void onResume()
     {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver,filter);
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
+        mBackgroundHandler = new BackgroundWorkerHandler(mStarNum, mEndNum);
+
+        // 我们仅在网络可行的情况下进行网络请求，减少不必要的网络请求
+        if (mBackgroundHandler.getState() == Thread.State.NEW)
+        {
+            Log.d(TAG, " in the onCreateView --> start the background handler ");
+            mBackgroundHandler.start();
+        }
+        if (! Utils.networkAvaiable(getActivity())){
+            mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
+        }
         super.onResume();
     }
 
@@ -232,6 +243,13 @@ public class BilliardsNearbyDatingFragment extends Fragment
     {
         Log.d(TAG, " the onPause method has been called ");
         mCallback.closePopupWindow();
+
+        if (null != mBackgroundHandler)
+        {
+            Log.d(TAG, " we need to stop the Background Handler ");
+            mBackgroundHandler.interrupt();
+            mBackgroundHandler = null;
+        }
         super.onPause();
     }
 
@@ -245,12 +263,7 @@ public class BilliardsNearbyDatingFragment extends Fragment
     @Override
     public void onDestroy()
     {
-        if (null != mBackgroundHandler)
-        {
-            Log.d(TAG, " we need to stop the Background Handler ");
-            mBackgroundHandler.interrupt();
-            mBackgroundHandler = null;
-        }
+
 
         // 将所有的筛选参数置空
         sParamsPreference.setDatingPublishedDate(mContext, "");
@@ -539,6 +552,12 @@ public class BilliardsNearbyDatingFragment extends Fragment
 //                                    mDatingList.add(datingBean);
 //                                }
 //                            }
+                        }else{
+                            int index = mDatingList.indexOf(datingBean);
+                            if(!datingBean.getUserPhoto().equals(mDatingList.get(index).getUserPhoto())){
+                                mDatingList.remove(index);
+                                mDatingList.add(index,datingBean);
+                            }
                         }
                     }
                     mAfterCount = mDatingList.size();
@@ -585,18 +604,21 @@ public class BilliardsNearbyDatingFragment extends Fragment
                     if (mDatingList.isEmpty())
                     {
                         setEmptyViewVisible();
+                        mEmptyView.setText(mContext.getString(R.string.network_not_available));
+                    }else{
+                        Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     }
-                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
+
 
                     break;
-                case PublicConstant.TIME_OUT:
-                    // 超时之后的处理策略
-                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
-                    if (mDatingList.isEmpty()) {
-                        setEmptyViewVisible();
-                    }
-                    hideProgress();
-                    break;
+//                case PublicConstant.TIME_OUT:
+//                    // 超时之后的处理策略
+//                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
+//                    if (mDatingList.isEmpty()) {
+//                        setEmptyViewVisible();
+//                    }
+//                    hideProgress();
+//                    break;
                 case PublicConstant.NO_RESULT:
                     if (mDatingList.isEmpty()) {
                         setEmptyViewVisible();
@@ -612,17 +634,27 @@ public class BilliardsNearbyDatingFragment extends Fragment
                 case PublicConstant.REQUEST_ERROR:
                     Bundle errorData = msg.getData();
                     String errorInfo = errorData.getString(KEY_REQUEST_ERROR_DATING);
-                    if (! TextUtils.isEmpty(errorInfo))
-                    {
-                        Utils.showToast(mContext, errorInfo);
-                    } else
-                    {
-                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
-                    }
 
                     if (mDatingList.isEmpty())
                     {
                         setEmptyViewVisible();
+                        if (! TextUtils.isEmpty(errorInfo))
+                        {
+                            mEmptyView.setText(errorInfo);
+                        } else
+                        {
+                            mEmptyView.setText(mContext.getString(R.string.http_request_error));
+                        }
+
+                    }else{
+                        if (! TextUtils.isEmpty(errorInfo))
+                        {
+                            Utils.showToast(mContext, errorInfo);
+                        } else
+                        {
+                            Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
+                        }
+
                     }
 
                     hideProgress();
@@ -700,6 +732,11 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
             }
             mDatingListAdapter.notifyDataSetChanged();
+            if(mLoadMore && !mDatingList.isEmpty())
+            {
+                mDatingListView.getRefreshableView().setSelection(mCurrentPos - 1);
+            }
+
         }
     };
 
@@ -727,7 +764,9 @@ public class BilliardsNearbyDatingFragment extends Fragment
     {
         Log.d(TAG, " inside the showProgress internal method ");
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreText.setVisibility(View.VISIBLE);
+        if(mDatingList.isEmpty()) {
+            mPreText.setVisibility(View.VISIBLE);
+        }
     }
 
     private void hideProgress()
@@ -840,8 +879,8 @@ public class BilliardsNearbyDatingFragment extends Fragment
     {
         super.onCreateOptionsMenu(menu, inflater);
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
@@ -987,6 +1026,27 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
         mLocationManagerProxy.setGpsEnable(false);
     }
+
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(getActivity())) {
+                    NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
+                    commonUtils.initViewPager(mContext, mView);
+                    if (mDatingList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        if (null != mBackgroundHandler) {
+                            mBackgroundHandler.fetchDatingData(0, 9);
+                        }
+                    }
+                }
+            }
+        }
+    };
 
 
 }

@@ -151,7 +151,13 @@ public class MyProfileRadioSetupFragment extends Fragment implements View.OnClic
             mTextView4.setText(mTexts[3]);
             mTextView5.setText(mTexts[4]);
             mTextView6.setText(mTexts[5]);
-        }else{
+        }else if(mTexts.length == 4){
+            mTextView1.setText(mTexts[0]);
+            mTextView2.setText(mTexts[1]);
+            mTextView3.setText(mTexts[2]);
+            mTextView4.setText(mTexts[3]);
+        }
+        else{
             mTextView1.setText(mTexts[0]);
             mTextView2.setText(mTexts[1]);
             mTextView3.setText(mTexts[2]);
@@ -242,6 +248,8 @@ public class MyProfileRadioSetupFragment extends Fragment implements View.OnClic
                 params.put(HttpConstants.SetAttr.USED_TYPE, mSubmitId);
             } else if (mTypeStr.equals(getString(R.string.type))) {
                 params.put(HttpConstants.SetAttr.MYTYPE, mSubmitId);
+            } else if(mTypeStr.equals(getString(R.string.zizhi))){
+                params.put(HttpConstants.SetAttr.ZIZHI,mSubmitId);
             }
 
             HttpUtil.requestHttp(HttpConstants.SetAttr.URL, params, HttpConstants.RequestMethod.POST, new JsonHttpResponseHandler() {
@@ -303,6 +311,9 @@ public class MyProfileRadioSetupFragment extends Fragment implements View.OnClic
                         mEditor.putString(DatabaseConstant.UserTable.MY_TYPE,mSubmitId);
                         mEditor.apply();
                         YueQiuApp.sUserInfo.setMy_type(Integer.valueOf(mSubmitId));
+                    }else if(mTypeStr.equals(getString(R.string.zizhi))){
+                        mEditor.putInt(DatabaseConstant.UserTable.ZIZHI,Integer.valueOf(mSubmitId));
+                        mEditor.apply();
                     }
 
                     Intent intent = new Intent();

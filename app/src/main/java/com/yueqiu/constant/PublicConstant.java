@@ -94,5 +94,10 @@ public class PublicConstant {
     public static final int SEARCH_BUSINESS_PLAY    = 11;
     public static final int SEARCH_FRIEND           = 12;
 
+    public static final int ZIZHI_COUNTRY_MEMBER    = 1;
+    public static final int ZIZHI_PROFESSION        = 2;
+    public static final int ZIZHI_COACH             = 3;
+    public static final int ZIZHI_OTHER             = 4;
+
 
 }

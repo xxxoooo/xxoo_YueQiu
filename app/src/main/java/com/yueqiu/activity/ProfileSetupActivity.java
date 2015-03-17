@@ -184,6 +184,15 @@ public class ProfileSetupActivity extends SingleFragmentActivity implements MyPr
                 MyProfileTextSetupFragment workFragment = new MyProfileTextSetupFragment(work_live);
                 workFragment.setArguments(args);
                 return workFragment;
+
+            case ZIZHI:
+                mActionBar.setTitle(getString(R.string.zizhi));
+                return new MyProfileRadioSetupFragment(new String[]{
+                        getString(R.string.zizhi_profession_memeber),
+                        getString(R.string.zizhi_profession_memeber),
+                        getString(R.string.zizhi_coach),
+                        getString(R.string.billiard_other)
+                },mUserInfo.getZizhi(),getString(R.string.zizhi));
             default:
                 return null;
         }
@@ -222,6 +231,8 @@ public class ProfileSetupActivity extends SingleFragmentActivity implements MyPr
             attr = Attr.MY_TYPE;
         }else if(id == 12){
             attr = Attr.WORK_LIVE;
+        }else if(id == 13){
+            attr = Attr.ZIZHI;
         }
         return attr;
     }

@@ -88,7 +88,7 @@
         android:layout_below="@id/assistcoauch_filter_group"
         style="@style/SearchSubActivityListViewStyle"
         android:id="@+id/search_assistcoauch_subfragment_listview"
-        android:layout_marginBottom="@dimen/nearby_subfragment_listview_margin_bottom">
+        >
 
     </com.yueqiu.view.pullrefresh.PullToRefreshListView>
 

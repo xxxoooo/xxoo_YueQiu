@@ -16,8 +16,11 @@ import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.Toast;
 
+import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeChatTarget;
+import com.gotye.api.GotyeGender;
 import com.gotye.api.GotyeUser;
+import com.gotye.api.Icon;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
@@ -62,7 +65,7 @@ public class ContactFragment extends Fragment {
     private Map<String, String> mMapArgument = new HashMap<String, String>();
     private ContactsDao mContactsDao;
     private List<GotyeChatTarget> mTargets;
-    private FriendsListChanged mListener;
+    private GotyeAPI mApi;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,6 +79,7 @@ public class ContactFragment extends Fragment {
                              Bundle savedInstanceState) {
         mContext = getActivity();
         mBaseView = inflater.inflate(R.layout.fragment_chatbar_contact, null);
+        mApi = GotyeAPI.getInstance();
         findView();
         init();
         initData();
@@ -85,11 +89,11 @@ public class ContactFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            mListener = (FriendsListChanged) activity;
-        }catch (ClassCastException e){
-            throw new ClassCastException(activity.toString() + " must implement IndexListener");
-        }
+//        try {
+//            mListener = (FriendsListChanged) activity;
+//        }catch (ClassCastException e){
+//            throw new ClassCastException(activity.toString() + " must implement IndexListener");
+//        }
     }
 
     private void findView() {
@@ -114,13 +118,19 @@ public class ContactFragment extends Fragment {
                 //TODO:传入待聊天好友的userid
                 if (TextUtils.isEmpty(contacts.getUsername()))
                     return false;
+
+                //TODO:逻辑还要变
                 Intent intent = new Intent(getActivity(), ChatPage.class);
-                intent.putExtra("user", new GotyeUser(contacts.getUsername()));
+                GotyeUser user = mApi.requestUserInfo(contacts.getPhone(),true);
+//                modifyUser(user,contacts.getImg_url(),contacts.getUsername(),Integer.valueOf(contacts.getSex()));
+
+                intent.putExtra("user", user);
                 intent.putExtra("from", 200);
 //                intent.putExtra(MessageFragment.FRIEND_USER_ID, contacts.getUser_id());//fake date
 //                intent.putExtra(MessageFragment.FRIEND_USER_NAME, contacts.getUsername());
                 startActivity(intent);
                 getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+
                 return true;
             }
         });
@@ -137,6 +147,7 @@ public class ContactFragment extends Fragment {
             return;
         }
         getContactList();
+//        getAllContact();
     }
 
     /**
@@ -204,6 +215,7 @@ public class ContactFragment extends Fragment {
                                         mMapArgument.put(DatabaseConstant.FriendsTable.IMG_URL, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.IMG_URL));
                                         mMapArgument.put(DatabaseConstant.FriendsTable.LAST_MESSAGE, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.LAST_MESSAGE));
                                         mMapArgument.put(DatabaseConstant.FriendsTable.DATETIME, list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.DATETIME));
+                                        mMapArgument.put(DatabaseConstant.FriendsTable.PHONE,list_data.getJSONObject(j).getString(DatabaseConstant.FriendsTable.PHONE));
 //                                        mContactsDao.insertContact(mMapArgument);
 //                                        mContactsDao.updateContact(mMapArgument);
                                         ContactsList.Contacts contacts = contactsList.new Contacts();
@@ -213,6 +225,7 @@ public class ContactFragment extends Fragment {
                                         contacts.setImg_url(list_data.getJSONObject(j).getString("img_url"));
                                         contacts.setContent(list_data.getJSONObject(j).getString("content"));
                                         contacts.setCreate_time(list_data.getJSONObject(j).getString("create_time"));
+                                        contacts.setPhone(list_data.getJSONObject(j).getString("phone"));
                                         contactsList.mList.add(contacts);
 
                                         maps.put(key, contactsList.mList);
@@ -257,10 +270,7 @@ public class ContactFragment extends Fragment {
                     mMaps = (HashMap<Integer, List<ContactsList.Contacts>>) msg.obj;
                     mExpAdapter.setData(mMaps);
                     mExpAdapter.notifyDataSetChanged();
-                    mListener.onFriendsListChanged();
-                    break;
-                case PublicConstant.TIME_OUT:
-                    Utils.showToast(getActivity(), getString(R.string.http_request_time_out));
+//                    mListener.onFriendsListChanged();
                     break;
                 case PublicConstant.REQUEST_ERROR:
                     if (null == msg.obj) {
@@ -279,7 +289,16 @@ public class ContactFragment extends Fragment {
         }
     };
 
-    public interface FriendsListChanged {
-        public void onFriendsListChanged();
+    private void modifyUser(GotyeUser user,String img_url,String nickName,int gender) {
+        int split = img_url.lastIndexOf("/");
+        String url = YueQiuApp.sUserInfo.getImg_url().substring(split + 1);
+        user.setNickname(nickName + ":" + url);
+
+        user.setGender(gender == 1 ? GotyeGender.Male : GotyeGender.Femal);
+        Log.e("cao", " contact modify mGotyeUser = " + user);
+        int result = mApi.requestModifyUserInfo(user, null);
+
+        Log.d("cao","contact modify result" + result);
+
     }
 }

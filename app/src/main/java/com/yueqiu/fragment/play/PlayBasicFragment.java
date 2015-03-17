@@ -2,10 +2,13 @@ package com.yueqiu.fragment.play;
 
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -82,6 +85,7 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     private List<PlayInfo> mInsertList = new ArrayList<PlayInfo>();
     private List<PlayInfo> mUpdateList = new ArrayList<PlayInfo>();
     private List<PlayInfo> mCacheList = new ArrayList<PlayInfo>();
+    private SearchView mSearchView;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -148,6 +152,13 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onResume() {
         super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver,filter);
+
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
         /**
          * 如果网络正常，就向网络请求数据
          */
@@ -228,7 +239,9 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     private void requestPlay(){
 
         mPreProgressBar.setVisibility(View.VISIBLE);
-        mPreTextView.setVisibility(View.VISIBLE);
+        if(mList.isEmpty()) {
+            mPreTextView.setVisibility(View.VISIBLE);
+        }
 
         mParamMap.put(HttpConstants.Play.TYPE, mPlayType);
         mParamMap.put(HttpConstants.Play.START_NO,mStart);
@@ -420,32 +433,43 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
                         }
                     }
                     break;
-                case PublicConstant.TIME_OUT:
-                    Utils.showToast(mActivity, mActivity.getString(R.string.http_request_time_out));
-                    if(mList.isEmpty()) {
-                        setEmptyViewVisible();
-                    }
-                    break;
+//                case PublicConstant.TIME_OUT:
+//                    Utils.showToast(mActivity, mActivity.getString(R.string.http_request_time_out));
+//                    if(mList.isEmpty()) {
+//                        setEmptyViewVisible();
+//                    }
+//                    break;
                 case PublicConstant.REQUEST_ERROR:
-                    if(null == msg.obj){
-                        Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
-                    }else{
-                        Utils.showToast(mActivity, (String) msg.obj);
-                    }
+
                     if(mList.isEmpty()) {
                         setEmptyViewVisible();
+                        if(null == msg.obj){
+                            mEmptyView.setText(mActivity.getString(R.string.http_request_error));
+                        }else{
+                            mEmptyView.setText((String) msg.obj);
+                        }
+                    }else{
+                        if(null == msg.obj){
+                            Utils.showToast(mActivity,mActivity.getString(R.string.http_request_error));
+                        }else{
+                            Utils.showToast(mActivity, (String) msg.obj);
+                        }
                     }
                     break;
                 case PublicConstant.NO_NETWORK:
-                    Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
-                    if(mList.isEmpty())
+
+                    if(mList.isEmpty()) {
                         setEmptyViewVisible();
+                        mEmptyView.setText(mActivity.getString(R.string.network_not_available));
+                    }else{
+                        Utils.showToast(mActivity,mActivity.getString(R.string.network_not_available));
+                    }
                     break;
             }
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
             if(mLoadMore && !mList.isEmpty()){
-                mListView.setSelection(mCurrPosition);
+                mListView.setSelection(mCurrPosition - 1);
             }
         }
     };
@@ -556,8 +580,8 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
@@ -583,6 +607,24 @@ public class PlayBasicFragment extends Fragment implements AdapterView.OnItemCli
             }
         });
     }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(getActivity())) {
+                    if (mList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        mParamMap.put(HttpConstants.GroupList.STAR_NO,0);
+                        mParamMap.put(HttpConstants.GroupList.END_NO,9);
+                        requestPlay();
+                    }
+                }
+            }
+        }
+    };
 
 
 }

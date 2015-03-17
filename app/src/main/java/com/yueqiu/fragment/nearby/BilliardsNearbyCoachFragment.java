@@ -2,11 +2,14 @@ package com.yueqiu.fragment.nearby;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -38,6 +41,7 @@ import com.yueqiu.R;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyCoauchSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyCoauchSubFragmentCoauchBean;
+import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
@@ -56,6 +60,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -78,6 +84,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
     private PullToRefreshListView mCoauchListView;
 
     private Context mContext;
+    private SearchView mSearchView;
 
     @SuppressLint("ValidFragment")
     public BilliardsNearbyCoachFragment()
@@ -182,17 +189,9 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
         }
 
-        mWorker = new BackgroundWorkerThread(mStartNum, mEndNum);
         mLoadMore = false;
         mRefresh = false;
-        if (mWorker.getState() == Thread.State.NEW)
-        {
-            mWorker.start();
-        }
-        if ( !Utils.networkAvaiable(mContext))
-        {
-            mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
-        }
+
 
         return mView;
     }
@@ -212,7 +211,22 @@ public class BilliardsNearbyCoachFragment extends Fragment
     public void onResume()
     {
         super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver,filter);
 
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
+        mWorker = new BackgroundWorkerThread(mStartNum, mEndNum);
+        if (mWorker.getState() == Thread.State.NEW)
+        {
+            mWorker.start();
+        }
+        if ( !Utils.networkAvaiable(mContext))
+        {
+            mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
+        }
     }
 
     @Override
@@ -491,8 +505,16 @@ public class BilliardsNearbyCoachFragment extends Fragment
 //                                    mCoauchList.add(bean);
 //                                }
 //                            }
+                        }else{
+                            int index = mCoauchList.indexOf(bean);
+                            if(!bean.getUserPhoto().equals(mCoauchList.get(index).getUserPhoto()) ||
+                                    !bean.getUserName().equals(mCoauchList.get(index))){
+                                mCoauchList.remove(index);
+                                mCoauchList.add(index,bean);
+                            }
                         }
                     }
+                    Collections.sort(mCoauchList,new DescComparator());
                     mAfterCount = mCoauchList.size();
                     // TODO: 在这里进行一下更新数据库的操作
                     if (mCoauchList.isEmpty())
@@ -542,18 +564,20 @@ public class BilliardsNearbyCoachFragment extends Fragment
                     if (mCoauchList.isEmpty())
                     {
                         setEmptyViewVisible();
+                        mEmptyView.setText(mContext.getString(R.string.network_not_available));
+                    }else {
+                        Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     }
-                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     break;
-                case PublicConstant.TIME_OUT:
-                    // 超时之后的处理策略
-                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
-                    if (mCoauchList.isEmpty())
-                    {
-                        setEmptyViewVisible();
-                    }
-                    hideProgress();
-                    break;
+//                case PublicConstant.TIME_OUT:
+//                    // 超时之后的处理策略
+//                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
+//                    if (mCoauchList.isEmpty())
+//                    {
+//                        setEmptyViewVisible();
+//                    }
+//                    hideProgress();
+//                    break;
 
                 case PublicConstant.NO_RESULT:
                     if (mCoauchList.isEmpty())
@@ -572,17 +596,26 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 case PublicConstant.REQUEST_ERROR:
                     Bundle errorData = msg.getData();
                     String errorStr = errorData.getString(KEY_REQUEST_ERROR_MSG);
-                    if (! TextUtils.isEmpty(errorStr))
-                    {
-                        Utils.showToast(mContext, errorStr);
-                    } else
-                    {
-                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
-                    }
+
 
                     if (mCoauchList.isEmpty())
                     {
                         setEmptyViewVisible();
+                        if (! TextUtils.isEmpty(errorStr))
+                        {
+                            mEmptyView.setTag(errorStr);
+                        } else
+                        {
+                            mEmptyView.setText(mContext.getString(R.string.http_request_error));
+                        }
+                    }else{
+                        if (! TextUtils.isEmpty(errorStr))
+                        {
+                            Utils.showToast(mContext, errorStr);
+                        } else
+                        {
+                            Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
+                        }
                     }
                     hideProgress();
                     break;
@@ -643,6 +676,10 @@ public class BilliardsNearbyCoachFragment extends Fragment
 
             }
             mCoauchListAdapter.notifyDataSetChanged();
+            if(mLoadMore && !mCoauchList.isEmpty())
+            {
+                mCoauchListView.getRefreshableView().setSelection(mCurrentPos - 1 );
+            }
         }
     };
 
@@ -672,7 +709,9 @@ public class BilliardsNearbyCoachFragment extends Fragment
     private void showProgress()
     {
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreTextView.setVisibility(View.VISIBLE);
+        if(mCoauchList.isEmpty()) {
+            mPreTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void hideProgress()
@@ -705,7 +744,6 @@ public class BilliardsNearbyCoachFragment extends Fragment
                 {
                     super.handleMessage(msg);
                     switch (msg.what) {
-//<<<<<<< HEAD
 //                        case RETRIEVE_ALL_COAUCH_INFO:
 //                            // 通知UIHandler开始显示Dialog
 //                            mUIEventsHandler.sendEmptyMessage(UI_SHOW_PROGRESS);
@@ -814,8 +852,8 @@ public class BilliardsNearbyCoachFragment extends Fragment
     {
         super.onCreateOptionsMenu(menu, inflater);
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
@@ -967,6 +1005,38 @@ public class BilliardsNearbyCoachFragment extends Fragment
         mLocationManagerProxy.setGpsEnable(false);
     }
 
+    /**
+     * 由于服务器是按降序排序，但是从网络获取到的json却是升序，所以重新排序一下
+     */
+    private class DescComparator implements Comparator<NearbyCoauchSubFragmentCoauchBean> {
+
+        @Override
+        public int compare(NearbyCoauchSubFragmentCoauchBean lhs, NearbyCoauchSubFragmentCoauchBean rhs) {
+            int lhsUserId = Integer.valueOf(lhs.getId());
+            int rhsUserId = Integer.valueOf(rhs.getId());
+            return lhsUserId > rhsUserId ? -1 : 1;
+        }
+    }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(getActivity())) {
+                    NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
+                    commonUtils.initViewPager(mContext, mView);
+                    if (mCoauchList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        if (null != mWorker) {
+                            mWorker.fetchAllData(0, 9);
+                        }
+                    }
+                }
+            }
+        }
+    };
 
 }
 

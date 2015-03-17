@@ -17,6 +17,7 @@ import com.yueqiu.bean.RecentChat;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 import com.yueqiu.view.contacts.IphoneTreeView;
 
 import java.lang.ref.SoftReference;
@@ -103,7 +104,7 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
             holder = new ChildHolder();
             holder.nameView = (TextView) convertView.findViewById(R.id.contact_list_item_name);
             holder.feelView = (TextView) convertView.findViewById(R.id.cpntact_list_item_state);
-            holder.iconView = (NetworkImageView) convertView.findViewById(R.id.icon);
+            holder.iconView = (CustomNetWorkImageView) convertView.findViewById(R.id.icon);
             holder.date = (TextView) convertView.findViewById(R.id.contact_list_item_time);
             convertView.setTag(holder);
         } else {
@@ -111,7 +112,7 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
         }
         holder.iconView.setDefaultImageResId(R.drawable.default_head);
         holder.iconView.setErrorImageResId(R.drawable.default_head);
-        holder.iconView.setImageUrl(HttpConstants.IMG_BASE_URL + ((ContactsList.Contacts) getChild(groupPosition, childPosition)).getImg_url(),mImgLoader);
+        holder.iconView.setImageUrl("http://" + ((ContactsList.Contacts) getChild(groupPosition, childPosition)).getImg_url(),mImgLoader);
         holder.nameView.setText(((ContactsList.Contacts) getChild(groupPosition, childPosition)).getUsername());
         holder.feelView.setText(((ContactsList.Contacts) getChild(groupPosition, childPosition)).getContent());
         holder.date.setText(((ContactsList.Contacts) getChild(groupPosition, childPosition)).getCreate_time());
@@ -191,7 +192,7 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
     class ChildHolder {
         TextView nameView;
         TextView feelView;
-        NetworkImageView iconView;
+        CustomNetWorkImageView iconView;
         TextView date;
     }
 

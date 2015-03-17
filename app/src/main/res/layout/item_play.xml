@@ -5,7 +5,7 @@
         android:layout_height="wrap_content"
         android:padding="8dp"
         >
-        <com.android.volley.toolbox.NetworkImageView
+        <com.yueqiu.view.CustomNetWorkImageView
             android:id="@+id/activities_lv_item_iv_head"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="20dp"
@@ -30,7 +30,7 @@
                 android:id="@+id/activities_lv_item_tv_title"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textColor="@color/md__defaultBackground"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -39,9 +39,10 @@
                 android:id="@+id/activities_lv_item_tv_activities_time"
                 android:ellipsize="end"
                 android:textColor="@color/md__defaultBackground"
-                android:textSize="13sp"
+                android:textSize="15sp"
                 android:singleLine="true"
                 style="@style/TimeTextStyle"
+                android:layout_marginTop="3dp"
 
                />
         </LinearLayout>

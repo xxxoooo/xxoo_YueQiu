@@ -25,6 +25,9 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.gotye.api.GotyeAPI;
+import com.gotye.api.GotyeGender;
+import com.gotye.api.GotyeUser;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.BilliardNearbyActivity;
 import com.yueqiu.R;
@@ -70,6 +73,9 @@ public class Register1Activity extends Activity implements View.OnClickListener 
     private SharedPreferences.Editor mEditor;
     private UserDao mUserDao;
 
+    private GotyeAPI mApi;
+    private GotyeUser mGotyeUser;
+
     private static final int REQUESTCODE = 0x03;
     private static final int REGISTER_SUCCESS = 0x00;
     private static final int REGISTER_ERROR = 0x01;
@@ -103,6 +109,10 @@ public class Register1Activity extends Activity implements View.OnClickListener 
                     }
                     mEditor.apply();
 
+
+                    mGotyeUser = mApi.requestUserInfo(map.get(DatabaseConstant.UserTable.PHONE),true);
+                    modifyUser();
+
                     mUserDao.insertUserInfo(map);
                     Intent intent = new Intent(Register1Activity.this, BilliardNearbyActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -125,6 +135,8 @@ public class Register1Activity extends Activity implements View.OnClickListener 
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
         mUserDao = DaoFactory.getUser(Register1Activity.this);
+        mApi = GotyeAPI.getInstance();
+
         initActionBar();
         initView();
 
@@ -296,7 +308,16 @@ public class Register1Activity extends Activity implements View.OnClickListener 
                     getString(R.string.man) : getString(R.string.woman));
         }
     }
+    private void modifyUser() {
 
+//        int split = mPhotoImgUrl.lastIndexOf("/");
+//        String img_url = mPhotoImgUrl.substring(split + 1);
+        mGotyeUser.setNickname(YueQiuApp.sUserInfo.getUsername() + "|");
+        mGotyeUser.setGender(YueQiuApp.sUserInfo.getSex() == 1 ? GotyeGender.Male : GotyeGender.Femal);
+        Log.e("cao", " register modify mGotyeUser = " + mGotyeUser);
+        int result = mApi.requestModifyUserInfo(mGotyeUser, null);
+        Log.d("cao"," register modify result" + result);
+    }
 
 }
 

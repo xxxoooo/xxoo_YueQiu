@@ -1,7 +1,10 @@
 package com.yueqiu.fragment.slidemenu;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -84,6 +87,9 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
     @Override
     public void onResume() {
         super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver,filter);
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
@@ -115,22 +121,23 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
                     mIsListEmpty = mList.isEmpty();
                     List<PartInInfo> list = (List<PartInInfo>) msg.obj;
                     for(PartInInfo info : list){
-//                        if(!mList.contains(info)){
-//                            if(!mIsListEmpty && Integer.valueOf(((PartInInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
+                        if(!mList.contains(info)){
+                            if(!mIsListEmpty && Integer.valueOf(((PartInInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
+                                mList.add(0,info);
+                            }else {
+                                mList.add(info);
+                            }
+//                        if(mRefresh && !mIsListEmpty) {
+//                            mList.add(0,info);
+//                        }else{
+//                            if(mIsSavedInstance){
 //                                mList.add(0,info);
-//                            }else {
+//                            }else{
 //                                mList.add(info);
 //                            }
 //                        }
-                        if(mRefresh && !mIsListEmpty) {
-                            mList.add(0,info);
-                        }else{
-                            if(mIsSavedInstance){
-                                mList.add(0,info);
-                            }else{
-                                mList.add(info);
-                            }
                         }
+
                     }
 //                    Collections.sort(mList,new DescComparator());
                     mAfterCount = mList.size();
@@ -150,7 +157,7 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
             mListView.setAdapter(mPartInAdapter);
             mPartInAdapter.notifyDataSetChanged();
             if(mLoadMore && !mList.isEmpty()){
-                mListView.setSelection(mCurrPosition);
+                mListView.setSelection(mCurrPosition - 1);
             }
 
         }
@@ -184,7 +191,9 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
     protected void requestResult() {
 
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreText.setVisibility(View.VISIBLE);
+        if(mList.isEmpty()) {
+            mPreText.setVisibility(View.VISIBLE);
+        }
 
         mParamsMap.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
         mParamsMap.put(HttpConstants.Published.TYPE,mType);
@@ -198,21 +207,22 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
     protected List<PartInInfo> setBeanByJSON(JSONObject jsonResult) {
         List<PartInInfo> list = new ArrayList<PartInInfo>();
         try {
-            if(jsonResult.getJSONObject("result").get("list_data").equals("null")){
+            if(jsonResult.get("result").equals("null")){
                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
             }else {
-                JSONArray list_data = jsonResult.getJSONObject("result").getJSONArray("list_data");
+                JSONArray list_data = jsonResult.getJSONArray("result");
                 if (list_data.length() < 1) {
                     mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                 } else {
                     for (int i = 0; i < list_data.length(); i++) {
                         PartInInfo itemInfo = new PartInInfo();
                         itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
+                        itemInfo.setRid(list_data.getJSONObject(i).getInt("rid"));
                         itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
                         itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
                         itemInfo.setDateTime(list_data.getJSONObject(i).getString("create_time"));
                         itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                        itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type")));
+                        itemInfo.setType(Integer.valueOf(list_data.getJSONObject(i).getString("type_id")));
                         itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
                         //TODO:根据服务器确定的字段,如果需要缓存应该再加一个字段subtype,代表这条数据是type中的那个子类型
                         //TODO:不过目前服务器那边说不传，不做缓存的话，倒是用不到这个字段
@@ -252,7 +262,7 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
         Intent intent;
         PartInInfo info = (PartInInfo) mPartInAdapter.getItem(position - 1);
 
-        int table_id = Integer.valueOf(info.getTable_id());
+        int table_id = info.getRid();
         String username = info.getUsername();
         String img_url = info.getImg_url();
 
@@ -325,4 +335,22 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
             return lhsUserId > rhsUserId ? -1 : 1;
         }
     }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(getActivity())) {
+                    if (mList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        mParamsMap.put(HttpConstants.Published.START_NO,0);
+                        mParamsMap.put(HttpConstants.Published.END_NO, 9);
+                        requestResult();
+                    }
+                }
+            }
+        }
+    };
 }

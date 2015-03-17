@@ -80,7 +80,21 @@ public class NearbyPeopleInfo {
             return user_id;
         }
 
+        @Override
+        public int hashCode() {
+            int result = 17;
+            result = 37 * result + user_id;
+            return result;
+        }
 
+        @Override
+        public boolean equals(Object o) {
+            SearchPeopleItemInfo info = (SearchPeopleItemInfo) o;
+            if(this.user_id == info.getUser_id()){
+                return true;
+            }
+            return false;
+        }
     }
 
     public void setUser_id(int user_id) {

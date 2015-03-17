@@ -622,20 +622,15 @@ public class Utils
                         IWeiboShareAPI weiboShareAPI = WeiboShareSDK.createWeiboAPI(context, HttpConstants.WEIBO_APP_KEY);
                         if (weiboShareAPI.isWeiboAppInstalled())
                         {
-                            Log.d("scguo_sina_share_test", " client installed ");
                             // 新浪微博已经安装，我们可以启动进行微博分享的具体过程了
                             Intent sinaIntent = new Intent(context, WeiboShareActionCompleteActivity.class);
-                            Bitmap cachedBitmap = bitmap;
-
-                            sinaIntent.putExtra(PublicConstant.SHARE_TO_SINA_BITMAP, cachedBitmap);
-                            Log.d("scguo_sina_share_test", " the bitmap we get are : " + (bitmap != null));
-//                            Bitmap testBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
-//                            sinaIntent.putExtra(PublicConstant.SHARE_TO_SINA_BITMAP, testBitmap);
+                            Bundle args = new Bundle();
+//                            args.putParcelable(PublicConstant.SHARE_TO_SINA_BITMAP,bitmap);
+//                            sinaIntent.putExtras(args);
+//                            sinaIntent.putExtra(PublicConstant.SHARE_TO_SINA_BITMAP,bitmap);
                             context.startActivity(sinaIntent);
-
                         } else
                         {
-                            Log.d("scguo_sina_share_test", " client is not installed ");
                             // 新浪微博并没有安装，我们需要告诉用户安装客户端之后再进行分享
                             Toast.makeText(context, context.getString(R.string.weibo_need_to_install_first), Toast.LENGTH_SHORT).show();
                         }

@@ -48,7 +48,6 @@
         android:layout_below="@id/dating_filter_group"
         android:id="@+id/search_dating_subfragment_list"
         style="@style/SearchSubActivityListViewStyle"
-        android:layout_marginBottom="@dimen/nearby_subfragment_listview_margin_bottom"
         >
 
     </com.yueqiu.view.pullrefresh.PullToRefreshListView>

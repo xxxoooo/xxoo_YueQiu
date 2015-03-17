@@ -13,6 +13,7 @@ import com.yueqiu.R;
 import com.yueqiu.bean.NearbyDatingSubFragmentDatingBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +68,7 @@ public class NearbyDatingSubFragmentListAdapter extends BaseAdapter
             convertView = mInflater.inflate(R.layout.item_nearby_dating_layout, parent, false);
             viewHolder = new ViewHolder();
 
-            viewHolder.mUserPhoto = (NetworkImageView) convertView.findViewById(R.id.img_dating_subfragment_listitem_photo);
+            viewHolder.mUserPhoto = (CustomNetWorkImageView) convertView.findViewById(R.id.img_dating_subfragment_listitem_photo);
             viewHolder.mUserNickname = (TextView) convertView.findViewById(R.id.tv_dating_subfragment_listitem_nickname);
             viewHolder.mUserDeclareation = (TextView) convertView.findViewById(R.id.tv_dating_subfragment_listitem_declareation);
             viewHolder.mUserDistance = (TextView) convertView.findViewById(R.id.tv_dating_subfragment_listitem_distance_meter);
@@ -83,10 +84,17 @@ public class NearbyDatingSubFragmentListAdapter extends BaseAdapter
         {
             viewHolder.mUserPhoto.setDefaultImageResId(R.drawable.default_head);
             viewHolder.mUserPhoto.setErrorImageResId(R.drawable.default_head);
-            viewHolder.mUserPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + bean.getUserPhoto(), mImgLoader);
+            viewHolder.mUserPhoto.setImageUrl("http://" + bean.getUserPhoto(), mImgLoader);
 
             viewHolder.mUserNickname.setText(bean.getUserName());
-            viewHolder.mUserDistance.setText(mContext.getString(R.string.in_meter,bean.getUserDistance()));
+
+            long distance = Long.valueOf(bean.getUserDistance());
+            float show_distance = distance / 1000 ;
+            if(show_distance > 10) {
+                viewHolder.mUserDistance.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, show_distance));
+            }else{
+                viewHolder.mUserDistance.setText(mContext.getString(R.string.in_meter,bean.getUserDistance()));
+            }
             viewHolder.mUserDeclareation.setText(bean.getUserDeclare());
         }
 
@@ -95,7 +103,7 @@ public class NearbyDatingSubFragmentListAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        public NetworkImageView mUserPhoto;
+        public CustomNetWorkImageView mUserPhoto;
         public TextView mUserNickname, mUserDeclareation, mUserDistance;
     }
 

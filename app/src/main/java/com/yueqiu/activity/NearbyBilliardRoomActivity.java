@@ -141,6 +141,8 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
             String name = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, "");
             String shopHours = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_SHOP_HOURS, "");
 
+            Log.d("wy","recommend room name ->" + name);
+
             // 把我们得到的数据全部渲染到Activity当中
             mRoomPrice.setText(String.valueOf(price));
             mRoomRatingBar.setRating(level);
@@ -328,7 +330,8 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
                 // 我们需要传入Intent来进行微信分享请求的结果监听
                 // 我们可以在这个Intent当中传递我们需要的分享的具体数据
                 // 我们目前需要分享包括基本的球厅的信息，球厅图片(Bitmap),球厅活动说明
-                Dialog dlg = Utils.showSheet(this, Utils.getCurrentScreenShot(mRootView));
+                YueQiuApp.sScreenBitmap = Utils.getCurrentScreenShot(mRootView);
+                Dialog dlg = Utils.showSheet(this, YueQiuApp.sScreenBitmap);
                 dlg.show();
                 // TODO: 以下是测试代码，我们暂时将所有的涉及到分享的代码移动到当前的Activity当中，因为关于分享的部分会涉及到一些关于
                 // TODO: Activity生命周期的控制方法

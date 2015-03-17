@@ -13,6 +13,7 @@ import com.yueqiu.R;
 import com.yueqiu.bean.NearbyDatingDetailedAlreadyBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +65,7 @@ public class NearbyDatingDetailedGridAdapter extends BaseAdapter
         {
             convertView = mInflater.inflate(R.layout.item_nearby_dating_grid_layout, parent, false);
             viewHolder = new ViewHolder();
-            viewHolder.mPhoto = (NetworkImageView) convertView.findViewById(R.id.img_grid_search_dating_detailed_userphoto);
+            viewHolder.mPhoto = (CustomNetWorkImageView) convertView.findViewById(R.id.img_grid_search_dating_detailed_userphoto);
             viewHolder.mName = (TextView) convertView.findViewById(R.id.tv_grid_search_dating_detailed_username);
             convertView.setTag(viewHolder);
         } else
@@ -86,7 +87,7 @@ public class NearbyDatingDetailedGridAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        public NetworkImageView mPhoto;
+        public CustomNetWorkImageView mPhoto;
         public TextView mName;
     }
 

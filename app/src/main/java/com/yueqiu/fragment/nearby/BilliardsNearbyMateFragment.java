@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -26,6 +27,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -97,6 +99,7 @@ public class BilliardsNearbyMateFragment extends Fragment
     private LocationManagerProxy mLocationManagerProxy;
 
     private PullToRefreshListView mSubFragmentListView;
+    private ListView mMateListView;
 
     @SuppressLint("ValidFragment")
     public BilliardsNearbyMateFragment()
@@ -176,6 +179,7 @@ public class BilliardsNearbyMateFragment extends Fragment
     private ArrayList<NearbyMateSubFragmentUserBean> mCachedMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
 
     public NearbyFragmentsCommonUtils.ControlPopupWindowCallback mPopupwindowCallback;
+    private SearchView mSearchView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -187,6 +191,8 @@ public class BilliardsNearbyMateFragment extends Fragment
         commonUtils.initViewPager(mContext, mView);
 
         mSubFragmentListView = (PullToRefreshListView) mView.findViewById(R.id.search_sub_fragment_list);
+        mMateListView = mSubFragmentListView.getRefreshableView();
+
         mSubFragmentListView.setMode(PullToRefreshBase.Mode.BOTH);
         mSubFragmentListView.setOnRefreshListener(mOnRefreshListener);
 
@@ -242,24 +248,14 @@ public class BilliardsNearbyMateFragment extends Fragment
 
 
         mMateListAdapter = new NearbyMateSubFragmentListAdapter(mContext,  mUserList);
-        mSubFragmentListView.setAdapter(mMateListAdapter);
+//        mSubFragmentListView.setAdapter(mMateListAdapter);
+        mMateListView.setAdapter(mMateListAdapter);
 
-//        mMateListAdapter.notifyDataSetChanged();
+        mMateListAdapter.notifyDataSetChanged();
 
         mLoadMore = false;
         mRefresh = false;
-        mWorker = new BackgroundWorker(mStartNum, mEndNum);
-        if (mWorker.getState() == Thread.State.NEW)
-        {
-            Log.d(TAG_2, " 1. the mWorker has started ");
-            mWorker.start();
-        }
 
-        if (! Utils.networkAvaiable(mContext))
-        {
-            // 我们的数据请求只是发生于网络可行的情况下
-            mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
-        }
 
         return mView;
     }
@@ -275,6 +271,25 @@ public class BilliardsNearbyMateFragment extends Fragment
     {
         super.onResume();
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver,filter);
+
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
+        mWorker = new BackgroundWorker(mStartNum, mEndNum);
+        if (mWorker.getState() == Thread.State.NEW)
+        {
+            Log.d(TAG_2, " 1. the mWorker has started ");
+            mWorker.start();
+        }
+
+        if (! Utils.networkAvaiable(mContext))
+        {
+            // 我们的数据请求只是发生于网络可行的情况下
+            mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
+        }
     }
 
     @Override
@@ -539,6 +554,13 @@ public class BilliardsNearbyMateFragment extends Fragment
                             }else {
                                 mUserList.add(mateBean);
                             }
+                        }else{
+                            int index = mUserList.indexOf(mateBean);
+                            if(!mateBean.getUserPhotoUrl().equals(mUserList.get(index).getUserPhotoUrl())
+                                    || !mateBean.getUserNickName().equals(mUserList.get(index).getUserNickName())){
+                                mUserList.remove(index);
+                                mUserList.add(index,mateBean);
+                            }
                         }
                         // TODO: ------------------------UNCOMMENT LATER------------------------------------------
 //                        if (!mDBList.isEmpty())
@@ -591,12 +613,14 @@ public class BilliardsNearbyMateFragment extends Fragment
                 // TODO: ------------------------UNCOMMENT LATER------------------------------------------
                 case NO_NETWORK:
                     setEmptyViewGone();
-                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
+
 
                     if (mUserList.isEmpty())
                     {
-                        Log.d("scguo_tag", "load emptyView 3");
                         setEmptyVewVisible();
+                        mEmptyView.setText(mContext.getString(R.string.network_not_available));
+                    }else{
+                        Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     }
 
                     mRefresh = false;
@@ -652,25 +676,24 @@ public class BilliardsNearbyMateFragment extends Fragment
 
                     break;
 
-                case PublicConstant.TIME_OUT:
-                    setEmptyViewGone();
-                    // 超时之后的处理策略
-                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
-                    if (mUserList.isEmpty())
-                    {
-                        Log.d("scguo_tag", "load emptyView 5");
-                        setEmptyVewVisible();
-                    }
-                    hideProgress();
-                    mRefresh = false;
-                    mLoadMore = false;
-                    break;
+//                case PublicConstant.TIME_OUT:
+//                    setEmptyViewGone();
+//                    // 超时之后的处理策略
+//                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
+//                    if (mUserList.isEmpty())
+//                    {
+//                        Log.d("scguo_tag", "load emptyView 5");
+//                        setEmptyVewVisible();
+//                    }
+//                    hideProgress();
+//                    mRefresh = false;
+//                    mLoadMore = false;
+//                    break;
 
                 case PublicConstant.NO_RESULT:
                     setEmptyViewGone();
                     if (mUserList.isEmpty())
                     {
-                        Log.d("scguo_tag", "load emptyView 6");
                         setEmptyVewVisible();
                     } else
                     {
@@ -690,18 +713,26 @@ public class BilliardsNearbyMateFragment extends Fragment
                     Bundle errorData = msg.getData();
                     String errorInfo = errorData.getString(KEY_REQUEST_ERROR_MSG);
                     Log.d(TAG, " inside the UIEventsProcessingHandler --> have exception while we make the network request, and the error msg : " + errorInfo);
-                    if (! TextUtils.isEmpty(errorInfo))
-                    {
-                        Utils.showToast(mContext, errorInfo);
-                    } else
-                    {
-                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
-                    }
+
 
                     if (mUserList.isEmpty())
                     {
-                        Log.d("scguo_tag", " fuck goes here ! load emptyView 7");
                         setEmptyVewVisible();
+                        if (! TextUtils.isEmpty(errorInfo))
+                        {
+                            mEmptyView.setText(errorInfo);
+                        } else
+                        {
+                            mEmptyView.setText(mContext.getString(R.string.http_request_error));
+                        }
+                    }else{
+                        if (! TextUtils.isEmpty(errorInfo))
+                        {
+                            Utils.showToast(mContext, errorInfo);
+                        } else
+                        {
+                            Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
+                        }
                     }
 
                     mRefresh = false;
@@ -770,7 +801,13 @@ public class BilliardsNearbyMateFragment extends Fragment
                     }
                     break;
             }
-            mMateListAdapter.notifyDataSetChanged();
+//            mMateListView.setAdapter(mMateListAdapter);
+//            mMateListAdapter.notifyDataSetChanged();
+//            if(mLoadMore && !mUserList.isEmpty())
+//            {
+//                mMateListView.setSelection(mCurrentPos - 1);
+//            }
+            mMateListView.setSelection(mCurrentPos - 1);
         }
     };
 
@@ -800,7 +837,9 @@ public class BilliardsNearbyMateFragment extends Fragment
     {
         Log.d(TAG, " showing the progress bar ");
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreTextView.setVisibility(View.VISIBLE);
+        if(mUserList.isEmpty()) {
+            mPreTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void hideProgress()
@@ -1156,9 +1195,9 @@ public class BilliardsNearbyMateFragment extends Fragment
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
     {
         super.onCreateOptionsMenu(menu, inflater);
-        super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//        super.onCreateOptionsMenu(menu, inflater);
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
@@ -1170,7 +1209,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                     args.putString(PublicConstant.SEARCH_KEYWORD, query);
                     intent.putExtras(args);
                     startActivity(intent);
-
+                    ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
 
                 }else{
                     Utils.showToast(mContext,getString(R.string.network_not_available));
@@ -1199,6 +1239,26 @@ public class BilliardsNearbyMateFragment extends Fragment
             return lhsUserId > rhsUserId ? -1 : 1;
         }
     }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(getActivity())) {
+                    NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
+                    commonUtils.initViewPager(mContext, mView);
+                    if (mUserList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        if (null != mWorker) {
+                            mWorker.fetchAllData(0, 9);
+                        }
+                    }
+                }
+            }
+        }
+    };
 
 
 

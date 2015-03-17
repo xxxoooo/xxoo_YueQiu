@@ -74,4 +74,5 @@ public class FriendsApplicationActivity extends SingleFragmentActivity {
             mFragmentManager.popBackStack();
         }
     }
+
 }

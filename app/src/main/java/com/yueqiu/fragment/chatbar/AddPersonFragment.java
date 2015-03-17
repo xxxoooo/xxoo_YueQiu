@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -27,6 +28,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -42,6 +44,7 @@ import com.amap.api.location.LocationProviderProxy;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.loopj.android.http.JsonHttpResponseHandler;
+import com.yueqiu.ChatBarActivity;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.RequestAddFriendActivity;
@@ -62,6 +65,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -87,8 +91,8 @@ public class AddPersonFragment extends Fragment {
     private ImageLoader mImageLoader;
     private LocationManagerProxy mLocationManagerProxy;
     private AddAdapter mAdapter;
-    private SearchView mSearchView;
     private List<NearbyPeopleInfo.SearchPeopleItemInfo> mList = new ArrayList<NearbyPeopleInfo.SearchPeopleItemInfo>();
+    private SearchView mSearchView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,14 +109,28 @@ public class AddPersonFragment extends Fragment {
         }
         init(view);
         //初始化查询
-        getLocation();
-//        getActivity().startService(new Intent(getActivity(), LocationUtil.class));
+        if(Utils.networkAvaiable(getActivity())) {
+            getLocation();
+        }else{
+            setEmptyViewVisible();
+            mEmptyView.setText(getString(R.string.network_not_available));
+        }
+//        mSearchView = ChatBarActivity.mSearchView;
         return view;
+    }
+
+    private void setEmptyViewVisible(){
+//        mEmptyView.setGravity(Gravity.CENTER);
+//        mEmptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP,18);
+//        mEmptyView.setTextColor(getResources().getColor(R.color.md__defaultBackground));
+//        mEmptyView.setText(getString(R.string.nearby_no_user));
+//        mListView.setEmptyView(mEmptyView);
+        mEmptyView.setVisibility(View.VISIBLE);
     }
 
     private void init(View view) {
         mEmptyView = (TextView) view.findViewById(R.id.empty_view);
-        mEmptyView.setVisibility(View.GONE);
+//        mEmptyView = new TextView(getActivity());
 
         mListView = (ListView) view.findViewById(R.id.search_result_container);
         mAdapter= new AddAdapter(getActivity(), mList);
@@ -130,16 +148,20 @@ public class AddPersonFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (!Utils.networkAvaiable(getActivity())) {
-                    Utils.showToast(getActivity(), getString(R.string.network_not_available));
-                    mListView.setEmptyView(mEmptyView);
+
+                    if(mList.isEmpty()){
+                        setEmptyViewVisible();
+                    }else{
+                        Utils.showToast(getActivity(), getString(R.string.network_not_available));
+                    }
+
                     return;
                 }
                 if (mList != null && mList.size() > 0) {
                     mList.clear();
+                    mAdapter.notifyDataSetChanged();
                 }
                 showProgressBar(true);
-                //TODO:该方法总是会获取到0，所以先不用，待日后完善
-//                getActivity().startService(new Intent(getActivity(), LocationUtil.class));
                 getLocation();
             }
         });
@@ -147,6 +169,7 @@ public class AddPersonFragment extends Fragment {
 
     private void showProgressBar(boolean isShow) {
         mEmptyView.setVisibility(View.GONE);
+        mListView.setEmptyView(null);
         if (isShow) {
             mProgressBar.setVisibility(View.VISIBLE);
             mProgressBarText.setVisibility(View.VISIBLE);
@@ -156,41 +179,13 @@ public class AddPersonFragment extends Fragment {
         }
     }
 
-//    BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            Bundle bundle = intent.getExtras();
-//            boolean isTimeout = bundle.getBoolean(LocationUtil.ISTIMEOUT_KEY);
-//            if (isTimeout) {
-//                showProgressBar(false);
-//            } else {
-//                Location location = bundle.getParcelable(LocationUtil.LOCATION_KEY);
-//                mLatitude = location.getLatitude();
-//                mLongitude = location.getLongitude();
-//                Log.d(TAG, "位置信息：latitude = " + mLatitude + " longitude = " + mLongitude);
-//                if (Utils.networkAvaiable(getActivity())) {
-//                    new Thread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            searchFriendsByLocation(mLatitude, mLongitude);
-//                        }
-//                    }).start();
-//                } else {
-//                    stopViewSearch();
-//                }
-//
-//            }
-//
-//        }
-//    };
-
     @Override
     public void onResume() {
         super.onResume();
+        Log.d("wy","onResume");
         if(mSearchView != null){
             mSearchView.clearFocus();
-            ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
-                    .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+
         }
     }
 
@@ -199,20 +194,21 @@ public class AddPersonFragment extends Fragment {
         super.onPause();
         if(mSearchView != null){
             mSearchView.clearFocus();
-            ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
-                    .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
         }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        Log.d("wy","onCreateOptionMenu");
+        menu.findItem(R.id.near_nemu_search).collapseActionView();
         mSearchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setIconified(true);
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
 
-                if(Utils.networkAvaiable(getActivity())) {
+                if (Utils.networkAvaiable(getActivity())) {
                     Intent intent = new Intent(getActivity(), SearchResultActivity.class);
                     Bundle args = new Bundle();
                     args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_FRIEND);
@@ -221,12 +217,10 @@ public class AddPersonFragment extends Fragment {
                     startActivity(intent);
                     ((InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE))
                             .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
-                }else{
-                    Utils.showToast(getActivity(),getString(R.string.network_not_available));
+                } else {
+                    Utils.showToast(getActivity(), getString(R.string.network_not_available));
                 }
                 mSearchView.clearFocus();
-
-//                searchFriendsByKeyWords(searchView.getQuery().toString());
                 return true;
             }
 
@@ -235,7 +229,6 @@ public class AddPersonFragment extends Fragment {
                 return false;
             }
         });
-
     }
 
     private Handler mHandler = new Handler() {
@@ -245,11 +238,17 @@ public class AddPersonFragment extends Fragment {
             switch (msg.what) {
                 case PublicConstant.GET_SUCCESS:
                     NearbyPeopleInfo searchPeopleInfo = (NearbyPeopleInfo) msg.obj;
-                    mList.addAll(searchPeopleInfo.mList);
-                    if (mList.size() > 0)
+                    for(NearbyPeopleInfo.SearchPeopleItemInfo info : searchPeopleInfo.mList ){
+                        if(!mList.contains(info)){
+                            mList.add(info);
+                        }
+                    }
+                    if (mList.size() > 0) {
                         mEmptyView.setVisibility(View.GONE);
-                    else
-                        mEmptyView.setVisibility(View.VISIBLE);
+                        mListView.setEmptyView(null);
+                    }else {
+                        setEmptyViewVisible();
+                    }
 
                     mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
@@ -269,16 +268,12 @@ public class AddPersonFragment extends Fragment {
                         mEmptyView.setVisibility(View.GONE);
                         Utils.showToast(getActivity(), getActivity().getString(R.string.not_found_friend));
                     }else {
-                        mEmptyView.setVisibility(View.VISIBLE);
+                        setEmptyViewVisible();
                     }
 //
                     break;
                 case PublicConstant.REQUEST_ERROR:
-                    if (null == msg.obj) {
-                        mEmptyView.setText(getString(R.string.http_request_error));
-                    } else {
-                        mEmptyView.setText((String) msg.obj);
-                    }
+
                     if (mList.size() > 0) {
                         mEmptyView.setVisibility(View.GONE);
                         if(null == msg.obj){
@@ -287,19 +282,25 @@ public class AddPersonFragment extends Fragment {
                             Utils.showToast(getActivity(), (String) msg.obj);
                         }
                     }else {
-                        mEmptyView.setVisibility(View.VISIBLE);
+                        setEmptyViewVisible();
+                        if (null == msg.obj) {
+                            mEmptyView.setText(getString(R.string.http_request_error));
+                        } else {
+                            mEmptyView.setText((String) msg.obj);
+                        }
                     }
                     break;
                 case GET_FRIEND_BY_LOCATION:
+                    mProgressBarText.setText(getString(R.string.quering));
                     searchFriendsByLocation(mLatitude,mLongitude);
                     break;
                 default:
                     break;
             }
             mAdapter.notifyDataSetChanged();
-            if (mList == null || mList.size() <= 0) {
-                mEmptyView.setVisibility(View.VISIBLE);
-            }
+//            if (mList == null || mList.size() <= 0) {
+//                mEmptyView.setVisibility(View.VISIBLE);
+//            }
         }
     };
 
@@ -310,7 +311,6 @@ public class AddPersonFragment extends Fragment {
         map.put(HttpConstants.SearchPeopleByNearby.LAT, latitude);
         map.put(HttpConstants.SearchPeopleByNearby.LNG, longitude);
 
-        mProgressBarText.setText(getString(R.string.quering));
 
         HttpUtil.requestHttp(HttpConstants.SearchPeopleByNearby.URL, map, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
             @Override
@@ -328,8 +328,10 @@ public class AddPersonFragment extends Fragment {
                                 itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
                                 itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
                                 itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                                itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
-                                itemInfo.setDatetime(list_data.getJSONObject(i).getString("datetime"));
+                                itemInfo.setSex(list_data.getJSONObject(i).getInt("sex"));
+                                itemInfo.setDistrict(list_data.getJSONObject(i).getString("district"));
+//                                itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
+//                                itemInfo.setDatetime(list_data.getJSONObject(i).getString("datetime"));
                                 searchPeople.mList.add(itemInfo);
                             }
                             mHandler.obtainMessage(PublicConstant.GET_SUCCESS, searchPeople).sendToTarget();
@@ -358,83 +360,21 @@ public class AddPersonFragment extends Fragment {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 super.onFailure(statusCode, headers, responseString, throwable);
-
+                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
             }
         });
         
     }
 
-
-    /**
-     * 通过关键字查询好友
-     *
-     * @param keyWords
-     */
-    public void searchFriendsByKeyWords(String keyWords) {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put(HttpConstants.SearchPeopleByKeyword.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));//
-        map.put(HttpConstants.SearchPeopleByKeyword.KEYWORDS, keyWords);
-
-
-        HttpUtil.requestHttp(HttpConstants.SearchPeopleByKeyword.URL, map, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
-                super.onSuccess(statusCode, headers, response);
-                Log.d("wy","add friend response ->" + response);
-                try{
-                    if (!response.isNull("code")) {
-                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                            NearbyPeopleInfo searchPeople = new NearbyPeopleInfo();
-//                searchPeople.setCount(response.getJSONObject("result").getInt("count"));
-                            JSONArray list_data = response.getJSONObject("result").getJSONArray("list_data");
-                            for (int i = 0; i < list_data.length(); i++) {
-                                NearbyPeopleInfo.SearchPeopleItemInfo itemInfo = searchPeople.new SearchPeopleItemInfo();
-                                itemInfo.setUser_id(list_data.getJSONObject(i).getInt("user_id"));
-                                itemInfo.setUsername(list_data.getJSONObject(i).getString("username"));
-                                itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
-                                itemInfo.setSex(list_data.getJSONObject(i).getInt("sex"));
-                                itemInfo.setDistrict(list_data.getJSONObject(i).getString("district"));
-                                searchPeople.mList.add(itemInfo);
-                            }
-                            mHandler.obtainMessage(PublicConstant.GET_SUCCESS, searchPeople).sendToTarget();
-                        } else if (response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT) {
-                            mHandler.obtainMessage(PublicConstant.TIME_OUT).sendToTarget();
-                        } else if (response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT) {
-                            mHandler.obtainMessage(PublicConstant.NO_RESULT).sendToTarget();
-                        } else {
-                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR, response.getString("msg")).sendToTarget();
-                        }
-                    } else {
-                        mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
-                    }
-                }catch (JSONException e){
-                    e.printStackTrace();
-                    mHandler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            stopViewSearch();
-                        }
-                    }, 100);
-                    Log.e(TAG, "JSONException>>" + e.toString());
-                }
-            }
-
-            @Override
-            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
-                super.onFailure(statusCode, headers, responseString, throwable);
-                mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
-            }
-        });
-    }
-
     private void stopViewSearch() {
         showProgressBar(false);
-        mEmptyView.setVisibility(View.VISIBLE);
-        Utils.showToast(getActivity(), getString(R.string.no_data));
+        if(mList.isEmpty()) {
+            setEmptyViewVisible();
+            mEmptyView.setText(getString(R.string.no_data));
+        }else {
+            Utils.showToast(getActivity(), getString(R.string.no_data));
+        }
     }
-
-
-
 
     /**
      * 初始化定位,用高德SDK获取经纬度，准确率貌似更高点，

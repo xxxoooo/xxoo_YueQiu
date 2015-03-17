@@ -19,6 +19,7 @@ import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.BitmapUtil;
 import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class GroupBasicAdapter extends BaseAdapter{
         if(convertView == null){
             convertView = mInflater.inflate(R.layout.item_billiard_group_layout,null);
             holder = new ViewHolder();
-            holder.image = (NetworkImageView) convertView.findViewById(R.id.group_item_image);
+            holder.image = (CustomNetWorkImageView) convertView.findViewById(R.id.group_item_image);
             holder.title = (TextView) convertView.findViewById(R.id.billiard_group_title);
             holder.content = (EmojiconTextView) convertView.findViewById(R.id.group_content);
             holder.browseCount = (TextView) convertView.findViewById(R.id.billiard_group_browse_count_text);
@@ -81,7 +82,7 @@ public class GroupBasicAdapter extends BaseAdapter{
     }
 
     class ViewHolder{
-        NetworkImageView image;
+        CustomNetWorkImageView image;
         TextView  title;
         EmojiconTextView content;
         TextView  browseCount;

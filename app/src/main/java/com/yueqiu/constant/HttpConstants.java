@@ -310,6 +310,8 @@ public class HttpConstants
     {
         public static final String URL = "/friend/getList";
 
+        public static final String ALL_URL = "/friend/getAll";
+
         //请求参数：位置坐标
         public static final String USER_ID = "user_id";
         public static final String GROUP_ID = "group_id";
@@ -364,6 +366,16 @@ public class HttpConstants
     public static final class GetAsk
     {
         public static final String URL = "/friend/getAsk";
+
+        public static final String USER_ID = "user_id";
+    }
+
+    /**
+     * 清空好友
+     */
+    public static final class ClearAsk{
+
+        public static final String URL = "/news/delList";
 
         public static final String USER_ID = "user_id";
     }
@@ -451,6 +463,9 @@ public class HttpConstants
 
         public static final String KEYWORD = "keyword";
 
+        public static final String TIME = "time";
+
+        public static final String WEIGHT = "weight";
 
     }
 

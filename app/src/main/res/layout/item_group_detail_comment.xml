@@ -5,7 +5,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="5dp">
-        <com.android.volley.toolbox.NetworkImageView
+        <com.yueqiu.view.CustomNetWorkImageView
             android:id="@+id/group_detail_comment_img"
             android:layout_width="@dimen/listview_item_user_photo_width"
             android:layout_height="@dimen/listview_item_user_photo_height"
@@ -41,14 +41,7 @@
             android:textSize="16sp"
             android:layout_marginTop="3dp"
             android:ellipsize="end"
-            android:layout_toLeftOf="@+id/help_text"
+            android:singleLine="true"
             />
-        <TextView
-            android:id="@+id/help_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignTop="@+id/group_detail_comment_str"
-            android:text="help_text_view"
-            android:visibility="invisible"/>
+
     </RelativeLayout>

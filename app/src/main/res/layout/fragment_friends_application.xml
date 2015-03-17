@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,7 +8,7 @@
         layout="@layout/pre_load"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:layout_centerInParent="true"
         />
     <com.yueqiu.view.pullrefresh.PullToRefreshListView
         android:id="@+id/friends_application_container"
@@ -21,5 +21,5 @@
 
         />
 
-</FrameLayout>
+</RelativeLayout>
 

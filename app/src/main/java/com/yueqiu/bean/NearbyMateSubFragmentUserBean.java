@@ -151,8 +151,7 @@ public class NearbyMateSubFragmentUserBean implements Parcelable
         int hash = 3;
         try
         {
-            int idVal = Integer.parseInt(this.getUserId());
-            hash *= idVal;
+            hash = 17 * mUserId.hashCode();
         } catch (final Exception e)
         {
             Log.d(TAG, " exception happened while we parse the iD value we get : " + e.toString());
@@ -171,10 +170,7 @@ public class NearbyMateSubFragmentUserBean implements Parcelable
         } else
         {
             NearbyMateSubFragmentUserBean thatObj = (NearbyMateSubFragmentUserBean) object;
-            if (thatObj.getUserNickName().equals(this.getUserNickName())
-                    && thatObj.getUserPhotoUrl().equals(this.getUserPhotoUrl())
-                    && thatObj.getUserDistrict().equals(this.getUserDistrict())
-                    && thatObj.getUserId().equals(this.getUserId()))
+            if (thatObj.getUserId().equals(this.getUserId()))
             {
                 result = true;
             }

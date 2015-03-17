@@ -40,6 +40,8 @@ public class UserInfo {
     private String comment_time;
     private String content;
 
+    private int zizhi;
+
     private static final String JSON_USER_ID = "user_id";
     private static final String JSON_IMGREAL = "img_url";
     private static final String JSON_ACCOUNT = "username";//账户
@@ -295,6 +297,14 @@ public class UserInfo {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public int getZizhi() {
+        return zizhi;
+    }
+
+    public void setZizhi(int zizhi) {
+        this.zizhi = zizhi;
     }
 
     public JSONObject toJSON() throws JSONException {

@@ -12,7 +12,7 @@
             android:layout_margin="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <com.android.volley.toolbox.NetworkImageView
+            <com.yueqiu.view.CustomNetWorkImageView
                 android:id="@+id/profile_photo_img"
                 android:layout_width="@dimen/listview_item_user_photo_width"
                 android:layout_height="@dimen/listview_item_user_photo_height"

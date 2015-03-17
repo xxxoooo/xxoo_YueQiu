@@ -295,6 +295,9 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
      */
     @Override
     public boolean onQueryTextSubmit(String query) {
+        if(mEmptyView != null){
+            mEmptyView.setVisibility(View.GONE);
+        }
         switch (mSearchType) {
             case PublicConstant.SEARCH_NEARBY_MATE:
                 mNearbyMateList.clear();
@@ -1049,6 +1052,8 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
 
     private void searchFriend(){
 
+        mFriendList.clear();
+
         mPreProgressBar.setVisibility(View.VISIBLE);
         mPreTextView.setVisibility(View.VISIBLE);
 
@@ -1056,6 +1061,8 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
         map.put(HttpConstants.SearchPeopleByKeyword.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));//
         map.put(HttpConstants.SearchPeopleByKeyword.KEYWORDS, mQueryResult);
 
+
+        Log.d("wy","search friend param ->" + map);
 
         HttpUtil.requestHttp(HttpConstants.SearchPeopleByKeyword.URL, map, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
             @Override
@@ -1118,16 +1125,20 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                     handleResultWhenSuccess(msg);
                     break;
                 case PublicConstant.REQUEST_ERROR:
-                    if(null == msg.obj){
-                        Utils.showToast(SearchResultActivity.this, getString(R.string.http_request_error));
-                    }else{
-                        Utils.showToast(SearchResultActivity.this, (String) msg.obj);
-                    }
-                    switch(mReceiveTypeParam){
 
-                    }
                     if(mAdapter.getCount() == 0) {
                         setEmptyViewVisible();
+                        if(null == msg.obj){
+                            mEmptyView.setText(getString(R.string.http_request_error));
+                        }else{
+                            mEmptyView.setText((String) msg.obj);
+                        }
+                    }else{
+                        if(null == msg.obj){
+                            Utils.showToast(SearchResultActivity.this, getString(R.string.http_request_error));
+                        }else{
+                            Utils.showToast(SearchResultActivity.this, (String) msg.obj);
+                        }
                     }
                     break;
                 case PublicConstant.NO_RESULT:
@@ -1137,11 +1148,19 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                             mEmptyView.setText(mEmptyTypeStr);
                         }
                     }else{
-                        Utils.showToast(SearchResultActivity.this,getString(R.string.no_search_info, mEmptyTypeStr));
+                        if(!mLoadMore) {
+                            Utils.showToast(SearchResultActivity.this, getString(R.string.no_search_info, mEmptyTypeStr));
+                        }
                     }
                     break;
                 case PublicConstant.NO_NETWORK:
-                    Utils.showToast(SearchResultActivity.this,getString(R.string.network_not_available));
+                    if(mAdapter.getCount() == 0){
+                        setEmptyViewVisible();
+                        mEmptyView.setText(getString(R.string.network_not_available));
+                    }else{
+                        Utils.showToast(SearchResultActivity.this,getString(R.string.network_not_available));
+                    }
+
                     break;
             }
             mPullToRefreshListView.setAdapter(mAdapter);
@@ -2037,7 +2056,11 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                 break;
             case PublicConstant.SEARCH_FRIEND:
                 NearbyPeopleInfo searchPeopleInfo = (NearbyPeopleInfo) msg.obj;
-                mFriendList.addAll(searchPeopleInfo.mList);
+                for(NearbyPeopleInfo.SearchPeopleItemInfo info : searchPeopleInfo.mList ){
+                    if(!mFriendList.contains(info)){
+                        mFriendList.add(info);
+                    }
+                }
                 if (mFriendList.size() > 0)
                     mEmptyView.setVisibility(View.GONE);
                 else

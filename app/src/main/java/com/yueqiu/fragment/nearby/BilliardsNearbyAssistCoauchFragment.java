@@ -2,11 +2,14 @@ package com.yueqiu.fragment.nearby;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -37,6 +40,7 @@ import com.yueqiu.R;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyAssistCoauchSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyAssistCoauchSubFragmentBean;
+import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
@@ -55,6 +59,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -72,6 +78,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     // 用于展示助教信息的ListView
     private PullToRefreshListView mListView;
     private Context mContext;
+    private SearchView mSearchView;
 
     @SuppressLint("ValidFragment")
     public BilliardsNearbyAssistCoauchFragment()
@@ -182,17 +189,9 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             mUIEventsHandler.obtainMessage(PublicConstant.USE_CACHE, mCachedList).sendToTarget();
         }
 
-        mWorker = new BackgroundWorkerHandler(mStartNum, mEndNum);
         mLoadMore = false;
         mRefresh = false;
-        if (mWorker.getState() == Thread.State.NEW)
-        {
-            mWorker.start();
-        }
-        if (! Utils.networkAvaiable(getActivity()))
-        {
-            mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
-        }
+
         return mView;
     }
     @Override
@@ -209,6 +208,22 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     public void onResume()
     {
         super.onResume();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver,filter);
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+        }
+        mWorker = new BackgroundWorkerHandler(mStartNum, mEndNum);
+        if (mWorker.getState() == Thread.State.NEW)
+        {
+            mWorker.start();
+        }
+        if (! Utils.networkAvaiable(getActivity()))
+        {
+            mUIEventsHandler.sendEmptyMessage(NETWORK_UNAVAILABLE);
+        }
     }
 
     @Override
@@ -297,7 +312,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-
+                Log.d("wy","assistant response ->" + response);
                 try
                 {
                     if (! TextUtils.isEmpty(response.get("code").toString()))
@@ -513,8 +528,16 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 //                                    mAssistCoauchList.add(asBean);
 //                                }
 //                            }
+                        }else{
+                            int index = mAssistCoauchList.indexOf(asBean);
+                            if(!asBean.getPhoto().equals(mAssistCoauchList.get(index).getPhoto())
+                                    || asBean.getName().equals(mAssistCoauchList.get(index).getName())){
+                                mAssistCoauchList.remove(index);
+                                mAssistCoauchList.add(index,asBean);
+                            }
                         }
                     }
+                    Collections.sort(mAssistCoauchList,new DescComparator());
                     mAfterCount = mAssistCoauchList.size();
 
                     // 判断一下，当前的List是否是空的，如果是空的，我们就需要加载一下当list为空时，显示的TextView
@@ -571,10 +594,11 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                 case NETWORK_UNAVAILABLE:
                     if (mAssistCoauchList.isEmpty())
                     {
-                        Log.d(TAG, " inside the UIEvents Handler, and we have loaded the EmptyView here ");
                         setEmptyViewVisible();
+                        mEmptyView.setText(mContext.getString(R.string.network_not_available));
+                    }else {
+                        Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     }
-                    Utils.showToast(mContext, mContext.getString(R.string.network_not_available));
                     // 当网络不可行时，我们需要将ProgressBar不再显示
                     hideProgress();
                     break;
@@ -582,17 +606,17 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                     mAssistCoauchListAdapter.notifyDataSetChanged();
                     Log.d(TAG, " the data set has been updated ");
                     break;
-                case PublicConstant.TIME_OUT:
-                    // 超时之后的处理策略
-                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
-                    if (mAssistCoauchList.isEmpty())
-                    {
-
-                        setEmptyViewVisible();
-                    }
-
-                    hideProgress();
-                    break;
+//                case PublicConstant.TIME_OUT:
+//                    // 超时之后的处理策略
+//                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
+//                    if (mAssistCoauchList.isEmpty())
+//                    {
+//
+//                        setEmptyViewVisible();
+//                    }
+//
+//                    hideProgress();
+//                    break;
                 case PublicConstant.NO_RESULT:
                     if (mAssistCoauchList.isEmpty())
                     {
@@ -610,16 +634,25 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
                 case PublicConstant.REQUEST_ERROR:
                     Bundle errorData = msg.getData();
                     String errorInfo = errorData.getString(KEY_REQUEST_ERROR_MSG);
-                    if (! TextUtils.isEmpty(errorInfo))
-                    {
-                        Utils.showToast(mContext, errorInfo);
-                    } else
-                    {
-                        Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
-                    }
+
                     if (mAssistCoauchList.isEmpty())
                     {
                         setEmptyViewVisible();
+                        if (! TextUtils.isEmpty(errorInfo))
+                        {
+                            mEmptyView.setText(errorInfo);
+                        } else
+                        {
+                            mEmptyView.setText(mContext.getString(R.string.http_request_error));
+                        }
+                    }else{
+                        if (! TextUtils.isEmpty(errorInfo))
+                        {
+                            Utils.showToast(mContext, errorInfo);
+                        } else
+                        {
+                            Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
+                        }
                     }
 
                     hideProgress();
@@ -711,13 +744,19 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             }
 
             mAssistCoauchListAdapter.notifyDataSetChanged();
+            if(mLoadMore && !mAssistCoauchList.isEmpty())
+            {
+                mListView.getRefreshableView().setSelection(mCurrentPos - 1);
+            }
         }
     };
 
     private void showProgress()
     {
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreTextView.setVisibility(View.VISIBLE);
+        if(mAssistCoauchList.isEmpty()) {
+            mPreTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void hideProgress()
@@ -888,8 +927,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     {
         super.onCreateOptionsMenu(menu, inflater);
         super.onCreateOptionsMenu(menu, inflater);
-        final SearchView searchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //TODO:将搜索结果传到SearResultActivity，在SearchResultActivity中进行搜索
@@ -1041,7 +1080,38 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
 
         mLocationManagerProxy.setGpsEnable(false);
     }
+    /**
+     * 由于服务器是按降序排序，但是从网络获取到的json却是升序，所以重新排序一下
+     */
+    private class DescComparator implements Comparator<NearbyAssistCoauchSubFragmentBean> {
 
+        @Override
+        public int compare(NearbyAssistCoauchSubFragmentBean lhs, NearbyAssistCoauchSubFragmentBean rhs) {
+            int lhsUserId = Integer.valueOf(lhs.getUserId());
+            int rhsUserId = Integer.valueOf(rhs.getUserId());
+            return lhsUserId > rhsUserId ? -1 : 1;
+        }
+    }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(getActivity())) {
+                    NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
+                    commonUtils.initViewPager(mContext, mView);
+                    if (mAssistCoauchList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        if (null != mWorker) {
+                            mWorker.fetchAllData(0, 9);
+                        }
+                    }
+                }
+            }
+        }
+    };
 }
 
 

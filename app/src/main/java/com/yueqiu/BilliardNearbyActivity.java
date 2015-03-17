@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -34,13 +36,21 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gotye.api.GotyeAPI;
+import com.gotye.api.GotyeChatTarget;
+import com.gotye.api.GotyeMessage;
+import com.gotye.api.GotyeNotify;
 import com.gotye.api.GotyeStatusCode;
 import com.gotye.api.GotyeUser;
+import com.gotye.api.listener.ChatListener;
 import com.gotye.api.listener.LoginListener;
+import com.gotye.api.listener.NotifyListener;
+import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.activity.DateIssueActivity;
 import com.yueqiu.activity.FavorActivity;
 import com.yueqiu.activity.SearchResultActivity;
@@ -65,11 +75,13 @@ import com.yueqiu.fragment.nearby.BilliardsNearbyDatingFragment;
 import com.yueqiu.fragment.nearby.BilliardsNearbyMateFragment;
 import com.yueqiu.fragment.nearby.BilliardsNearbyRoomFragment;
 import com.yueqiu.fragment.nearby.common.NearbySubFragmentConstants;
+import com.yueqiu.util.AppUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.menudrawer.MenuDrawer;
 import com.yueqiu.view.menudrawer.Position;
 
+import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -85,7 +97,7 @@ import java.util.Map;
 /**
  * 首页的SearchActivity
  */
-public class BilliardNearbyActivity extends FragmentActivity implements ActionBar.TabListener, LoginListener {
+public class BilliardNearbyActivity extends FragmentActivity implements ActionBar.TabListener, LoginListener ,NotifyListener,ChatListener{
     private static final String TAG = "BilliardNearbyActivity";
 
     private static final String STATE_MENUDRAWER = "com.yueqiu.menuDrawer";
@@ -94,6 +106,10 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private static final String FRAGMENT_PAGER_LAST_POSITION = "fragmentPagerLastPosition";
     private static final String CURRENT_KEY = "nearby_current_item";
 
+    private static final int NEARBY = 1;
+    private static final int CHATBAR = 2;
+    private static final int PLAY = 3;
+    private static final int GROUP = 4;
 
     private ViewPager mViewPager;
     private String[] mTitles;
@@ -101,7 +117,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private ActionBar mActionBar;
     private Context mContext;
     private RadioGroup mGroup;
-    private RadioButton mNearbyRadio;
+    private RadioButton mNearbyRadio,mChatRadio;
     private Intent mIntent = new Intent();
     private MenuDrawer mMenuDrawer;
     private SlideViewAdapter mAdapter;
@@ -113,8 +129,15 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
 
+    private RelativeLayout mNearby,mChatBar,mPlay,mGroupRe;
+    private TextView mNotifyView;
+
+
+    private SearchView mSearchView;
+
     // 这个变量用于保存每次当SearchActivity被切换到别的地方的时候，回来的时候，还能确保我们回到最后一次滑动到的Fragment的position
     private static int sPagerPos = 0;
+    private int mType;
     private NearbyParamsPreference mPreference = NearbyParamsPreference.getInstance();
 
     @Override
@@ -127,6 +150,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         mFragmentTransaction = mFragmentManager.beginTransaction();
 
         mContext = this;
+
         mSharedPreferences = getSharedPreferences(PublicConstant.USERBASEUSER, Context.MODE_PRIVATE);
         mEditor = mSharedPreferences.edit();
         mActionBar = getActionBar();
@@ -146,37 +170,51 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         mViewPager = (ViewPager) findViewById(R.id.search_parent_fragment_view_pager);
 
         mGroup = (RadioGroup) findViewById(R.id.search_parent_radio_group);
-        mNearbyRadio = (RadioButton) findViewById(R.id.first_title_nearby);
-        mGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                switch (checkedId) {
-                    case R.id.first_title_nearby:
-                        break;
-                    case R.id.first_title_chatbar:
-                        if (checkUserId()) {
-                            mIntent.setClass(BilliardNearbyActivity.this, ChatBarActivity.class);
-                        } else {
-                            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
-                            mIntent.setClass(BilliardNearbyActivity.this, LoginActivity.class);
-                        }
-                        startActivity(mIntent);
-                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        break;
-                    case R.id.first_title_activity:
-                        mIntent.setClass(BilliardNearbyActivity.this, PlayMainActivity.class);
-                        startActivity(mIntent);
-                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        break;
-                    case R.id.first_title_group:
-                        mIntent.setClass(BilliardNearbyActivity.this, BilliardGroupActivity.class);
-                        startActivity(mIntent);
-                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-                        break;
-                }
+//        mNearbyRadio = (RadioButton) findViewById(R.id.first_title_nearby);
+//        mChatRadio = (RadioButton) findViewById(R.id.first_title_chatbar);
 
-            }
-        });
+        mNearby = (RelativeLayout) findViewById(R.id.nearby_bottom_re);
+        mChatBar = (RelativeLayout) findViewById(R.id.nearby_chat_bar_re);
+        mPlay = (RelativeLayout) findViewById(R.id.nearby_play_re);
+        mGroupRe = (RelativeLayout) findViewById(R.id.nearby_group_re);
+        mNotifyView = (TextView) findViewById(R.id.nearby_chat_bar_unread_count);
+
+//        mGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(RadioGroup group, int checkedId) {
+//                switch (checkedId) {
+//                    case R.id.first_title_nearby:
+//                        break;
+//                    case R.id.first_title_chatbar:
+//                        if (checkUserId()) {
+//                            mIntent.setClass(BilliardNearbyActivity.this, ChatBarActivity.class);
+//                        } else {
+//                            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+//                            mIntent.setClass(BilliardNearbyActivity.this, LoginActivity.class);
+//                        }
+//                        startActivity(mIntent);
+//                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+//                        break;
+//                    case R.id.first_title_activity:
+//                        mIntent.setClass(BilliardNearbyActivity.this, PlayMainActivity.class);
+//                        startActivity(mIntent);
+//                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+//                        break;
+//                    case R.id.first_title_group:
+//                        mIntent.setClass(BilliardNearbyActivity.this, BilliardGroupActivity.class);
+//                        startActivity(mIntent);
+//                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+//                        break;
+//                }
+//
+//            }
+//        });
+
+        mNearby.setOnClickListener(mClickListener);
+        mChatBar.setOnClickListener(mClickListener);
+        mPlay.setOnClickListener(mClickListener);
+        mGroupRe.setOnClickListener(mClickListener);
+
         setupTabs();
         initDrawer();
 
@@ -199,19 +237,59 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
     }
 
+    private View.OnClickListener mClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch(v.getId()){
+                case R.id.nearby_bottom_re:
+                    break;
+                case R.id.nearby_chat_bar_re:
+                    setBottomBackgroud(mChatBar,mNearby,mPlay,mGroupRe);
+                    if(mNotifyView.getVisibility() == View.VISIBLE){
+                        mNotifyView.setVisibility(View.GONE);
+                    }
+                    if (checkUserId()) {
+                        mIntent.setClass(BilliardNearbyActivity.this, ChatBarActivity.class);
+                    } else {
+                        Toast.makeText(BilliardNearbyActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                        mIntent.setClass(BilliardNearbyActivity.this, LoginActivity.class);
+                    }
+                    startActivity(mIntent);
+                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                    break;
+                case R.id.nearby_play_re:
+                    setBottomBackgroud(mPlay,mNearby,mChatBar,mGroupRe);
+                    mIntent.setClass(BilliardNearbyActivity.this, PlayMainActivity.class);
+                    startActivity(mIntent);
+                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                    break;
+                case R.id.nearby_group_re:
+                    setBottomBackgroud(mGroupRe,mNearby,mChatBar,mPlay);
+                    mIntent.setClass(BilliardNearbyActivity.this, BilliardGroupActivity.class);
+                    startActivity(mIntent);
+                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                    break;
+            }
+        }
+    };
+
     @Override
     protected void onResume() {
         super.onResume();
-        mNearbyRadio.setChecked(true);
+//        mNearbyRadio.setChecked(true);
+        mType = NEARBY;
+        setBottomBackgroud(mNearby,mChatBar,mPlay,mGroupRe);
+        getBgColor();
         mViewPager.setCurrentItem(sPagerPos);
         if (checkUserId()) {
             //登录IM
             GotyeAPI.getInstance().addListener(this);
             login();
         } else {
-            Log.e(TAG, "IM已经退出了！！！");
-            resetUSerInfo();
+            Log.e(TAG, "IM已经退出了");
+            resetUserInfo();
         }
+
     }
 
     @Override
@@ -285,7 +363,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         int loginState = GotyeAPI.getInstance().getOnLineState();
         Log.e(TAG, "login -> login state -> " + loginState);
         if (loginState == 0) {
-            GotyeAPI.getInstance().login(YueQiuApp.sUserInfo.getUsername(), null);
+            GotyeAPI.getInstance().login(YueQiuApp.sUserInfo.getPhone(), null);
         }
     }
 
@@ -296,6 +374,24 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
      */
     @Override
     public void onLogout(int code) {
+
+//        GotyeAPI.getInstance().logout();
+////        if (code == GotyeStatusCode.CODE_FORCELOGOUT) {
+////            Toast.makeText(this, getString(R.string.im_login_other_device), Toast.LENGTH_SHORT).show();
+////        } else if (code == GotyeStatusCode.CODE_NETWORD_DISCONNECTED) {
+////            Toast.makeText(this, getString(R.string.im_user_offline), Toast.LENGTH_SHORT).show();
+////        }
+//        if (Utils.networkAvaiable(BilliardNearbyActivity.this)) {
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    logout();
+//                }
+//            }).start();
+//        } else {
+//            Toast.makeText(BilliardNearbyActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
+//        }
+
     }
 
     /**
@@ -313,10 +409,9 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                 || code == GotyeStatusCode.CODE_RELOGIN_SUCCESS) {
             //由于掉线YueQiuApp类中的监听器会被迫remove掉，这里登录成功在注册一次
             ((YueQiuApp) YueQiuApp.getAppContext()).registerListener();
-            Log.e(TAG, ">>>>>>>>>>>>>>>>>Billiardnearbayactivity-onLogin-CODE_OK<<<<<<<<<<<<<<<<<<");
 
             if (code == GotyeStatusCode.CODE_OFFLINELOGIN_SUCCESS) {
-                Toast.makeText(this, "您当前处于离线状态", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "您当前处于离线状态", Toast.LENGTH_SHORT).show();
             } else if (code == GotyeStatusCode.CODE_OK) {
                 Toast.makeText(this, "登录成功", Toast.LENGTH_SHORT).show();
                 Intent toService = new Intent(this, GotyeService.class);
@@ -325,19 +420,13 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         } else {
             // 失败,可根据code定位失败原因
             Log.d(TAG, "IM登录失败");
-            Toast.makeText(this, "登录失败 code=" + code, Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(this, "登录失败 code=" + code, Toast.LENGTH_SHORT).show();
         }
 
 
     }
 
-    @Override
-    public void onReconnecting(int i, GotyeUser gotyeUser) {
-        if (i == 0) {
-            Log.d(TAG, "current user " + gotyeUser.getName() + " ReLogin success by network available!!");
-        }
-    }
+
 
 
     private class SectionPagerAdapter extends FragmentPagerAdapter {
@@ -422,11 +511,11 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         getMenuInflater().inflate(R.menu.billiard_search, menu);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         //ToDo:不起作用，得重新找方法
 
         int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
-        EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
+        EditText searchEditText = (EditText) mSearchView.findViewById(searchSrcTextId);
         searchEditText.setTextColor(Color.WHITE);
         searchEditText.setHintTextColor(Color.LTGRAY);
 
@@ -437,11 +526,11 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 //        View searchPlate = searchView.findViewById(searchSrcTextId);
 //        searchPlate.setBackgroundResource(R.drawable.edit_test);
 
-        searchView.setIconifiedByDefault(false);
+        mSearchView.setIconifiedByDefault(false);
         try {
             Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
             searchField.setAccessible(true);
-            ImageView searchHintIcon = (ImageView) searchField.get(searchView);
+            ImageView searchHintIcon = (ImageView) searchField.get(mSearchView);
             searchHintIcon.setImageResource(R.drawable.search);
         } catch (NoSuchFieldException e) {
             Log.d(TAG, " Exception happened while we retrieving the mSearchHintIcon, and the reason goes to : " + e.toString());
@@ -483,7 +572,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         //mItemList.clear();
         Log.d("wy", "YueQiu img_url ->" + YueQiuApp.sUserInfo.getImg_url());
         SlideAccountItemISlide accountItem = new SlideAccountItemISlide(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
-                100, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id());
+                100, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id(),YueQiuApp.sUserInfo.getNick());
         mItemList.add(accountItem);
 
         String[] values = new String[]{
@@ -621,12 +710,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
                         if (!checkUserId())
                             return;
                         if (Utils.networkAvaiable(BilliardNearbyActivity.this)) {
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    logout();
-                                }
-                            }).start();
+                           logout();
                         } else {
                             Toast.makeText(BilliardNearbyActivity.this, getString(R.string.network_not_available), Toast.LENGTH_SHORT).show();
                         }
@@ -649,7 +733,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case YueQiuApp.LOGOUT_SUCCESS:
-                    resetUSerInfo();
+                    resetUserInfo();
                     GotyeAPI.getInstance().logout();
                     Toast.makeText(BilliardNearbyActivity.this, getString(R.string.logout_success), Toast.LENGTH_SHORT).show();
                     break;
@@ -663,26 +747,48 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
     private void logout() {
         Map<String, String> map = new HashMap<String, String>();
         map.put(DatabaseConstant.UserTable.USER_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
-        String result = HttpUtil.urlClient(HttpConstants.LogoutConstant.URL,
-                map, HttpConstants.RequestMethod.GET);
-        try {
-            JSONObject resultJson = new JSONObject(result);
-            int rtCode = resultJson.getInt("code");
-            if (rtCode == HttpConstants.ResponseCode.NORMAL) {
-                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_SUCCESS);
-            } else {
-                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_FAILED);
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        HttpUtil.requestHttp(HttpConstants.LogoutConstant.URL,
+                map, HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                        super.onSuccess(statusCode, headers, response);
+                        try {
+                            int rtCode = response.getInt("code");
+                            if (rtCode == HttpConstants.ResponseCode.NORMAL) {
+                                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_SUCCESS);
+                            } else {
+                                mHandler.sendEmptyMessage(YueQiuApp.LOGOUT_FAILED);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                        super.onFailure(statusCode, headers, responseString, throwable);
+                    }
+                });
     }
 
-    private void resetUSerInfo() {
+    private void resetUserInfo() {
         YueQiuApp.sUserInfo.setImg_url("");
         YueQiuApp.sUserInfo.setUsername(getString(R.string.guest));
         YueQiuApp.sUserInfo.setUser_id(0);
         YueQiuApp.sUserInfo.setPhone("");
+        YueQiuApp.sUserInfo.setNick("");
+        YueQiuApp.sUserInfo.setDistrict("");
+        YueQiuApp.sUserInfo.setLevel(-1);
+        YueQiuApp.sUserInfo.setBall_type(-1);
+        YueQiuApp.sUserInfo.setBallArm(-1);
+        YueQiuApp.sUserInfo.setUsedType(-1);
+        YueQiuApp.sUserInfo.setBallAge("");
+        YueQiuApp.sUserInfo.setIdol("");
+        YueQiuApp.sUserInfo.setIdol_name("");
+        YueQiuApp.sUserInfo.setCost("");
+        YueQiuApp.sUserInfo.setMy_type(1);
+        YueQiuApp.sUserInfo.setWork_live("");
+        YueQiuApp.sUserInfo.setZizhi(4);
 
         mEditor.putString(DatabaseConstant.UserTable.USERNAME, getString(R.string.guest));
         mEditor.putString(DatabaseConstant.UserTable.IMG_URL, "");
@@ -691,20 +797,24 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         mEditor.putString(DatabaseConstant.UserTable.IMG_URL, "");
         mEditor.putString(DatabaseConstant.UserTable.NICK, "");
         mEditor.putString(DatabaseConstant.UserTable.PHONE, "");
-        mEditor.putString(DatabaseConstant.UserTable.DISTRICT, "");
-        mEditor.putInt(DatabaseConstant.UserTable.LEVEL, -1);
-        mEditor.putInt(DatabaseConstant.UserTable.BALL_TYPE, -1);
-        mEditor.putInt(DatabaseConstant.UserTable.BALLARM, -1);
-        mEditor.putInt(DatabaseConstant.UserTable.USERDTYPE, -1);
-        mEditor.putString(DatabaseConstant.UserTable.BALLAGE, "");
-        mEditor.putString(DatabaseConstant.UserTable.IDOL, "");
-        mEditor.putString(DatabaseConstant.UserTable.IDOL_NAME, "");
+        mEditor.putString(DatabaseConstant.UserTable.DISTRICT,"");
+        mEditor.putInt(DatabaseConstant.UserTable.LEVEL,-1);
+        mEditor.putInt(DatabaseConstant.UserTable.BALL_TYPE,-1);
+        mEditor.putInt(DatabaseConstant.UserTable.BALLARM,-1);
+        mEditor.putInt(DatabaseConstant.UserTable.USERDTYPE,-1);
+        mEditor.putString(DatabaseConstant.UserTable.BALLAGE,"");
+        mEditor.putString(DatabaseConstant.UserTable.IDOL,"");
+        mEditor.putString(DatabaseConstant.UserTable.IDOL_NAME,"");
+        mEditor.putString(DatabaseConstant.UserTable.COST,"");
+        mEditor.putInt(DatabaseConstant.UserTable.MY_TYPE,1);
+        mEditor.putString(DatabaseConstant.UserTable.WORK_LIVE,"");
+        mEditor.putInt(DatabaseConstant.UserTable.ZIZHI,4);
         mEditor.apply();
 
 
         mItemList.remove(0);
         SlideAccountItemISlide accountItem = new SlideAccountItemISlide(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
-                0, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id());
+                0, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id(),YueQiuApp.sUserInfo.getNick());
         mItemList.add(0, accountItem);
         mAdapter.notifyDataSetChanged();
 
@@ -780,6 +890,130 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         }
     };
 
+    @Override
+    public void onReconnecting(int i, GotyeUser gotyeUser) {
+        if (i == 0) {
+            Log.d(TAG, "current user " + gotyeUser.getName() + " ReLogin success by network available!!");
+        }
+    }
+
+    @Override
+    public void onReceiveMessage(int i, GotyeMessage gotyeMessage) {
+        if (mNotifyView != null){
+            String currentActivityName = AppUtil.getCurrentActivityName(getBaseContext());
+            if (currentActivityName.equals("com.yueqiu.im.ChatPage") ||
+                    currentActivityName.equals("com.yueqiu.ChatBarActivity")) {
+                return;
+            }
+            mNotifyView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onDownloadMessage(int i, GotyeMessage gotyeMessage) {
+
+    }
+
+    @Override
+    public void onReleaseMessage(int i) {
+
+    }
+
+    @Override
+    public void onReport(int i, GotyeMessage gotyeMessage) {
+
+    }
+
+    @Override
+    public void onStartTalk(int i, boolean b, int i2, GotyeChatTarget gotyeChatTarget) {
+
+    }
+
+    @Override
+    public void onStopTalk(int i, GotyeMessage gotyeMessage, boolean b) {
+
+    }
+
+    @Override
+    public void onDecodeMessage(int i, GotyeMessage gotyeMessage) {
+
+    }
+
+    @Override
+    public void onGetMessageList(int i, List<GotyeMessage> gotyeMessages) {
+
+    }
+
+    @Override
+    public void onOutputAudioData(byte[] bytes) {
+
+    }
+
+    @Override
+    public void onGetCustomerService(int i, GotyeUser gotyeUser, int i2, String s) {
+
+    }
+
+    @Override
+    public void onReceiveMessage(int i, GotyeMessage gotyeMessage, boolean b) {
+
+    }
+
+    @Override
+    public void onSendMessage(int i, GotyeMessage gotyeMessage) {
+
+    }
+
+    @Override
+    public void onReceiveNotify(int i, GotyeNotify gotyeNotify) {
+
+    }
+
+    @Override
+    public void onRemoveFriend(int i, GotyeUser gotyeUser) {
+
+    }
+
+    @Override
+    public void onAddFriend(int i, GotyeUser gotyeUser) {
+
+    }
+
+    @Override
+    public void onNotifyStateChanged() {
+
+    }
+
+    private void setBottomBackgroud(RelativeLayout greenView, RelativeLayout blackView1, RelativeLayout blackView2,RelativeLayout blackview3) {
+        greenView.setBackgroundColor(getResources().getColor(R.color.actionbar_color));
+        blackView1.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+        blackView2.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+        blackview3.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+    }
+
+    private void getBgColor(){
+        if(mType == NEARBY){
+            mNearby.setBackgroundColor(getResources().getColor(R.color.actionbar_color));
+            mChatBar.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+            mPlay.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+            mGroupRe.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+        }else if(mType == CHATBAR){
+            mChatBar.setBackgroundColor(getResources().getColor(R.color.actionbar_color));
+            mNearby.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+            mPlay.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+            mGroupRe.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+        }else if(mType == PLAY){
+            mPlay.setBackgroundColor(getResources().getColor(R.color.actionbar_color));
+            mNearby.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+            mChatBar.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+            mGroupRe.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+        }else if(mType == GROUP){
+            mGroupRe.setBackgroundColor(getResources().getColor(R.color.actionbar_color));
+            mNearby.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+            mChatBar.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+            mPlay.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
+        }
+    }
 
 }
 

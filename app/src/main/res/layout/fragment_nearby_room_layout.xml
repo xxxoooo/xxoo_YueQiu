@@ -88,9 +88,35 @@
         style="@style/SearchSubActivityListViewStyle"
         android:layout_below="@id/room_filter_group"
         android:id="@+id/search_room_subfragment_listview"
-        android:layout_marginBottom="@dimen/nearby_subfragment_listview_margin_bottom">
+        android:layout_above="@+id/dianping_re">
 
     </com.yueqiu.view.pullrefresh.PullToRefreshListView>
+
+    <RelativeLayout
+        android:id="@+id/dianping_re"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/search_radio_normal_bg"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/dpapi_logo"
+            android:layout_toLeftOf="@+id/dianping"
+            android:layout_marginRight="2dp"/>
+        <TextView
+            android:id="@+id/dianping"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/data_from_dazhong"
+            android:textColor="@color/white"
+            android:layout_centerInParent="true"
+            android:textSize="12sp"
+
+            />
+
+    </RelativeLayout>
 
 
     <!--用于加载ProgressBar,这些ProgressBar的初始属性都被设置成GONG，即不占用任何位置，直到

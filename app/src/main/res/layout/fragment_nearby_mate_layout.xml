@@ -51,7 +51,6 @@
         style="@style/SearchSubActivityListViewStyle"
         android:layout_below="@id/filter_group"
         android:id="@+id/search_sub_fragment_list"
-        android:layout_marginBottom="@dimen/nearby_subfragment_listview_margin_bottom"
         >
     </com.yueqiu.view.pullrefresh.PullToRefreshListView>
 

@@ -13,6 +13,7 @@ import com.yueqiu.R;
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class JoinListAdapter extends BaseAdapter{
         if(convertView == null){
             convertView = mInflater.inflate(R.layout.item_join_list,null);
             holder = new ViewHolder();
-            holder.photo = (NetworkImageView) convertView.findViewById(R.id.join_photo);
+            holder.photo = (CustomNetWorkImageView) convertView.findViewById(R.id.join_photo);
             holder.name = (TextView) convertView.findViewById(R.id.join_user_name);
             convertView.setTag(holder);
         }else{
@@ -72,7 +73,7 @@ public class JoinListAdapter extends BaseAdapter{
     }
 
     class ViewHolder{
-        NetworkImageView photo;
+        CustomNetWorkImageView photo;
         TextView name;
     }
 }

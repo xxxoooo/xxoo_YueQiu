@@ -14,6 +14,7 @@ import com.yueqiu.bean.NearbyAssistCoauchSubFragmentBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class NearbyAssistCoauchSubFragmentListAdapter extends BaseAdapter
             convertView = mInflater.inflate(R.layout.item_nearby_assistcoauch_layout, parent, false);
             viewHolder = new ViewHolder();
 
-            viewHolder.mPhoto = (NetworkImageView) convertView.findViewById(R.id.img_assistcoauch_subfragment_listitem_photo);
+            viewHolder.mPhoto = (CustomNetWorkImageView) convertView.findViewById(R.id.img_assistcoauch_subfragment_listitem_photo);
             viewHolder.mNickname = (TextView) convertView.findViewById(R.id.tv_assistcoauch_subfragment_listitem_name);
             viewHolder.mGender = (TextView) convertView.findViewById(R.id.tv_assistcoauch_subfragment_listitem_gender);
             viewHolder.mKinds = (TextView) convertView.findViewById(R.id.tv_assistcoauch_subfragment_listitem_kinds);
@@ -91,7 +92,7 @@ public class NearbyAssistCoauchSubFragmentListAdapter extends BaseAdapter
         // here we set it as static data
         viewHolder.mPhoto.setDefaultImageResId(R.drawable.default_head);
         viewHolder.mPhoto.setErrorImageResId(R.drawable.default_head);
-        viewHolder.mPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + bean.getPhoto(), mImgLoader);
+        viewHolder.mPhoto.setImageUrl("http://" + bean.getPhoto(), mImgLoader);
 
         viewHolder.mNickname.setText(bean.getName());
         viewHolder.mGender.setText(bean.getGender());
@@ -105,14 +106,20 @@ public class NearbyAssistCoauchSubFragmentListAdapter extends BaseAdapter
         }else{
             viewHolder.mPrice.setText(mContext.getString(R.string.low_and_equal,bean.getPrice()));
         }
-        viewHolder.mDistance.setText(mContext.getString(R.string.in_meter,bean.getDistance()));
+        long distance = Long.valueOf(bean.getDistance());
+        float show_distance = distance / 1000 ;
+        if(show_distance > 10) {
+            viewHolder.mDistance.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, show_distance));
+        }else{
+            viewHolder.mDistance.setText(mContext.getString(R.string.in_meter,bean.getDistance()));
+        }
 
         return convertView;
     }
 
     private static class ViewHolder
     {
-        private NetworkImageView mPhoto;
+        private CustomNetWorkImageView mPhoto;
         private TextView mNickname, mGender, mKinds, mPrice, mDistance;
     }
 }

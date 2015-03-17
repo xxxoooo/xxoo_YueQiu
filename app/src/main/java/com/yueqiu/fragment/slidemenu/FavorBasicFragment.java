@@ -1,8 +1,11 @@
 package com.yueqiu.fragment.slidemenu;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
@@ -68,6 +71,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
         outState.putBoolean(SAVE_FAVOR_REFRESH,mRefresh);
         outState.putBoolean(SAVE_FAVOR_LOAD_MORE,mLoadMore);
         outState.putBoolean(SAVE_FAVOR_INSTANCE,true);
+
     }
     
     @Override
@@ -117,6 +121,10 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
     @Override
     public void onResume() {
         super.onResume();
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver,filter);
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
@@ -167,7 +175,9 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
     protected void requestResult() {
 
         mPreProgress.setVisibility(View.VISIBLE);
-        mPreText.setVisibility(View.VISIBLE);
+        if(mList.isEmpty()) {
+            mPreText.setVisibility(View.VISIBLE);
+        }
 
         mParamsMap.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
         mParamsMap.put(HttpConstants.Favor.TYPE,mType == 1 ? 1 : mType + 1);
@@ -193,7 +203,9 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                 } else {
                     for (int i = 0; i < list_data.length(); i++) {
                         FavorInfo itemInfo = new FavorInfo();
+                        //现数据表
                         itemInfo.setTable_id(list_data.getJSONObject(i).getString("id"));
+                        //源数据表
                         itemInfo.setRid(list_data.getJSONObject(i).getInt("rid"));
                         itemInfo.setTitle(list_data.getJSONObject(i).getString("title"));
                         itemInfo.setImg_url(list_data.getJSONObject(i).getString("img_url"));
@@ -275,20 +287,20 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
                     for(FavorInfo info : list){
                         if (!mList.contains(info)) {
 
-//                            if(!mIsListEmpty && Integer.valueOf(((FavorInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
-//                                mList.add(0,info);
-//                            }else {
-//                                mList.add(info);
-//                            }
-                            if(mRefresh && !mIsListEmpty) {
+                            if(!mIsListEmpty && Integer.valueOf(((FavorInfo)mList.get(0)).getTable_id()) < Integer.valueOf(info.getTable_id())){
                                 mList.add(0,info);
-                            }else{
-                                if(mIsSavedInstance){
-                                    mList.add(0,info);
-                                }else{
-                                    mList.add(info);
-                                }
+                            }else {
+                                mList.add(info);
                             }
+//                            if(mRefresh && !mIsListEmpty) {
+//                                mList.add(0,info);
+//                            }else{
+//                                if(mIsSavedInstance){
+//                                    mList.add(0,info);
+//                                }else{
+//                                    mList.add(info);
+//                                }
+//                            }
                         }
                         //////////////////////////////////////////////////////
                         //TODO:下面的逻辑是用来更新缓存的，不过目前先不需要缓存
@@ -342,7 +354,7 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
             if(mLoadMore && !mList.isEmpty()){
-                mListView.setSelection(mCurrPosition);
+                mListView.setSelection(mCurrPosition - 1);
             }
         }
     };
@@ -426,4 +438,22 @@ public class FavorBasicFragment extends SlideMenuBasicFragment implements Adapte
         });
 
     }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(getActivity())) {
+                    if (mList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        mParamsMap.put(HttpConstants.Published.START_NO,0);
+                        mParamsMap.put(HttpConstants.Published.END_NO, 9);
+                        requestResult();
+                    }
+                }
+            }
+        }
+    };
 }

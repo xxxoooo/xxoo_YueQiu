@@ -23,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -66,15 +67,16 @@ import java.util.List;
  * 聊吧Activity
  */
 public class ChatBarActivity extends FragmentActivity implements NotifyListener,
-        LoginListener, ChatListener, View.OnClickListener, ContactFragment.FriendsListChanged {
+        LoginListener, ChatListener, View.OnClickListener{
     private static final String TAG = "ChatBarActivity";
+    private static final int MESSAGE = 1;
+    private static final int CONTACT = 2;
+    private static final int ADD_PERSON = 3;
     private ActionBar mActionBar;
-    private FragmentManager fragmentManager;
-    private FragmentTransaction transaction;
-    private Fragment mCurrentFragment;
+    private FragmentManager mFragmentManager;
+    private FragmentTransaction mTransaction;
+//    private Fragment mCurrentFragment;
     private MessageFragment mMessageFragment = new MessageFragment();
-    private ContactFragment mContactFragment = new ContactFragment();
-    private AddPersonFragment mAddPersonFragment = new AddPersonFragment();
     private String mUserName = YueQiuApp.sUserInfo.getUsername();
     private String mPassword;//暂时不需要密码
     private LinearLayout mBottomContainer;
@@ -84,7 +86,8 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
     private BeepManager beep;
     private GotyeAPI api;
     private boolean returnNotify = false;
-
+    public static SearchView mSearchView;
+    private int mType;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +97,7 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         beep = new BeepManager(this);
         beep.updatePrefs();
 
-        fragmentManager = getSupportFragmentManager();
+        mFragmentManager = getSupportFragmentManager();
         initView();
 
         IntentFilter filter = new IntentFilter();
@@ -104,16 +107,7 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
 
     }
 
-    private void switchFragment(Fragment fragment) {
-        if (mCurrentFragment == fragment)
-            return;
-        transaction = fragmentManager.beginTransaction();
-        if (fragment.isAdded())
-            transaction.hide(mCurrentFragment).show(fragment).commit();
-        else
-            transaction.hide(mCurrentFragment).add(R.id.chatbar_fragment_container, fragment).commit();
-        mCurrentFragment = fragment;
-    }
+
 
     @Override
     protected void onResume() {
@@ -135,11 +129,16 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         if (loginState == 0) {
             Utils.showToast(this, getString(R.string.im_user_offline));
             //需重新登录
-            api.login(YueQiuApp.sUserInfo.getUsername(), null);
+            api.login(YueQiuApp.sUserInfo.getPhone(), null);
         } else {
             Intent toService = new Intent(this, GotyeService.class);
             startService(toService);
             api.beginRcvOfflineMessge();
+        }
+
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+
         }
     }
 
@@ -169,18 +168,18 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.billiard_search, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
 
         int searchSrcTextId = getResources().getIdentifier("android:id/search_src_text", null, null);
-        EditText searchEditText = (EditText) searchView.findViewById(searchSrcTextId);
+        EditText searchEditText = (EditText) mSearchView.findViewById(searchSrcTextId);
         searchEditText.setTextColor(Color.WHITE);
         searchEditText.setHintTextColor(Color.LTGRAY);
 
-        searchView.setIconifiedByDefault(false);
+        mSearchView.setIconifiedByDefault(false);
         try {
             Field searchField = SearchView.class.getDeclaredField("mSearchHintIcon");
             searchField.setAccessible(true);
-            ImageView searchHintIcon = (ImageView) searchField.get(searchView);
+            ImageView searchHintIcon = (ImageView) searchField.get(mSearchView);
             searchHintIcon.setImageResource(R.drawable.search);
         } catch (NoSuchFieldException e) {
             Log.d(TAG, " Exception happened while we retrieving the mSearchHintIcon, and the reason goes to : " + e.toString());
@@ -189,11 +188,47 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
             Log.d(TAG, " Exception happened as we have no right to access this filed, and the reason goes to : " + e.toString());
             e.printStackTrace();
         } catch (final Exception e) {
-            Log.d(TAG, " exception happened while we make the search button : " + e.toString());
+            e.printStackTrace();
         }
+        mSearchView = (SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
+        mSearchView.setIconified(true);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
 
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(new ComponentName(this, SearchResultActivity.class)));
+                if (Utils.networkAvaiable(ChatBarActivity.this)) {
+                    Intent intent = new Intent(ChatBarActivity.this, SearchResultActivity.class);
+                    Bundle args = new Bundle();
+                    args.putInt(PublicConstant.SEARCH_TYPE, PublicConstant.SEARCH_FRIEND);
+                    args.putString(PublicConstant.SEARCH_KEYWORD, query);
+                    intent.putExtras(args);
+                    startActivity(intent);
+                    ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                            .toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                } else {
+                    Utils.showToast(ChatBarActivity.this, getString(R.string.network_not_available));
+                }
+                mSearchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
         return true;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                finish();
+                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                break;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private void initView() {
@@ -210,10 +245,10 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         mMsgView = (RelativeLayout) findViewById(R.id.chat_bar_msg_re);
         mContactView = (RelativeLayout) findViewById(R.id.chat_bar_contact_re);
         mAddPersonView = (RelativeLayout) findViewById(R.id.chat_bar_add_re);
-        transaction = fragmentManager.beginTransaction();
-        transaction.add(R.id.chatbar_fragment_container, mMessageFragment);
-        transaction.commit();
-        mCurrentFragment = mMessageFragment;
+        mTransaction = mFragmentManager.beginTransaction();
+        mTransaction.replace(R.id.chatbar_fragment_container, mMessageFragment,"message");
+        mTransaction.commit();
+        mType = MESSAGE;
 
         mMsgView.setOnClickListener(this);
         mContactView.setOnClickListener(this);
@@ -221,39 +256,51 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
 
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case KeyEvent.KEYCODE_BACK:
-                finish();
-                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+    private void switchFragment(int type) {
+
+        if (mType == type)
+            return;
+        mTransaction = mFragmentManager.beginTransaction();
+        switch(type){
+            case MESSAGE:
+                mMessageFragment = new MessageFragment();
+                mTransaction.replace(R.id.chatbar_fragment_container,mMessageFragment,"message").commit();
+                mType = MESSAGE;
+                break;
+            case CONTACT:
+                ContactFragment contact = new ContactFragment();
+                mTransaction.replace(R.id.chatbar_fragment_container,contact,"contact").commit();
+                mType = CONTACT;
+                break;
+            case ADD_PERSON:
+                mType = ADD_PERSON;
+                AddPersonFragment addPersonFragment = new AddPersonFragment();
+                mTransaction.replace(R.id.chatbar_fragment_container,addPersonFragment,"addPerson").commit();
                 break;
         }
-        return super.onKeyDown(keyCode, event);
     }
 
-    // 更新提醒
-    public void updateUnReadTip() {
-        int unreadCount = api.getTotalUnreadMsgCount();
-        int unreadNotifyCount = api.getUnreadNotifyCount();
-        unreadCount += unreadNotifyCount;
-//        msgTip.setVisibility(View.VISIBLE);
-//        if (unreadCount > 0 && unreadCount < 100) {
-//            msgTip.setText(String.valueOf(unreadCount));
-//        } else if (unreadCount >= 100) {
-//            msgTip.setText("99");
-//        } else {
-//            msgTip.setVisibility(View.GONE);
-//        }
-    }
+
+
+//    // 更新提醒
+//    public void updateUnReadTip() {
+//        int unreadCount = api.getTotalUnreadMsgCount();
+//        int unreadNotifyCount = api.getUnreadNotifyCount();
+//        unreadCount += unreadNotifyCount;
+////        msgTip.setVisibility(View.VISIBLE);
+////        if (unreadCount > 0 && unreadCount < 100) {
+////            msgTip.setText(String.valueOf(unreadCount));
+////        } else if (unreadCount >= 100) {
+////            msgTip.setText("99");
+////        } else {
+////            msgTip.setVisibility(View.GONE);
+////        }
+//    }
 
     // 页面刷新
     private void mainRefresh() {
-        updateUnReadTip();
+//        updateUnReadTip();
         mMessageFragment.refresh();
-//        if (mContactFragment != null) {
-//            mContactFragment.refresh();
-//        }
 
     }
 
@@ -291,7 +338,7 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         mMessageFragment.refresh();
         Log.d("ddd", "onReceiveMessage type = " + message.getReceiverType());
         if (unRead) {
-            updateUnReadTip();
+//            updateUnReadTip();
 
 //            if (!api.isNewMsgNotify()) {
 //                return;
@@ -307,6 +354,10 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
 //            }
             beep.playBeepSoundAndVibrate();
         }
+
+        Intent intent = new Intent();
+        intent.setAction(PublicConstant.CHAT_HAS_NEW_MSG);
+        sendBroadcast(intent);
     }
 
     // 自己发送的信息统一在此处理
@@ -366,6 +417,7 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
     // 收到群邀请信息
     @Override
     public void onReceiveNotify(int code, GotyeNotify notify) {
+
 //        if (returnNotify) {
 //            return;
 //        }
@@ -443,21 +495,28 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
      */
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
+
+        if(mSearchView != null){
+            mSearchView.clearFocus();
+            mSearchView.setIconified(true);
+        }
+        switch(v.getId()){
+
             case R.id.chat_bar_msg_re:
-                switchFragment(mMessageFragment);
+                switchFragment(MESSAGE);
                 mActionBar.setTitle(R.string.btn_liaoba_message);
                 setBottomBackgroud(mMsgView, mContactView, mAddPersonView);
                 break;
             case R.id.chat_bar_contact_re:
-                switchFragment(mContactFragment);
+                switchFragment(CONTACT);
                 mActionBar.setTitle(R.string.btn_liaoba_contact);
                 setBottomBackgroud(mContactView, mMsgView, mAddPersonView);
                 break;
             case R.id.chat_bar_add_re:
-                switchFragment(mAddPersonFragment);
-                mActionBar.setTitle(R.string.btn_liaoba_add_friend);
-                setBottomBackgroud(mAddPersonView, mMsgView, mContactView);
+                switchFragment(ADD_PERSON);
+                 mActionBar.setTitle(R.string.btn_liaoba_add_friend);
+                setBottomBackgroud(mAddPersonView,mMsgView,mContactView);
+
                 break;
         }
     }
@@ -468,16 +527,16 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         blackView2.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
     }
 
-    private void getBgColor() {
-        if (mCurrentFragment == mMessageFragment) {
+    private void getBgColor(){
+        if(mType == MESSAGE){
             mMsgView.setBackgroundColor(getResources().getColor(R.color.actionbar_color));
             mContactView.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
             mAddPersonView.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
-        } else if (mCurrentFragment == mContactFragment) {
+        }else if(mType == CONTACT){
             mContactView.setBackgroundColor(getResources().getColor(R.color.actionbar_color));
             mMsgView.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
             mAddPersonView.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
-        } else if (mCurrentFragment == mAddPersonFragment) {
+        }else if(mType == ADD_PERSON){
             mAddPersonView.setBackgroundColor(getResources().getColor(R.color.actionbar_color));
             mContactView.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
             mMsgView.setBackgroundColor(getResources().getColor(R.color.search_radio_normal_bg));
@@ -488,20 +547,17 @@ public class ChatBarActivity extends FragmentActivity implements NotifyListener,
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(PublicConstant.CHAT_HAS_NEW_MSG)) {
-                mUnreadCountTv.setVisibility(View.VISIBLE);
-            } else if (action.equals(PublicConstant.CHAT_HAS_NO_MSG)) {
+            if(action.equals(PublicConstant.CHAT_HAS_NEW_MSG)){
+                Fragment fragment = mFragmentManager.findFragmentByTag("message");
+                if(fragment == null) {
+                    mUnreadCountTv.setVisibility(View.VISIBLE);
+                }
+            }else if(action.equals(PublicConstant.CHAT_HAS_NO_MSG)){
                 mUnreadCountTv.setVisibility(View.GONE);
             }
         }
     };
 
-    @Override
-    public void onFriendsListChanged() {
-        Log.e("ddd", "更新消息列表头像");
-        mMessageFragment.mAdapter.notifyDataSetChanged();
-
-    }
 
     @Override
     public void onLogout(int i) {

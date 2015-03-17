@@ -105,6 +105,7 @@ public class GroupDetailReplyActivity extends Activity {
         mPreProgress.setVisibility(View.VISIBLE);
         mPreTextView.setVisibility(View.VISIBLE);
 
+        Log.d("wy","group reply param ->" + params);
         HttpUtil.requestHttp(HttpConstants.Reply.URL,params,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {

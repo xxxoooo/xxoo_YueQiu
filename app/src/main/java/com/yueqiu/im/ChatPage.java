@@ -39,7 +39,9 @@ import com.gotye.api.PathUtil;
 import com.rockerhieu.emojicon.EmojiconGridFragment;
 import com.rockerhieu.emojicon.EmojiconsFragment;
 import com.rockerhieu.emojicon.emoji.Emojicon;
+import com.yueqiu.BilliardNearbyActivity;
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
 import com.yueqiu.bean.OnKeyboardHideListener;
 import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.ProgressDialogUtil;
@@ -197,13 +199,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 }
             }
         });
-//        //用于判断当前屏幕是否显示了软键盘
-//        pullListView.setOnResizeListener(new CustomListView.OnResizeListener() {
-//            @Override
-//            public void onResize(int w, int h, int oldw, int oldh) {
-////                isDisplayInputMethod = !isShowExtension;
-//            }
-//        });
     }
 
     private void initView() {
@@ -224,7 +219,27 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
         if (mUser != null) {
             mChatType = 0;
-            mActionBar.setTitle(getString(R.string.and) + mUser.getName() + getString(R.string.chat));
+            String title;
+            if(!TextUtils.isEmpty(mUser.getNickname())) {
+                String nicknameStr = mUser.getNickname();
+                String nick;
+                int splitIndex = nicknameStr.lastIndexOf("|");
+                if (splitIndex != -1) {
+                    nick = nicknameStr.substring(0, splitIndex);
+                    String img_url = nicknameStr.substring(splitIndex + 1);
+                } else {
+                    nick = nicknameStr;
+                }
+                if (TextUtils.isEmpty(nick)) {
+                    title = mUser.getName();
+                } else {
+                    title = nick;
+                }
+            }else{
+                title = mUser.getName();
+            }
+            mActionBar.setTitle(getString(R.string.and) + title + getString(R.string.chat));
+
         } else if (mRoom != null) {
             mChatType = 1;
             mActionBar.setTitle(getString(R.string.chat_room) + mRoom.getRoomID());
@@ -357,7 +372,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             String url = mCurrentLoginUser.getIcon().getUrl();
             Log.e("ddd", "ChatPage setTextMessage>>> url = " + url);
             if (mChatType == 0) {
-                toSend = GotyeMessage.createTextMessage(mCurrentLoginUser, mUser, text);
+                toSend = GotyeMessage.createTextMessage(mCurrentLoginUser, mUser,text);
             } else if (mChatType == 1) {
                 toSend = GotyeMessage.createTextMessage(mCurrentLoginUser, mRoom, text);
             } else {
@@ -381,6 +396,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
             }
 
             int code = api.sendMessage(toSend);
+            Log.d("wy","send code ->" + code);
             mAdapter.addMsgToBottom(toSend);
             scrollToBottom();
 //            sendUserDataMessage("userdata message".getBytes(), "text#text");
@@ -465,6 +481,15 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         super.onResume();
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.cancel(0);
+        int state = api.getOnLineState();
+        if (state == 0) {
+            Utils.showToast(this, getString(R.string.im_user_offline));
+            YueQiuApp app = (YueQiuApp)getApplicationContext();
+//            app.resetUSerInfo();
+            app.logout();
+
+        }
+
     }
 
     @Override
@@ -483,10 +508,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.chat_container_open_emotion:
-//                isDisplayEmoji = true;
-//                isDisplayPlugin = false;
-//                showExtension(true);
-//                isShowExtension = true;
                 mIsDisplayPlugin = false;
                 if (mIsDisplayEmoji) {
                     mEmotionToggle.setVisibility(View.GONE);
@@ -501,7 +522,6 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 }
                 break;
             case R.id.chat_container_open_assist_toggle:
-//              mIsDisplayEmoji = false;
                 if (mIsDisplayPlugin) {
                     mExtension.setVisibility(View.GONE);
                     mIsDisplayPlugin = false;
@@ -513,24 +533,10 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                         mOnKeyHideListener.onKeyBoardHide();
                     }
                 }
-//                isDisplayEmoji = false;
-//                isDisplayPlugin = !isDisplayPlugin;
-//                showExtension(isDisplayPlugin);
-//
-//                isShowExtension = isDisplayPlugin;
-                break;
             case R.id.chat_container_text_ed:
-//                isDisplayPlugin = false;
-//                isDisplayEmoji = false;
                 mTextMessage.setFocusable(true);
-//                showExtension(false);
-//                isShowExtension = false;
                 break;
             case R.id.chat_container_send_btn:
-//                sendMessage();
-//                if (isShowExtension) {
-//                    showExtension(false);
-//                }
                 sendTextMessage(mTextMessage.getText().toString());
                 mTextMessage.setText("");
                 break;
@@ -549,8 +555,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
     }
 
     private void takePic() {
-//        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
-//        intent.setType("image/*");
+
         Intent albumIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(albumIntent, REQUEST_PIC);
     }
@@ -581,6 +586,7 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
                 Uri selectedImage = data.getData();
                 if (selectedImage != null) {
                     String path = FileUtil.uriToPath(this, selectedImage);
+                    Log.d("cao","image path is ->" + path);
                     if (null != path && !"".equals(path))
                         sendPicture(path);
                 }
@@ -620,8 +626,11 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onSendMessage(int code, GotyeMessage message) {
-        Log.d("ddd", "Chatpage onSendMessage>>>> code= " + code + " message = " + message);
+        Log.d("cao", "chat page send message  code= " + code + " message = " + message);
         // GotyeChatManager.getInstance().insertChatMessage(message);
+        if(code == 300){
+            message.setStatus(GotyeMessage.STATUS_SENDFAILED);
+        }
         mAdapter.updateMessage(message);
         if (message.getType() == GotyeMessageType.GotyeMessageTypeAudio) {
             api.decodeMessage(message);
@@ -633,8 +642,30 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
 
     @Override
     public void onReceiveMessage(int code, GotyeMessage message) {
-        Log.d("ddd", "Chatpage onReceiveMessage>>>> code= " + code + " message = " + message);
+        Log.d("cao", "chat page onReceiveMessage  code= " + code + " message = " + message);
         // GotyeChatManager.getInstance().insertChatMessage(message);
+        GotyeUser user = api.requestUserInfo(message.getReceiver().getName(),true);
+        String title;
+        if(!TextUtils.isEmpty(user.getNickname())) {
+            String nicknameStr = user.getNickname();
+            Log.d("cao", "chat page receive message nicknameStr ->" + nicknameStr);
+            String nick;
+            int splitIndex = nicknameStr.lastIndexOf("|");
+            if (splitIndex != -1) {
+                nick = nicknameStr.substring(0, splitIndex);
+            } else {
+                nick = nicknameStr;
+            }
+            if (TextUtils.isEmpty(nick)) {
+                title = user.getName();
+            } else {
+                title = nick;
+            }
+        }else{
+            title = user.getName();
+        }
+        mActionBar.setTitle(getString(R.string.and) + title + getString(R.string.chat));
+
         if (mChatType == 0) {
             if (isMyMessage(message)) {
                 // msg.senderUser = user;
@@ -869,9 +900,10 @@ public class ChatPage extends BaseActivity implements View.OnClickListener,
         return true;
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.chat_page_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.chat_page_menu, menu);
+//        return super.onCreateOptionsMenu(menu);
+//    }
 }

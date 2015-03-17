@@ -35,6 +35,7 @@ import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import org.apache.http.Header;
 import org.json.JSONException;
@@ -53,14 +54,14 @@ public class VerificationFragment extends Fragment {
     private FragmentManager mFragmentManager;
     private ActionBar mActionBar;
     public static final String ARGUMENTS_KEY = "com.yueqiu.fragment.requestaddfriend.arguments_key";
-    private NetworkImageView mPhoto;
+    private CustomNetWorkImageView mPhoto;
     private String mAccount;
     private String mGender;
     private String mDistrict;
     private String mFriendUserId;
     private TextView mAccountTextView, mGenderTextView, mDistrictTextView;
     private EditText mEditText;
-    private String mNews = "我是谁";
+    private String mNews;
     private String mPhotoUrl;
     private ImageLoader mImageLoader;
 
@@ -80,6 +81,7 @@ public class VerificationFragment extends Fragment {
         mFriendUserId = getArguments().getString(FriendProfileFragment.FRIEND_USER_ID);
         mPhotoUrl = getArguments().getString(FriendProfileFragment.IMG_URL_REAL_KEY);
         mImageLoader = VolleySingleton.getInstance().getImgLoader();
+        mNews = getString(R.string.who_i_am,YueQiuApp.sUserInfo.getUsername());
         Log.e(TAG, "mPhotoUrl = " + mPhotoUrl);
     }
 
@@ -87,6 +89,7 @@ public class VerificationFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_identity_verification, container, false);
         mEditText = (EditText) view.findViewById(R.id.verification_news_ed);
+        mEditText.setHint(mNews);
         mEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -112,9 +115,10 @@ public class VerificationFragment extends Fragment {
     }
 
     private void init(View v) {
-        mPhoto = (NetworkImageView) v.findViewById(R.id.account_iv);
+        mPhoto = (CustomNetWorkImageView) v.findViewById(R.id.account_iv);
         mAccountTextView = (TextView) v.findViewById(R.id.account_tv);
         mGenderTextView = (TextView) v.findViewById(R.id.gender_tv);
+        mDistrictTextView = (TextView) v.findViewById(R.id.district_tv);
         if(mDistrict.equals("")) {
             mDistrictTextView = (TextView) v.findViewById(R.id.district_tv);
             mDistrictTextView.setVisibility(View.VISIBLE);
@@ -141,15 +145,7 @@ public class VerificationFragment extends Fragment {
                 return true;
             case R.id.next:
                 sendRequest();
-                Bundle args = new Bundle();
-                args.putInt(ARGUMENTS_KEY, 1);
-                args.putString(FriendProfileFragment.FRIEND_USER_ID, mFriendUserId);
-                Fragment fragment = new FriendManageFragment();
-                fragment.setArguments(args);
-                FragmentTransaction ft = mFragmentManager.beginTransaction();
-                ft.addToBackStack("com.yueqiu.activity.RequestAddFriendActivity");
-                ft.setCustomAnimations(R.anim.push_left_in, R.anim.push_left_out);
-                ft.replace(R.id.fragment_container, fragment).commit();
+
                 Utils.dismissInputMethod(getActivity(), mEditText);
                 return true;
             default:
@@ -168,7 +164,7 @@ public class VerificationFragment extends Fragment {
      * post请求
      */
     private void sendRequest() {
-        Map<String, String> requestMap = new HashMap<String, String>();
+        final Map<String, String> requestMap = new HashMap<String, String>();
         requestMap.put(HttpConstants.FriendSendAsk.MY_ID, String.valueOf(YueQiuApp.sUserInfo.getUser_id()));//
         requestMap.put(HttpConstants.FriendSendAsk.ASK_ID, mFriendUserId);
         requestMap.put(HttpConstants.FriendSendAsk.NEWS, mNews);
@@ -178,12 +174,12 @@ public class VerificationFragment extends Fragment {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                     super.onSuccess(statusCode, headers, response);
+                    Log.d("wy","verify response ->" + response);
                     try {
                         if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-
-                            Log.d(TAG, "好友请求发送失败！->" + response.getString("msg"));
+                            mHandler.sendEmptyMessage(PublicConstant.GET_SUCCESS);
                         } else {
-                            mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
+                            mHandler.obtainMessage(PublicConstant.REQUEST_ERROR,response.getString("msg")).sendToTarget();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -209,6 +205,15 @@ public class VerificationFragment extends Fragment {
             super.handleMessage(msg);
             switch(msg.what){
                 case PublicConstant.GET_SUCCESS:
+                    Bundle args = new Bundle();
+                    args.putInt(ARGUMENTS_KEY, 1);
+                    args.putString(FriendProfileFragment.FRIEND_USER_ID, mFriendUserId);
+                    Fragment fragment = new FriendManageFragment();
+                    fragment.setArguments(args);
+                    FragmentTransaction ft = mFragmentManager.beginTransaction();
+                    ft.addToBackStack("com.yueqiu.activity.RequestAddFriendActivity");
+                    ft.setCustomAnimations(R.anim.push_left_in, R.anim.push_left_out);
+                    ft.replace(R.id.fragment_container, fragment).commit();
                     break;
                 case PublicConstant.REQUEST_ERROR:
                     if(null == msg.obj){

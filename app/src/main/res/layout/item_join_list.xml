@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="3dp">
-    <com.android.volley.toolbox.NetworkImageView
+    <com.yueqiu.view.CustomNetWorkImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:id="@+id/join_photo"

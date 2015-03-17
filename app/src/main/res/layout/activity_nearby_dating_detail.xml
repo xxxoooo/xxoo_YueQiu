@@ -20,9 +20,9 @@
         android:layout_height="0dp"
         android:layout_weight="1.1">
 
-        <com.android.volley.toolbox.NetworkImageView
-            android:layout_width="62dp"
-            android:layout_height="62dp"
+        <com.yueqiu.view.CustomNetWorkImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:id="@+id/img_search_dating_detail_photo"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"

@@ -13,6 +13,7 @@
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/button_tool"
         android:layout_marginRight="20dp"
+
         />
     <Button
         android:layout_width="20dp"

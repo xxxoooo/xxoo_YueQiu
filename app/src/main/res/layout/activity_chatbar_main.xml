@@ -29,7 +29,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/btn_liaoba_message"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="13sp"
                 android:layout_centerHorizontal="true"/>
             <ImageView
                 android:id="@+id/chat_bar_msg_icon"
@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:text="@string/btn_liaoba_contact"
-                android:textSize="16sp"
+                android:textSize="13sp"
                 android:layout_centerHorizontal="true"/>
             <ImageView
                 android:id="@+id/chat_bar_contact_icon"
@@ -85,7 +85,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:text="@string/btn_liaoba_add_friend"
-                android:textSize="16sp"
+                android:textSize="13sp"
                 android:layout_centerHorizontal="true"/>
             <ImageView
                 android:id="@+id/chat_bar_add_icon"

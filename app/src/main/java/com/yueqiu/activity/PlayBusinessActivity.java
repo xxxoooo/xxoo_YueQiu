@@ -3,16 +3,20 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -118,6 +122,9 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
     @Override
     protected void onResume() {
         super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(mReceiver, filter);
         if(mSearchView != null){
             mSearchView.clearFocus();
         }
@@ -168,6 +175,7 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                Log.d("wy","bussiness response ->" + response);
                 try{
                     if(!response.isNull("code")){
                         if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
@@ -330,32 +338,43 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
                         }
                     }
                     break;
-                case PublicConstant.TIME_OUT:
-                    Utils.showToast(PlayBusinessActivity.this, getString(R.string.http_request_time_out));
-                    if(mList.isEmpty()) {
-                        setEmptyViewVisible();
-                    }
-                    break;
+//                case PublicConstant.TIME_OUT:
+//                    Utils.showToast(PlayBusinessActivity.this, getString(R.string.http_request_time_out));
+//                    if(mList.isEmpty()) {
+//                        setEmptyViewVisible();
+//                    }
+//                    break;
                 case PublicConstant.REQUEST_ERROR:
-                    if(null == msg.obj){
-                        Utils.showToast(PlayBusinessActivity.this,getString(R.string.http_request_error));
-                    }else{
-                        Utils.showToast(PlayBusinessActivity.this, (String) msg.obj);
-                    }
+
                     if(mList.isEmpty()) {
                         setEmptyViewVisible();
+                        if(null == msg.obj){
+                            mEmptyView.setText(getString(R.string.http_request_error));
+                        }else{
+                            mEmptyView.setText((String) msg.obj);
+                        }
+                    }else{
+                        if(null == msg.obj){
+                            Utils.showToast(PlayBusinessActivity.this,getString(R.string.http_request_error));
+                        }else{
+                            Utils.showToast(PlayBusinessActivity.this, (String) msg.obj);
+                        }
                     }
                     break;
                 case PublicConstant.NO_NETWORK:
-                    Utils.showToast(PlayBusinessActivity.this,getString(R.string.network_not_available));
-                    if(mList.isEmpty())
+
+                    if(mList.isEmpty()) {
                         setEmptyViewVisible();
+                        mEmptyView.setText(getString(R.string.network_not_available));
+                    }else{
+                        Utils.showToast(PlayBusinessActivity.this,getString(R.string.network_not_available));
+                    }
                     break;
             }
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
             if(mLoadMore && !mList.isEmpty()){
-                mListView.setSelection(mCurrPosition);
+                mListView.setSelection(mCurrPosition - 1);
             }
         }
     };
@@ -518,6 +537,23 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
 //                }
 //            }
 
+        }
+    };
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(PlayBusinessActivity.this)) {
+                    if (mList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        mParamMap.put(HttpConstants.GroupList.STAR_NO,0);
+                        mParamMap.put(HttpConstants.GroupList.END_NO,9);
+                        requestPlay();
+                    }
+                }
+            }
         }
     };
 

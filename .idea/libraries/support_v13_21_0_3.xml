@@ -6,8 +6,12 @@
       <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/support-v13/21.0.3/res" />
     </CLASSES>
     <JAVADOC />
+<<<<<<< HEAD
     <SOURCES>
       <root url="jar://$USER_HOME$/android_sdk/sdk/extras/android/m2repository/com/android/support/support-v13/21.0.3/support-v13-21.0.3-sources.jar!/" />
     </SOURCES>
+=======
+    <SOURCES />
+>>>>>>> 1e40554e2e67cda554bb793c5ee7446bf31ceeb7
   </library>
 </component>

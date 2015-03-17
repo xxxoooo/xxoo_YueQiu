@@ -49,6 +49,7 @@ import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.apache.http.Header;
@@ -69,7 +70,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
     private View mPraiseView,mReplyView;
     private TextView mTvYueqiu, mTvYueqiuCircle, mTvFriendCircle,
             mTvWeichat, mTvQQZone, mTvTencentWeibo, mTvSinaWeibo, mTvRenren;
-    private NetworkImageView mOwnerImg;//mExtraImg;
+    private CustomNetWorkImageView mOwnerImg;//mExtraImg;
     private TextView mOwnerTv,mOwnerSexTv,mReadCountTv,mCreateTimeTv,mPaiseCountTv,
             mReplyCountTv;//mTitleTv,mContentTv;
 //    private LinearLayout mContentContainer;
@@ -119,7 +120,7 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
         mPraiseView = findViewById(R.id.billiard_group_praise_view);
         mReplyView = findViewById(R.id.billiard_group_reply_view);
 
-        mOwnerImg = (NetworkImageView) findViewById(R.id.billiard_group_detail_img);
+        mOwnerImg = (CustomNetWorkImageView) findViewById(R.id.billiard_group_detail_img);
         mOwnerImg.setDefaultImageResId(R.drawable.default_head);
         mOwnerImg.setErrorImageResId(R.drawable.default_head);
 
@@ -329,7 +330,8 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
             overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
         }else if(id == R.id.billiard_detail_action_share)
         {
-            mShareDlg = Utils.showSheet(this, Utils.getCurrentScreenShot(mRootView));
+            YueQiuApp.sScreenBitmap = Utils.getCurrentScreenShot(mRootView);
+            mShareDlg = Utils.showSheet(this, YueQiuApp.sScreenBitmap);
             mShareDlg.show();
 
         }else if(id == R.id.billiard_detail_action_collect){
@@ -349,19 +351,28 @@ public class BilliardGroupDetailActivity extends Activity implements View.OnClic
 
     @Override
     public void onClick(View v) {
+        int user_id = YueQiuApp.sUserInfo.getUser_id();
         switch(v.getId()){
             case R.id.billiard_group_praise_view:
-                if(Utils.networkAvaiable(BilliardGroupDetailActivity.this)){
-                    praise();
-                }else{
-                    Utils.showToast(BilliardGroupDetailActivity.this,getString(R.string.network_not_available));
+                if(user_id < 1){
+                    Utils.showToast(this, getString(R.string.please_login_first));
+                }else {
+                    if (Utils.networkAvaiable(BilliardGroupDetailActivity.this)) {
+                        praise();
+                    } else {
+                        Utils.showToast(BilliardGroupDetailActivity.this, getString(R.string.network_not_available));
+                    }
                 }
                 break;
             case R.id.billiard_group_reply_view:
-                Intent intent = new Intent(BilliardGroupDetailActivity.this,GroupDetailReplyActivity.class);
-                intent.putExtra("id",mNoteId);
-                startActivityForResult(intent, REPLY_CODE);
-                overridePendingTransition(R.anim.push_left_in,R.anim.push_left_out);
+                if(user_id < 1){
+                    Utils.showToast(this, getString(R.string.please_login_first));
+                }else {
+                    Intent intent = new Intent(BilliardGroupDetailActivity.this, GroupDetailReplyActivity.class);
+                    intent.putExtra("id", mNoteId);
+                    startActivityForResult(intent, REPLY_CODE);
+                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                }
                 break;
         }
     }

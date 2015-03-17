@@ -15,6 +15,7 @@ import com.yueqiu.bean.GroupDetailCommentItem;
 import com.yueqiu.bean.GroupDetailContentItem;
 import com.yueqiu.bean.IGroupDetailItem;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.List;
 
@@ -89,7 +90,7 @@ public class GroupDetailContentAdapter extends BaseAdapter{
                 if(convertView == null){
                     convertView = mInflater.inflate(R.layout.item_group_detail_comment,null);
                     commentHolder = new ViewCommentHolder();
-                    commentHolder.image = (NetworkImageView) convertView.findViewById(R.id.group_detail_comment_img);
+                    commentHolder.image = (CustomNetWorkImageView) convertView.findViewById(R.id.group_detail_comment_img);
                     commentHolder.name = (TextView) convertView.findViewById(R.id.group_detail_comment_owner);
                     commentHolder.time = (TextView) convertView.findViewById(R.id.group_detail_comment_time);
                     commentHolder.comment = (TextView) convertView.findViewById(R.id.group_detail_comment_str);
@@ -116,7 +117,7 @@ public class GroupDetailContentAdapter extends BaseAdapter{
     }
 
     class ViewCommentHolder{
-        NetworkImageView image;
+        CustomNetWorkImageView image;
         TextView name;
         TextView time;
         TextView comment;

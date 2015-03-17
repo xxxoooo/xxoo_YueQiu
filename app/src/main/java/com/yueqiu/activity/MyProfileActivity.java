@@ -30,6 +30,7 @@ import com.yueqiu.dao.UserDao;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import android.app.ActionBar;
 import android.view.View;
@@ -56,12 +57,13 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
     private static final String TAG = "MyProfileActivity";
     private Button mAssistant, mCoach;
     private RelativeLayout mPhoto, mAccount, mGender, mNickName, mRegion, mLevel, mBallType,
-            mBilliardsCue, mCueHabits, mPlayAge, mIdol, mSign,mCost,mWorkLive,mMyType;//mTheNewestPost;
+            mBilliardsCue, mCueHabits, mPlayAge, mIdol, mSign,mCost,mWorkLive,mMyType,mZizhi;//mTheNewestPost;
     private TextView mNickNameTextView, mRegionTextView, mLevelTextView, mBallTypeTextView,
             mBilliardsCueTextView, mCueHabitsTextView, mPlayAgeTextView, mIdolTextView,
-            mSignTextView, mAccountTextView, mGenderTextView,mCostTextView,mMyTypeTextView,mWorkLiveTextView;
+            mSignTextView, mAccountTextView, mGenderTextView,mCostTextView,mMyTypeTextView,
+            mWorkLiveTextView,mZizhiTextView;
 //    private ImageView mTheNewestPostImageView;
-    private NetworkImageView mPhotoImageView;
+    private CustomNetWorkImageView mPhotoImageView;
     private SharedPreferences mSharedPreference;
     private SharedPreferences.Editor mEditor;
 
@@ -82,6 +84,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
     private UserDao mUserDao;
     private ImageLoader mImgLoader;
     private LinearLayout mAfterUpgradeAssitantView;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -121,9 +124,12 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
         mCost = (RelativeLayout) findViewById(R.id.profile_cost_re);
         mWorkLive = (RelativeLayout) findViewById(R.id.profile_work_live_re);
         mMyType = (RelativeLayout) findViewById(R.id.profile_type_re);
+        mZizhi = (RelativeLayout) findViewById(R.id.profile_zizhi_re);
+
         mCostTextView = (TextView) findViewById(R.id.profile_upgrade_cost);
         mMyTypeTextView = (TextView) findViewById(R.id.profile_upgrade_type);
         mWorkLiveTextView = (TextView) findViewById(R.id.profile_upgrade_experience);
+        mZizhiTextView = (TextView) findViewById(R.id.profile_upload_zizhi);
 //        mTheNewestPost = (RelativeLayout) findViewById(R.id.my_profile_the_new_post);
 
         mAccountTextView = (TextView) findViewById(R.id.my_profile_account_tv);
@@ -138,7 +144,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
         mIdolTextView = (TextView) findViewById(R.id.my_profile_idol_tv);
         mSignTextView = (TextView) findViewById(R.id.my_profile_sign_tv);
 
-        mPhotoImageView = (NetworkImageView) findViewById(R.id.my_profile_photo_iv);
+        mPhotoImageView = (CustomNetWorkImageView) findViewById(R.id.my_profile_photo_iv);
 //        mTheNewestPostImageView = (ImageView) findViewById(R.id.my_profile_the_new_post_im);
         mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
         mPhotoImageView.setErrorImageResId(R.drawable.default_head);
@@ -161,8 +167,15 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
             mAfterUpgradeAssitantView.setVisibility(View.GONE);
         }
 
-        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_assist_coauch_str)) ||
-                YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_coauch_str))){
+        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_assist_coauch_str))
+                ){
+            mAssistant.setVisibility(View.GONE);
+            mCoach.setVisibility(View.GONE);
+            mAfterUpgradeAssitantView.setVisibility(View.VISIBLE);
+            mZizhi.setVisibility(View.GONE);
+        }
+
+        if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_coauch_str))){
             mAssistant.setVisibility(View.GONE);
             mCoach.setVisibility(View.GONE);
             mAfterUpgradeAssitantView.setVisibility(View.VISIBLE);
@@ -207,6 +220,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
                                         String cost = response.getJSONObject("result").getString(DatabaseConstant.UserTable.COST);
                                         String my_type = response.getJSONObject("result").getString(DatabaseConstant.UserTable.MY_TYPE);
                                         String work_live = response.getJSONObject("result").getString(DatabaseConstant.UserTable.WORK_LIVE);
+                                        int zizhi = response.getJSONObject("result").getInt(DatabaseConstant.UserTable.ZIZHI);
 
                                         mMap.put(DatabaseConstant.UserTable.SEX, sex);
                                         mMap.put(DatabaseConstant.UserTable.IMG_URL, img_url);
@@ -226,6 +240,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
                                         mMap.put(DatabaseConstant.UserTable.COST,cost);
                                         mMap.put(DatabaseConstant.UserTable.MY_TYPE,my_type);
                                         mMap.put(DatabaseConstant.UserTable.WORK_LIVE,work_live);
+                                        mMap.put(DatabaseConstant.UserTable.ZIZHI,String.valueOf(zizhi));
 
 //                                        mUserInfo = Utils.mapingObject(UserInfo.class, response.getJSONObject("result"));
                                         mUserInfo = new UserInfo();
@@ -245,6 +260,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
                                         mUserInfo.setCost(cost);
                                         mUserInfo.setMy_type(Integer.valueOf(my_type));
                                         mUserInfo.setWork_live(work_live);
+                                        mUserInfo.setZizhi(zizhi);
 
 
                                         message.what = DATA_SUCCESS;
@@ -350,6 +366,8 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
                 unset : getTypeStrByTypeId(userInfo.getMy_type()));
         mWorkLiveTextView.setText(TextUtils.isEmpty(userInfo.getWork_live()) ?
                 unset : userInfo.getWork_live());
+        mZizhiTextView.setText(TextUtils.isEmpty(String.valueOf(userInfo.getZizhi())) ?
+                unset : getZizhiById(userInfo.getZizhi()));
 //        mTheNewestPostImageView.setImageDrawable();
     }
 
@@ -371,6 +389,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
         YueQiuApp.sUserInfo.setCost(user.getCost());
         YueQiuApp.sUserInfo.setMy_type(user.getMy_type());
         YueQiuApp.sUserInfo.setWork_live(user.getWork_live());
+        YueQiuApp.sUserInfo.setZizhi(user.getZizhi());
 
         mEditor.putString(DatabaseConstant.UserTable.USERNAME,user.getUsername());
         mEditor.putString(DatabaseConstant.UserTable.IMG_URL,user.getImg_url());
@@ -387,6 +406,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
         mEditor.putString(DatabaseConstant.UserTable.COST,user.getCost());
         mEditor.putString(DatabaseConstant.UserTable.MY_TYPE,String.valueOf(user.getMy_type()));
         mEditor.putString(DatabaseConstant.UserTable.WORK_LIVE,user.getWork_live());
+        mEditor.putInt(DatabaseConstant.UserTable.ZIZHI,user.getZizhi());
 
         mEditor.apply();
     }
@@ -604,6 +624,13 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
                 mUserInfo.setWork_live(str);
                 mMap.put(DatabaseConstant.UserTable.WORK_LIVE,str);
                 break;
+            case ZIZHI:
+                int id = Integer.valueOf(str);
+                String zizhi = getZizhiById(id);
+                mZizhiTextView.setText(zizhi);
+                mUserInfo.setZizhi(id);
+                mMap.put(DatabaseConstant.UserTable.ZIZHI,String.valueOf(id));
+                break;
 
         }
         mUserDao.updateUserInfo(mMap);
@@ -615,7 +642,9 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
             attr = Attr.PHOTO;
         }else if(id == 1){
             attr = Attr. NICKNAME;
-        }else if(id == 2){
+        }else if(id == 2) {
+            attr = Attr.DISTRICT;
+        }else if(id == 3){
             attr = Attr.LEVEL;
         }else if(id == 3){
             attr = Attr.BALL_CLASS;
@@ -637,6 +666,8 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
             attr = Attr.MY_TYPE;
         }else if(id == 12){
             attr = Attr.WORK_LIVE;
+        }else if(id == 13){
+            attr = Attr.ZIZHI;
         }
         return attr;
     }
@@ -660,6 +691,25 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
                 break;
             case PublicConstant.HANDSOME_TYPE:
                 str = getString(R.string.handsome_type);
+                break;
+        }
+        return str;
+    }
+
+    private String getZizhiById(int id){
+        String str = "";
+        switch(id){
+            case PublicConstant.ZIZHI_COUNTRY_MEMBER:
+                str = getString(R.string.zizhi_country_team_member);
+                break;
+            case PublicConstant.ZIZHI_PROFESSION:
+                str = getString(R.string.zizhi_profession_memeber);
+                break;
+            case PublicConstant.ZIZHI_COACH:
+                str = getString(R.string.zizhi_coach);
+                break;
+            case PublicConstant.ZIZHI_OTHER:
+                str = getString(R.string.billiard_other);
                 break;
         }
         return str;

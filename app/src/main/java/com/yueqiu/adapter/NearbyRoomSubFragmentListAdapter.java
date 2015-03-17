@@ -15,6 +15,7 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomRoomNetView;
 
 import java.awt.font.TextAttribute;
 import java.math.BigInteger;
@@ -73,7 +74,7 @@ public class NearbyRoomSubFragmentListAdapter extends BaseAdapter
             viewHolder = new ViewHolder();
             convertView = mInflater.inflate(R.layout.item_nearby_room_layout, parent, false);
 
-            viewHolder.mRoomPhoto = (NetworkImageView) convertView.findViewById(R.id.img_room_subfragment_listitem_photo);
+            viewHolder.mRoomPhoto = (CustomRoomNetView) convertView.findViewById(R.id.img_room_subfragment_listitem_photo);
             viewHolder.mRoomName = (TextView) convertView.findViewById(R.id.tv_room_subfragment_listitem_roomname);
             viewHolder.mRoomAddress = (TextView) convertView.findViewById(R.id.tv_room_subfragment_listitem_roomaddress);
             viewHolder.mRoomLevel = (RatingBar) convertView.findViewById(R.id.rating_room_subfragment_listitem_rating);
@@ -95,9 +96,12 @@ public class NearbyRoomSubFragmentListAdapter extends BaseAdapter
         viewHolder.mRoomLevel.setStepSize(0.02f); // 我们接受到的rating的值的总数为100，但是我们只有5个星星，所以我们每次移动的步骤就是5/100=0.02
 
         long distance = Long.valueOf(item.getDistance());
-        long show_distance = distance / 1000 ;
-
-        viewHolder.mRoomDistance.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, show_distance));
+        float show_distance = distance / 1000 ;
+        if(show_distance > 10) {
+            viewHolder.mRoomDistance.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, show_distance));
+        }else{
+            viewHolder.mRoomDistance.setText(mContext.getString(R.string.in_meter,item.getDistance()));
+        }
         viewHolder.mRoomAddress.setText(item.getDetailedAddress());
         viewHolder.mRoomPrice.setText(String.valueOf(item.getPrice()));
         Log.d(TAG, " the rating level for the room item are : " + item.getLevel() + ", and the distance we get are : " + item.getDistance()
@@ -109,7 +113,7 @@ public class NearbyRoomSubFragmentListAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        private NetworkImageView mRoomPhoto;
+        private CustomRoomNetView mRoomPhoto;
         private TextView mRoomName;
         private RatingBar mRoomLevel;
         private TextView mRoomPrice;

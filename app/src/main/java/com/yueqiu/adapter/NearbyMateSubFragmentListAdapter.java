@@ -14,6 +14,7 @@ import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,7 +81,7 @@ public class NearbyMateSubFragmentListAdapter extends BaseAdapter
             convertView = mInflater.inflate(R.layout.item_mate_layout, parent, false);
             viewHolder = new ViewHolder();
 
-            viewHolder.mUserPhoto = (NetworkImageView) convertView.findViewById(R.id.img_mate_subfragment_listitem_photo);
+            viewHolder.mUserPhoto = (CustomNetWorkImageView) convertView.findViewById(R.id.img_mate_subfragment_listitem_photo);
             viewHolder.mUserNickName = (TextView) convertView.findViewById(R.id.tv_mate_subfragment_listitem_nickname);
             viewHolder.mUserGender = (TextView) convertView.findViewById(R.id.tv_mate_subfragment_listitem_gender);
             viewHolder.mUserDistanceMeter = (TextView) convertView.findViewById(R.id.tv_mate_subfragment_listitem_distance_meter);
@@ -99,12 +100,18 @@ public class NearbyMateSubFragmentListAdapter extends BaseAdapter
         // TODO: 我们在Layout文件当中已经设置关于UserPhoto的默认图片，我们在这里重新加载以下
         viewHolder.mUserPhoto.setDefaultImageResId(R.drawable.default_head);
         viewHolder.mUserPhoto.setErrorImageResId(R.drawable.default_head);
-        viewHolder.mUserPhoto.setImageUrl(HttpConstants.IMG_BASE_URL + userInsta.getUserPhotoUrl(), mImgLoader);
+        viewHolder.mUserPhoto.setImageUrl("http://" + userInsta.getUserPhotoUrl(), mImgLoader);
         viewHolder.mUserGender.setText(userInsta.getUserGender());
         viewHolder.mUserGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, NearbyFragmentsCommonUtils.parseGenderDrawable(userInsta.getUserGender()), 0);
         viewHolder.mUserGender.setCompoundDrawablePadding(6);
         viewHolder.mUserNickName.setText(userInsta.getUserNickName());
-        viewHolder.mUserDistanceMeter.setText(mContext.getString(R.string.in_meter,userInsta.getUserDistance()));
+        long distance = Long.valueOf(userInsta.getUserDistance());
+        float show_distance = distance / 1000;
+        if(show_distance > 10){
+            viewHolder.mUserDistanceMeter.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, show_distance));
+        }else {
+            viewHolder.mUserDistanceMeter.setText(mContext.getString(R.string.in_meter, userInsta.getUserDistance()));
+        }
         if(userInsta.getUserDistrict().equals("")){
             viewHolder.mUserDistrict.setVisibility(View.GONE);
         }else{
@@ -119,7 +126,7 @@ public class NearbyMateSubFragmentListAdapter extends BaseAdapter
 
     private static class ViewHolder
     {
-        public NetworkImageView mUserPhoto;
+        public CustomNetWorkImageView mUserPhoto;
         public TextView mUserNickName, mUserGender, mUserDistanceMeter, mUserDistrict;
     }
 }
