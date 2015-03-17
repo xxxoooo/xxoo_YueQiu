@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
@@ -46,6 +47,7 @@ import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.activity.NearbyBilliardRoomActivity;
 import com.yueqiu.activity.WeiboShareActionCompleteActivity;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
@@ -511,6 +513,7 @@ public class Utils
 
         View.OnClickListener listener = new View.OnClickListener()
         {
+            @TargetApi(Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v)
             {
@@ -619,12 +622,20 @@ public class Utils
                         IWeiboShareAPI weiboShareAPI = WeiboShareSDK.createWeiboAPI(context, HttpConstants.WEIBO_APP_KEY);
                         if (weiboShareAPI.isWeiboAppInstalled())
                         {
+                            Log.d("scguo_sina_share_test", " client installed ");
                             // 新浪微博已经安装，我们可以启动进行微博分享的具体过程了
                             Intent sinaIntent = new Intent(context, WeiboShareActionCompleteActivity.class);
-                            sinaIntent.putExtra(PublicConstant.SHARE_TO_SINA_BITMAP, bitmap);
+                            Bitmap cachedBitmap = bitmap;
+
+                            sinaIntent.putExtra(PublicConstant.SHARE_TO_SINA_BITMAP, cachedBitmap);
+                            Log.d("scguo_sina_share_test", " the bitmap we get are : " + (bitmap != null));
+//                            Bitmap testBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
+//                            sinaIntent.putExtra(PublicConstant.SHARE_TO_SINA_BITMAP, testBitmap);
                             context.startActivity(sinaIntent);
+
                         } else
                         {
+                            Log.d("scguo_sina_share_test", " client is not installed ");
                             // 新浪微博并没有安装，我们需要告诉用户安装客户端之后再进行分享
                             Toast.makeText(context, context.getString(R.string.weibo_need_to_install_first), Toast.LENGTH_SHORT).show();
                         }
@@ -829,10 +840,12 @@ public class Utils
      */
     public static Bitmap getCurrentScreenShot(View view)
     {
+        final int width = view.getWidth();
+        final int height = view.getHeight();
         Bitmap bitmap = Bitmap.createBitmap(
-                view.getWidth(),
-                view.getHeight(),
-                Bitmap.Config.ARGB_8888);
+                width,
+                height,
+                Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bitmap);
         view.draw(canvas);
 

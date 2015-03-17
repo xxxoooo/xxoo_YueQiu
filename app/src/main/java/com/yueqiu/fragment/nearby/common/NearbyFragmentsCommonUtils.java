@@ -45,7 +45,6 @@ import java.util.List;
  */
 public class NearbyFragmentsCommonUtils{
     private static final String TAG = "NearbyFragmentsCommonUtils";
-    private static final String TAG_1 = "empty_visibility_debug";
     public static interface ControlPopupWindowCallback
     {
         public void closePopupWindow();
@@ -172,7 +171,8 @@ public class NearbyFragmentsCommonUtils{
                         if (status == HttpConstants.ResponseCode.NORMAL) {
                             JSONArray resultJsonArr = response.getJSONArray("result");
                             final int count = resultJsonArr.length();
-                            for (int i = 0; i < count; ++i) {
+                            for (int i = 0; i < count; ++i)
+                            {
                                 JSONObject dataUnit = resultJsonArr.getJSONObject(i);
                                 String roomId = dataUnit.getString("id");
                                 String photoUrl = dataUnit.getString("img_url");
@@ -210,16 +210,14 @@ public class NearbyFragmentsCommonUtils{
                                         roomDetailInfo,// roomInfo
                                         roomShopHours // shopHours营业时间
                                 );
+
                                 cacheRoomList.add(roomItem);
-                                Log.d(TAG, " ----> the photo url we get for the recommendation are : " + roomItem.getRoomPhotoUrl() + "; "
-                                        + roomAddress + "; " + roomLatitude + " ; " + roomLongitude + "; " + roomPrice
-                                        + "; " + roomPriceVal);
                             }
                             // 现在我们就需要将我们获得的数据传递出去
                             mInternalHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheRoomList).sendToTarget();
                         }
                     }
-                    else{
+                    else {
                         mInternalHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
                     }
                 } catch (JSONException e)
@@ -321,10 +319,13 @@ public class NearbyFragmentsCommonUtils{
 
 
 
-    private Handler mInternalHandler = new Handler(){
-        public void handleMessage(Message msg) {
+    private Handler mInternalHandler = new Handler()
+    {
+        public void handleMessage(Message msg)
+        {
             super.handleMessage(msg);
-            switch(msg.what){
+            switch(msg.what)
+            {
                 case DATA_RETRIEVE_SUCCESS:
                     //TODO:获取成功以后，不应该再显示那一行小字
                     mNoDataIndicatorText.setVisibility(View.INVISIBLE);

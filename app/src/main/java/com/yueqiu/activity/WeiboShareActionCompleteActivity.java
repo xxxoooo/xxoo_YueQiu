@@ -35,15 +35,16 @@ public class WeiboShareActionCompleteActivity extends Activity implements IWeibo
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Log.d("scguo_sina_share_test", " enter the activity ");
         mSharedBitmap = getIntent().getParcelableExtra(PublicConstant.SHARE_TO_SINA_BITMAP);
 
         // 初始化WeiboShareSDK
         this.mWeiboShareApi = WeiboShareSDK.createWeiboAPI(this, HttpConstants.WEIBO_APP_KEY);
         // 将当前的应用注册到微博当中
         this.mWeiboShareApi.registerApp();
-
         if (savedInstanceState != null)
         {
+            Log.d("scguo_sina_share_test", " in activity --> handle response ");
             mWeiboShareApi.handleWeiboResponse(getIntent(), this);
         }
     }
@@ -94,7 +95,7 @@ public class WeiboShareActionCompleteActivity extends Activity implements IWeibo
                     // 从当前的Activity实例跳转到我们新浪微博指定的分享信息Activity，在这里我们
                     // 用于创建分享实例的context就是BilliardsRoomActiviity实例，所以我们可以把她强制转换成Activity实例,来
                     // 完成跳转
-                    Log.d(TAG, " sending the request to share message to sina weibo ");
+                    Log.d("scguo_sina_share_test", " sending the request to share message to sina weibo ");
                     mWeiboShareApi.sendRequest(this, request);
                 }
             } else
