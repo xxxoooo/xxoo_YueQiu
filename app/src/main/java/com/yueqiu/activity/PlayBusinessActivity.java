@@ -3,12 +3,15 @@ package com.yueqiu.activity;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -119,6 +122,9 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
     @Override
     protected void onResume() {
         super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(mReceiver, filter);
         if(mSearchView != null){
             mSearchView.clearFocus();
         }
@@ -531,6 +537,23 @@ public class PlayBusinessActivity extends Activity implements AdapterView.OnItem
 //                }
 //            }
 
+        }
+    };
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(PlayBusinessActivity.this)) {
+                    if (mList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        mParamMap.put(HttpConstants.GroupList.STAR_NO,0);
+                        mParamMap.put(HttpConstants.GroupList.END_NO,9);
+                        requestPlay();
+                    }
+                }
+            }
         }
     };
 

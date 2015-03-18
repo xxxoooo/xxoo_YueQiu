@@ -572,7 +572,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
         //mItemList.clear();
         Log.d("wy", "YueQiu img_url ->" + YueQiuApp.sUserInfo.getImg_url());
         SlideAccountItemISlide accountItem = new SlideAccountItemISlide(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
-                100, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id());
+                100, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id(),YueQiuApp.sUserInfo.getNick());
         mItemList.add(accountItem);
 
         String[] values = new String[]{
@@ -814,7 +814,7 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
 
         mItemList.remove(0);
         SlideAccountItemISlide accountItem = new SlideAccountItemISlide(YueQiuApp.sUserInfo.getImg_url(), YueQiuApp.sUserInfo.getUsername(),
-                0, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id());
+                0, YueQiuApp.sUserInfo.getTitle(), YueQiuApp.sUserInfo.getUser_id(),YueQiuApp.sUserInfo.getNick());
         mItemList.add(0, accountItem);
         mAdapter.notifyDataSetChanged();
 

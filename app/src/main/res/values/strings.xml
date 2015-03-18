@@ -560,4 +560,7 @@
     <string name="data_from_dazhong">列表数据来自大众点评</string>
     <string name="ask_already_null">好友申请列表已经为空</string>
 
+    <string name="please_send_jpg">请发送jpg图片</string>
+    <string name="image_send_fail">图片消息发送失败</string>
+
 </resources>

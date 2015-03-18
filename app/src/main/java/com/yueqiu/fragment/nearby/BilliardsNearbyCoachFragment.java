@@ -2,11 +2,14 @@ package com.yueqiu.fragment.nearby;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -208,6 +211,10 @@ public class BilliardsNearbyCoachFragment extends Fragment
     public void onResume()
     {
         super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver,filter);
+
         if(mSearchView != null){
             mSearchView.clearFocus();
         }
@@ -1010,6 +1017,25 @@ public class BilliardsNearbyCoachFragment extends Fragment
         }
     }
 
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(getActivity())) {
+                    NearbyFragmentsCommonUtils commonUtils = new NearbyFragmentsCommonUtils(mContext);
+                    commonUtils.initViewPager(mContext, mView);
+                    if (mCoauchList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        if (null != mWorker) {
+                            mWorker.fetchAllData(0, 9);
+                        }
+                    }
+                }
+            }
+        }
+    };
 
 }
 

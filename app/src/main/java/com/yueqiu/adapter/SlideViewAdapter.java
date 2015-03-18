@@ -131,7 +131,11 @@ public class SlideViewAdapter extends BaseAdapter {
                 if(user_id > 0){
                     accountHolder.login.setVisibility(View.GONE);
                     accountHolder.name.setVisibility(View.VISIBLE);
-                    accountHolder.name.setText(accountItem.getName());
+                    if(TextUtils.isEmpty(accountItem.getmNickName())) {
+                        accountHolder.name.setText(accountItem.getName());
+                    }else{
+                        accountHolder.name.setText(accountItem.getmNickName());
+                    }
                     final String img = accountItem.getImg();
                     String img_url = "http://" + img;
                    final int finallyEmbedResId = embedResId;

@@ -429,7 +429,7 @@ public class ChatMessageAdapter extends BaseAdapter {
                     chatPage.startActivity(intent);
                 } else {
                     if (!Utils.networkAvaiable(chatPage)) {
-                        Utils.showToast(chatPage, "当前网络不可用，请检查网络后重试！");
+                        Utils.showToast(chatPage, chatPage.getString(R.string.network_not_available));
                         return;
                     }
                     int code = api.downloadMessage(msg);
@@ -437,7 +437,7 @@ public class ChatMessageAdapter extends BaseAdapter {
                     mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (checkImgMsgCount > 20) {
+                            if (checkImgMsgCount > 10) {
                                 intent.putExtra(ShowBigImage.EXTRA_TIMEOUT, true);
                                 chatPage.startActivity(intent);
                                 checkImgMsgCount = 0;

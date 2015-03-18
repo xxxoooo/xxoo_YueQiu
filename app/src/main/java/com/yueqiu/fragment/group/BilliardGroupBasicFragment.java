@@ -1,10 +1,13 @@
 package com.yueqiu.fragment.group;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,6 +45,7 @@ import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.DaoFactory;
 import com.yueqiu.dao.GroupInfoDao;
+import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
@@ -169,6 +173,10 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
     @Override
     public void onResume() {
         super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver,filter);
+
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
@@ -847,4 +855,35 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
             }
         });
     }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(getActivity())) {
+                    if (mList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        if(mNormal) {
+                            mParamMap.put(HttpConstants.GroupList.STAR_NO, 0);
+                            mParamMap.put(HttpConstants.GroupList.END_NO, 9);
+                            requestGroup();
+                        }
+                        if(mTimeDesc){
+                            mTimeParam.put(HttpConstants.GroupList.STAR_NO, String.valueOf(0));
+                            mTimeParam.put(HttpConstants.GroupList.END_NO,String.valueOf(9));
+                            getGroupByTime();
+                        }
+
+                        if(mPopularityDesc){
+                            mPopParam.put(HttpConstants.GroupList.STAR_NO, String.valueOf(0));
+                            mPopParam.put(HttpConstants.GroupList.END_NO,String.valueOf(9));
+                            getGroupByPop();
+                        }
+                    }
+                }
+            }
+        }
+    };
 }

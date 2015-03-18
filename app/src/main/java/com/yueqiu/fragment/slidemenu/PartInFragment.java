@@ -1,7 +1,10 @@
 package com.yueqiu.fragment.slidemenu;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -84,6 +87,9 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
     @Override
     public void onResume() {
         super.onResume();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        getActivity().registerReceiver(mReceiver,filter);
         if(Utils.networkAvaiable(mActivity)){
             mLoadMore = false;
             mRefresh = false;
@@ -329,4 +335,22 @@ public class PartInFragment extends SlideMenuBasicFragment implements AdapterVie
             return lhsUserId > rhsUserId ? -1 : 1;
         }
     }
+
+    private BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equals(ConnectivityManager.CONNECTIVITY_ACTION)){
+                if(Utils.networkAvaiable(getActivity())) {
+                    if (mList.isEmpty()) {
+                        mLoadMore = false;
+                        mRefresh = false;
+                        mParamsMap.put(HttpConstants.Published.START_NO,0);
+                        mParamsMap.put(HttpConstants.Published.END_NO, 9);
+                        requestResult();
+                    }
+                }
+            }
+        }
+    };
 }

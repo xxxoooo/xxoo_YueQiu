@@ -123,6 +123,31 @@ public class BitmapUtil {
 		return null;
 	}
 
+    public static String saveSmallBitmapFile(Bitmap bitmap){
+        if(!FileUtil.isSDCardReady()){
+            return null;
+        }
+
+        File f = new File("/sdcard/yueqiu/cache");
+        if (!f.isDirectory()) {
+            f.mkdirs();
+        }
+
+        File file = new File("/sdcard/yueqiu/cache"
+                + System.currentTimeMillis() + ".jpg");
+        try {
+            BufferedOutputStream bos = new BufferedOutputStream(
+                    new FileOutputStream(file));
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+            bos.flush();
+            bos.close();
+            return file.getAbsolutePath();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 	public static String check(String path) {
 		if (path.endsWith(".jpg") || path.endsWith(".jpeg")
 				|| path.endsWith(".JPG") || path.endsWith(".JPEG")) {
