@@ -680,7 +680,8 @@ public class BilliardsNearbyCoachFragment extends Fragment implements AdapterVie
 
             }
             mCoauchListAdapter.notifyDataSetChanged();
-            if(mLoadMore && !mCoauchList.isEmpty()){
+            if(mLoadMore && !mCoauchList.isEmpty())
+            {
                 mCoauchListView.getRefreshableView().setSelection(mCurrentPos - 1 );
             }
         }

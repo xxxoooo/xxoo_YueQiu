@@ -4,10 +4,21 @@
       <root url="file://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/res" />
       <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar!/" />
       <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar!/" />
     </CLASSES>
     <JAVADOC />
+<<<<<<< HEAD
     <SOURCES>
       <root url="jar://$USER_HOME$/Library/Android/sdk/extras/android/m2repository/com/android/support/support-v4/21.0.3/support-v4-21.0.3-sources.jar!/" />
     </SOURCES>
+=======
+<<<<<<< HEAD
+    <SOURCES>
+      <root url="jar://$USER_HOME$/android_sdk/sdk/extras/android/m2repository/com/android/support/support-v4/21.0.3/support-v4-21.0.3-sources.jar!/" />
+    </SOURCES>
+=======
+    <SOURCES />
+>>>>>>> 1e40554e2e67cda554bb793c5ee7446bf31ceeb7
+>>>>>>> 641b1afaabccb164f852ff359d7518e3c3560645
   </library>
 </component>

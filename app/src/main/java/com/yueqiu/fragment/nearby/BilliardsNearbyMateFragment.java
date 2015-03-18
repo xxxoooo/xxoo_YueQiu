@@ -102,6 +102,7 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
     private LocationManagerProxy mLocationManagerProxy;
 
     private PullToRefreshListView mSubFragmentListView;
+    private ListView mMateListView;
 
     @SuppressLint("ValidFragment")
     public BilliardsNearbyMateFragment()
@@ -193,6 +194,8 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
         commonUtils.initViewPager(mContext, mView);
 
         mSubFragmentListView = (PullToRefreshListView) mView.findViewById(R.id.search_sub_fragment_list);
+        mMateListView = mSubFragmentListView.getRefreshableView();
+
         mSubFragmentListView.setMode(PullToRefreshBase.Mode.BOTH);
         mSubFragmentListView.setOnRefreshListener(mOnRefreshListener);
         mSubFragmentListView.setOnItemClickListener(this);
@@ -249,9 +252,10 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
 
 
         mMateListAdapter = new NearbyMateSubFragmentListAdapter(mContext,  mUserList);
-        mSubFragmentListView.setAdapter(mMateListAdapter);
+//        mSubFragmentListView.setAdapter(mMateListAdapter);
+        mMateListView.setAdapter(mMateListAdapter);
 
-//        mMateListAdapter.notifyDataSetChanged();
+        mMateListAdapter.notifyDataSetChanged();
 
         mLoadMore = false;
         mRefresh = false;
@@ -801,12 +805,14 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                     }
                     break;
             }
-//
-            mMateListAdapter.notifyDataSetChanged();
-            if(mLoadMore && !mUserList.isEmpty()){
-                Log.d("wy","------------------------->count-->" + mMateListAdapter.getCount());
-                mSubFragmentListView.getRefreshableView().setSelection(mCurrentPos - 1);
-            }
+
+//            mMateListView.setAdapter(mMateListAdapter);
+//            mMateListAdapter.notifyDataSetChanged();
+//            if(mLoadMore && !mUserList.isEmpty())
+//            {
+//                mMateListView.setSelection(mCurrentPos - 1);
+//            }
+            mMateListView.setSelection(mCurrentPos - 1);
         }
     };
 

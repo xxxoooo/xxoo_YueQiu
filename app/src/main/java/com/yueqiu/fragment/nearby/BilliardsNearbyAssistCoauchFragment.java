@@ -748,7 +748,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment implements Ada
             }
 
             mAssistCoauchListAdapter.notifyDataSetChanged();
-            if(mLoadMore && !mAssistCoauchList.isEmpty()){
+            if(mLoadMore && !mAssistCoauchList.isEmpty())
+            {
                 mListView.getRefreshableView().setSelection(mCurrentPos - 1);
             }
         }

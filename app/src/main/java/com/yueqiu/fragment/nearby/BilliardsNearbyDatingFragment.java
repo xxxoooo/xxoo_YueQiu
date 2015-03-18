@@ -732,9 +732,11 @@ public class BilliardsNearbyDatingFragment extends Fragment
 
             }
             mDatingListAdapter.notifyDataSetChanged();
-            if(mLoadMore && !mDatingList.isEmpty()){
+            if(mLoadMore && !mDatingList.isEmpty())
+            {
                 mDatingListView.getRefreshableView().setSelection(mCurrentPos - 1);
             }
+
         }
     };
 

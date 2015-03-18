@@ -645,7 +645,9 @@ public class BilliardGroupBasicFragment extends Fragment implements AdapterView.
             }
             mListView.setAdapter(mAdapter);
             mAdapter.notifyDataSetChanged();
-            if(mLoadMore && !mList.isEmpty()){
+            if(mLoadMore && !mList.isEmpty())
+            {
+                Log.d("scguo_pos", " play set selection executed ... ");
                 mListView.setSelection(mCurrPosition - 1);
             }
         }
