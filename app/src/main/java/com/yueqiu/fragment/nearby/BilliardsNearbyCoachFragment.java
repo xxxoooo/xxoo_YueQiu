@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -38,12 +39,14 @@ import com.amap.api.location.LocationManagerProxy;
 import com.amap.api.location.LocationProviderProxy;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
+import com.yueqiu.activity.RequestAddFriendActivity;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyCoauchSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyCoauchSubFragmentCoauchBean;
 import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
@@ -71,7 +74,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 用于SearchActivity当中的教练子Fragment的实现
  */
 @SuppressLint("ValidFragment")
-public class BilliardsNearbyCoachFragment extends Fragment
+public class BilliardsNearbyCoachFragment extends Fragment implements AdapterView.OnItemClickListener
 {
     private static final String TAG = "BilliardsNearbyCoauchFragment";
 
@@ -160,6 +163,7 @@ public class BilliardsNearbyCoachFragment extends Fragment
         mCoauchListView = (PullToRefreshListView) mView.findViewById(R.id.search_coauch_subfragment_list);
         mCoauchListView.setMode(PullToRefreshBase.Mode.BOTH);
         mCoauchListView.setOnRefreshListener(mOnRefreshListener);
+        mCoauchListView.setOnItemClickListener(this);
 
         mPreProgress = (ProgressBar) mView.findViewById(R.id.pre_progress);
         mPreTextView = (TextView) mView.findViewById(R.id.pre_text);
@@ -717,6 +721,16 @@ public class BilliardsNearbyCoachFragment extends Fragment
     {
         mPreProgress.setVisibility(View.GONE);
         mPreTextView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Intent intent = new Intent(getActivity(), RequestAddFriendActivity.class);
+        int friendUserId = Integer.valueOf(mCoauchList.get(i-1).getId());
+        String username = mCoauchList.get(i-1).getUserName();
+        intent.putExtra(AddPersonFragment.FRIEND_INFO_USER_ID, friendUserId);
+        intent.putExtra(AddPersonFragment.FRIEND_INFO_USERNAME, username);
+        startActivity(intent);
     }
 
     private class BackgroundWorkerThread extends HandlerThread

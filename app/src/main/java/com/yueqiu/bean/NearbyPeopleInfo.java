@@ -20,6 +20,7 @@ public class NearbyPeopleInfo {
         private String datetime;//时间
         private int sex;//性别
         private String district;//地区
+        private String distance;
 
         public void setUsername(String username) {
             this.username = username;
@@ -80,6 +81,14 @@ public class NearbyPeopleInfo {
             return user_id;
         }
 
+        public String getDistance() {
+            return distance;
+        }
+
+        public void setDistance(String distance) {
+            this.distance = distance;
+        }
+
         @Override
         public int hashCode() {
             int result = 17;
@@ -95,6 +104,8 @@ public class NearbyPeopleInfo {
             }
             return false;
         }
+
+
     }
 
     public void setUser_id(int user_id) {

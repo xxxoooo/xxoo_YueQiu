@@ -120,7 +120,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
             case R.id.btn_assistcoauch_cost:
                 String[] priceArr = {
                         mContext.getResources().getString(R.string.search_room_price_popupwindow_lowtohigh), // TODO: ??????从到到低，对应的数字值是????????????
-                        mContext.getResources().getString(R.string.search_room_price_popupwindow_lowtohigh) // TODO: ??????从到到低，对应的数字值是????????????
+                        mContext.getResources().getString(R.string.search_room_price_popupwindow_hightolow) // TODO: ??????从到到低，对应的数字值是????????????
                 };
 
                 mPopupTitleView.setText(R.string.search_room_price_popupwindow_no_filter);

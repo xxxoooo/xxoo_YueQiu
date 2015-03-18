@@ -562,5 +562,6 @@
 
     <string name="please_send_jpg">请发送jpg图片</string>
     <string name="image_send_fail">图片消息发送失败</string>
+    <string name="delete_friend_fail">删除好友失败</string>
 
 </resources>

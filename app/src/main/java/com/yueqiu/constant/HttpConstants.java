@@ -682,6 +682,16 @@ public class HttpConstants
 
     }
 
+    public static final class DeleteFriend{
+        public static final String URL = "/friend/delFriend";
+
+        public static final String MY_ID = "my_id";
+
+        public static final String FRIEND_ID = "friend_id";
+
+        public static final String GROUP_ID = "group_id";
+    }
+
     // 这是SearchActivity当中的球厅Fragment当中的请求数据的过程
     // 因为服务器端使用的是大众点评的SDK，所以我们的请求地址是以大众点评为基础的
     public static final String DP_BASE_URL = "http://api.dianping.com/v1";
