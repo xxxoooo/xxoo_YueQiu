@@ -86,6 +86,8 @@ public class Register1Activity extends Activity implements View.OnClickListener 
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             mPreProgress.setVisibility(View.GONE);
+            mPreText.setVisibility(View.GONE);
+            mBtnRegister.setEnabled(true);
             switch (msg.what)
             {
                 case REGISTER_ERROR:
@@ -152,6 +154,7 @@ public class Register1Activity extends Activity implements View.OnClickListener 
         mBtnRegister = (Button) findViewById(R.id.activity_register1_btn_register);
 
         mPreText = (TextView) findViewById(R.id.pre_text);
+        mPreText.setText(getString(R.string.registing));
         mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
 
         mProgressDrawable = new FoldingCirclesDrawable.Builder(this).build();
@@ -241,6 +244,8 @@ public class Register1Activity extends Activity implements View.OnClickListener 
 
                 if(Utils.networkAvaiable(Register1Activity.this)){
                     mPreProgress.setVisibility(View.VISIBLE);
+                    mPreText.setVisibility(View.VISIBLE);
+                    mBtnRegister.setEnabled(false);
                     HttpUtil.requestHttp(HttpConstants.RegisterConstant.URL,mMap,HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){
                         @Override
                         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {

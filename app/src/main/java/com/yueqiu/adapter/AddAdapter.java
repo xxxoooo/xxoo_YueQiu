@@ -1,6 +1,7 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,6 +57,7 @@ public class AddAdapter extends BaseAdapter {
             viewHolder.mNickName = (TextView) convertView.findViewById(R.id.chatbar_item_account_tv);
             viewHolder.mGender = (TextView) convertView.findViewById(R.id.chatbar_item_gender_tv);
             viewHolder.mDistrict = (TextView) convertView.findViewById(R.id.chatbar_item_district_tv);
+            viewHolder.mRange = (TextView) convertView.findViewById(R.id.add_person_distance);
             //绑定viewholder对象
             convertView.setTag(viewHolder);
         } else {
@@ -74,6 +76,20 @@ public class AddAdapter extends BaseAdapter {
             viewHolder.mDistrict.setText(district);
             viewHolder.mDistrict.setVisibility(View.VISIBLE);
         }
+        long distance;
+        float show_distance;
+        if(!TextUtils.isEmpty(mList.get(position).getDistance())) {
+            distance = Long.valueOf(mList.get(position).getDistance());
+            show_distance = distance / 1000;
+        }else{
+            distance = 0;
+            show_distance = 0;
+        }
+        if(show_distance > 10) {
+            viewHolder.mRange.setText(mContext.getString(R.string.nearby_room_subfragment_listitem_range, show_distance));
+        }else{
+            viewHolder.mRange.setText(mContext.getString(R.string.in_meter,distance));
+        }
         return convertView;
     }
 
@@ -82,5 +98,6 @@ public class AddAdapter extends BaseAdapter {
         public TextView mNickName;
         public TextView mGender;
         public TextView mDistrict;
+        public TextView mRange;
     }
 }

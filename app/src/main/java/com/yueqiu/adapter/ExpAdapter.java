@@ -106,6 +106,8 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
             holder.feelView = (TextView) convertView.findViewById(R.id.cpntact_list_item_state);
             holder.iconView = (CustomNetWorkImageView) convertView.findViewById(R.id.icon);
             holder.date = (TextView) convertView.findViewById(R.id.contact_list_item_time);
+            holder.groupId = groupPosition;
+            holder.info = (ContactsList.Contacts) getChild(groupPosition, childPosition);
             convertView.setTag(holder);
         } else {
             holder = (ChildHolder) convertView.getTag();
@@ -189,11 +191,13 @@ public class ExpAdapter extends BaseExpandableListAdapter implements
         }
     }
 
-    class ChildHolder {
+    public class ChildHolder {
         TextView nameView;
         TextView feelView;
         CustomNetWorkImageView iconView;
         TextView date;
+        public int groupId;
+        public ContactsList.Contacts info;
     }
 
     class GroupHolder {

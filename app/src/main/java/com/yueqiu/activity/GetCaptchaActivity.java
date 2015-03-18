@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
@@ -44,20 +45,25 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
 
     private EditText mEtPhone;
     private EditText mEtCheckNum;
-    private TextView mGetCheckNum, mTvLogin, mTvAgree;
+    private TextView mGetCheckNum, mTvLogin, mTvAgree,mBottomGuide;
     private Button mBtnNext;
     private String mPhone;
     private int mCode;
     private ActionBar mActionBar;
     private CheckBox mCheckBox;
     private ProgressBar mPreProgress;
+    private TextView mPreTextView;
     private Drawable mProgressDrawable;
     private Map<String,String> mParamMap = new HashMap<String, String>();
+    private int mCaptchaType;
+    private View mArtivleView;
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             mPreProgress.setVisibility(View.GONE);
+            mPreTextView.setVisibility(View.GONE);
+            mBtnNext.setEnabled(true);
             switch (msg.what) {
 
                 case PublicConstant.GET_SUCCESS:
@@ -90,6 +96,17 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_with_captcha);
 
+        mCaptchaType = getIntent().getIntExtra(PublicConstant.GET_CAPTCHA_TYPE,0);
+
+        initActionBar();
+        initView();
+
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        mCaptchaType = intent.getIntExtra(PublicConstant.GET_CAPTCHA_TYPE,0);
         initActionBar();
         initView();
     }
@@ -97,7 +114,11 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
     private void initActionBar() {
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setTitle(getString(R.string.register));
+        if(mCaptchaType == PublicConstant.GET_CAPTCHA_TYPE_FORGET){
+            mActionBar.setTitle(getString(R.string.forget_password));
+        }else {
+            mActionBar.setTitle(getString(R.string.register));
+        }
     }
 
     private void initView(){
@@ -109,6 +130,18 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
         mTvLogin = (TextView) findViewById(R.id.activity_checkphone_tv_login);
         mTvAgree = (TextView) findViewById(R.id.checkphone_read_and_agree_the_article);
         mCheckBox = (CheckBox) findViewById(R.id.checkphone_agree_article_check);
+        mBottomGuide = (TextView) findViewById(R.id.bottom_guide);
+        mArtivleView = findViewById(R.id.article_layout);
+        if(mCaptchaType == PublicConstant.GET_CAPTCHA_TYPE_FORGET){
+            mBottomGuide.setText(getString(R.string.have_no_account_yet));
+            mTvLogin.setText(getString(R.string.register_right_now));
+            mArtivleView.setVisibility(View.GONE);
+        }else if(mCaptchaType == PublicConstant.GET_CAPTCHA_TYPE_REGIST){
+            mBottomGuide.setText(getString(R.string.already_have_account));
+            mTvLogin.setText(getString(R.string.login_right_now));
+            mArtivleView.setVisibility(View.VISIBLE);
+        }
+
         SpannableString spanStr = new SpannableString(getString(R.string.already_read_and_agree_the_article));
         spanStr.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.have_agree_and_read)), 0, 7, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanStr.setSpan(new MyURLSpan("file://android_asset/policy.html"), 7, 16, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -118,6 +151,8 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
         mGetCheckNum.setOnClickListener(this);
         mBtnNext.setOnClickListener(this);
 
+        mPreTextView = (TextView) findViewById(R.id.pre_text);
+        mPreTextView.setText(getString(R.string.getting_captcha));
         mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
         mProgressDrawable = new FoldingCirclesDrawable.Builder(this).build();
         Rect bounds = mPreProgress.getIndeterminateDrawable().getBounds();
@@ -129,6 +164,7 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.tv_register_getchecknum:
+
                 mPhone = mEtPhone.getText().toString();
                 if (mPhone.length() != 11) {
                     Utils.showToast(GetCaptchaActivity.this,getString(R.string.please_input_right_number));
@@ -142,43 +178,75 @@ public class GetCaptchaActivity extends Activity implements View.OnClickListener
                 Utils.dismissInputMethod(this,mEtPhone);
                 break;
             case R.id.activity_checkphone_btn_register:
+                if(TextUtils.isEmpty(mEtPhone.getText().toString())){
+                    Utils.showToast(this,getString(R.string.phone_can_not_empty));
+                    return;
+                }
+                if(!mPhone.equals(mEtPhone.getText().toString())){
+                    Utils.showToast(this,getString(R.string.phone_not_same));
+                    return;
+                }
+                if (mPhone.length() != 11) {
+                    Utils.showToast(GetCaptchaActivity.this,getString(R.string.please_input_right_number));
+                    return;
+                }
                 String code = mEtCheckNum.getText().toString().trim();
                 if (code == null || code.equals("")) {
                     Utils.showToast(GetCaptchaActivity.this,getString(R.string.please_input_captcha));
                     return;
                 }
-                if (!code.equals(String.valueOf(mCode))) {
+                if (Integer.valueOf(code) != mCode) {
                     Utils.showToast(GetCaptchaActivity.this,getString(R.string.captcha_is_wrong));
                     return;
                 }
 
-                if (!mCheckBox.isChecked()) {
-                    Utils.showToast(GetCaptchaActivity.this,getString(R.string.please_read_article));
-                    return;
-                }
+                if(mCaptchaType == PublicConstant.GET_CAPTCHA_TYPE_REGIST) {
+                    if (!mCheckBox.isChecked()) {
+                        Utils.showToast(GetCaptchaActivity.this, getString(R.string.please_read_article));
+                        return;
+                    }
 
-                Intent intent = new Intent();
-                Bundle bundle = new Bundle();
-                bundle.putString(HttpConstants.RegisterConstant.PHONE, mPhone);
-                bundle.putString(HttpConstants.RegisterConstant.VERFICATION_CODE, String.valueOf(mCode));
-                intent.setClass(GetCaptchaActivity.this, Register1Activity.class);
-                intent.putExtras(bundle);
-                startActivity(intent);
-                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                    Intent intent = new Intent();
+                    Bundle bundle = new Bundle();
+                    bundle.putString(HttpConstants.RegisterConstant.PHONE, mPhone);
+                    bundle.putString(HttpConstants.RegisterConstant.VERFICATION_CODE, String.valueOf(mCode));
+                    intent.setClass(GetCaptchaActivity.this, Register1Activity.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                }else if(mCaptchaType == PublicConstant.GET_CAPTCHA_TYPE_FORGET){
+                    Intent reset = new Intent(this,ResetPasswordActivity.class);
+                    reset.putExtra(HttpConstants.ResetPwd.PHONE,mPhone);
+                    reset.putExtra(HttpConstants.ResetPwd.VERFICATION,mCode);
+                    startActivity(reset);
+                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                }
                 break;
             case R.id.activity_checkphone_tv_login:
-                this.finish();
-                overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                if(mCaptchaType == PublicConstant.GET_CAPTCHA_TYPE_FORGET){
+                    Intent registerIntent = new Intent(this,GetCaptchaActivity.class);
+                    registerIntent.putExtra(PublicConstant.GET_CAPTCHA_TYPE,PublicConstant.GET_CAPTCHA_TYPE_REGIST);
+                    startActivity(registerIntent);
+                }else {
+                    this.finish();
+                    overridePendingTransition(R.anim.push_right_in, R.anim.push_right_out);
+                }
                 break;
         }
     }
 
     private void getCaptcha(){
 
+        mBtnNext.setEnabled(false);
         mPreProgress.setVisibility(View.VISIBLE);
+        mPreTextView.setVisibility(View.VISIBLE);
 
         mParamMap.put(HttpConstants.Captcha.PHONE,mPhone);
-        mParamMap.put(HttpConstants.Captcha.ACTION_TYPE,String.valueOf(3));
+        if(mCaptchaType == PublicConstant.GET_CAPTCHA_TYPE_REGIST) {
+            mParamMap.put(HttpConstants.Captcha.ACTION_TYPE, String.valueOf(3));
+        }else if(mCaptchaType == PublicConstant.GET_CAPTCHA_TYPE_FORGET){
+            mParamMap.put(HttpConstants.Captcha.ACTION_TYPE, String.valueOf(2));
+        }
 
         //TODO:暂时用testHttp这个方法，等所有接口都部署到新服务器地址后改回requestHttp
         HttpUtil.testHttp(HttpConstants.Captcha.URL,mParamMap,HttpConstants.RequestMethod.POST,new JsonHttpResponseHandler(){

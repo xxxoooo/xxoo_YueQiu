@@ -559,8 +559,23 @@
     <string name="sure">确定</string>
     <string name="data_from_dazhong">列表数据来自大众点评</string>
     <string name="ask_already_null">好友申请列表已经为空</string>
-
     <string name="please_send_jpg">请发送jpg图片</string>
     <string name="image_send_fail">图片消息发送失败</string>
+    <string name="delete_friend_fail">删除好友失败</string>
+    <string name="forget_password">忘记密码</string>
+    <string name="title_activity_reset_password">ResetPasswordActivity</string>
+    <string name="new_password">新密码</string>
+    <string name="again_new_password">重复新密码</string>
+    <string name="reset_pwd">重置密码</string>
+    <string name="new_pwd_can_not_empty">新密码不能为空</string>
+    <string name="please_input_new_pwd_again">请再次输入新密码</string>
+    <string name="two_pwd_not_same">两次输入的密码不一致</string>
+    <string name="reset_success">重置密码成功</string>
+    <string name="phone_can_not_empty">请输入手机号码</string>
+    <string name="phone_not_same">当前手机号与获取验证码的手机号不一致</string>
+    <string name="getting_captcha">正在获取验证码...</string>
+    <string name="resetting">正在重置...</string>
+    <string name="registing">正在注册...</string>
+    <string name="logining">正在登录...</string>
 
 </resources>

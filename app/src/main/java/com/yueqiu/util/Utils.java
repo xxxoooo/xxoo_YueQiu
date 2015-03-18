@@ -47,6 +47,7 @@ import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
+import com.yueqiu.activity.NearbyBilliardRoomActivity;
 import com.yueqiu.activity.WeiboShareActionCompleteActivity;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
@@ -512,6 +513,7 @@ public class Utils
 
         View.OnClickListener listener = new View.OnClickListener()
         {
+            @TargetApi(Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v)
             {
@@ -833,10 +835,12 @@ public class Utils
      */
     public static Bitmap getCurrentScreenShot(View view)
     {
+        final int width = view.getWidth();
+        final int height = view.getHeight();
         Bitmap bitmap = Bitmap.createBitmap(
-                view.getWidth(),
-                view.getHeight(),
-                Bitmap.Config.ARGB_8888);
+                width,
+                height,
+                Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(bitmap);
         view.draw(canvas);
 

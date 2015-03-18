@@ -67,6 +67,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
             super.handleMessage(msg);
             mPreProgress.setVisibility(View.GONE);
             mPreText.setVisibility(View.GONE);
+            mBtnLogin.setEnabled(true);
             switch (msg.what) {
                 case PublicConstant.REQUEST_ERROR:
                     if(msg.obj == null){
@@ -128,6 +129,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         mEtUserId = (EditText) findViewById(R.id.activity_login_et_username);
         mEtPwd = (EditText) findViewById(R.id.activity_login_et_password);
         mRootView = findViewById(R.id.login_root_view);
+        mTvForgetPwd = (TextView) findViewById(R.id.forget_password_tv);
 
 
         mPreProgress = (ProgressBar) findViewById(R.id.pre_progress);
@@ -136,11 +138,12 @@ public class LoginActivity extends Activity implements View.OnClickListener{
         mPreProgress.setIndeterminateDrawable(mProgressDrawable);
         mPreProgress.getIndeterminateDrawable().setBounds(bounds);
         mPreText = (TextView) findViewById(R.id.pre_text);
-        mPreText.setText(getString(R.string.pre_login_text));
+        mPreText.setText(getString(R.string.logining));
 ////
         mBtnLogin.setOnClickListener(this);
         mImm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mTvRegister.setOnClickListener(this);
+        mTvForgetPwd.setOnClickListener(this);
 
         ViewTreeObserver observer = mRootView.getViewTreeObserver();
         observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -185,7 +188,15 @@ public class LoginActivity extends Activity implements View.OnClickListener{
                 mImm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                 break;
             case R.id.activity_login_tv_register:
-                startActivity(new Intent(LoginActivity.this, GetCaptchaActivity.class));
+                Intent registerIntent = new Intent(this,GetCaptchaActivity.class);
+                registerIntent.putExtra(PublicConstant.GET_CAPTCHA_TYPE,PublicConstant.GET_CAPTCHA_TYPE_REGIST);
+                startActivity(registerIntent);
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                break;
+            case R.id.forget_password_tv:
+                Intent forgetIntent = new Intent(this,GetCaptchaActivity.class);
+                forgetIntent.putExtra(PublicConstant.GET_CAPTCHA_TYPE,PublicConstant.GET_CAPTCHA_TYPE_FORGET);
+                startActivity(forgetIntent);
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
         }
@@ -197,6 +208,7 @@ public class LoginActivity extends Activity implements View.OnClickListener{
 
         mPreProgress.setVisibility(View.VISIBLE);
         mPreText.setVisibility(View.VISIBLE);
+        mBtnLogin.setEnabled(false);
 
         Map<String, String> params = new HashMap<String, String>();
         params.put(HttpConstants.LoginConstant.USERNAME, mUserName);

@@ -28,6 +28,7 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -42,6 +43,7 @@ import com.amap.api.location.LocationManagerProxy;
 import com.amap.api.location.LocationProviderProxy;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
+import com.yueqiu.activity.RequestAddFriendActivity;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyMateSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyDatingDetailedAlreadyBean;
@@ -49,6 +51,7 @@ import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.daoimpl.NearbyMateDaoImpl;
+import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
@@ -84,7 +87,7 @@ import static com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils.KEY_S
  * 使用RadioButton来进行控制了。
  */
 @SuppressLint("ValidFragment")
-public class BilliardsNearbyMateFragment extends Fragment
+public class BilliardsNearbyMateFragment extends Fragment implements AdapterView.OnItemClickListener
 {
     private static final String TAG = "DeskBallFragment";
     private static final String TAG_2 = "data_retrieve_debug";
@@ -99,6 +102,7 @@ public class BilliardsNearbyMateFragment extends Fragment
     private LocationManagerProxy mLocationManagerProxy;
 
     private PullToRefreshListView mSubFragmentListView;
+    private ListView mMateListView;
 
     @SuppressLint("ValidFragment")
     public BilliardsNearbyMateFragment()
@@ -190,8 +194,11 @@ public class BilliardsNearbyMateFragment extends Fragment
         commonUtils.initViewPager(mContext, mView);
 
         mSubFragmentListView = (PullToRefreshListView) mView.findViewById(R.id.search_sub_fragment_list);
+        mMateListView = mSubFragmentListView.getRefreshableView();
+
         mSubFragmentListView.setMode(PullToRefreshBase.Mode.BOTH);
         mSubFragmentListView.setOnRefreshListener(mOnRefreshListener);
+        mSubFragmentListView.setOnItemClickListener(this);
 
         mPreProgress = (ProgressBar) mView.findViewById(R.id.pre_progress);
         mPreTextView = (TextView) mView.findViewById(R.id.pre_text);
@@ -245,9 +252,10 @@ public class BilliardsNearbyMateFragment extends Fragment
 
 
         mMateListAdapter = new NearbyMateSubFragmentListAdapter(mContext,  mUserList);
-        mSubFragmentListView.setAdapter(mMateListAdapter);
+//        mSubFragmentListView.setAdapter(mMateListAdapter);
+        mMateListView.setAdapter(mMateListAdapter);
 
-//        mMateListAdapter.notifyDataSetChanged();
+        mMateListAdapter.notifyDataSetChanged();
 
         mLoadMore = false;
         mRefresh = false;
@@ -457,7 +465,7 @@ public class BilliardsNearbyMateFragment extends Fragment
     private static final String KEY_REQUEST_START_NUM = "requestStartNum";
     private static final String KEY_REQUEST_END_NUM = "requestEndNum";
 
-    private static final int DATA_HAS_BEEN_UPDATED = 1 << 8;
+//    private static final int DATA_HAS_BEEN_UPDATED = 1 << 8;
     private static final int START_RETRIEVE_ALL_DATA = 1 << 1;
 
     private static final int DATA_RETRIEVE_SUCCESS = 1 << 2;
@@ -577,7 +585,6 @@ public class BilliardsNearbyMateFragment extends Fragment
 
                     if (mUserList.isEmpty())
                     {
-                        Log.d("scguo_tag", "load emptyView 2");
                         setEmptyVewVisible();
                     } else
                     {
@@ -633,7 +640,7 @@ public class BilliardsNearbyMateFragment extends Fragment
                     break;
                 case HIDE_PROGRESSBAR:
                     setEmptyViewGone();
-                    mMateListAdapter.notifyDataSetChanged();
+//                     mMateListAdapter.notifyDataSetChanged();
                     hideProgress();
                     // 当我们将数据获取完之后，就需要经Refresh的标记去掉，否则会一直在那里转
                     if (mSubFragmentListView.isRefreshing())
@@ -643,7 +650,6 @@ public class BilliardsNearbyMateFragment extends Fragment
 
                     if (mUserList.isEmpty())
                     {
-                        Log.d("scguo_tag", "load emptyView 4");
                         setEmptyVewVisible();
                     }
                     Log.d(TAG, " hiding the progress bar ");
@@ -666,11 +672,11 @@ public class BilliardsNearbyMateFragment extends Fragment
 //                    }
 //                    break;
 
-                case DATA_HAS_BEEN_UPDATED:
-                    mMateListAdapter.notifyDataSetChanged();
-                    Log.d(TAG, " inside the UIEventsHandler --> the adapter has been notified ");
-
-                    break;
+//                case DATA_HAS_BEEN_UPDATED:
+////                    mMateListAdapter.notifyDataSetChanged();
+//                    Log.d(TAG, " inside the UIEventsHandler --> the adapter has been notified ");
+//
+//                    break;
 
 //                case PublicConstant.TIME_OUT:
 //                    setEmptyViewGone();
@@ -770,7 +776,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                                 Log.d(TAG, "inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
                                 mUserList.clear();
                                 // 然后通知Adapter当中的数据源已经发生变化，所以更新Adapter
-                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+//                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                                mMateListAdapter.notifyDataSetChanged();
                             }
                             Log.d(TAG, " inside the workThread --> start filtering the mate list based on the range of the current user " + mArgs);
                             // 每次筛选，都是从第0条开始请求最新的数据
@@ -784,7 +791,8 @@ public class BilliardsNearbyMateFragment extends Fragment
                             {
                                 Log.d(TAG, " inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
                                 mUserList.clear();
-                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+//                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
+                                mMateListAdapter.notifyDataSetChanged();
                             }
                             Log.d(TAG, " inside the workThread --> start filtering the mate list based on the gender of the current user " + mArgs);
                             if (sParamsPreference.getMateRange(mContext) != null) {
@@ -797,10 +805,14 @@ public class BilliardsNearbyMateFragment extends Fragment
                     }
                     break;
             }
+
+            mMateListView.setAdapter(mMateListAdapter);
             mMateListAdapter.notifyDataSetChanged();
-            if(mLoadMore && !mUserList.isEmpty()){
-                mSubFragmentListView.getRefreshableView().setSelection(mCurrentPos - 1);
+            if(mLoadMore && !mUserList.isEmpty())
+            {
+                mMateListView.setSelection(mCurrentPos - 1);
             }
+//            mMateListView.setSelection(mCurrentPos - 1);
         }
     };
 
@@ -844,6 +856,16 @@ public class BilliardsNearbyMateFragment extends Fragment
 
     private static final String WORKER_NAME = "BackgroundWorker";
     private BackgroundWorker mWorker;
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Intent intent = new Intent(getActivity(), RequestAddFriendActivity.class);
+        int friendUserId = Integer.valueOf(mUserList.get(i-1).getUserId());
+        String username = mUserList.get(i-1).getUserNickName();
+        intent.putExtra(AddPersonFragment.FRIEND_INFO_USER_ID, friendUserId);
+        intent.putExtra(AddPersonFragment.FRIEND_INFO_USERNAME, username);
+        startActivity(intent);
+    }
 
     // 这个Handler是真正在后台当中控制所有繁重任务的Handler，包括基本的网络请求和从数据库当中检索数据
     private class BackgroundWorker extends HandlerThread

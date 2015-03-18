@@ -8,6 +8,7 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import com.android.volley.toolbox.NetworkImageView;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.bean.UserInfo;
+import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
@@ -136,10 +138,53 @@ public class FriendProfileFragment extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
+                Log.d("wy","friend profile response ->" + response);
                 Message message = new Message();
                 try {
                     if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
-                        mFriendInfo = Utils.mapingObject(UserInfo.class, response.getJSONObject("result"));
+//                        mFriendInfo = Utils.mapingObject(UserInfo.class, response.getJSONObject("result"));
+
+
+                        String user_id = response.getJSONObject("result").getString(DatabaseConstant.UserTable.USER_ID);
+                        String sex = response.getJSONObject("result").getString(DatabaseConstant.UserTable.SEX);
+                        String img_url = response.getJSONObject("result").getString(DatabaseConstant.UserTable.IMG_URL);
+                        String username = response.getJSONObject("result").getString(DatabaseConstant.UserTable.USERNAME);
+                        String nick = response.getJSONObject("result").getString(DatabaseConstant.UserTable.NICK);
+                        String district = response.getJSONObject("result").getString(DatabaseConstant.UserTable.DISTRICT);
+                        String level = response.getJSONObject("result").getString(DatabaseConstant.UserTable.LEVEL);
+                        String ball_type = response.getJSONObject("result").getString(DatabaseConstant.UserTable.BALL_TYPE);
+                        String appoint_date = response.getJSONObject("result").getString(DatabaseConstant.UserTable.APPOINT_DATE);
+                        String ball_arm = response.getJSONObject("result").getString(DatabaseConstant.UserTable.BALLARM);
+                        String usedType = response.getJSONObject("result").getString(DatabaseConstant.UserTable.USERDTYPE);
+                        String ball_age = response.getJSONObject("result").getString(DatabaseConstant.UserTable.BALLAGE);
+                        String idol = response.getJSONObject("result").getString(DatabaseConstant.UserTable.IDOL);
+                        String idol_name = response.getJSONObject("result").getString(DatabaseConstant.UserTable.IDOL_NAME);
+                        String new_img = response.getJSONObject("result").getString(DatabaseConstant.UserTable.NEW_IMG);
+                        String cost = response.getJSONObject("result").getString(DatabaseConstant.UserTable.COST);
+                        String my_type = response.getJSONObject("result").getString(DatabaseConstant.UserTable.MY_TYPE);
+                        String work_live = response.getJSONObject("result").getString(DatabaseConstant.UserTable.WORK_LIVE);
+                        int zizhi = response.getJSONObject("result").getInt(DatabaseConstant.UserTable.ZIZHI);
+
+
+                        mFriendInfo = new UserInfo();
+                        mFriendInfo.setUser_id(Integer.valueOf(user_id));
+                        mFriendInfo.setSex(Integer.valueOf(sex));
+                        mFriendInfo.setImg_url(img_url);
+                        mFriendInfo.setUsername(username);
+                        mFriendInfo.setNick(nick);
+                        mFriendInfo.setDistrict(district);
+                        mFriendInfo.setLevel(Integer.valueOf(level));
+                        mFriendInfo.setBall_type(Integer.valueOf(ball_type));
+                        mFriendInfo.setAppoint_date(appoint_date);
+                        mFriendInfo.setBallArm(Integer.valueOf(ball_arm));
+                        mFriendInfo.setUsedType(Integer.valueOf(usedType));
+                        mFriendInfo.setBallAge(ball_age);
+                        mFriendInfo.setIdol(idol);
+                        mFriendInfo.setIdol_name(idol_name);
+                        mFriendInfo.setCost(cost);
+                        mFriendInfo.setMy_type(Integer.valueOf(my_type));
+                        mFriendInfo.setWork_live(work_live);
+                        mFriendInfo.setZizhi(zizhi);
                         message.what = DATA_SUCCESS;
                         message.obj = mFriendInfo;
 
@@ -194,7 +239,8 @@ public class FriendProfileFragment extends Fragment {
         account = mFriendInfo.getUsername();
         gender = mFriendInfo.getSex() == 1
                 ? getString(R.string.man) : getString(R.string.woman);
-        nick_name = mFriendInfo.getUsername();
+        nick_name = TextUtils.isEmpty(mFriendInfo.getNick()) ?
+                getString(R.string.unset) : mFriendInfo.getNick();
         district = "".equals(mFriendInfo.getDistrict()) ?
                 "未知" : mFriendInfo.getDistrict();
         level = 1 == mFriendInfo.getLevel()

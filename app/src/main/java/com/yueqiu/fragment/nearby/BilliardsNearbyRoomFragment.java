@@ -394,8 +394,10 @@ public class BilliardsNearbyRoomFragment extends Fragment
         requestParams.put("city", city);
         // 我们这里采用默认的策略，因为有些参数还是要添加的，如果用户没有设置的话，我们就直接赋予一个默认值就可以了
         // 比如说用户没有指定region，那么我们就将默认的区域设置为“朝阳区”(当然我们也可以设置成昌平区)
-        String regionVal = TextUtils.isEmpty(region) ? "朝阳区" : region;
-        requestParams.put("region", regionVal);
+//        String regionVal = TextUtils.isEmpty(region) ? "朝阳区" : region;
+        if(!TextUtils.isEmpty(region)) {
+            requestParams.put("region", region);
+        }
 
         Log.d(TAG_1, " the current room request params are --> 1. region : " + region + ", range : " + range + " sort : " + sort + " limit : " + limit +
                 " page : " + page);
@@ -448,6 +450,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                             JSONArray businessJsonArr = response.getJSONArray("businesses");
 
                             final int size = businessJsonArr.length();
+                            Log.d("wy","room size is ->" + size);
                             Log.d(TAG_1, " the total json objects we get are : " + size);
                             if(size < 1){
                                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
@@ -843,7 +846,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
                     {
                         if (mLoadMore)
                         {
-                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.nearby_billiard_coauch_str)));
+                            Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.nearby_billiard_room_str)));
                         }
                     }
                     hideProgress();
@@ -1121,7 +1124,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
             mLoadMore = true;
 
-            if (mBeforeCount != mAfterCount && !mRefresh)
+//            if (mBeforeCount != mAfterCount && !mRefresh)
                 mPage += 1;
             mRefresh = false;
             mCurrentPos = mRoomList.size();

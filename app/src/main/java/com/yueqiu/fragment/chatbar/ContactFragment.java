@@ -10,10 +10,14 @@ import android.os.Message;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.gotye.api.GotyeAPI;
@@ -54,6 +58,8 @@ import java.util.Map;
  */
 public class ContactFragment extends Fragment {
 
+    private static final int DELETE_SUCCESS = 42;
+    private static final int DELETE_FAILED = 43;
     private static final String TAG = "ContactFragment";
     private ActionBar mActionBar;
     private Context mContext;
@@ -61,11 +67,15 @@ public class ContactFragment extends Fragment {
     private LoadingView mLoadingView;
     private IphoneTreeView mIphoneTreeView;
     private ExpAdapter mExpAdapter;
-    private HashMap<Integer, List<ContactsList.Contacts>> mMaps;
     private Map<String, String> mMapArgument = new HashMap<String, String>();
     private ContactsDao mContactsDao;
     private List<GotyeChatTarget> mTargets;
     private GotyeAPI mApi;
+    private ContactsList.Contacts mDeleteContact;
+    private int mDeleteGroupId;
+    private HashMap<Integer, List<ContactsList.Contacts>> mMaps = new HashMap<Integer, List<ContactsList.Contacts>>();
+    private List<ContactsList.Contacts> mList = new ArrayList<ContactsList.Contacts>();
+    private int mChildId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,6 +93,7 @@ public class ContactFragment extends Fragment {
         findView();
         init();
         initData();
+
         return mBaseView;
     }
 
@@ -99,6 +110,7 @@ public class ContactFragment extends Fragment {
     private void findView() {
         mLoadingView = (LoadingView) mBaseView.findViewById(R.id.loadingView);
         mIphoneTreeView = (IphoneTreeView) mBaseView.findViewById(R.id.iphone_tree_view);
+        registerForContextMenu(mIphoneTreeView);
     }
 
     private void init() {
@@ -134,6 +146,8 @@ public class ContactFragment extends Fragment {
                 return true;
             }
         });
+        registerForContextMenu(mIphoneTreeView);
+
     }
 
     public void initData() {
@@ -148,6 +162,73 @@ public class ContactFragment extends Fragment {
         }
         getContactList();
 //        getAllContact();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        ExpandableListView.ExpandableListContextMenuInfo info =(ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
+        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
+
+
+        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD )
+        {
+            menu.add(0,1,0,"删除好友" );
+        }
+
+        View view = (View)info.targetView;
+        mDeleteContact= ((ExpAdapter.ChildHolder)view.getTag()).info;
+        mDeleteGroupId = ((ExpAdapter.ChildHolder)view.getTag()).groupId;
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        ExpandableListView.ExpandableListContextMenuInfo info=
+                (ExpandableListView.ExpandableListContextMenuInfo)item.getMenuInfo();
+        mChildId = ExpandableListView
+                .getPackedPositionChild(info.packedPosition);
+        switch(item.getItemId()){
+            case 1:
+                deleteFriend();
+                break;
+        }
+        return true;
+    }
+
+    private void deleteFriend(){
+        Map<String,String> param = new HashMap<String, String>();
+        param.put(HttpConstants.DeleteFriend.MY_ID,String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+        param.put(HttpConstants.DeleteFriend.FRIEND_ID,String.valueOf(mDeleteContact.getUser_id()));
+        param.put(HttpConstants.DeleteFriend.GROUP_ID,String.valueOf(mDeleteGroupId + 1));
+
+        HttpUtil.requestHttp(HttpConstants.DeleteFriend.URL,param,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                super.onSuccess(statusCode, headers, response);
+                Log.d("wy","delete friend response ->" + response);
+                try{
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            List<ContactsList.Contacts> list = mMaps.get(mDeleteGroupId);
+                            list.remove(mChildId);
+                            mMaps.put(mDeleteGroupId,list);
+                            mHandler.obtainMessage(DELETE_SUCCESS,mMaps).sendToTarget();
+                        }else{
+                            mHandler.obtainMessage(DELETE_FAILED,response.getString("msg")).sendToTarget();
+                        }
+                    }else{
+                        mHandler.sendEmptyMessage(DELETE_FAILED);
+                    }
+                }catch(JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                super.onFailure(statusCode, headers, responseString, throwable);
+                mHandler.sendEmptyMessage(DELETE_FAILED);
+            }
+        });
     }
 
     /**
@@ -186,7 +267,7 @@ public class ContactFragment extends Fragment {
      * 从网络中获取好友列表信息
      */
     private void getContactList() {
-        final HashMap<Integer, List<ContactsList.Contacts>> maps = new HashMap<Integer, List<ContactsList.Contacts>>();
+
         for (int i = 0; i < 3; i++) {
             final Map<String, Integer> map = new HashMap<String, Integer>();
             map.put(DatabaseConstant.UserTable.USER_ID, YueQiuApp.sUserInfo.getUser_id());
@@ -227,10 +308,10 @@ public class ContactFragment extends Fragment {
                                         contacts.setCreate_time(list_data.getJSONObject(j).getString("create_time"));
                                         contacts.setPhone(list_data.getJSONObject(j).getString("phone"));
                                         contactsList.mList.add(contacts);
-
-                                        maps.put(key, contactsList.mList);
+                                        mList = contactsList.mList;
+                                        mMaps.put(key, mList);
                                     }
-                                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS, maps).sendToTarget();
+                                    mHandler.obtainMessage(PublicConstant.GET_SUCCESS, mMaps).sendToTarget();
                                 }
                             }
                             //http请求超时
@@ -281,6 +362,19 @@ public class ContactFragment extends Fragment {
                     break;
                 case PublicConstant.NO_RESULT:
 //                    Utils.showToast(getActivity(), getString(R.string.no_contact_info));
+                    break;
+
+                case DELETE_FAILED:
+                    if (null == msg.obj) {
+                        Utils.showToast(getActivity(), getString(R.string.delete_friend_fail));
+                    } else {
+                        Utils.showToast(getActivity(), (String) msg.obj);
+                    }
+                    break;
+                case DELETE_SUCCESS:
+                    HashMap<Integer, List<ContactsList.Contacts>> map = (HashMap<Integer, List<ContactsList.Contacts>>) msg.obj;
+                    mExpAdapter.setData(map);
+                    mExpAdapter.notifyDataSetChanged();
                     break;
                 default:
                     break;

@@ -223,7 +223,6 @@ public class BilliardNearbyActivity extends FragmentActivity implements ActionBa
             @Override
             public void onGlobalLayout() {
                 YueQiuApp.sBottomHeight = mGroup.getHeight();
-                Log.d("wy", "bottom height ->" + YueQiuApp.sBottomHeight);
             }
         });
 

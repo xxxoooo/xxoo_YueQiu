@@ -22,9 +22,11 @@ public class PublicConstant {
     public static final String SEARCH_TYPE = "search_type";
     public static final String SEARCH_KEYWORD = "search_keyword";
     public static final String TYPE = "type";
+    public static final String GET_CAPTCHA_TYPE = "captcha_type";
 
     // 用于分享到新浪微博的bitmap
     public static final String SHARE_TO_SINA_BITMAP = "shareToSinaBitmap";
+    public static final String SHARE_TO_SINA_DATA = "shareToSinaData";
 
     public static final int GET_SUCCESS   = 0;
     public static final int NO_RESULT     = -1;
@@ -83,7 +85,7 @@ public class PublicConstant {
     public static final int SEARCH_NEARBY_DATE      = 2;
     public static final int SEARCH_NEARBY_ASSITANT  = 3;
     public static final int SEARCH_NEARBY_COACH     = 4;
-    public static final int SEARCH_NEARBY_ROOM        = 5;
+    public static final int SEARCH_NEARBY_ROOM      = 5;
 
     public static final int SEARCH_PLAY             = 6;
     public static final int SEARCH_GROUP            = 7;
@@ -97,6 +99,10 @@ public class PublicConstant {
     public static final int ZIZHI_PROFESSION        = 2;
     public static final int ZIZHI_COACH             = 3;
     public static final int ZIZHI_OTHER             = 4;
+
+
+    public static final int GET_CAPTCHA_TYPE_FORGET = 1;
+    public static final int GET_CAPTCHA_TYPE_REGIST = 2;
 
 
 }

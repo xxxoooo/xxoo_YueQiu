@@ -2,6 +2,7 @@ package com.yueqiu.bean;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -212,10 +213,16 @@ public class NearbyRoomSubFragmentRoomBean implements Parcelable
     {
         int hash = 3;
         // 我们在这里选取的是最不容易重复的四个字段，但是说实话，不太完美
-        hash = 7 * hash + this.mRoomName.hashCode();
-        hash = 7 * hash + this.mDetailedAddress.hashCode();
-        hash = 7 * hash + this.mRoomPhotoUrl.hashCode();
-        hash = 7 * hash + this.mRoomPhone.hashCode();
+        if (! TextUtils.isEmpty(getRoomName()))
+        {
+            hash = 7 * hash + this.getRoomName().hashCode();
+            hash = 7 * hash + this.getDetailedAddress().hashCode();
+            hash = 7 * hash + this.getRoomPhotoUrl().hashCode();
+            hash = 7 * hash + this.getRoomPhone().hashCode();
+        } else
+        {
+
+        }
         return hash;
     }
 

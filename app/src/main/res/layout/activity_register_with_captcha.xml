@@ -67,7 +67,6 @@
             android:drawablePadding="10dp"
             android:hint="@string/check_num"
             android:phoneNumber="true"
-            android:digits="@string/inputtype"
             android:textColorHint="@color/edit_text_hint_color"
             android:textColor="@color/md__defaultBackground"
             android:singleLine="true" />
@@ -94,6 +93,7 @@
             android:textSize="20sp" />
     </LinearLayout>
     <LinearLayout
+        android:id="@+id/article_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -113,8 +113,6 @@
             android:layout_marginLeft="10dp"
             />
 
-
-
     </LinearLayout>
 
     <LinearLayout
@@ -127,6 +125,7 @@
         android:layout_width="match_parent">
 
         <TextView
+            android:id="@+id/bottom_guide"
             style="@style/ListItemTvStyle"
             android:textSize="18sp"
             android:text="@string/already_have_account" />

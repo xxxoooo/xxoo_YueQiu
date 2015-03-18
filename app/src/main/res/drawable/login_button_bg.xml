@@ -9,6 +9,13 @@
             <corners android:radius="5dp"></corners>
         </shape>
     </item>
+
+    <item android:state_enabled="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/gray_font"></solid>
+            <corners android:radius="5dp"></corners>
+        </shape>
+    </item>
     <!-- the default state -->
     <item>
         <shape android:shape="rectangle">

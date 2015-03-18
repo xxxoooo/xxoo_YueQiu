@@ -45,7 +45,6 @@ import java.util.List;
  */
 public class NearbyFragmentsCommonUtils{
     private static final String TAG = "NearbyFragmentsCommonUtils";
-    private static final String TAG_1 = "empty_visibility_debug";
     public static interface ControlPopupWindowCallback
     {
         public void closePopupWindow();
@@ -213,13 +212,14 @@ public class NearbyFragmentsCommonUtils{
                                         roomDetailInfo,// roomInfo
                                         roomShopHours // shopHours营业时间
                                 );
+
                                 cacheRoomList.add(roomItem);
                             }
                             // 现在我们就需要将我们获得的数据传递出去
                             mInternalHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheRoomList).sendToTarget();
                         }
                     }
-                    else{
+                    else {
                         mInternalHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
                     }
                 } catch (JSONException e)
@@ -248,10 +248,13 @@ public class NearbyFragmentsCommonUtils{
 
 
 
-    private Handler mInternalHandler = new Handler(){
-        public void handleMessage(Message msg) {
+    private Handler mInternalHandler = new Handler()
+    {
+        public void handleMessage(Message msg)
+        {
             super.handleMessage(msg);
-            switch(msg.what){
+            switch(msg.what)
+            {
                 case DATA_RETRIEVE_SUCCESS:
 
                     mGalleryIndicatorGroup.removeAllViews();

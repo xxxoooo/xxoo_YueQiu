@@ -146,7 +146,9 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.GetCaptchaActivity"
-            android:screenOrientation="portrait" />
+            android:launchMode="singleTop"
+            android:screenOrientation="portrait"
+            android:noHistory="true"/>
         <activity
             android:name=".activity.Register1Activity"
             android:screenOrientation="portrait" />
@@ -267,8 +269,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
+        <activity
+            android:name=".activity.ResetPasswordActivity"
+            android:screenOrientation="portrait"
+            android:noHistory="true">
+        </activity>
     </application>
 
 </manifest>

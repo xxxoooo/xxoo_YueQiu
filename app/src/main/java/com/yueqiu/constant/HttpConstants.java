@@ -564,6 +564,17 @@ public class HttpConstants
         public static final String ACTION_TYPE = "action_type";
     }
 
+    public static class ResetPwd{
+
+        public static final String URL = "/user/resetPassword";
+
+        public static final String PHONE = "phone";
+
+        public static final String PASSWORD = "password";
+
+        public static final String VERFICATION = "verfication_code";
+    }
+
     public static class ChangePhoto{
 
         //TODO:服务端接口还没定
@@ -680,6 +691,16 @@ public class HttpConstants
         public static final String CONTENT = "content";
 
 
+    }
+
+    public static final class DeleteFriend{
+        public static final String URL = "/friend/delFriend";
+
+        public static final String MY_ID = "my_id";
+
+        public static final String FRIEND_ID = "friend_id";
+
+        public static final String GROUP_ID = "group_id";
     }
 
     // 这是SearchActivity当中的球厅Fragment当中的请求数据的过程

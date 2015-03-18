@@ -98,6 +98,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="@color/search_radio_normal_bg"
+        android:visibility="gone"
         >
         <ImageView
             android:layout_width="wrap_content"

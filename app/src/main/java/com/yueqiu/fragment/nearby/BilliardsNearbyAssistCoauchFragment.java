@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -37,12 +38,14 @@ import com.amap.api.location.LocationManagerProxy;
 import com.amap.api.location.LocationProviderProxy;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
+import com.yueqiu.activity.RequestAddFriendActivity;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyAssistCoauchSubFragmentListAdapter;
 import com.yueqiu.bean.NearbyAssistCoauchSubFragmentBean;
 import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
@@ -70,7 +73,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 用于NearbyActivity当中的助教子Fragment的实现
  */
 @SuppressLint("ValidFragment")
-public class BilliardsNearbyAssistCoauchFragment extends Fragment
+public class BilliardsNearbyAssistCoauchFragment extends Fragment implements AdapterView.OnItemClickListener
 {
     private final String TAG = "BilliardsNearbyAssistCoauchFragment";
     public final String BILLIARDS_Nearby_ASSIST_COAUCH_FRAGMENT_TAB_NAME = "BilliardsNearbyAssistCoauchFragment";
@@ -164,6 +167,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
         mListView = (PullToRefreshListView) mView.findViewById(R.id.search_assistcoauch_subfragment_listview);
         mListView.setMode(PullToRefreshBase.Mode.BOTH);
         mListView.setOnRefreshListener(mOnRefreshListener);
+        mListView.setOnItemClickListener(this);
 
 
         mPreProgress = (ProgressBar) mView.findViewById(R.id.pre_progress);
@@ -744,7 +748,8 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
             }
 
             mAssistCoauchListAdapter.notifyDataSetChanged();
-            if(mLoadMore && !mAssistCoauchList.isEmpty()){
+            if(mLoadMore && !mAssistCoauchList.isEmpty())
+            {
                 mListView.getRefreshableView().setSelection(mCurrentPos - 1);
             }
         }
@@ -765,6 +770,16 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment
     }
 
     private final String BACKGROUND_HANDLER_NAME = "BackgroundWorkerHandler";
+
+    @Override
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        Intent intent = new Intent(getActivity(), RequestAddFriendActivity.class);
+        int friendUserId = Integer.valueOf(mAssistCoauchList.get(i-1).getUserId());
+        String username = mAssistCoauchList.get(i-1).getName();
+        intent.putExtra(AddPersonFragment.FRIEND_INFO_USER_ID, friendUserId);
+        intent.putExtra(AddPersonFragment.FRIEND_INFO_USERNAME, username);
+        startActivity(intent);
+    }
 
     // 用于处理后台任务的处理器
     private class BackgroundWorkerHandler extends HandlerThread
