@@ -75,6 +75,6 @@ dependencies {
     compile project(':datetimepicker-library')
     compile project(':emoji-library')
     compile 'com.android.support:support-v13:21.0.3'
-//    compile 'com.mcxiaoke.volley:library:1.0.10'
+    compile 'com.mcxiaoke.volley:library:1.0.10'
     compile files('libs/gotyeapi.jar')
 }

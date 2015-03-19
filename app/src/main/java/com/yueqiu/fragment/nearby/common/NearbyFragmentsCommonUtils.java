@@ -365,7 +365,8 @@ public class NearbyFragmentsCommonUtils{
                     NetworkImageView imgView = new NetworkImageView(mContext);
                     imgView.setScaleType(ImageView.ScaleType.FIT_XY);
                     imgView.setDefaultImageResId(R.drawable.default_reommend_img);
-                    imgView.setImageUrl("", mImgLoader);
+                    imgView.setErrorImageResId(R.drawable.default_reommend_img);
+//                    imgView.setImageUrl("", mImgLoader);
                     mPagerImgArr[0] = imgView;
                     mGalleryImgAdapter = new NearbyMateFragmentViewPagerImgAdapter(mPagerImgArr);
                     mImgGalleryViewPager.setAdapter(mGalleryImgAdapter);
