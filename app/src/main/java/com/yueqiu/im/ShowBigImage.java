@@ -20,12 +20,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import com.yueqiu.R;
 import com.yueqiu.im.view.PhotoView;

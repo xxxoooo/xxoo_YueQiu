@@ -52,6 +52,8 @@
         android:src="@drawable/reading"
         android:layout_below="@+id/group_content"
         android:layout_alignBottom="@+id/group_item_image"
+        android:scaleType="fitXY"
+        android:paddingBottom="3dp"
         />
     <TextView
         android:id="@+id/billiard_group_browse_count_text"

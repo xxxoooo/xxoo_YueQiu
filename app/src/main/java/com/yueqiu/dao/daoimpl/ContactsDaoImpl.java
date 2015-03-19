@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 import com.yueqiu.bean.ContactsList;
 import com.yueqiu.constant.DatabaseConstant;

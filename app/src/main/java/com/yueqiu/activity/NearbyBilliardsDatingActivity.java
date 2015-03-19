@@ -16,9 +16,9 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +32,7 @@ import com.yueqiu.adapter.NearbyDatingDetailedGridAdapter;
 import com.yueqiu.bean.NearbyDatingDetailedAlreadyBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
+import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
@@ -150,6 +151,22 @@ public class NearbyBilliardsDatingActivity extends Activity
         mAlreadyInUserGridAdapter = new NearbyDatingDetailedGridAdapter(this, (ArrayList<NearbyDatingDetailedAlreadyBean>) mFollowList);
         mGridAlreadyFlow.setAdapter(mAlreadyInUserGridAdapter);
         mAlreadyInUserGridAdapter.notifyDataSetChanged();
+        mGridAlreadyFlow.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                if(YueQiuApp.sUserInfo.getUser_id() < 1){
+                    Toast.makeText(NearbyBilliardsDatingActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                }else {
+                    Intent intent = new Intent(NearbyBilliardsDatingActivity.this, RequestAddFriendActivity.class);
+                    int friendUserId = Integer.valueOf(mFollowList.get(position).getUserId());
+                    String username = mFollowList.get(position).getUserName();
+                    intent.putExtra(AddPersonFragment.FRIEND_INFO_USER_ID, friendUserId);
+                    intent.putExtra(AddPersonFragment.FRIEND_INFO_USERNAME, username);
+                    startActivity(intent);
+                }
+            }
+        });
 
     }
 

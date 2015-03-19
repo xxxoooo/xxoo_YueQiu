@@ -4,9 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -20,14 +18,11 @@ import com.gotye.api.GotyeNotify;
 import com.gotye.api.GotyeStatusCode;
 import com.gotye.api.GotyeUser;
 import com.gotye.api.listener.NotifyListener;
-import com.gotye.api.listener.UserListener;
 import com.yueqiu.ChatBarActivity;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.LoginActivity;
 import com.yueqiu.util.AppUtil;
-
-import java.util.List;
 
 
 public class GotyeService extends Service implements NotifyListener {

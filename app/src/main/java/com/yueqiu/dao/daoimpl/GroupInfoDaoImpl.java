@@ -5,9 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.provider.ContactsContract;
-import android.text.TextUtils;
-import android.util.Log;
 
 import com.yueqiu.bean.GroupNoteInfo;
 import com.yueqiu.constant.DatabaseConstant;

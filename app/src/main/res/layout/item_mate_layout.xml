@@ -48,7 +48,7 @@
         android:drawableRight="@drawable/male"
         android:drawablePadding="6dp"
         android:paddingLeft="4dp"
-        android:padding="4dp"
+        android:padding="2dp"
         android:layout_marginLeft="15dp"
         android:layout_marginBottom="3dp"/>
 

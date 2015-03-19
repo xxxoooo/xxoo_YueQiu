@@ -1,18 +1,11 @@
 package com.yueqiu.adapter;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.android.volley.toolbox.NetworkImageView;
-
-import java.awt.font.TextAttribute;
 
 /**
  * Created by scguo on 14/12/20.

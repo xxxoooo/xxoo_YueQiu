@@ -7,8 +7,6 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.awt.font.TextAttribute;
-
 /**
  * Created by scguo on 14/12/25.
  *

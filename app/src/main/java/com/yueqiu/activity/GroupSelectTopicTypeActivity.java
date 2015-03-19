@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.yueqiu.R;
-import com.yueqiu.constant.DatabaseConstant;
 
 public class GroupSelectTopicTypeActivity extends Activity implements View.OnClickListener{
     public static final String TOPIC_TYPE_KEY = "topic_type";

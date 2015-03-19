@@ -36,13 +36,9 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.gotye.api.GotyeAPI;
 import com.gotye.api.GotyeGender;
 import com.gotye.api.GotyeUser;
-import com.gotye.api.Icon;
-import com.gotye.api.PathUtil;
-import com.gotye.api.listener.UserListener;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.SyncHttpClient;
@@ -54,7 +50,6 @@ import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.group.ImageFragment;
-import com.yueqiu.util.BitmapUtil;
 import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.Utils;
@@ -75,9 +70,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**

@@ -15,11 +15,12 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
@@ -36,7 +37,7 @@ import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.FavorDao;
 import com.yueqiu.dao.PlayDao;
 import com.yueqiu.dao.DaoFactory;
-import com.yueqiu.util.AsyncTaskUtil;
+import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
@@ -52,7 +53,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by yinfeng on 15/1/6.
@@ -263,7 +263,7 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
 
 
 
-    private void updateUI(PlayInfo info){
+    private void updateUI(final PlayInfo info){
         if (! TextUtils.isEmpty(info.getImg_url()))
         {
             mHeadImgIv.setImageUrl("http://"+ info.getImg_url(), mImgLoader);
@@ -295,6 +295,21 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
 
         mJoinAdapter = new JoinListAdapter(this, info.mJoinList);
         mPartInGridView.setAdapter(mJoinAdapter);
+        mPartInGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(YueQiuApp.sUserInfo.getUser_id() < 1) {
+                    Toast.makeText(PlayDetailActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
+                }else{
+                    Intent intent = new Intent(PlayDetailActivity.this, RequestAddFriendActivity.class);
+                    int friendUserId = Integer.valueOf(info.mJoinList.get(position).getUser_id());
+                    String username = info.mJoinList.get(position).getUsername();
+                    intent.putExtra(AddPersonFragment.FRIEND_INFO_USER_ID, friendUserId);
+                    intent.putExtra(AddPersonFragment.FRIEND_INFO_USERNAME, username);
+                    startActivity(intent);
+                }
+            }
+        });
 
         if(! TextUtils.isEmpty(info.getExtra_img())){
             mExtraImage.setImageUrl("http://" + info.getExtra_img(),mImgLoader);

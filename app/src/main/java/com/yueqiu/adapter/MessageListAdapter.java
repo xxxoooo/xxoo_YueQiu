@@ -1,7 +1,6 @@
 package com.yueqiu.adapter;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;

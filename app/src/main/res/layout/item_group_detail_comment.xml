@@ -38,7 +38,7 @@
             android:layout_alignLeft="@+id/group_detail_comment_owner"
             android:layout_below="@+id/group_detail_comment_time"
             android:text="大力支持"
-            android:textSize="16sp"
+            android:textSize="13sp"
             android:layout_marginTop="3dp"
             android:ellipsize="end"
             android:singleLine="true"

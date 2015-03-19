@@ -1,23 +1,16 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.rockerhieu.emojicon.EmojiconTextView;
 import com.yueqiu.R;
 import com.yueqiu.bean.GroupNoteInfo;
-import com.yueqiu.constant.HttpConstants;
-import com.yueqiu.util.BitmapUtil;
-import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.CustomNetWorkImageView;
 

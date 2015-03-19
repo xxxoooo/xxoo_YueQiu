@@ -9,11 +9,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.FavorInfo;
 import com.yueqiu.bean.ISlideMenuBasic;
-import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.CustomNetWorkImageView;
 

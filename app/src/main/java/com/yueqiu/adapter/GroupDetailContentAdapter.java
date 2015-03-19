@@ -1,19 +1,23 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
-import android.util.Log;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
+import com.yueqiu.YueQiuApp;
+import com.yueqiu.activity.RequestAddFriendActivity;
 import com.yueqiu.bean.GroupDetailCommentItem;
 import com.yueqiu.bean.GroupDetailContentItem;
 import com.yueqiu.bean.IGroupDetailItem;
+import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.CustomNetWorkImageView;
 
@@ -101,7 +105,8 @@ public class GroupDetailContentAdapter extends BaseAdapter{
                 GroupDetailCommentItem commentItem = (GroupDetailCommentItem) item;
                 commentHolder.image.setDefaultImageResId(R.drawable.default_head);
                 commentHolder.image.setErrorImageResId(R.drawable.default_head);
-                commentHolder.image.setImageUrl("http://" + commentItem.getImg_url(),mImgLoader);
+                commentHolder.image.setImageUrl("http://" + commentItem.getImg_url(), mImgLoader);
+
                 commentHolder.name.setText(commentItem.getUsername());
                 commentHolder.time.setText(commentItem.getCreate_time());
                 commentHolder.comment.setText(commentItem.getContent());

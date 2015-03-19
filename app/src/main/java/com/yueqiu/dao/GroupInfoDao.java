@@ -2,7 +2,6 @@ package com.yueqiu.dao;
 
 import com.yueqiu.bean.GroupNoteInfo;
 
-import java.security.acl.Group;
 import java.util.List;
 
 /**

@@ -14,24 +14,14 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Message;
 import android.text.TextUtils;
 import android.view.Display;
-import android.widget.ImageView;
 
 import com.yueqiu.view.IssueImageView;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.lang.ref.SoftReference;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class ImgUtil {
 	private static ImgUtil instance;

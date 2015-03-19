@@ -25,7 +25,6 @@ import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 
 import com.yueqiu.constant.HttpConstants;
-import com.yueqiu.bean.UserInfo;
 import com.yueqiu.util.BitmapUtil;
 import com.yueqiu.util.ImageCache;
 import com.yueqiu.util.TimeUtil;

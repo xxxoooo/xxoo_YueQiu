@@ -11,13 +11,12 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -29,9 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -46,18 +43,15 @@ import com.yueqiu.R;
 import com.yueqiu.activity.RequestAddFriendActivity;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyMateSubFragmentListAdapter;
-import com.yueqiu.bean.NearbyDatingDetailedAlreadyBean;
 import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.dao.daoimpl.NearbyMateDaoImpl;
 import com.yueqiu.fragment.chatbar.AddPersonFragment;
 import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbySubFragmentConstants;
 import com.yueqiu.util.HttpUtil;
-import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
@@ -68,7 +62,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -99,10 +92,13 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
     private float mLat;
     private float mLng;
 
+    private double mGetLat,mGetLng;
+
     private LocationManagerProxy mLocationManagerProxy;
 
     private PullToRefreshListView mSubFragmentListView;
     private ListView mMateListView;
+
 
     @SuppressLint("ValidFragment")
     public BilliardsNearbyMateFragment()
@@ -1158,53 +1154,76 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
         //注意设置合适的定位时间的间隔，并且在合适时间调用removeUpdates()方法来取消定位请求
         //在定位结束后，在合适的生命周期调用destroy()方法
         //其中如果间隔时间为-1，则定位只定一次
-        mLocationManagerProxy.requestLocationData(
-                LocationProviderProxy.AMapNetwork, -1, 15, new AMapLocationListener() {
-                    @Override
-                    public void onLocationChanged(AMapLocation aMapLocation) {
-                        if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
-                            //获取位置信息
-                            double latitude = aMapLocation.getLatitude();
-                            double longitude = aMapLocation.getLongitude();
-
-                            Log.d("wy","latitude ->" + latitude);
-                            Log.d("wy","longitude ->" + longitude);
-                            // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
-                            sParamsPreference.ensurePreference(mContext);
-                            sParamsPreference.setRoomLati(mContext, (float) latitude);
-                            sParamsPreference.setRoomLongi(mContext, (float) longitude);
-
-                            Bundle args = new Bundle();
-                            args.putFloat("lat", (float) latitude);
-                            args.putFloat("lng", (float) longitude);
-                            mUIEventsHandler.obtainMessage(LOCATION_HAS_GOT,args).sendToTarget();
-
-                        }
-                    }
-
-                    @Override
-                    public void onLocationChanged(Location location) {
-
-                    }
-
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                    }
-
-                    @Override
-                    public void onProviderEnabled(String provider) {
-
-                    }
-
-                    @Override
-                    public void onProviderDisabled(String provider) {
-
-                    }
-                });
-
+        mLocationManagerProxy.requestLocationData(LocationProviderProxy.AMapNetwork, -1, 15, mAmapLocationListener);
         mLocationManagerProxy.setGpsEnable(false);
+
+        CountDownTimer timer = new CountDownTimer(8100,1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                if(mGetLat == 0 && mGetLng == 0){
+                    mLocationManagerProxy.removeUpdates(mAmapLocationListener);
+                    // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
+                    sParamsPreference.ensurePreference(mContext);
+                    sParamsPreference.setRoomLati(mContext, (float) mGetLat);
+                    sParamsPreference.setRoomLongi(mContext, (float) mGetLng);
+
+                    Bundle args = new Bundle();
+                    args.putFloat("lat", (float) mGetLat);
+                    args.putFloat("lng", (float) mGetLng);
+                    mUIEventsHandler.obtainMessage(LOCATION_HAS_GOT,args).sendToTarget();
+                }
+            }
+        };
+        timer.start();
+
     }
+
+    private AMapLocationListener mAmapLocationListener = new AMapLocationListener() {
+        @Override
+        public void onLocationChanged(AMapLocation aMapLocation) {
+            if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
+                //获取位置信息
+                mGetLat = aMapLocation.getLatitude();
+                mGetLng = aMapLocation.getLongitude();
+
+                // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
+                sParamsPreference.ensurePreference(mContext);
+                sParamsPreference.setRoomLati(mContext, (float) mGetLat);
+                sParamsPreference.setRoomLongi(mContext, (float) mGetLng);
+
+                Bundle args = new Bundle();
+                args.putFloat("lat", (float) mGetLat);
+                args.putFloat("lng", (float) mGetLng);
+                mUIEventsHandler.obtainMessage(LOCATION_HAS_GOT,args).sendToTarget();
+
+            }
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)

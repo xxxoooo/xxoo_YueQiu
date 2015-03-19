@@ -31,18 +31,15 @@ import android.widget.TextView;
 
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
-import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.PlayDetailActivity;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.PlayListViewAdapter;
-import com.yueqiu.bean.PlayIdentity;
 import com.yueqiu.bean.PlayInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.dao.PlayDao;
 import com.yueqiu.dao.DaoFactory;
-import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;

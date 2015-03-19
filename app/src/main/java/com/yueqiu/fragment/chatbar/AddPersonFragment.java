@@ -1,25 +1,18 @@
 package com.yueqiu.fragment.chatbar;
 
 import android.app.ActionBar;
-import android.app.SearchManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,24 +20,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
 import com.amap.api.location.LocationManagerProxy;
 import com.amap.api.location.LocationProviderProxy;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.loopj.android.http.JsonHttpResponseHandler;
-import com.yueqiu.ChatBarActivity;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.RequestAddFriendActivity;
@@ -53,9 +40,7 @@ import com.yueqiu.adapter.AddAdapter;
 import com.yueqiu.bean.NearbyPeopleInfo;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.util.HttpUtil;
-import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
@@ -65,7 +50,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -392,46 +376,64 @@ public class AddPersonFragment extends Fragment {
         //注意设置合适的定位时间的间隔，并且在合适时间调用removeUpdates()方法来取消定位请求
         //在定位结束后，在合适的生命周期调用destroy()方法
         //其中如果间隔时间为-1，则定位只定一次
-        mLocationManagerProxy.requestLocationData(LocationProviderProxy.AMapNetwork, -1, -1, new AMapLocationListener() {
-                    @Override
-                    public void onLocationChanged(AMapLocation aMapLocation) {
-                        if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
-                            //获取位置信息
-                            mLatitude = aMapLocation.getLatitude();
-                            mLongitude = aMapLocation.getLongitude();
-
-                            Log.d("wy","add person latitude ->" + mLatitude);
-                            Log.d("wy","add person longitude ->" + mLongitude);
-                            // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
-
-//                            searchFriendsByLocation(mLatitude,mLongitude);
-                            mHandler.sendEmptyMessage(GET_FRIEND_BY_LOCATION);
-
-                        }
-                    }
-
-                    @Override
-                    public void onLocationChanged(Location location) {
-
-                    }
-
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                    }
-
-                    @Override
-                    public void onProviderEnabled(String provider) {
-
-                    }
-
-                    @Override
-                    public void onProviderDisabled(String provider) {
-
-                    }
-                });
+        mLocationManagerProxy.requestLocationData(LocationProviderProxy.AMapNetwork, -1, -1,mAmapLocationListener);
 
         mLocationManagerProxy.setGpsEnable(false);
+        CountDownTimer timer = new CountDownTimer(8100,1000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                if(mLatitude == 0 && mLongitude == 0){
+                    mLocationManagerProxy.removeUpdates(mAmapLocationListener);
+                    mHandler.sendEmptyMessage(GET_FRIEND_BY_LOCATION);
+                }
+            }
+        };
+        timer.start();
+
     }
+
+    private AMapLocationListener mAmapLocationListener = new AMapLocationListener() {
+        @Override
+        public void onLocationChanged(AMapLocation aMapLocation) {
+            if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
+                //获取位置信息
+                mLatitude = aMapLocation.getLatitude();
+                mLongitude = aMapLocation.getLongitude();
+
+                Log.d("wy","add person latitude ->" + mLatitude);
+                Log.d("wy","add person longitude ->" + mLongitude);
+                // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
+
+//                            searchFriendsByLocation(mLatitude,mLongitude);
+                mHandler.sendEmptyMessage(GET_FRIEND_BY_LOCATION);
+
+            }
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 
 }

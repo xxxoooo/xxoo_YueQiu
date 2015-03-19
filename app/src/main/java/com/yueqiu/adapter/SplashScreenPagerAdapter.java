@@ -12,8 +12,6 @@ import android.util.Log;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuSplashScreen;
 
-import java.awt.font.TextAttribute;
-
 /**
  * Created by scguo on 15/3/7.
  */

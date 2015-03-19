@@ -18,7 +18,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.SearchView;
 
-import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.BilliardGroupDetailActivity;
@@ -27,8 +26,6 @@ import com.yueqiu.activity.PlayDetailActivity;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.FavorBasicAdapter;
 import com.yueqiu.bean.FavorInfo;
-import com.yueqiu.bean.Identity;
-import com.yueqiu.bean.PublishedInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
@@ -39,7 +36,6 @@ import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
 
-import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

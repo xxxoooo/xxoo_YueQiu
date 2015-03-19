@@ -1,10 +1,7 @@
 package com.yueqiu.util;
 
 import android.os.AsyncTask;
-import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+
 import com.yueqiu.constant.PublicConstant;
 import org.json.JSONObject;
 import java.util.Map;

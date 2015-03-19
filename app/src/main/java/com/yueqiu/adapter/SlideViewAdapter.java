@@ -2,14 +2,8 @@ package com.yueqiu.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,13 +15,11 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.activity.LoginActivity;
 import com.yueqiu.bean.ISlideListItem;
 import com.yueqiu.bean.SlideAccountItemISlide;
 import com.yueqiu.bean.SlideOtherItemISlide;
-import com.yueqiu.util.BitmapUtil;
 import com.yueqiu.util.ImgUtil;
 import com.yueqiu.util.VolleySingleton;
 

@@ -3,11 +3,8 @@ package com.yueqiu.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.sina.weibo.sdk.api.ImageObject;
@@ -23,7 +20,6 @@ import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.constant.HttpConstants;
-import com.yueqiu.constant.PublicConstant;
 
 public class WeiboShareActionCompleteActivity extends Activity implements IWeiboHandler.Response
 {

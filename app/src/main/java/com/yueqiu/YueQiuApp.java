@@ -1,15 +1,11 @@
 package com.yueqiu;
 
 import android.app.Application;
-import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
@@ -31,7 +27,6 @@ import com.yueqiu.im.CrashApplication;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
-import com.yueqiu.util.AppUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 

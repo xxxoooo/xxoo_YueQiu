@@ -3,7 +3,6 @@ package com.yueqiu;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.app.SearchManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -20,7 +19,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SearchView;
 
-import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.activity.PlayBusinessActivity;
 import com.yueqiu.activity.PlayIssueActivity;
 import com.yueqiu.bean.PlayInfo;

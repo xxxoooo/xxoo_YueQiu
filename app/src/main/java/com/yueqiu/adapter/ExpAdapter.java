@@ -1,7 +1,6 @@
 package com.yueqiu.adapter;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,17 +9,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.ContactsList;
-import com.yueqiu.bean.RecentChat;
-import com.yueqiu.constant.HttpConstants;
-import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.CustomNetWorkImageView;
 import com.yueqiu.view.contacts.IphoneTreeView;
 
-import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.List;
 

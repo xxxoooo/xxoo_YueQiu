@@ -5,18 +5,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.os.Process;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -31,7 +30,6 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationListener;
@@ -39,7 +37,6 @@ import com.amap.api.location.LocationManagerProxy;
 import com.amap.api.location.LocationProviderProxy;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
-import com.yueqiu.activity.BilliardsRoomWebViewActivity;
 import com.yueqiu.activity.NearbyBilliardRoomActivity;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.NearbyRoomSubFragmentListAdapter;
@@ -50,7 +47,6 @@ import com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils;
 import com.yueqiu.fragment.nearby.common.NearbyParamsPreference;
 import com.yueqiu.fragment.nearby.common.NearbyPopBasicClickListener;
 import com.yueqiu.util.HttpUtil;
-import com.yueqiu.util.LocationUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 import com.yueqiu.view.pullrefresh.PullToRefreshBase;
@@ -146,6 +142,7 @@ public class BilliardsNearbyRoomFragment extends Fragment
     private LocationManagerProxy mLocationManagerProxy;
     private int mCurrentPos;
     private SearchView mSearchView;
+    private double mGetLat,mGetLng;
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
@@ -263,57 +260,86 @@ public class BilliardsNearbyRoomFragment extends Fragment
 //            }
 //        }
 //    };
-    public void getLocation() {
+    /**
+     * 初始化定位,用高德SDK获取经纬度，准确率貌似更高点，
+     * 之后可能会加功能，会用到高德的SDK
+     */
+    private void getLocation() {
 
         mLocationManagerProxy = LocationManagerProxy.getInstance(getActivity());
 
-        mLocationManagerProxy.requestLocationData(
-                LocationProviderProxy.AMapNetwork, -1, 15, new AMapLocationListener() {
-                    @Override
-                    public void onLocationChanged(AMapLocation aMapLocation) {
-                        if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
-                            //获取位置信息
-                            double latitude = aMapLocation.getLatitude();
-                            double longitude = aMapLocation.getLongitude();
+        //此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
+        //注意设置合适的定位时间的间隔，并且在合适时间调用removeUpdates()方法来取消定位请求
+        //在定位结束后，在合适的生命周期调用destroy()方法
+        //其中如果间隔时间为-1，则定位只定一次
+        mLocationManagerProxy.requestLocationData(LocationProviderProxy.AMapNetwork, -1, 15,mAmapLocationListener);
+        mLocationManagerProxy.setGpsEnable(false);
+        CountDownTimer timer = new CountDownTimer(8100,100) {
+            @Override
+            public void onTick(long millisUntilFinished) {
 
-                            Log.d("wy","latitude ->" + latitude);
-                            Log.d("wy","longitude ->" + longitude);
-                            // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
-                            sParamsPreference.ensurePreference(mContext);
-                            sParamsPreference.setRoomLati(mContext, (float) latitude);
-                            sParamsPreference.setRoomLongi(mContext, (float) longitude);
+            }
 
-                            Bundle args = new Bundle();
-                            args.putFloat("lat", (float) latitude);
-                            args.putFloat("lng", (float) longitude);
-                            mUIEventsHandler.obtainMessage(LOCATION_HAS_GOT,args).sendToTarget();
+            @Override
+            public void onFinish() {
+                if(mGetLng == 0 && mGetLat == 0){
+                    mLocationManagerProxy.removeUpdates(mAmapLocationListener);
 
-                        }
-                    }
+                    sParamsPreference.ensurePreference(mContext);
+                    sParamsPreference.setRoomLati(mContext, (float) mGetLat);
+                    sParamsPreference.setRoomLongi(mContext, (float) mGetLng);
 
-                    @Override
-                    public void onLocationChanged(Location location) {
-
-                    }
-
-                    @Override
-                    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                    }
-
-                    @Override
-                    public void onProviderEnabled(String provider) {
-
-                    }
-
-                    @Override
-                    public void onProviderDisabled(String provider) {
-
-                    }
-                });
-
-            mLocationManagerProxy.setGpsEnable(false);
+                    Bundle args = new Bundle();
+                    args.putFloat("lat", (float) mGetLat);
+                    args.putFloat("lng", (float) mGetLng);
+                    mUIEventsHandler.obtainMessage(LOCATION_HAS_GOT, args).sendToTarget();
+                }
+            }
+        };
+        timer.start();
     }
+
+    private AMapLocationListener mAmapLocationListener = new AMapLocationListener() {
+        @Override
+        public void onLocationChanged(AMapLocation aMapLocation) {
+            if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
+                //获取位置信息
+                mGetLat = aMapLocation.getLatitude();
+                mGetLng = aMapLocation.getLongitude();
+
+                // 我们此时可以将我们获取到的当前用户的位置信息用来进行球厅的位置筛选操作
+                sParamsPreference.ensurePreference(mContext);
+                sParamsPreference.setRoomLati(mContext, (float) mGetLat);
+                sParamsPreference.setRoomLongi(mContext, (float) mGetLng);
+
+                Bundle args = new Bundle();
+                args.putFloat("lat", (float) mGetLat);
+                args.putFloat("lng", (float) mGetLng);
+                mUIEventsHandler.obtainMessage(LOCATION_HAS_GOT,args).sendToTarget();
+
+            }
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
 
     @Override
     public void onResume()

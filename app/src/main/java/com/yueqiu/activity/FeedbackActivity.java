@@ -1,7 +1,6 @@
 package com.yueqiu.activity;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -25,7 +24,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -43,7 +41,6 @@ import com.yueqiu.bean.OnKeyboardHideListener;
 import com.yueqiu.constant.HttpConstants;
 import com.yueqiu.constant.PublicConstant;
 import com.yueqiu.fragment.group.ImageFragment;
-import com.yueqiu.util.AsyncTaskUtil;
 import com.yueqiu.util.FileUtil;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.ImgUtil;

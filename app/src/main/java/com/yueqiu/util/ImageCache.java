@@ -16,7 +16,6 @@ package com.yueqiu.util;
 import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.ImageView;
 
 import com.gotye.api.GotyeAPI;

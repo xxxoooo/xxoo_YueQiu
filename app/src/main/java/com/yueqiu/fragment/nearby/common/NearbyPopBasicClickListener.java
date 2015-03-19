@@ -1,14 +1,11 @@
 package com.yueqiu.fragment.nearby.common;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -23,12 +20,7 @@ import com.yueqiu.fragment.nearby.BilliardsNearbyDatingFragment;
 import com.yueqiu.fragment.nearby.BilliardsNearbyMateFragment;
 import com.yueqiu.fragment.nearby.BilliardsNearbyRoomFragment;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 import static com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils.getFilterPopupWindow;
 

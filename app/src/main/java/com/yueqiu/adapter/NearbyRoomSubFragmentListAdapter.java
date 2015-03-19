@@ -6,19 +6,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
 import com.yueqiu.R;
 import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
 import com.yueqiu.util.VolleySingleton;
 import com.yueqiu.view.CustomRoomNetView;
 
-import java.awt.font.TextAttribute;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 

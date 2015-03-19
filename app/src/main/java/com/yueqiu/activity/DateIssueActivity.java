@@ -1,16 +1,17 @@
 package com.yueqiu.activity;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
@@ -27,13 +28,16 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationListener;
+import com.amap.api.location.LocationManagerProxy;
+import com.amap.api.location.LocationProviderProxy;
 import com.fourmob.datetimepicker.date.DatePickerDialog;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -135,6 +139,8 @@ public class DateIssueActivity extends FragmentActivity implements View.OnClickL
     private double mLatitude,mLongitude;
     private String mImg_url;
     private AsyncTask<Void,Void,Void> mUploadTask;
+    private LocationManagerProxy mLocationManagerProxy;
+    private double mGetLat,mGetLng;
 
 
     private Handler mHandler = new Handler()
@@ -218,6 +224,7 @@ public class DateIssueActivity extends FragmentActivity implements View.OnClickL
 
         //获取当前经纬度
         //TODO:
+        getLocation();
 //        startService(new Intent(DateIssueActivity.this, LocationUtil.class));
 
         mFragmentManager = getSupportFragmentManager();
@@ -393,6 +400,9 @@ public class DateIssueActivity extends FragmentActivity implements View.OnClickL
             case R.id.issue_activity:
 
                 if(Utils.networkAvaiable(DateIssueActivity.this)) {
+                    if(mLocationManagerProxy != null){
+                        mLocationManagerProxy.removeUpdates(mAmapLocationListener);
+                    }
                     issueDate();
                 }else{
                     Toast.makeText(DateIssueActivity.this,getString(R.string.network_not_available),Toast.LENGTH_SHORT).show();
@@ -488,8 +498,8 @@ public class DateIssueActivity extends FragmentActivity implements View.OnClickL
         map.put(HttpConstants.DateIssue.PHONE,phone);
 
 //
-//        map.put(HttpConstants.Play.LAT,  0);
-//        map.put(HttpConstants.Play.LNG, 0);
+        map.put(HttpConstants.Play.LAT,  mGetLat);
+        map.put(HttpConstants.Play.LNG, mGetLng);
 
         if(mIvAddImg.getBitmapBean() != null) {
             if (mUploadProgress.getVisibility() == View.VISIBLE) {
@@ -992,5 +1002,53 @@ public class DateIssueActivity extends FragmentActivity implements View.OnClickL
         return true;
     }
 
+    /**
+     * 初始化定位,用高德SDK获取经纬度，准确率貌似更高点，
+     * 之后可能会加功能，会用到高德的SDK
+     */
+    public void getLocation() {
+
+        mLocationManagerProxy = LocationManagerProxy.getInstance(this);
+
+        //此方法为每隔固定时间会发起一次定位请求，为了减少电量消耗或网络流量消耗，
+        //注意设置合适的定位时间的间隔，并且在合适时间调用removeUpdates()方法来取消定位请求
+        //在定位结束后，在合适的生命周期调用destroy()方法
+        //其中如果间隔时间为-1，则定位只定一次
+        mLocationManagerProxy.requestLocationData(LocationProviderProxy.AMapNetwork, -1, 15, mAmapLocationListener);
+        mLocationManagerProxy.setGpsEnable(true);
+
+    }
+
+    private AMapLocationListener mAmapLocationListener = new AMapLocationListener() {
+        @Override
+        public void onLocationChanged(AMapLocation aMapLocation) {
+            if(aMapLocation != null && aMapLocation.getAMapException().getErrorCode() == 0){
+                //获取位置信息
+                mGetLat = aMapLocation.getLatitude();
+                mGetLng = aMapLocation.getLongitude();
+
+            }
+        }
+
+        @Override
+        public void onLocationChanged(Location location) {
+
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
     
 }

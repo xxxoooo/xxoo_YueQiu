@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.yueqiu.R;
-import com.yueqiu.YueQiuApp;
 import com.yueqiu.YueQiuSplashScreen;
 import com.yueqiu.util.AspectRatioImgView;
 

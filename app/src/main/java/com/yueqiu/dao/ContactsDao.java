@@ -2,7 +2,6 @@ package com.yueqiu.dao;
 
 import com.yueqiu.bean.ContactsList;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

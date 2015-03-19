@@ -3,8 +3,6 @@ package com.yueqiu.db;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.ContactsContract;
-import android.util.Log;
 
 import com.yueqiu.constant.DatabaseConstant;
 
