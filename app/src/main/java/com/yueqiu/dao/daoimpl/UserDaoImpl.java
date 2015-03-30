@@ -81,6 +81,8 @@ public class UserDaoImpl implements UserDao{
                 "" : map.get(DatabaseConstant.UserTable.WORK_LIVE));
         values.put(DatabaseConstant.UserTable.ZIZHI,map.get(DatabaseConstant.UserTable.ZIZHI) == null ?
                 4 : Integer.valueOf(map.get(DatabaseConstant.UserTable.ZIZHI)));
+        values.put(DatabaseConstant.UserTable.IMG_COUNT,map.get(DatabaseConstant.UserTable.IMG_COUNT) == null ?
+                0 : Integer.valueOf(map.get(DatabaseConstant.UserTable.IMG_COUNT)));
 
         SQLiteDatabase db = mDBUtils.getWritableDatabase();
         long result = -1;
@@ -164,6 +166,7 @@ public class UserDaoImpl implements UserDao{
             info.setMy_type(Integer.valueOf(str.equals("") ? "-1": str));
             info.setWork_live(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.WORK_LIVE)));
             info.setZizhi(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.ZIZHI)));
+            info.setImg_count(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseConstant.UserTable.IMG_COUNT)));
         }
         cursor.close();
         return info;

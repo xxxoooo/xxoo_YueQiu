@@ -141,12 +141,11 @@ public class SlideViewAdapter extends BaseAdapter {
                                    public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate)
                                    {
                                        Bitmap sourceBitmap = response.getBitmap();
-
                                        if (null != sourceBitmap)
                                        {
                                            Log.d("wy","bitmap is not null");
-//                                           Bitmap sourceRound = ImgUtil.toRoundCorner(sourceBitmap,8);
-                                           accountHolder.image.setImageBitmap(ImgUtil.embedBitmap(mContext.getResources(), sourceBitmap, finallyEmbedResId));
+                                           Bitmap sourceRound = ImgUtil.toRoundCorner(sourceBitmap,8);
+                                           accountHolder.image.setImageBitmap(ImgUtil.embedBitmap(mContext.getResources(), sourceRound, finallyEmbedResId));
 //                                           accountHolder.image.setImageBitmap(sourceBitmap);
                                        } else
                                        {

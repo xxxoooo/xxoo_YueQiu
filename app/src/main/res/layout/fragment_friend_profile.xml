@@ -284,6 +284,34 @@
                         android:layout_alignParentRight="true"
                         android:text="@string/unset"/>
                 </RelativeLayout>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/devide_line"/>
+
+                <RelativeLayout
+                    android:id="@+id/friend_new_photo_re"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp">
+
+                    <TextView
+                        android:textColor="@color/md__defaultBackground"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_centerVertical="true"
+                        android:text="@string/the_new_post"/>
+
+                    <TextView
+                        android:textColor="@color/md__defaultBackground"
+                        android:id="@+id/friend_new_photo_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true"
+                        />
+                </RelativeLayout>
 
 
             </LinearLayout>

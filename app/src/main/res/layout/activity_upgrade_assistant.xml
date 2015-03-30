@@ -41,7 +41,7 @@
                             android:layout_centerVertical="true"
                             android:text="@string/photo"/>
 
-                        <com.android.volley.toolbox.NetworkImageView
+                        <com.yueqiu.view.CustomNetWorkImageView
                             android:id="@+id/upgrade_photo_view"
                             android:textColor="@color/md__defaultBackground"
                             android:layout_width="50dp"

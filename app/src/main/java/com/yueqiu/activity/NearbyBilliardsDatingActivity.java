@@ -157,7 +157,10 @@ public class NearbyBilliardsDatingActivity extends Activity
 
                 if(YueQiuApp.sUserInfo.getUser_id() < 1){
                     Toast.makeText(NearbyBilliardsDatingActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
-                }else {
+                }else if(Integer.valueOf(mFollowList.get(position).getUserId()) == YueQiuApp.sUserInfo.getUser_id()){
+                    return;
+                }
+                else {
                     Intent intent = new Intent(NearbyBilliardsDatingActivity.this, RequestAddFriendActivity.class);
                     int friendUserId = Integer.valueOf(mFollowList.get(position).getUserId());
                     String username = mFollowList.get(position).getUserName();

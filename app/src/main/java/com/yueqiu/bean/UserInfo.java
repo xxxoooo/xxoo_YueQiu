@@ -41,6 +41,7 @@ public class UserInfo {
     private String content;
 
     private int zizhi;
+    private int img_count;
 
     private static final String JSON_USER_ID = "user_id";
     private static final String JSON_IMGREAL = "img_url";
@@ -305,6 +306,14 @@ public class UserInfo {
 
     public void setZizhi(int zizhi) {
         this.zizhi = zizhi;
+    }
+
+    public int getImg_count() {
+        return img_count;
+    }
+
+    public void setImg_count(int img_count) {
+        this.img_count = img_count;
     }
 
     public JSONObject toJSON() throws JSONException {

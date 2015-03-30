@@ -32,6 +32,7 @@ import com.yueqiu.dao.UserDao;
 import com.yueqiu.util.HttpUtil;
 import com.yueqiu.util.Utils;
 import com.yueqiu.util.VolleySingleton;
+import com.yueqiu.view.CustomNetWorkImageView;
 import com.yueqiu.view.progress.FoldingCirclesDrawable;
 
 import org.apache.http.Header;
@@ -49,7 +50,7 @@ public class UpgradeAssistantActivity extends Activity {
     private TextView mAccountTv,mSexTv,mNickNameTv,mDistrictTv,mLevelTv
             ,mBallType,mBallArm,mUsedTypeTv,mBallAge,mIdolTv,mSignTv,mCostTv
             ,mTypeTv,mExperienceTv;
-    private NetworkImageView mPhotoView;//mNewerPhotoView;
+    private CustomNetWorkImageView mPhotoView;//mNewerPhotoView;
     private ProgressBar mPreProgress;
     private TextView mPreText;
     private Drawable mProgressDrawable;
@@ -76,7 +77,13 @@ public class UpgradeAssistantActivity extends Activity {
 
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle(getString(R.string.update_to_assistant));
+        if (mTag.equals(getString(R.string.nearby_billiard_mate_str))) {
+            actionBar.setTitle(getString(R.string.back_to_mate));
+        } else if(mTag.equals(getString(R.string.nearby_billiard_assist_coauch_str))){
+            actionBar.setTitle(getString(R.string.update_to_assistant));
+        }else{
+            actionBar.setTitle(getString(R.string.update_to_coach));
+        }
 
         initView();
     }
@@ -106,7 +113,7 @@ public class UpgradeAssistantActivity extends Activity {
         mTypeTv = (TextView) findViewById(R.id.upgrade_type);
         mExperienceTv = (TextView) findViewById(R.id.upgrade_experience);
 
-        mPhotoView = (NetworkImageView) findViewById(R.id.upgrade_photo_view);
+        mPhotoView = (CustomNetWorkImageView) findViewById(R.id.upgrade_photo_view);
 //        mNewerPhotoView = (NetworkImageView) findViewById(R.id.upgrade_newer_photo);
 
         String unset = getString(R.string.unset);
@@ -179,6 +186,9 @@ public class UpgradeAssistantActivity extends Activity {
         else if(mTag.equals(getString(R.string.nearby_billiard_coauch_str))){
             params.put(HttpConstants.SetUserUp.USER_TYPE,String.valueOf(PublicConstant.UPGRADE_COACH));
         }
+        else{
+            params.put(HttpConstants.SetUserUp.USER_TYPE,String.valueOf(PublicConstant.UPGRADE_MATE));
+        }
 
 
         HttpUtil.requestHttp(HttpConstants.SetUserUp.URL,params,HttpConstants.RequestMethod.GET,new JsonHttpResponseHandler(){
@@ -225,6 +235,9 @@ public class UpgradeAssistantActivity extends Activity {
                     else if(mTag.equals(getString(R.string.nearby_billiard_coauch_str))){
                         mEditor.putString(DatabaseConstant.UserTable.TITLE, getString(R.string.nearby_billiard_coauch_str));
                         YueQiuApp.sUserInfo.setTitle(getString(R.string.nearby_billiard_coauch_str));
+                    }else{
+                        mEditor.putString(DatabaseConstant.UserTable.TITLE,getString(R.string.nearby_billiard_mate_str));
+                        YueQiuApp.sUserInfo.setTitle(getString(R.string.nearby_billiard_mate_str));
                     }
 
                     mEditor.apply();

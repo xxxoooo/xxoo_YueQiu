@@ -577,5 +577,11 @@
     <string name="resetting">正在重置...</string>
     <string name="registing">正在注册...</string>
     <string name="logining">正在登录...</string>
+    <string name="title_activity_friend_new_photo">FriendNewPhotoActivity</string>
+    <string name="back_to_mate">退回球友</string>
+    <string name="delete_photo">删除图片</string>
+    <string name="upload_photo_fail">上传图片失败</string>
+    <string name="delete_photo_fail">删除图片失败</string>
+
 
 </resources>

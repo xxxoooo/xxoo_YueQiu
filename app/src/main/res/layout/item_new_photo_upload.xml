@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.yueqiu.view.IssueImageView
+        android:id="@+id/new_photo_upload"
+        android:layout_width="@dimen/listview_item_user_photo_width"
+        android:layout_height="@dimen/listview_item_user_photo_height"
+        android:scaleType="fitXY"/>
+
+</LinearLayout>

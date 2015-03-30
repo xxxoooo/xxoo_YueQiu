@@ -33,6 +33,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
@@ -370,8 +371,11 @@ public class PhotoSetupFragment extends Fragment implements View.OnClickListener
         super.onOptionsItemSelected(item);
         switch (item.getItemId()) {
             case R.id.setup_confirm:
-                changePhoto();
-
+                if(Utils.networkAvaiable(getActivity())) {
+                    changePhoto();
+                }else{
+                    Toast.makeText(getActivity(),getActivity().getString(R.string.network_not_available),Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
         return true;

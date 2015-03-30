@@ -21,6 +21,7 @@ import com.yueqiu.dao.UserDao;
 import com.yueqiu.fragment.profilesetup.MyProfileRadioSetupFragment;
 import com.yueqiu.fragment.profilesetup.MyProfileSetupListener;
 import com.yueqiu.fragment.profilesetup.MyProfileTextSetupFragment;
+import com.yueqiu.fragment.profilesetup.NewPhotoFragment;
 import com.yueqiu.fragment.profilesetup.PhotoSetupFragment;
 import com.yueqiu.util.Utils;
 
@@ -193,6 +194,9 @@ public class ProfileSetupActivity extends SingleFragmentActivity implements MyPr
                         getString(R.string.zizhi_coach),
                         getString(R.string.billiard_other)
                 },mUserInfo.getZizhi(),getString(R.string.zizhi));
+            case NEW_PHOTO:
+                mActionBar.setTitle(getString(R.string.the_new_post));
+                return new NewPhotoFragment();
             default:
                 return null;
         }
@@ -233,6 +237,8 @@ public class ProfileSetupActivity extends SingleFragmentActivity implements MyPr
             attr = Attr.WORK_LIVE;
         }else if(id == 13){
             attr = Attr.ZIZHI;
+        }else if(id == 14){
+            attr = Attr.NEW_PHOTO;
         }
         return attr;
     }

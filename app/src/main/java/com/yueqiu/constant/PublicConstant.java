@@ -71,6 +71,7 @@ public class PublicConstant {
     public static final int JOIN_TYPE_PLAY          = 2;
     public static final int JOIN_TYPE_DATE          = 1;
 
+    public static final int UPGRADE_MATE            = 1;
     public static final int UPGRADE_ASSITANT        = 2;
     public static final int UPGRADE_COACH           = 3;
 

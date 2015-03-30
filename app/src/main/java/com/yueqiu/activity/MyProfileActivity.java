@@ -51,14 +51,13 @@ import java.util.Map;
  */
 public class MyProfileActivity extends FragmentActivity implements View.OnClickListener {
     private static final String TAG = "MyProfileActivity";
-    private Button mAssistant, mCoach;
+    private Button mAssistant, mCoach,mBackToMateBtn;
     private RelativeLayout mPhoto, mAccount, mGender, mNickName, mRegion, mLevel, mBallType,
-            mBilliardsCue, mCueHabits, mPlayAge, mIdol, mSign,mCost,mWorkLive,mMyType,mZizhi;//mTheNewestPost;
+            mBilliardsCue, mCueHabits, mPlayAge, mIdol, mSign,mCost,mWorkLive,mMyType,mZizhi,mTheNewestPost;
     private TextView mNickNameTextView, mRegionTextView, mLevelTextView, mBallTypeTextView,
             mBilliardsCueTextView, mCueHabitsTextView, mPlayAgeTextView, mIdolTextView,
             mSignTextView, mAccountTextView, mGenderTextView,mCostTextView,mMyTypeTextView,
-            mWorkLiveTextView,mZizhiTextView;
-//    private ImageView mTheNewestPostImageView;
+            mWorkLiveTextView,mZizhiTextView, mTheNewestPostImageView;
     private CustomNetWorkImageView mPhotoImageView;
     private SharedPreferences mSharedPreference;
     private SharedPreferences.Editor mEditor;
@@ -80,7 +79,6 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
     private UserDao mUserDao;
     private ImageLoader mImgLoader;
     private LinearLayout mAfterUpgradeAssitantView;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -121,12 +119,13 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
         mWorkLive = (RelativeLayout) findViewById(R.id.profile_work_live_re);
         mMyType = (RelativeLayout) findViewById(R.id.profile_type_re);
         mZizhi = (RelativeLayout) findViewById(R.id.profile_zizhi_re);
+        mBackToMateBtn = (Button) findViewById(R.id.back_to_mate_btn);
 
         mCostTextView = (TextView) findViewById(R.id.profile_upgrade_cost);
         mMyTypeTextView = (TextView) findViewById(R.id.profile_upgrade_type);
         mWorkLiveTextView = (TextView) findViewById(R.id.profile_upgrade_experience);
         mZizhiTextView = (TextView) findViewById(R.id.profile_upload_zizhi);
-//        mTheNewestPost = (RelativeLayout) findViewById(R.id.my_profile_the_new_post);
+        mTheNewestPost = (RelativeLayout) findViewById(R.id.my_profile_the_new_post);
 
         mAccountTextView = (TextView) findViewById(R.id.my_profile_account_tv);
         mGenderTextView = (TextView) findViewById(R.id.my_profile_gender_tv);
@@ -141,7 +140,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
         mSignTextView = (TextView) findViewById(R.id.my_profile_sign_tv);
 
         mPhotoImageView = (CustomNetWorkImageView) findViewById(R.id.my_profile_photo_iv);
-//        mTheNewestPostImageView = (ImageView) findViewById(R.id.my_profile_the_new_post_im);
+        mTheNewestPostImageView = (TextView) findViewById(R.id.my_profile_the_new_post_im);
         mPhotoImageView.setDefaultImageResId(R.drawable.default_head);
         mPhotoImageView.setErrorImageResId(R.drawable.default_head);
 
@@ -161,6 +160,9 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
         initData();
         if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_mate_str))){
             mAfterUpgradeAssitantView.setVisibility(View.GONE);
+            mBackToMateBtn.setVisibility(View.GONE);
+            mAssistant.setVisibility(View.VISIBLE);
+            mCoach.setVisibility(View.VISIBLE);
         }
 
         if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_assist_coauch_str))
@@ -169,12 +171,14 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
             mCoach.setVisibility(View.GONE);
             mAfterUpgradeAssitantView.setVisibility(View.VISIBLE);
             mZizhi.setVisibility(View.GONE);
+            mBackToMateBtn.setVisibility(View.VISIBLE);
         }
 
         if(YueQiuApp.sUserInfo.getTitle().equals(getString(R.string.nearby_billiard_coauch_str))){
             mAssistant.setVisibility(View.GONE);
             mCoach.setVisibility(View.GONE);
             mAfterUpgradeAssitantView.setVisibility(View.VISIBLE);
+            mBackToMateBtn.setVisibility(View.VISIBLE);
         }
     }
 
@@ -217,6 +221,8 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
                                         String my_type = response.getJSONObject("result").getString(DatabaseConstant.UserTable.MY_TYPE);
                                         String work_live = response.getJSONObject("result").getString(DatabaseConstant.UserTable.WORK_LIVE);
                                         int zizhi = response.getJSONObject("result").getInt(DatabaseConstant.UserTable.ZIZHI);
+                                        //TODO:有待确认
+                                        int img_count = response.getJSONObject("result").getInt(DatabaseConstant.UserTable.IMG_COUNT);
 
                                         mMap.put(DatabaseConstant.UserTable.SEX, sex);
                                         mMap.put(DatabaseConstant.UserTable.IMG_URL, img_url);
@@ -237,6 +243,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
                                         mMap.put(DatabaseConstant.UserTable.MY_TYPE,my_type);
                                         mMap.put(DatabaseConstant.UserTable.WORK_LIVE,work_live);
                                         mMap.put(DatabaseConstant.UserTable.ZIZHI,String.valueOf(zizhi));
+                                        mMap.put(DatabaseConstant.UserTable.IMG_COUNT,String.valueOf(img_count));
 
 //                                        mUserInfo = Utils.mapingObject(UserInfo.class, response.getJSONObject("result"));
                                         mUserInfo = new UserInfo();
@@ -257,6 +264,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
                                         mUserInfo.setMy_type(Integer.valueOf(my_type));
                                         mUserInfo.setWork_live(work_live);
                                         mUserInfo.setZizhi(zizhi);
+                                        mUserInfo.setImg_count(img_count);
 
 
                                         message.what = DATA_SUCCESS;
@@ -294,7 +302,25 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
     }
 
     private void getMyProfileFromLocal() {
-        mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+//        mUserInfo = mUserDao.getUserByUserId(String.valueOf(YueQiuApp.sUserInfo.getUser_id()));
+        mUserInfo = new UserInfo();
+        mUserInfo.setUsername(mSharedPreference.getString(DatabaseConstant.UserTable.USERNAME,""));
+        mUserInfo.setImg_url(mSharedPreference.getString(DatabaseConstant.UserTable.IMG_URL,""));
+        mUserInfo.setSex(mSharedPreference.getInt(DatabaseConstant.UserTable.SEX, 1));
+        mUserInfo.setNick(mSharedPreference.getString(DatabaseConstant.UserTable.NICK,getString(R.string.unset)));
+        mUserInfo.setDistrict(mSharedPreference.getString(DatabaseConstant.UserTable.DISTRICT,getString(R.string.unset)));
+        mUserInfo.setLevel(mSharedPreference.getInt(DatabaseConstant.UserTable.LEVEL,1));
+        mUserInfo.setBall_type(mSharedPreference.getInt(DatabaseConstant.UserTable.BALL_TYPE,1));
+        mUserInfo.setBallArm(mSharedPreference.getInt(DatabaseConstant.UserTable.BALLARM, 1));
+        mUserInfo.setUsedType(mSharedPreference.getInt(DatabaseConstant.UserTable.USERDTYPE, 1));
+        mUserInfo.setBallAge(mSharedPreference.getString(DatabaseConstant.UserTable.BALLAGE, getString(R.string.unset)));
+        mUserInfo.setIdol(mSharedPreference.getString(DatabaseConstant.UserTable.IDOL, getString(R.string.unset)));
+        mUserInfo.setIdol_name(mSharedPreference.getString(DatabaseConstant.UserTable.IDOL_NAME, getString(R.string.unset)));
+        mUserInfo.setCost(mSharedPreference.getString(DatabaseConstant.UserTable.COST, getString(R.string.unset)));
+        mUserInfo.setMy_type(Integer.valueOf(mSharedPreference.getString(DatabaseConstant.UserTable.MY_TYPE, "1")));
+        mUserInfo.setWork_live(mSharedPreference.getString(DatabaseConstant.UserTable.WORK_LIVE, getString(R.string.unset)));
+        mUserInfo.setZizhi(mSharedPreference.getInt(DatabaseConstant.UserTable.ZIZHI, 1));
+        mUserInfo.setImg_count(mSharedPreference.getInt(DatabaseConstant.UserTable.IMG_COUNT, 0));
     }
 
 
@@ -364,6 +390,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
                 unset : userInfo.getWork_live());
         mZizhiTextView.setText(TextUtils.isEmpty(String.valueOf(userInfo.getZizhi())) ?
                 unset : getZizhiById(userInfo.getZizhi()));
+        mTheNewestPostImageView.setText(userInfo.getImg_count() + "");
 //        mTheNewestPostImageView.setImageDrawable();
     }
 
@@ -386,6 +413,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
         YueQiuApp.sUserInfo.setMy_type(user.getMy_type());
         YueQiuApp.sUserInfo.setWork_live(user.getWork_live());
         YueQiuApp.sUserInfo.setZizhi(user.getZizhi());
+        YueQiuApp.sUserInfo.setImg_count(user.getImg_count());
 
         mEditor.putString(DatabaseConstant.UserTable.USERNAME,user.getUsername());
         mEditor.putString(DatabaseConstant.UserTable.IMG_URL,user.getImg_url());
@@ -403,6 +431,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
         mEditor.putString(DatabaseConstant.UserTable.MY_TYPE,String.valueOf(user.getMy_type()));
         mEditor.putString(DatabaseConstant.UserTable.WORK_LIVE,user.getWork_live());
         mEditor.putInt(DatabaseConstant.UserTable.ZIZHI,user.getZizhi());
+        mEditor.putInt(DatabaseConstant.UserTable.IMG_COUNT,user.getImg_count());
 
         mEditor.apply();
     }
@@ -443,7 +472,8 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
         mCost.setOnClickListener(this);
         mMyType.setOnClickListener(this);
         mWorkLive.setOnClickListener(this);
-//        mTheNewestPost.setOnClickListener(this);
+        mTheNewestPost.setOnClickListener(this);
+        mBackToMateBtn.setOnClickListener(this);
     }
 
     @Override
@@ -475,6 +505,12 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
                 Intent coach = new Intent(this, UpgradeAssistantActivity.class);
                 coach.putExtra(DatabaseConstant.UserTable.TITLE,getString(R.string.nearby_billiard_coauch_str));
                 startActivity(coach);
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                break;
+            case R.id.back_to_mate_btn:
+                Intent mate = new Intent(this, UpgradeAssistantActivity.class);
+                mate.putExtra(DatabaseConstant.UserTable.TITLE,getString(R.string.nearby_billiard_mate_str));
+                startActivity(mate);
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 break;
             case R.id.my_profile_photo:
@@ -522,9 +558,10 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
             case R.id.profile_work_live_re:
                 startMyActivity(Attr.WORK_LIVE);
                 break;
-//            case R.id.my_profile_the_new_post:
-//                startMyActivity(12);
-//                break;
+            case R.id.my_profile_the_new_post:
+                startMyActivity(Attr.NEW_PHOTO);
+                break;
+
         }
     }
 
@@ -664,6 +701,8 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
             attr = Attr.WORK_LIVE;
         }else if(id == 13){
             attr = Attr.ZIZHI;
+        }else if(id == 14){
+            attr = Attr.NEW_PHOTO;
         }
         return attr;
     }
@@ -710,5 +749,7 @@ public class MyProfileActivity extends FragmentActivity implements View.OnClickL
         }
         return str;
     }
+
+
 
 }

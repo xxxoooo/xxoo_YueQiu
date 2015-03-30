@@ -17,6 +17,7 @@ public enum Attr {
     COST,
     MY_TYPE,
     WORK_LIVE,
-    ZIZHI;
+    ZIZHI,
+    NEW_PHOTO;
 
 }

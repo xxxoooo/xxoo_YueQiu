@@ -147,8 +147,8 @@
         <activity
             android:name=".activity.GetCaptchaActivity"
             android:launchMode="singleTop"
-            android:screenOrientation="portrait"
-            android:noHistory="true"/>
+            android:noHistory="true"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.Register1Activity"
             android:screenOrientation="portrait" />
@@ -271,8 +271,12 @@
         </activity>
         <activity
             android:name=".activity.ResetPasswordActivity"
-            android:screenOrientation="portrait"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".activity.FriendNewPhotoActivity"
+            android:label="@string/title_activity_friend_new_photo" >
         </activity>
     </application>
 

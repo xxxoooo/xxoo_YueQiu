@@ -1,6 +1,7 @@
 package com.yueqiu.fragment.addfriend;
 
 import android.app.ActionBar;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,12 +16,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.loopj.android.http.JsonHttpResponseHandler;
 import com.yueqiu.R;
+import com.yueqiu.activity.FriendNewPhotoActivity;
 import com.yueqiu.bean.UserInfo;
 import com.yueqiu.constant.DatabaseConstant;
 import com.yueqiu.constant.HttpConstants;
@@ -41,7 +44,7 @@ import java.util.Map;
 /**
  * Created by doushuqi on 15/1/6.
  */
-public class FriendProfileFragment extends Fragment {
+public class FriendProfileFragment extends Fragment implements View.OnClickListener{
 
     private FragmentManager mFragmentManager;
     private ActionBar mActionBar;
@@ -49,7 +52,8 @@ public class FriendProfileFragment extends Fragment {
     private CustomNetWorkImageView mImageView;
     private TextView mAccountTextView, mGenderTextView,
             mNickNameTextView, mDistrictTextView, mLevelTextView,
-            mBallTypeTextView, mUsedTypeTextView, mBallArmTextView;
+            mBallTypeTextView, mUsedTypeTextView, mBallArmTextView,mNewPhotoTv;
+    private RelativeLayout mNewPhotoRe;
     private int mUserId;
     private static final int DATA_SUCCESS = 1;
     private UserInfo mFriendInfo;
@@ -76,6 +80,8 @@ public class FriendProfileFragment extends Fragment {
         mFragmentManager = getActivity().getSupportFragmentManager();
         mUserId = getActivity().getIntent().getIntExtra(AddPersonFragment.FRIEND_INFO_USER_ID, 0);
         mImageLoader = VolleySingleton.getInstance().getImgLoader();
+
+
     }
 
     @Override
@@ -121,6 +127,10 @@ public class FriendProfileFragment extends Fragment {
         mBallTypeTextView = (TextView) view.findViewById(R.id.friend_profile_ball_type);
         mBallArmTextView = (TextView) view.findViewById(R.id.friend_profile_ball_arm);
         mUsedTypeTextView = (TextView) view.findViewById(R.id.friend_profile_used_type);
+        mNewPhotoRe = (RelativeLayout) view.findViewById(R.id.friend_new_photo_re);
+        mNewPhotoTv = (TextView) view.findViewById(R.id.friend_new_photo_tv);
+
+        mNewPhotoRe.setOnClickListener(this);
     }
 
     private void initData() {
@@ -162,6 +172,7 @@ public class FriendProfileFragment extends Fragment {
                         String my_type = response.getJSONObject("result").getString(DatabaseConstant.UserTable.MY_TYPE);
                         String work_live = response.getJSONObject("result").getString(DatabaseConstant.UserTable.WORK_LIVE);
                         int zizhi = response.getJSONObject("result").getInt(DatabaseConstant.UserTable.ZIZHI);
+                        int img_count = response.getJSONObject("result").getInt(DatabaseConstant.UserTable.IMG_COUNT);
 
 
                         mFriendInfo = new UserInfo();
@@ -183,6 +194,7 @@ public class FriendProfileFragment extends Fragment {
                         mFriendInfo.setMy_type(Integer.valueOf(my_type));
                         mFriendInfo.setWork_live(work_live);
                         mFriendInfo.setZizhi(zizhi);
+                        mFriendInfo.setImg_count(img_count);
                         message.what = DATA_SUCCESS;
                         message.obj = mFriendInfo;
 
@@ -264,6 +276,7 @@ public class FriendProfileFragment extends Fragment {
         mBallTypeTextView.setText(ball_type);
         mBallArmTextView.setText(ball_arm);
         mUsedTypeTextView.setText(used_type);
+        mNewPhotoTv.setText(mFriendInfo.getImg_count() + "");
     }
 
     private void toast() {
@@ -283,4 +296,14 @@ public class FriendProfileFragment extends Fragment {
     }
 
 
+
+    @Override
+    public void onClick(View v) {
+        if(v == mNewPhotoRe){
+            Intent intent = new Intent(getActivity(), FriendNewPhotoActivity.class);
+            intent.putExtra("user_id",mUserId);
+            startActivity(intent);
+            getActivity().overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+        }
+    }
 }

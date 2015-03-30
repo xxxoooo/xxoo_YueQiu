@@ -703,6 +703,30 @@ public class HttpConstants
         public static final String GROUP_ID = "group_id";
     }
 
+    public static final class GET_NEW_PHOTO{
+
+        public static final String URL = "/system/getImgList";
+
+        public static final String USER_ID = "user_id";
+    }
+
+    public static final class ADD_IMG{
+
+        public static final String URL = "/system/addImg";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String IMG_NAME = "img_name";
+    }
+
+    public static final class DELETE_PHOTO{
+        public static final String URL = "/system/delImg";
+
+        public static final String USER_ID = "user_id";
+
+        public static final String IMG_NAME = "img_name";
+    }
+
     // 这是SearchActivity当中的球厅Fragment当中的请求数据的过程
     // 因为服务器端使用的是大众点评的SDK，所以我们的请求地址是以大众点评为基础的
     public static final String DP_BASE_URL = "http://api.dianping.com/v1";

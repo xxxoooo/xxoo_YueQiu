@@ -32,14 +32,24 @@
             android:background="@drawable/update_coach_click"
             android:text="@string/update_to_coach"
             android:textColor="@color/white"/>
+        <Button
+            android:id="@+id/back_to_mate_btn"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="@drawable/update_assistant_click"
+            android:text="@string/back_to_mate"
+            android:textColor="@color/white"
+            />
     </LinearLayout>
+
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/my_profile_footer"
-        android:layout_alignParentTop="true">
+        android:layout_alignParentTop="true"
+        >
 
         <com.yueqiu.view.CustomerScrollView
             android:id="@+id/customer_view"
@@ -436,30 +446,30 @@
                         android:layout_height="0.5dp"
                         android:background="@color/devide_line"/>
 
-                    <!--<RelativeLayout-->
-                        <!--android:id="@+id/my_profile_the_new_post"-->
-                        <!--android:clickable="true"-->
-                        <!--android:background="@drawable/list_corner_round_mid2"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="44dp">-->
+                    <RelativeLayout
+                        android:id="@+id/my_profile_the_new_post"
+                        android:clickable="true"
+                        android:background="@drawable/list_corner_round_mid2"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp">
 
-                        <!--<TextView-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:layout_marginLeft="10dp"-->
-                            <!--android:layout_centerVertical="true"-->
-                            <!--android:text="@string/the_new_post"-->
-                            <!--android:textColor="@color/md__defaultBackground"/>-->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_centerVertical="true"
+                            android:text="@string/the_new_post"
+                            android:textColor="@color/md__defaultBackground"/>
 
-                        <!--<ImageView-->
-                            <!--android:id="@+id/my_profile_the_new_post_im"-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:layout_marginRight="10dp"-->
-                            <!--android:layout_centerVertical="true"-->
-                            <!--android:layout_alignParentRight="true"-->
-                            <!--android:textColor="@color/md__defaultBackground"/>-->
-                    <!--</RelativeLayout>-->
+                        <TextView
+                            android:id="@+id/my_profile_the_new_post_im"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentRight="true"
+                            android:textColor="@color/md__defaultBackground"/>
+                    </RelativeLayout>
 
                 </LinearLayout>
                 <LinearLayout

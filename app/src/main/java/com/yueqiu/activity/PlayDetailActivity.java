@@ -300,7 +300,10 @@ public class PlayDetailActivity extends Activity implements View.OnClickListener
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(YueQiuApp.sUserInfo.getUser_id() < 1) {
                     Toast.makeText(PlayDetailActivity.this, getString(R.string.please_login_first), Toast.LENGTH_SHORT).show();
-                }else{
+                }else if(Integer.valueOf(info.mJoinList.get(position).getUser_id()) == YueQiuApp.sUserInfo.getUser_id()){
+                    return;
+                }
+                else{
                     Intent intent = new Intent(PlayDetailActivity.this, RequestAddFriendActivity.class);
                     int friendUserId = Integer.valueOf(info.mJoinList.get(position).getUser_id());
                     String username = info.mJoinList.get(position).getUsername();
