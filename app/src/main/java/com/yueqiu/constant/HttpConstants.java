@@ -720,11 +720,35 @@ public class HttpConstants
     }
 
     public static final class DELETE_PHOTO{
+
         public static final String URL = "/system/delImg";
 
         public static final String USER_ID = "user_id";
 
         public static final String IMG_NAME = "img_name";
+    }
+
+    public static final class GET_ROOM{
+
+        public static final String URL = "/ballhall/getList";
+
+        public static final String START_NO = "start_no";
+
+        public static final String END_NO = "end_no";
+
+        public static final String PRICE  = "price";
+
+        public static final String REGION = "region";
+
+        public static final String RANGE = "range";
+
+        public static final String LAT = "lat";
+
+        public static final String LNG = "lng";
+
+        public static final String EVALUATE = "evaluate";
+
+
     }
 
     // 这是SearchActivity当中的球厅Fragment当中的请求数据的过程

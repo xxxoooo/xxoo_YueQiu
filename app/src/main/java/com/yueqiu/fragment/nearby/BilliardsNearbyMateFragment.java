@@ -80,8 +80,7 @@ import static com.yueqiu.fragment.nearby.common.NearbyFragmentsCommonUtils.KEY_S
  * 使用RadioButton来进行控制了。
  */
 @SuppressLint("ValidFragment")
-public class BilliardsNearbyMateFragment extends Fragment implements AdapterView.OnItemClickListener
-{
+public class BilliardsNearbyMateFragment extends Fragment implements AdapterView.OnItemClickListener{
     private static final String TAG = "DeskBallFragment";
     private static final String TAG_2 = "data_retrieve_debug";
     private View mView;
@@ -99,18 +98,11 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
     private PullToRefreshListView mSubFragmentListView;
     private ListView mMateListView;
 
-
-    @SuppressLint("ValidFragment")
-    public BilliardsNearbyMateFragment()
-    {
-    }
-
     private static final String KEY_BILLIARDS_SEARCH_PARENT_FRAGMENT = "keyBilliardsSearchParentFragment";
 
     private static NearbyParamsPreference sParamsPreference = NearbyParamsPreference.getInstance();
 
-    public static BilliardsNearbyMateFragment newInstance(Context context, String params)
-    {
+    public static BilliardsNearbyMateFragment newInstance(Context context, String params){
 //        mContext = context;
         BilliardsNearbyMateFragment fragment = new BilliardsNearbyMateFragment();
 
@@ -121,8 +113,7 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
     }
 
     @Override
-    public void onAttach(Activity activity)
-    {
+    public void onAttach(Activity activity){
         super.onAttach(activity);
         this.mContext = activity;
     }
@@ -130,23 +121,16 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
     // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 //    private static NearbyMateDaoImpl mMateListAdapterateDaoImpl;
     // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
-
-    // mIsHead用于控制数据的加载到List当中的方向(即加载到头部还是加载到尾部)
-    private boolean mIsNetworkAvailable;
     private NearbyParamsPreference mRequestParms;
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
 
         // 得到用于保存请求参数的SharedPreference实例
         mRequestParms = NearbyParamsPreference.getInstance();
-
         // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 //        mMateListAdapterateDaoImpl = new NearbyMateDaoImpl(mContext);
         // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
-
-        mIsNetworkAvailable = Utils.networkAvaiable(mContext);
     }
 
     private ProgressBar mPreProgress;
@@ -162,7 +146,6 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
 
     private NearbyMateSubFragmentListAdapter mMateListAdapter;
     private NearbyPopBasicClickListener mClickListener;
-
 
     private boolean mRefresh;
     private boolean mLoadMore;
@@ -181,8 +164,7 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
     private SearchView mSearchView;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-    {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         mView = inflater.inflate(R.layout.fragment_nearby_mate_layout, container, false);
         setHasOptionsMenu(true);
         // then, inflate the image view pager
@@ -212,9 +194,6 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
         Bundle args = getArguments();
         mArgs = args.getString(NearbySubFragmentConstants.BILLIARD_SEARCH_TAB_NAME);
 
-        // TODO: 以下加载是测试数据，暂时不能删除(因为现在的数据不完整，我们还需要这些测试数据来查看数据加载完整的具体的具体的UI效果)
-//        initListViewDataSrc();
-
         // TODO: 我们现在由于不需要数据库缓存方面的逻辑需要，所以现在我们先将下面的代码注释掉，但是如果
         // TODO: 后期添加的时候主需要更改一下就可以了
         // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
@@ -232,23 +211,15 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
 //        }).start();
         // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 
-        // 我们将所有的数据请求的工作放到onCreateView()当中，而不是放到onResume()方法当中。
-        // 因为在onResume()当中请求太频繁了
-
-        if (null != savedInstanceState)
-        {
+        if (null != savedInstanceState) {
             mRefresh = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_REFRESH);
             mLoadMore = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_LOAD_MORE);
             mIsSavedInstance = savedInstanceState.getBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_INSTANCE);
-
             mCachedMateList = savedInstanceState.getParcelableArrayList(KEY_SAVED_LISTVIEW);
-
             mUIEventsHandler.obtainMessage(PublicConstant.USE_CACHE, mCachedMateList).sendToTarget();
         }
 
-
         mMateListAdapter = new NearbyMateSubFragmentListAdapter(mContext,  mUserList);
-//        mSubFragmentListView.setAdapter(mMateListAdapter);
         mMateListView.setAdapter(mMateListAdapter);
 
         mMateListAdapter.notifyDataSetChanged();
@@ -261,14 +232,12 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState)
-    {
+    public void onActivityCreated(Bundle savedInstanceState){
         super.onActivityCreated(savedInstanceState);
     }
 
     @Override
-    public void onResume()
-    {
+    public void onResume(){
         super.onResume();
 
         IntentFilter filter = new IntentFilter();
@@ -278,25 +247,20 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
         if(mSearchView != null){
             mSearchView.clearFocus();
         }
-        mWorker = new BackgroundWorker(mStartNum, mEndNum);
-        if (mWorker.getState() == Thread.State.NEW)
-        {
+        mWorker = new BackgroundWorker();
+        if (mWorker.getState() == Thread.State.NEW){
             Log.d(TAG_2, " 1. the mWorker has started ");
             mWorker.start();
         }
 
-        if (! Utils.networkAvaiable(mContext))
-        {
-            // 我们的数据请求只是发生于网络可行的情况下
+        if (! Utils.networkAvaiable(mContext)){
             mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
         }
     }
 
     @Override
-    public void onPause()
-    {
-        if (mWorker != null)
-        {
+    public void onPause(){
+        if (mWorker != null){
             mWorker.interrupt();
             mWorker = null;
         }
@@ -305,12 +269,7 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
     }
 
     @Override
-    public void onStop()
-    {
-        // TODO: 我们在这里进行一些停止数据更新的操作，即停止任何同数据请求和处理的相关工作,然后再调用super.onStop()
-        // TODO: 我们目前采用的策略只是简单的直接获取数据的方式，如果需要升级我们还需要通过添加BroadcastReceiver来
-        // TODO: 监听数据的获取状态，然后在onStop()方法当中解注册这个BroadcastReceiver
-
+    public void onStop(){
         mPopupwindowCallback.closePopupWindow();
         super.onStop();
     }
@@ -324,10 +283,8 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
      * @param distance 这个参数是可以为空的，当不为空的时候，就是我们进行筛选的时候
      * @param gender   这个参数是可以为空的，当不为空的时候，就是我们进行筛选的时候
      */
-    private void retrieveInitialMateInfoList(final int startNo, final int endNo, final String distance, final String gender,float lat, float lng)
-    {
-        if (!Utils.networkAvaiable(mContext))
-        {
+    private void retrieveInitialMateInfoList(final int startNo, final int endNo, final String distance, final String gender,float lat, float lng){
+        if (!Utils.networkAvaiable(mContext)){
             mUIEventsHandler.sendEmptyMessage(DATA_RETRIEVE_FAILED);
             mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
             return;
@@ -337,15 +294,12 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
         requestParams.put("end_no", endNo + "");
         requestParams.put("lat",String.valueOf(lat));
         requestParams.put("lng",String.valueOf(lng));
-        if (!TextUtils.isEmpty(distance))
-        {
+        if (!TextUtils.isEmpty(distance)){
             requestParams.put("range", distance);
         }
-        if (!TextUtils.isEmpty(gender))
-        {
+        if (!TextUtils.isEmpty(gender)){
             requestParams.put("sex", gender);
         }
-        Log.d("wy","mate params->" + requestParams);
         final List<NearbyMateSubFragmentUserBean> cacheMateList = new ArrayList<NearbyMateSubFragmentUserBean>();
 
         mUIEventsHandler.sendEmptyMessage(SET_PULLREFRESH_DISABLE);
@@ -355,20 +309,12 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
                 Log.d("wy","mate response ->" + response);
-                try
-                {
-                    if (! TextUtils.isEmpty(response.get("code").toString()))
-                    {
+                try{
+                    if (! TextUtils.isEmpty(response.get("code").toString())){
                         final int code = response.getInt("code");
                         JSONObject resultJson = response.getJSONObject("result");
-                        Log.d(TAG, " the initial json object we get are : " + response + " ; and the result are : " + resultJson);
-                        if (code == HttpConstants.ResponseCode.NORMAL)
-                        {
-                            if(resultJson != null)
-                            {
-                                Log.d(TAG, " all are ok in for now ");
-                                final int dataCount = resultJson.getInt("count");
-                                Log.d(TAG, " the dataCount we get are : " + dataCount);
+                        if (code == HttpConstants.ResponseCode.NORMAL){
+                            if(resultJson != null){
                                 if(resultJson.get("list_data").equals("null")){
                                     mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                                 }else {
@@ -385,62 +331,44 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                                             String userId = dataObj.getString("user_id");
                                             int range = dataObj.getInt("range");
                                             String district = dataObj.getString("district");
-                                            NearbyMateSubFragmentUserBean mateUserBean = new NearbyMateSubFragmentUserBean(userId, imgUrl, userName, NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex), district, String.valueOf(range));
-
+                                            NearbyMateSubFragmentUserBean mateUserBean = new NearbyMateSubFragmentUserBean(userId, imgUrl, userName,
+                                                    NearbyFragmentsCommonUtils.parseGenderStr(mContext, sex), district, String.valueOf(range));
                                             cacheMateList.add(mateUserBean);
                                         }
-                                        // TODO: 数据获取完之后，我们需要停止显示ProgressBar(这部分功能还需要进一步测试)
                                         if (cacheMateList.isEmpty()) {
-                                            Log.d(TAG_2, " before 5, bugs here ");
                                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
 
                                         } else {
-                                            Log.d(TAG_2, " 5. we have get all the data ");
                                             mUIEventsHandler.obtainMessage(DATA_RETRIEVE_SUCCESS, cacheMateList).sendToTarget();
                                             mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                                         }
                                     }
                                 }
-                            } else
-                            {
-                                Log.d(TAG_2, " 5.1 bug report 1 ");
+                            } else{
                                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                                 mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                             }
-                        } else if (code == HttpConstants.ResponseCode.TIME_OUT)
-                        {
-                            Log.d(TAG_2, "5.2 bug report 2 ");
+                        } else if (code == HttpConstants.ResponseCode.TIME_OUT){
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
                             mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
-                        } else if (code == HttpConstants.ResponseCode.NO_RESULT)
-                        {
-                            Log.d(TAG_2, "5.3 bug report 3 ");
+                        } else if (code == HttpConstants.ResponseCode.NO_RESULT){
                             mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                             mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
-                        } else
-                        {
-                            Log.d(TAG_2, "5.4 bug report 4 ");
+                        } else{
                             String errorStr = response.getString("msg");
-                            Log.d(TAG, " inside the initial mate data request method, and the error info we get are : " + errorStr);
                             Message errorMsg = mUIEventsHandler.obtainMessage(PublicConstant.REQUEST_ERROR);
                             Bundle data = new Bundle();
-                            if (! TextUtils.isEmpty(errorStr))
-                            {
+                            if (! TextUtils.isEmpty(errorStr)){
                                 data.putString(KEY_REQUEST_ERROR_MSG, errorStr);
                             }
                             errorMsg.setData(data);
                             mUIEventsHandler.sendMessage(errorMsg);
                         }
-                    } else
-                    {
-                        Log.d(TAG_2, " bug report 5 ");
+                    } else{
                         mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                         mUIEventsHandler.sendEmptyMessage(HIDE_PROGRESSBAR);
                     }
-                } catch (JSONException e)
-                {
-                    Log.d(TAG_2, " bug report 6, exception happened in parsing json , reason are : " + e.toString());
-                    // 一旦异常发生，我们应该停止数据的加载工作了，而不是继续的加载
+                } catch (JSONException e){
                     e.printStackTrace();
                     Log.d(TAG, " exception happened in parsing the json data we get, and the detailed reason are : " + e.toString());
                     mUIEventsHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
@@ -458,8 +386,6 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
     }
 
     private static final String KEY_REQUEST_ERROR_MSG = "keyRequestErrorMsg";
-    private static final String KEY_REQUEST_START_NUM = "requestStartNum";
-    private static final String KEY_REQUEST_END_NUM = "requestEndNum";
 
 //    private static final int DATA_HAS_BEEN_UPDATED = 1 << 8;
     private static final int START_RETRIEVE_ALL_DATA = 1 << 1;
@@ -499,12 +425,10 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
             if(mSubFragmentListView.getMode() == PullToRefreshBase.Mode.DISABLED){
                 mSubFragmentListView.setMode(PullToRefreshBase.Mode.BOTH);
             }
-            if (mSubFragmentListView.isRefreshing())
-            {
+            if (mSubFragmentListView.isRefreshing()){
                 mSubFragmentListView.onRefreshComplete();
             }
-            switch (msg.what)
-            {
+            switch (msg.what){
                 case DATA_RETRIEVE_FAILED:
                     setEmptyViewGone();
                     if (mUserList.isEmpty())
@@ -532,10 +456,8 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                     mBeforeCount = mUserList.size();
                     mIsListEmpty = mUserList.isEmpty();
                     List<NearbyMateSubFragmentUserBean> mateList = (ArrayList<NearbyMateSubFragmentUserBean>) msg.obj;
-                    for (NearbyMateSubFragmentUserBean mateBean : mateList)
-                    {
-                        if (!mUserList.contains(mateBean))
-                        {
+                    for (NearbyMateSubFragmentUserBean mateBean : mateList){
+                        if (!mUserList.contains(mateBean)){
 //                            if (mRefresh && !mIsListEmpty)
 //                            {
 //                                mUserList.add(0, mateBean);
@@ -579,25 +501,19 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                     mAfterCount = mUserList.size();
                     Log.d(TAG_2, " 7. mUIEventsHandler --> the final user list size are : " + mAfterCount);
 
-                    if (mUserList.isEmpty())
-                    {
+                    if (mUserList.isEmpty()){
                         setEmptyVewVisible();
-                    } else
-                    {
+                    } else{
                         // 如果触发DATA_RETRIEVE_SUCCESS的事件是来自用户的下拉刷新
                         // 事件，那么我们需要根据我们得到更新后的List来判断数据的加载是否是成功的(上拉刷新是不需要判断的，
-                        if (mRefresh)
-                        {
-                            if (mAfterCount == mBeforeCount)
-                            {
+                        if (mRefresh){
+                            if (mAfterCount == mBeforeCount){
                                 Utils.showToast(mContext, mContext.getString(R.string.no_newer_info));
-                            } else
-                            {
+                            } else{
                                 Utils.showToast(mContext, mContext.getString(R.string.have_already_update_info, mAfterCount - mBeforeCount));
                             }
                         }
                     }
-
                     mRefresh = false;
                     mLoadMore = false;
                     break;
@@ -612,10 +528,7 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                 // TODO: ------------------------UNCOMMENT LATER------------------------------------------
                 case NO_NETWORK:
                     setEmptyViewGone();
-
-
-                    if (mUserList.isEmpty())
-                    {
+                    if (mUserList.isEmpty()){
                         setEmptyVewVisible();
                         mEmptyView.setText(mContext.getString(R.string.network_not_available));
                     }else{
@@ -639,64 +552,20 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
 //                     mMateListAdapter.notifyDataSetChanged();
                     hideProgress();
                     // 当我们将数据获取完之后，就需要经Refresh的标记去掉，否则会一直在那里转
-                    if (mSubFragmentListView.isRefreshing())
-                    {
+                    if (mSubFragmentListView.isRefreshing()){
                         mSubFragmentListView.onRefreshComplete();
                     }
-
-                    if (mUserList.isEmpty())
-                    {
+                    if (mUserList.isEmpty()){
                         setEmptyVewVisible();
                     }
                     Log.d(TAG, " hiding the progress bar ");
-
                     break;
-//                case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
-//                    String gender = (String) msg.obj;
-//                    if (null != mWorker)
-//                    {
-//                        mWorker.fetchDataWithGenderFiltered(gender);
-//                    }
-//
-//                    break;
-//
-//                case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
-//                    String range = (String) msg.obj;
-//                    if (null != mWorker)
-//                    {
-//                        mWorker.fetchDataWithRangeFilter(range);
-//                    }
-//                    break;
-
-//                case DATA_HAS_BEEN_UPDATED:
-////                    mMateListAdapter.notifyDataSetChanged();
-//                    Log.d(TAG, " inside the UIEventsHandler --> the adapter has been notified ");
-//
-//                    break;
-
-//                case PublicConstant.TIME_OUT:
-//                    setEmptyViewGone();
-//                    // 超时之后的处理策略
-//                    Utils.showToast(mContext, mContext.getString(R.string.http_request_time_out));
-//                    if (mUserList.isEmpty())
-//                    {
-//                        Log.d("scguo_tag", "load emptyView 5");
-//                        setEmptyVewVisible();
-//                    }
-//                    hideProgress();
-//                    mRefresh = false;
-//                    mLoadMore = false;
-//                    break;
-
                 case PublicConstant.NO_RESULT:
                     setEmptyViewGone();
-                    if (mUserList.isEmpty())
-                    {
+                    if (mUserList.isEmpty()){
                         setEmptyVewVisible();
-                    } else
-                    {
-                        if (mLoadMore)
-                        {
+                    } else{
+                        if (mLoadMore){
                             Utils.showToast(mContext, mContext.getString(R.string.no_more_info, mContext.getString(R.string.nearby_billiard_mate_str)));
                         }
                     }
@@ -711,28 +580,20 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                     Bundle errorData = msg.getData();
                     String errorInfo = errorData.getString(KEY_REQUEST_ERROR_MSG);
                     Log.d(TAG, " inside the UIEventsProcessingHandler --> have exception while we make the network request, and the error msg : " + errorInfo);
-
-
-                    if (mUserList.isEmpty())
-                    {
+                    if (mUserList.isEmpty()){
                         setEmptyVewVisible();
-                        if (! TextUtils.isEmpty(errorInfo))
-                        {
+                        if (! TextUtils.isEmpty(errorInfo)){
                             mEmptyView.setText(errorInfo);
-                        } else
-                        {
+                        } else{
                             mEmptyView.setText(mContext.getString(R.string.http_request_error));
                         }
                     }else{
-                        if (! TextUtils.isEmpty(errorInfo))
-                        {
+                        if (! TextUtils.isEmpty(errorInfo)){
                             Utils.showToast(mContext, errorInfo);
-                        } else
-                        {
+                        } else{
                             Utils.showToast(mContext, mContext.getString(R.string.http_request_error));
                         }
                     }
-
                     mRefresh = false;
                     mLoadMore = false;
                     hideProgress();
@@ -741,7 +602,6 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                     mSubFragmentListView.setMode(PullToRefreshBase.Mode.DISABLED);
                     break;
                 case GET_LOCATION:
-//                    mPreTextView.setText("正在获取当前坐标");
                     showProgress();
                     mSubFragmentListView.setMode(PullToRefreshBase.Mode.DISABLED);
                     if(mEmptyView.getVisibility() == View.VISIBLE){
@@ -750,7 +610,6 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                     }
                     mRequestFlag = msg.arg1;
                     mArgs = (String) msg.obj;
-                    Log.d(TAG_2, " start retrieving all mate data, the request flags are : " + mRequestFlag + ", the args : " + mArgs);
 //                    getActivity().startService(new Intent(getActivity(), LocationUtil.class));
                     getLocation();
                     break;
@@ -759,23 +618,17 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                     mLat = args.getFloat("lat");
                     mLng = args.getFloat("lng");
                     switch(mRequestFlag){
-
                         case START_RETRIEVE_ALL_DATA:
                             String rangeParams = mRequestParms.getMateRange(mContext);
                             String genderParams = mRequestParms.getMateGender(mContext);
-//                            mPreTextView.setText(getString(R.string.pre_request_text));
                             retrieveInitialMateInfoList(mStartNum, mEndNum, rangeParams, genderParams, mLat, mLng);
                             break;
                         case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
-                            if (!mUserList.isEmpty())
-                            {
-                                Log.d(TAG, "inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
+                            if (!mUserList.isEmpty()){
                                 mUserList.clear();
                                 // 然后通知Adapter当中的数据源已经发生变化，所以更新Adapter
-//                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                                 mMateListAdapter.notifyDataSetChanged();
                             }
-                            Log.d(TAG, " inside the workThread --> start filtering the mate list based on the range of the current user " + mArgs);
                             // 每次筛选，都是从第0条开始请求最新的数据
                             // 因为这相当于完全的重新开始了，所以我们需要将我们已经获得的UserList清空才可以
                             if (sParamsPreference.getMateGender(mContext) != null) {
@@ -783,19 +636,12 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                             }
                             break;
                         case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
-                            if (!mUserList.isEmpty())
-                            {
-                                Log.d(TAG, " inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
+                            if (!mUserList.isEmpty()){
                                 mUserList.clear();
-//                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
                                 mMateListAdapter.notifyDataSetChanged();
                             }
-                            Log.d(TAG, " inside the workThread --> start filtering the mate list based on the gender of the current user " + mArgs);
                             if (sParamsPreference.getMateRange(mContext) != null) {
-                                // TODO: 现在我们正式完成了筛选的工作了，但是却还有一个问题，那就是我们
-                                // TODO: 确定所要加载的条目
                                 retrieveInitialMateInfoList(0, 9, sParamsPreference.getMateRange(mContext), mArgs,mLat,mLng);
-
                             }
                             break;
                     }
@@ -804,11 +650,9 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
 
             mMateListView.setAdapter(mMateListAdapter);
             mMateListAdapter.notifyDataSetChanged();
-            if(mLoadMore && !mUserList.isEmpty())
-            {
+            if(mLoadMore && !mUserList.isEmpty()){
                 mMateListView.setSelection(mCurrentPos - 1);
             }
-//            mMateListView.setSelection(mCurrentPos - 1);
         }
     };
 
@@ -864,148 +708,33 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
     }
 
     // 这个Handler是真正在后台当中控制所有繁重任务的Handler，包括基本的网络请求和从数据库当中检索数据
-    private class BackgroundWorker extends HandlerThread
-    {
+    private class BackgroundWorker extends HandlerThread{
         // 注意这里我们必须先要将Handler初始化一下，否则在没有网络的情况下，mHandler就是一个空的
         // 因为我们对Handler的初始化是在网络可行的情况下才调用HandlerThread的start()方法，而
         // new HandlerThread().start()的方法的调用才会调用onLooperPrepared()方法，只有这样才可以
         // 初始化我们内部的Handler
         private Handler mBackgroundHandler;
-        private int mStartNO, mEndNO;
-        public BackgroundWorker(final int initStartNum, final int initEndNum)
-        {
+        public BackgroundWorker(){
             super(WORKER_NAME, Process.THREAD_PRIORITY_BACKGROUND);
-            this.mStartNO = initStartNum;
-            this.mEndNO = initEndNum;
         }
 
         @Override
-        protected void onLooperPrepared()
-        {
+        protected void onLooperPrepared(){
             super.onLooperPrepared();
-            mBackgroundHandler = new Handler()
-            {
+            mBackgroundHandler = new Handler(){
                 @Override
-                public void handleMessage(Message msg)
-                {
-                    switch (msg.what)
-                    {
-//                        case START_RETRIEVE_ALL_DATA:
-//                            Log.d(TAG_2, " 4. have received the message to retrieving all the list data  ");
-//                            Bundle requestInfo = msg.getData();
-//                            int startNum = requestInfo.getInt(KEY_REQUEST_START_NUM);
-//                            int endNum = requestInfo.getInt(KEY_REQUEST_END_NUM);
-//                            Log.d(TAG, "inside the mWorker event processing Looper, and the startNum : " + startNum + " , and the endNum are : " + endNum);
-//                            String rangeParams = mRequestParms.getMateRange(mContext);
-//                            String genderParams = mRequestParms.getMateGender(mContext);
-////                            Log.d(TAG, " inside the mWorker event processing Looper --> And the request params that we stored in the SharedPreference : range : " + rangeParams + " , gender " + genderParams);
-//
-//                            retrieveInitialMateInfoList(startNum, endNum, rangeParams, genderParams,mLat,mLng);
-//                            break;
-//                        case START_RETRIEVE_DATA_WITH_RANGE_FILTER:
-//                            if (!mUserList.isEmpty())
-//                            {
-//                                Log.d(TAG, "inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
-//                                mUserList.clear();
-//                                // 然后通知Adapter当中的数据源已经发生变化，所以更新Adapter
-//                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
-//                            }
-//                            String range = (String) msg.obj;
-//                            Log.d(TAG, " inside the workThread --> start filtering the mate list based on the range of the current user " + range);
-//                            mUIEventsHandler.obtainMessage(GET_LOCATION,START_RETRIEVE_DATA_WITH_RANGE_FILTER,0,range).sendToTarget();
-//                            // 每次筛选，都是从第0条开始请求最新的数据
-//                            // 因为这相当于完全的重新开始了，所以我们需要将我们已经获得的UserList清空才可以
-//                            if (sParamsPreference.getMateGender(mContext) != null) {
-//                                retrieveInitialMateInfoList(0, 9, range, sParamsPreference.getMateGender(mContext));
-//                            }
-//
-//                            break;
-//                        case START_RETRIEVE_DATA_WITH_GENDER_FILTER:
-//                            if (!mUserList.isEmpty())
-//                            {
-//                                Log.d(TAG, " inside the UIEventsHandler, and the list is not empty, and we should empty it at first");
-//                                mUserList.clear();
-//                                mUIEventsHandler.sendEmptyMessage(DATA_HAS_BEEN_UPDATED);
-//                            }
-//                            String gender = (String) msg.obj;
-//                            Log.d(TAG, " inside the workThread --> start filtering the mate list based on the gender of the current user " + gender);
-//                            if (sParamsPreference.getMateRange(mContext) != null) {
-//                                // TODO: 现在我们正式完成了筛选的工作了，但是却还有一个问题，那就是我们
-//                                // TODO: 确定所要加载的条目
-//                                retrieveInitialMateInfoList(0, 9, sParamsPreference.getMateRange(mContext), gender,mLat,mLng);
-//
-//                            }
-//
-//                            break;
+                public void handleMessage(Message msg){
 
-                        // TODO: ------------------------UNCOMMENT LATER-------------------------------------------------------------
-//                        case UPDATE_LOCAL_MATE_TABLE:
-//                            // 更新我们所获得的本地的数据库
-//                            if (!mUpdateList.isEmpty())
-//                            {
-//                                mMateListAdapterateDaoImpl.updateMateInfoBatch(mUpdateList);
-//                            }
-//
-//                            if (!mInsertList.isEmpty())
-//                            {
-//                                long insertResult = mMateListAdapterateDaoImpl.insertMateItemBatch(mInsertList);
-//                                if (insertResult == -1)
-//                                {
-//                                    mMateListAdapterateDaoImpl.updateMateInfoBatch(mInsertList);
-//                                }
-//                            }
-//
-//                            break;
-                        // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
-
-                    }
                 }
             };
-
-            // TODO: 当我们需要处理缓存时，我们就需要重新设计这里了，因为我们还需要考虑到我们曾经加载过的历史数据
-            // 这里，我们需要理清一个基本前提的逻辑，那就是我们现在
-            // 是没有保持任何缓存的，所以我们在任何时候进入到这个应用的时候，也就是onResume()方法当中的时候，
-            // 我们仅仅只是单纯的加载我们所需要的最新的10条数据就可以了
-            if (Utils.networkAvaiable(mContext))
-            {
-                Log.d(TAG_2, " 2. on Background handler start, we start retrieving all data by default ");
-                fetchAllData(mStartNO, mEndNO);
+            if (Utils.networkAvaiable(mContext)){
+                fetchAllData();
             }
         }
 
-        public void fetchAllData(final int startNum, final int endNum)
-        {
-            if (null != mBackgroundHandler)
-            {
-                Log.d(TAG_2, " 3. inside the workThread, and the startNum and the endNum we need to retrieve are : " + startNum + " , " + endNum);
-//                Message requetMsg = mBackgroundHandler.obtainMessage(START_RETRIEVE_ALL_DATA);
-//                Bundle data = new Bundle();
-//                data.putInt(KEY_REQUEST_START_NUM, startNum);
-//                data.putInt(KEY_REQUEST_END_NUM, endNum);
-//                requetMsg.setData(data);
-//                mBackgroundHandler.sendMessage(requetMsg);
+        public void fetchAllData(){
+            if (null != mBackgroundHandler){
                 mUIEventsHandler.obtainMessage(GET_LOCATION,START_RETRIEVE_ALL_DATA,0).sendToTarget();
-            }
-        }
-
-        public void fetchDataWithRangeFilter(String range)
-        {
-            // 当用户添加了筛选之后，我们现在就是一个重新请求的过程了，因此我们需要先将我们之前获得的数据清除才可以
-            Log.d(TAG, " inside the mWorker --> fetchDataWithRangeFiltered --> the range data we get are : " + range);
-            if (! TextUtils.isEmpty(range) && mBackgroundHandler != null)
-            {
-                mBackgroundHandler.obtainMessage(START_RETRIEVE_DATA_WITH_RANGE_FILTER, range).sendToTarget();
-            }
-        }
-
-        public void fetchDataWithGenderFiltered(String gender)
-        {
-            // 同筛选距离的过程一样，我们也是需要先将我们之前的List清除掉，然后开始重新请求(因为我们不清楚我们之前
-            // 的请求过程是否时成功的)
-            Log.d(TAG, " inside the mWorker --> fetchDataWithGenderFiltered --> the gender data we get are : " + gender);
-            if (! TextUtils.isEmpty(gender) && mBackgroundHandler != null)
-            {
-                mBackgroundHandler.obtainMessage(START_RETRIEVE_DATA_WITH_GENDER_FILTER, gender).sendToTarget();
             }
         }
 
@@ -1021,18 +750,15 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
         // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 
         // 这个方法暂时不使用，因为这个方法会导致我们的任务处理终止
-        public void exit()
-        {
-            if (null != mBackgroundHandler)
-            {
+        public void exit(){
+            if (null != mBackgroundHandler){
                 mBackgroundHandler.getLooper().quit();
             }
         }
     }
 
     @Override
-    public void onDestroy()
-    {
+    public void onDestroy(){
         // 将所有的预筛选参数全部置空
         sParamsPreference.setMateRange(mContext, "");
         sParamsPreference.setMateGender(mContext, "");
@@ -1041,8 +767,7 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
 
 
     @Override
-    public void onSaveInstanceState(Bundle outState)
-    {
+    public void onSaveInstanceState(Bundle outState){
         super.onSaveInstanceState(outState);
         outState.putParcelableArrayList(KEY_SAVED_LISTVIEW, mUserList);
         outState.putBoolean(NearbyFragmentsCommonUtils.KEY_SAVED_LOAD_MORE, mLoadMore);
@@ -1052,33 +777,27 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
 
 
     //TODO:有问题
-    private PullToRefreshBase.OnRefreshListener2<ListView> mOnRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>()
-    {
+    private PullToRefreshBase.OnRefreshListener2<ListView> mOnRefreshListener = new PullToRefreshBase.OnRefreshListener2<ListView>(){
         @Override
-        public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView)
-        {
+        public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView){
             String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
-            if (Utils.networkAvaiable(getActivity()))
-            {
+            if (Utils.networkAvaiable(getActivity())){
                 mRefresh = true;
                 mLoadMore = false;
-                if (null != mWorker)
-                {
+                if (null != mWorker){
                     // 跟分析球厅RoomFragment当中请求最新数据的原理一样，当用户进行下拉刷新
                     // 的时候，一定是再要求最新的数据，那么我们一定是要从第0条开始加载，一次加载10条，
                     // 即从0到9
-                    mWorker.fetchAllData(0, 9);
+                    mWorker.fetchAllData();
                 }
-            } else
-            {
+            } else{
                 mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
             }
         }
 
         @Override
-        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView)
-        {
+        public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView){
             Log.d(TAG, " the user has touched the end of the current list in the BilliardsNearbyMateFragment ");
             String label = NearbyFragmentsCommonUtils.getLastedTime(mContext);
             refreshView.getLoadingLayoutProxy().setLastUpdatedLabel(label);
@@ -1092,19 +811,16 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
 //            mUpdateList.clear();
             // TODO: ------------------------UNCOMMENT LATER--------------------------------------------------------------
 
-            if (mBeforeCount != mAfterCount && mRefresh)
-            {
+            if (mBeforeCount != mAfterCount && mRefresh){
                 mStartNum = mEndNum + (mAfterCount - mBeforeCount);
                 mEndNum += 10 + (mAfterCount - mBeforeCount);
-            } else
-            {
+            } else{
                 mStartNum = mEndNum + 1;
                 mEndNum += 10;
             }
 
             mRefresh = false;
-            if (Utils.networkAvaiable(getActivity()))
-            {
+            if (Utils.networkAvaiable(getActivity())){
                 // 网络可行的情况,我们直接在我们已经得到的startNum和endNum基础之上进行数据的请求
                 // 我们应该在这里首先判断，用户是都已经添加了筛选参数，
                 // 如果用户已经添加了筛选参数，则我们需要在筛选参数的基础之上进行网络请求的工作
@@ -1113,12 +829,10 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                 // 但是我们并不在这里进行判断，而是把这个操作也代理处理因为我们每次加载都是需要判断
                 // 用户当前是否添加了筛选的参数，所以我们直接在mWorker当中创建一个函数，这个函数
                 // 会接受筛选的参数，然后直接根据加载的开始条数和结束条数就可以了
-                if (null != mWorker)
-                {
-                    mWorker.fetchAllData(mStartNum, mEndNum);
+                if (null != mWorker){
+                    mWorker.fetchAllData();
                 }
-            } else
-            {
+            } else{
                 // 当网络不可行时，我们需要告诉用户当前网络不可行
                 mUIEventsHandler.sendEmptyMessage(NO_NETWORK);
             }
@@ -1286,7 +1000,7 @@ public class BilliardsNearbyMateFragment extends Fragment implements AdapterView
                         mLoadMore = false;
                         mRefresh = false;
                         if (null != mWorker) {
-                            mWorker.fetchAllData(0, 9);
+                            mWorker.fetchAllData();
                         }
                     }
                 }

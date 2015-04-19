@@ -247,17 +247,12 @@ public class ImgUtil {
 //        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB){
 //            options.inMutable = true;
 //        }
-        //options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        //Bitmap source = BitmapFactory.decodeResource(resources,sourceId,options);
         Bitmap embedded;
         if(source.isMutable()){
             embedded = source;
         }else{
             embedded = source.copy(Bitmap.Config.ARGB_8888,true);
-            // TODO: 以下的是之前的实现，移除之后可以结合Volley当中的ImageLoader 使用，但是不移除的
-            // TODO: 话，暂时还不确定是否会影响内存资源的回收问题
-            // TODO: 关于source.recycle()内部的具体操作还不确定。需要参考StackOverflow上面的分析理解
-//            source.recycle();
+            source.recycle();
         }
 
         embedded.setHasAlpha(true);

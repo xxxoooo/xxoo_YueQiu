@@ -19,7 +19,7 @@ import android.widget.SearchView;
 import com.yueqiu.R;
 import com.yueqiu.YueQiuApp;
 import com.yueqiu.activity.BilliardGroupDetailActivity;
-import com.yueqiu.activity.NearbyBilliardsDatingActivity;
+import com.yueqiu.activity.NearbyDatingDetailActivity;
 import com.yueqiu.activity.PlayDetailActivity;
 import com.yueqiu.activity.SearchResultActivity;
 import com.yueqiu.adapter.PublishedBasicAdapter;
@@ -357,7 +357,7 @@ public class PublishedFragment extends SlideMenuBasicFragment implements Adapter
                 dateArg.putString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO,img_url);
                 dateArg.putString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME,username);
 
-                intent = new Intent(mActivity, NearbyBilliardsDatingActivity.class);
+                intent = new Intent(mActivity, NearbyDatingDetailActivity.class);
                 intent.putExtras(dateArg);
                 startActivity(intent);
                 break;

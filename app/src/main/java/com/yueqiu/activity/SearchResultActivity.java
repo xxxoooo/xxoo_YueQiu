@@ -30,6 +30,7 @@ import com.yueqiu.bean.NearbyCoauchSubFragmentCoauchBean;
 import com.yueqiu.bean.NearbyDatingSubFragmentDatingBean;
 import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
 import com.yueqiu.bean.NearbyPeopleInfo;
+import com.yueqiu.bean.NearbyRoomBean;
 import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
 import com.yueqiu.bean.PartInInfo;
 import com.yueqiu.bean.PlayInfo;
@@ -111,7 +112,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
     private ArrayList<NearbyDatingSubFragmentDatingBean> mNearbyDatingList = new ArrayList<NearbyDatingSubFragmentDatingBean>();
     private ArrayList<NearbyAssistCoauchSubFragmentBean> mNearbyASList = new ArrayList<NearbyAssistCoauchSubFragmentBean>();
     private ArrayList<NearbyCoauchSubFragmentCoauchBean> mNearbyCoauchList = new ArrayList<NearbyCoauchSubFragmentCoauchBean>();
-    private ArrayList<NearbyRoomSubFragmentRoomBean> mNearbyRoomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
+    private ArrayList<NearbyRoomBean> mNearbyRoomList = new ArrayList<NearbyRoomBean>();
 
     private ArrayList<NearbyPeopleInfo.SearchPeopleItemInfo> mFriendList = new ArrayList<NearbyPeopleInfo.SearchPeopleItemInfo>();
 
@@ -1903,8 +1904,8 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                 // TODO: 关于球厅的搜素我们目前可以想到解决办法就是将所有数据缓存下来，然后创建一个Search interface，按照本地
                 // TODO: 定义的关键字进行搜索
                 mIsListEmpty = mNearbyMateList.isEmpty();
-                List<NearbyRoomSubFragmentRoomBean> roomList = (List<NearbyRoomSubFragmentRoomBean>) msg.obj;
-                for (NearbyRoomSubFragmentRoomBean roomBean : roomList)
+                List<NearbyRoomBean> roomList = (List<NearbyRoomBean>) msg.obj;
+                for (NearbyRoomBean roomBean : roomList)
                 {
                     if (!mNearbyRoomList.contains(roomBean))
                     {
@@ -2084,7 +2085,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         args.putString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO, bean.getUserPhoto());
                         args.putInt(NearbyFragmentsCommonUtils.KEY_DATING_TABLE_ID, Integer.parseInt(bean.getId()));
                         args.putString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME, bean.getUserName());
-                        Intent intent = new Intent(SearchResultActivity.this, NearbyBilliardsDatingActivity.class);
+                        Intent intent = new Intent(SearchResultActivity.this, NearbyDatingDetailActivity.class);
                         intent.putExtras(args);
                         SearchResultActivity.this.startActivity(intent);
                     }
@@ -2097,24 +2098,19 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                 // 不处理(助教的信息只是用于展示，并没有点击之后的处理)
                 return;
             case PublicConstant.SEARCH_NEARBY_ROOM:
-                NearbyRoomSubFragmentRoomBean bean = mNearbyRoomList.get(position - 1);
-//                Bundle bundle = new Bundle();
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getRoomPhotoUrl());
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getRoomName());
-//                bundle.putFloat(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, bean.getLevel());
-//                bundle.putDouble(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, bean.getPrice());
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_TAG, bean.getRoomTag());
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, bean.getDetailedAddress());
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO, bean.getRoomInfo());
-//                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, bean.getRoomPhone());
-//
-//                // set the arguments into the bundle, and transferred into the RoomDetailedActivity
-//                Intent intent = new Intent(mContext, NearbyBilliardRoomActivity.class);
-//                intent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, bundle);
-//
-//                mContext.startActivity(intent);
-                intent = new Intent(this, BilliardsRoomWebViewActivity.class);
-                intent.putExtra(NearbyFragmentsCommonUtils.KEY_ROOM_WEBVIEW_PAGE_URL, bean.getRoomDetailPageUrl());
+                NearbyRoomBean bean = mNearbyRoomList.get(position - 1);
+                Bundle bundle = new Bundle();
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getImg_url());
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getName());
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, bean.getOverall_rating());
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, bean.getPrice());
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, bean.getAddress());
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO, bean.getDetail_info());
+                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, bean.getTelephone());
+                Intent roomIntent = new Intent(SearchResultActivity.this, NearbyRoomDetailActivity.class);
+                roomIntent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, bundle);
+
+                SearchResultActivity.this.startActivity(intent);
                 break;
             case PublicConstant.SEARCH_FAVOR:
                 FavorInfo info = (FavorInfo) mAdapter.getItem(position-1);
@@ -2141,7 +2137,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         args.putString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO,favor_img_url);
                         args.putString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME,favor_username);
 
-                        intent = new Intent(this, NearbyBilliardsDatingActivity.class);
+                        intent = new Intent(this, NearbyDatingDetailActivity.class);
                         break;
                     case PublicConstant.FAVOR_PLAY_TYPE:
                         //TODO:由于先不做球厅，所以这里实际是GROUP
@@ -2166,7 +2162,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         args.putString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO,join_img_url);
                         args.putString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME,join_username);
 
-                        intent = new Intent(this, NearbyBilliardsDatingActivity.class);
+                        intent = new Intent(this, NearbyDatingDetailActivity.class);
 
                         break;
                     case PublicConstant.PART_IN_PLAY_TYPE:
@@ -2197,7 +2193,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                         args.putString(NearbyFragmentsCommonUtils.KEY_DATING_FRAGMENT_PHOTO,published_img_url);
                         args.putString(NearbyFragmentsCommonUtils.KEY_DATING_USER_NAME,published_username);
 
-                        intent = new Intent(this, NearbyBilliardsDatingActivity.class);
+                        intent = new Intent(this, NearbyDatingDetailActivity.class);
                         break;
                     case PublicConstant.PUBLISHED_GROUP_TYPE:
                         args.putInt(DatabaseConstant.GroupInfo.NOTE_ID,published_table_id);

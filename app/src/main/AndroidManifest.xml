@@ -129,7 +129,7 @@
             android:name=".activity.PlaySelectSex"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.NearbyBilliardsDatingActivity"
+            android:name=".activity.NearbyDatingDetailActivity"
             android:label="@string/title_activity_billiards_dating"
             android:screenOrientation="portrait" />
         <activity
@@ -162,7 +162,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.NearbyBilliardRoomActivity"
+            android:name=".activity.NearbyRoomDetailActivity"
             android:parentActivityName=".BilliardNearbyActivity"
             android:screenOrientation="portrait" />
         <activity

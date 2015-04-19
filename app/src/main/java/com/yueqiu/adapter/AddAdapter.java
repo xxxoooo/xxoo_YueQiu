@@ -67,7 +67,7 @@ public class AddAdapter extends BaseAdapter {
         viewHolder.mGender.setText(mList.get(position).getSex() == 1 ? mContext.getString(R.string.man) : mContext.getString(R.string.woman));
         viewHolder.mGender.setCompoundDrawablesWithIntrinsicBounds(0, 0, NearbyFragmentsCommonUtils.parseGenderDrawable(mList.get(position).getSex() == 1 ? "男" : "女"), 0);
         String district = mList.get(position).getDistrict();
-        if("".equals(district)){
+        if("".equals(district)||"(null)".equals(district)){
             viewHolder.mDistrict.setVisibility(View.GONE);
         }else{
             viewHolder.mDistrict.setText(district);

@@ -13,8 +13,7 @@ import org.json.JSONObject;
  * 这是用于创建SearchActivity当中的球友Fragment当中的用户的Bean
  * 主要是用于创建ListView当中的item
  */
-public class NearbyMateSubFragmentUserBean implements Parcelable
-{
+public class NearbyMateSubFragmentUserBean implements Parcelable{
     private static final String TAG = "NearbyMateSubFragmentUserBean";
 
     private String mUserId;
@@ -28,11 +27,9 @@ public class NearbyMateSubFragmentUserBean implements Parcelable
     // other http request
     private String mUserPhotoUrl;
 
-    public NearbyMateSubFragmentUserBean()
-    {}
+    public NearbyMateSubFragmentUserBean(){}
 
-    public NearbyMateSubFragmentUserBean(String userId, String userPhotoUrl, String nickName, String userGender, String userDistrict, String userDistance)
-    {
+    public NearbyMateSubFragmentUserBean(String userId, String userPhotoUrl, String nickName, String userGender, String userDistrict, String userDistance){
         this.mUserId = userId;
         this.mUserDistance = userDistance;
         this.mUserPhotoUrl = userPhotoUrl;
@@ -101,74 +98,34 @@ public class NearbyMateSubFragmentUserBean implements Parcelable
     {
         this.mUserId = userId;
     }
-    private static final String JSON_USER_ID = "user_id";
-    private static final String JSON_SEX = "sex";
-    private static final String JSON_RANGE = "range";
-    private static final String JSON_DISTRICT = "district";
-    private static final String JSON_IMG_URL = "img_url";
-    private static final String JSON_USERNAME = "username";
 
-    public JSONObject toJson() throws JSONException
-    {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(JSON_USERNAME, mUserNickName);
-        jsonObject.put(JSON_DISTRICT, mUserDistrict);
-        jsonObject.put(JSON_SEX, mUserGender);
-        jsonObject.put(JSON_IMG_URL, mUserPhotoUrl);
-        jsonObject.put(JSON_RANGE, mUserDistance);
-
-        return jsonObject;
-    }
-
-    public NearbyMateSubFragmentUserBean(JSONObject jsonObject) throws JSONException
-    {
-        Log.d("search_mate_bean", "the json object we need to convert are : " + jsonObject.toString());
-        mUserPhotoUrl = jsonObject.getString(JSON_IMG_URL);
-//        Log.d("search_mate_bean", "the user photo are : " + mUserPhotoUrl);
-        mUserDistrict = jsonObject.getString("district");
-        Log.d("search_mate_bean", "the user district are : " + mUserDistrict);
-        mUserGender = jsonObject.getString(JSON_SEX);
-        Log.d("search_mate_bean", " the sex : " + mUserGender);
-        mUserNickName = jsonObject.getString(JSON_USERNAME);
-        Log.d("search_mate_bean", " the name : " + mUserNickName);
-        mUserDistance = jsonObject.getString(JSON_RANGE);
-        Log.d("search_mate_bean", " the range are : " + mUserDistance);
-    }
 
     @Override
-    public String toString()
-    {
+    public String toString(){
         return "the photo url are :" + mUserPhotoUrl + "; name : " + mUserNickName + "; gender: " + mUserGender +
                 "; district : " + mUserDistrict + "; and distance : " + mUserDistance;
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode(){
         int hash = 3;
-        try
-        {
+        try{
             hash = 17 * mUserId.hashCode();
-        } catch (final Exception e)
-        {
+        } catch (final Exception e){
             Log.d(TAG, " exception happened while we parse the iD value we get : " + e.toString());
         }
         return hash;
     }
 
     @Override
-    public boolean equals(Object object)
-    {
+    public boolean equals(Object object){
         boolean result = false;
 
-        if (object == null ||  object.getClass() != this.getClass())
-        {
+        if (object == null ||  object.getClass() != this.getClass()){
             result = false;
-        } else
-        {
+        } else{
             NearbyMateSubFragmentUserBean thatObj = (NearbyMateSubFragmentUserBean) object;
-            if (thatObj.getUserId().equals(this.getUserId()))
-            {
+            if (thatObj.getUserId().equals(this.getUserId())){
                 result = true;
             }
         }
@@ -196,8 +153,7 @@ public class NearbyMateSubFragmentUserBean implements Parcelable
      *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
      */
     @Override
-    public void writeToParcel(Parcel dest, int flags)
-    {
+    public void writeToParcel(Parcel dest, int flags){
         dest.writeString(mUserId);
         dest.writeString(mUserDistance);
         dest.writeString(mUserPhotoUrl);
@@ -206,23 +162,19 @@ public class NearbyMateSubFragmentUserBean implements Parcelable
         dest.writeString(mUserNickName);
     }
 
-    public static final Creator<NearbyMateSubFragmentUserBean> CREATOR = new Creator<NearbyMateSubFragmentUserBean>()
-    {
+    public static final Creator<NearbyMateSubFragmentUserBean> CREATOR = new Creator<NearbyMateSubFragmentUserBean>(){
         @Override
-        public NearbyMateSubFragmentUserBean createFromParcel(Parcel source)
-        {
+        public NearbyMateSubFragmentUserBean createFromParcel(Parcel source){
             return new NearbyMateSubFragmentUserBean(source);
         }
 
         @Override
-        public NearbyMateSubFragmentUserBean[] newArray(int size)
-        {
+        public NearbyMateSubFragmentUserBean[] newArray(int size){
             return new NearbyMateSubFragmentUserBean[size];
         }
     };
 
-    public NearbyMateSubFragmentUserBean(Parcel savedData)
-    {
+    public NearbyMateSubFragmentUserBean(Parcel savedData){
         // 我们读取的顺序需要同我们写入Parcel的顺序保持一致，否则我们读到的值就会是乱的
         // 之所以要保持顺序一致是因为我们写入Parcel时并没有根据相应的KEY值来进行插入，所以获取时要按照
         // 最原始的顺序来确定我们读到的值是正确的

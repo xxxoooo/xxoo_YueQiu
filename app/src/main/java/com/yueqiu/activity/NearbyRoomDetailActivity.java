@@ -67,17 +67,7 @@ import org.json.JSONObject;
 
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * @author scguo
- *         <p/>
- *         这是用于展示球厅的具体Activity
- *         当我们点击球厅子Fragment(BilliardsNearbyRoomFragment)当中的ListView的任何的一个item，就会
- *         跳转到当前的这个Fragment当中
- */
-// TODO: NearbyBilliardRoomActivity 当中包含了很多关于分享的原始实现代码，我们在后期测试当中完全通过之后，需要
-// TODO: 将这部分代码删除掉
-public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandler.Response, IUiListener
-{
+public class NearbyRoomDetailActivity extends Activity implements IWeiboHandler.Response, IUiListener{
     private static final String TAG = "NearbyBilliardRoomActivity";
     private static final String TAG_1 = "room_info_share_debug";
 
@@ -99,8 +89,7 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
     private View mRootView;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nearby_billiard_room);
 
@@ -132,23 +121,21 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
         Bundle receivedData = receivedIntent.getBundleExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT);
         if (null != receivedData) {
             double price = receivedData.getDouble(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, 0.0);
-            float level = receivedData.getFloat(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, 1.0f);
+            String level = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, "1.0");
             String tag = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_TAG, "");
             String info = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO, "");
             String address = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, "");
             String phone = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, "");
-            String photoUrl = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, "");
+            String photoUrl = "http://" + receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, "");
             String name = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, "");
             String shopHours = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_SHOP_HOURS, "");
 
-            Log.d("wy","recommend room name ->" + name);
-
             // 把我们得到的数据全部渲染到Activity当中
             mRoomPrice.setText(String.valueOf(price));
-            mRoomRatingBar.setRating(level);
+            mRoomRatingBar.setRating(Float.parseFloat(level));
             mRoomRatingNum.setText(String.valueOf(level));
             mRoomAddress.setText(address);
-            mRoomTag.setText(tag);
+            mRoomTag.setText(shopHours);
             mRoomPrice.setText(String.valueOf(price));
             mRoomDetailedInfo.setText(info);
             mRoomPhone.setText(phone);
@@ -171,8 +158,7 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
     }
 
     @Override
-    protected void onNewIntent(Intent intent)
-    {
+    protected void onNewIntent(Intent intent){
         super.onNewIntent(intent);
 
         // 从当前应用唤起微博并进行分享后，返回到当前应用时，需要在此处调用该函数
@@ -191,11 +177,9 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
      * @param baseResponse
      */
     @Override
-    public void onResponse(BaseResponse baseResponse)
-    {
+    public void onResponse(BaseResponse baseResponse){
         Log.d(TAG_1, " on share response, error code : " + baseResponse.errCode + ", error reason : " + baseResponse.errMsg);
-        switch (baseResponse.errCode)
-        {
+        switch (baseResponse.errCode){
             case STATUS_OK:
                 Toast.makeText(this, getString(R.string.weibo_share_success), Toast.LENGTH_SHORT).show();
                 break;
@@ -208,8 +192,7 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
         }
     }
 
-    public void shareWeiboMsg(String text, Bitmap bitmap)
-    {
+    public void shareWeiboMsg(String text, Bitmap bitmap){
         // 然后发送我们封装好的WeiboObject
         responseMessage(text, bitmap);
     }
@@ -225,16 +208,12 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
      * 过程了
      *
      */
-    private void responseMessage(String sharedText, Bitmap sharedBitmap)
-    {
-        if (mWeiboShareApi.isWeiboAppSupportAPI())
-        {
+    private void responseMessage(String sharedText, Bitmap sharedBitmap){
+        if (mWeiboShareApi.isWeiboAppSupportAPI()){
             final int supportAPI = mWeiboShareApi.getWeiboAppSupportAPI();
-            if (supportAPI >= 10351)
-            {
+            if (supportAPI >= 10351){
                 ImageObject imgObj = new ImageObject();
-                if (null != sharedBitmap)
-                {
+                if (null != sharedBitmap){
                     imgObj.setImageObject(sharedBitmap);
                 }
 
@@ -254,16 +233,14 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
                 request.multiMessage = weiboMultiMessage;
                 // 发送信息到微博,这个过程理论上应该能唤起微博分享界面，但是如果验证失败了，也就是卡在这一步了
                 Log.d(TAG, " we are going to invoke the WeiboShare Page activity");
-                if (WEIBO_SHARE_TYPE == SHARE_CLIENT)
-                {
+                if (WEIBO_SHARE_TYPE == SHARE_CLIENT){
                     // 从当前的Activity实例跳转到我们新浪微博指定的分享信息Activity，在这里我们
                     // 用于创建分享实例的context就是BilliardsRoomActiviity实例，所以我们可以把她强制转换成Activity实例,来
                     // 完成跳转
                     Log.d(TAG, " sending the request to share message to sina weibo ");
                     mWeiboShareApi.sendRequest(this, request);
                 }
-            } else
-            {
+            } else{
                 // 这样我们就只能发送一种类型的对象了，我们这里采用只发送文字
                 TextObject textObject = new TextObject();
                 textObject.text = sharedText;
@@ -280,8 +257,7 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
     }
 
     @Override
-    protected void onResume()
-    {
+    protected void onResume(){
         super.onResume();
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB) {
@@ -291,35 +267,20 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause(){
         super.onPause();
 
     }
-
-    // TODO: 用于得到球厅详情信息的网络请求处理过程
-    // TODO: 这里暂时还不知道怎么处理(目前的处理是直接从前一个Fragment的List当中直接获取
-    // TODO: 我们目前还不确定Server端的策略，如果他有提供这个interface，那么我们就直接在这里进行了，否则的话，就从新进行请求)
-    private String getRoomDetailedInfo()
-    {
-
-        return "";
-    }
-
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu){
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_billiards_room, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+    public boolean onOptionsItemSelected(MenuItem item){
+
         int id = item.getItemId();
 
         switch (id) {
@@ -349,34 +310,27 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
 
     // TODO: 腾讯微博分享需要安装QQ客户端
     // TODO: 但是QQ客户端如果安装上会导致分享到QQ空间无法实现(目前没有报出认出任何有关于这两者之间的冲突)
-    public Dialog showSheet(final Context context, Intent intent)
-    {
+    public Dialog showSheet(final Context context, Intent intent){
         // 创建用于实现微信分享的实例
         final WeChatShareManager weChatShareManager = WeChatShareManager.getInstance(context, intent);
         final RenRenShareManager renRenShareManager = RenRenShareManager.getInstance(context);
         final Tencent tencent = Tencent.createInstance(HttpConstants.QQ_ZONE_APP_KEY, this);
 
         // 用于实现腾讯微博分享的回调
-        final IUiListener tencentWeiboListener = new IUiListener()
-        {
+        final IUiListener tencentWeiboListener = new IUiListener(){
             @Override
-            public void onComplete(Object response)
-            {
-                try
-                {
+            public void onComplete(Object response){
+                try{
                     JSONObject result = (JSONObject) response;
                     int ret = result.getInt("ret");
-                    if (result.has("data"))
-                    {
+                    if (result.has("data")){
                         JSONObject data = result.getJSONObject("data");
-                        if (data.has("id"))
-                        {
+                        if (data.has("id")){
                             String lastAddedTweetId = data.getString("id");
                             Log.e(TAG_1, " ret : " + ret + " data = " + data + " time = " + lastAddedTweetId);
                         }
                     }
-                    if (ret == 0)
-                    {
+                    if (ret == 0){
                         Log.e(TAG_1, " successful by sending one tencent weibo to tencent weibo ");
                     }
                 } catch (JSONException e) {
@@ -385,14 +339,12 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
 
             }
             @Override
-            public void onError(UiError uiError)
-            {
+            public void onError(UiError uiError){
                 Log.e(TAG_1, " error by sharing message to tencent weibo ");
             }
 
             @Override
-            public void onCancel()
-            {
+            public void onCancel(){
                 Log.e(TAG_1, " sharing to tencent weibo has been cancelled ");
             }
         };
@@ -433,13 +385,10 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
         TextView tvRenren = (TextView) dlg.findViewById(R.id.img_search_dating_detail_share_renren);
         TextView btnCancel = (Button) dlg.findViewById(R.id.btn_search_dating_detailed_cancel);
 
-        View.OnClickListener listener = new View.OnClickListener()
-        {
+        View.OnClickListener listener = new View.OnClickListener(){
             @Override
-            public void onClick(View v)
-            {
-                switch (v.getId())
-                {
+            public void onClick(View v){
+                switch (v.getId()){
                     case R.id.btn_search_dating_detailed_cancel:
                         dlg.dismiss();
                         break;
@@ -464,8 +413,7 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
                         break;
                     case R.id.img_search_dating_detail_share_weichat:
                         // 分享到微信的指定好友那里
-                        if (null != weChatShareManager)
-                        {
+                        if (null != weChatShareManager){
                             weChatShareManager.shareByWeChat(
                                     weChatShareManager.new ShareTextContent("下面是我发送的测试内容"),
                                     false);
@@ -477,39 +425,33 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
                         final int shareType = QzoneShare.SHARE_TO_QZONE_TYPE_IMAGE_TEXT;
                         shareParmas.putString(QzoneShare.SHARE_TO_QQ_TITLE, " this is a message from yueqiu ");
                         shareParmas.putString(QzoneShare.SHARE_TO_QQ_SUMMARY, " yueqiu is a good app - from KingKimRi");
-                        if (shareType != QzoneShare.SHARE_TO_QZONE_TYPE_APP)
-                        {
+                        if (shareType != QzoneShare.SHARE_TO_QZONE_TYPE_APP){
                             shareParmas.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, HttpConstants.DEFAULT_DIRECT_URL);
                         }
-                        new Thread(new Runnable()
-                        {
+                        new Thread(new Runnable(){
                             @Override
-                            public void run()
-                            {
+                            public void run(){
                                 Log.d(TAG_1, " share to qqzone ");
-                                tencent.shareToQzone(NearbyBilliardRoomActivity.this, shareParmas, NearbyBilliardRoomActivity.this);
+                                tencent.shareToQzone(NearbyRoomDetailActivity.this, shareParmas, NearbyRoomDetailActivity.this);
                             }
                         }).start();
                         break;
                     case R.id.img_search_dating_detail_share_qqweibo:
-                        if (! tencent.isSessionValid())
-                        {
-                            tencent.login(NearbyBilliardRoomActivity.this, "all", new BaseUiListener()
+                        if (! tencent.isSessionValid()){
+                            tencent.login(NearbyRoomDetailActivity.this, "all", new BaseUiListener()
                             {
                                 @Override
                                 protected void doComplete(JSONObject response)
                                 {
-                                    try
-                                    {
+                                    try{
                                         String token = response.getString(Constants.PARAM_ACCESS_TOKEN);
                                         String expires = response.getString(Constants.PARAM_EXPIRES_IN);
                                         String openId = response.getString(Constants.PARAM_OPEN_ID);
-                                        if (! TextUtils.isEmpty(token) && ! TextUtils.isEmpty(expires) && ! TextUtils.isEmpty(openId))
-                                        {
+                                        if (! TextUtils.isEmpty(token) && ! TextUtils.isEmpty(expires) && ! TextUtils.isEmpty(openId)){
                                             tencent.setAccessToken(token, expires);
                                             tencent.setOpenId(openId);
                                         }
-                                        final Weibo weibo = new Weibo(NearbyBilliardRoomActivity.this, tencent.getQQToken());
+                                        final Weibo weibo = new Weibo(NearbyRoomDetailActivity.this, tencent.getQQToken());
                                         final String sharedContent = "";
                                         weibo.sendText(sharedContent, tencentWeiboListener);
 
@@ -521,15 +463,13 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
                         }
                         // 当前的Session是合法的
                         final boolean ready = tencent.isSessionValid() && tencent.getQQToken().getOpenId() != null;
-                        if (!ready)
-                        {
-                            Toast.makeText(NearbyBilliardRoomActivity.this, "Login first", Toast.LENGTH_SHORT).show();
-                        } else
-                        {
-                            final Weibo weibo = new Weibo(NearbyBilliardRoomActivity.this, tencent.getQQToken());
+                        if (!ready){
+                            Toast.makeText(NearbyRoomDetailActivity.this, "Login first", Toast.LENGTH_SHORT).show();
+                        } else{
+                            final Weibo weibo = new Weibo(NearbyRoomDetailActivity.this, tencent.getQQToken());
                             String content = " this is a message send to tencent weibo " + System.currentTimeMillis();
                             weibo.sendText(content, tencentWeiboListener);
-                            Toast.makeText(NearbyBilliardRoomActivity.this, "successful share to tencent weibo ", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(NearbyRoomDetailActivity.this, "successful share to tencent weibo ", Toast.LENGTH_SHORT).show();
                         }
 
 
@@ -554,12 +494,11 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
 //                                Toast.makeText(NearbyBilliardRoomActivity.this, getString(R.string.weibo_need_to_install_first), Toast.LENGTH_SHORT).show();
 //                            }
 //                        }
-                        startActivity(new Intent(NearbyBilliardRoomActivity.this, WeiboShareActionCompleteActivity.class));
+                        startActivity(new Intent(NearbyRoomDetailActivity.this, WeiboShareActionCompleteActivity.class));
 
                         break;
                     case R.id.img_search_dating_detail_share_renren:
-                        if (null != renRenShareManager)
-                        {
+                        if (null != renRenShareManager){
                             // 以下我们采用分享的是测试图片
                             Bitmap sharedRennBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher);
                             Log.d("renren_share", "Share to renren site ");
@@ -584,8 +523,7 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
     }
 
     // 将当前的球厅加入我们收藏当中
-    private void addRoomToFavor()
-    {
+    private void addRoomToFavor(){
         ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
         requestParams.put("user_id", YueQiuApp.sUserInfo.getUser_id() + "");
         requestParams.put("type", "2");
@@ -595,8 +533,7 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                try
-                {
+                try{
                     if(response.isNull("code")) {
                         final int code = response.getInt("code");
                         if (code == HttpConstants.ResponseCode.NORMAL) {
@@ -607,8 +544,7 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
                     }else{
                         mUIEventsHandler.sendEmptyMessage(FAVOR_FAILURE);
                     }
-                } catch (JSONException e)
-                {
+                } catch (JSONException e){
                     e.printStackTrace();
                 }
             }
@@ -627,29 +563,27 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
 
     private static final int ADD_TO_FAVOR = 1 << 3;
 
-    private Handler mUIEventsHandler = new Handler()
-    {
+    private Handler mUIEventsHandler = new Handler(){
         @Override
-        public void handleMessage(Message msg)
-        {
+        public void handleMessage(Message msg){
             switch (msg.what) {
                 case FAVOR_SUCCESS:
                     Intent favorSuccessIntent = new Intent(PublicConstant.SLIDE_FAVOR_ACTION);
-                    NearbyBilliardRoomActivity.this.sendBroadcast(favorSuccessIntent);
-                    Utils.showToast(NearbyBilliardRoomActivity.this, getString(R.string.store_success));
+                    NearbyRoomDetailActivity.this.sendBroadcast(favorSuccessIntent);
+                    Utils.showToast(NearbyRoomDetailActivity.this, getString(R.string.store_success));
                     break;
                 case FAVOR_FAILURE:
                     if(null == msg.obj){
-                        Utils.showToast(NearbyBilliardRoomActivity.this,getString(R.string.http_request_error));
+                        Utils.showToast(NearbyRoomDetailActivity.this,getString(R.string.http_request_error));
                     }else{
-                        Utils.showToast(NearbyBilliardRoomActivity.this, (String) msg.obj);
+                        Utils.showToast(NearbyRoomDetailActivity.this, (String) msg.obj);
                     }
                     break;
                 case ADD_TO_FAVOR:
-                    if(Utils.networkAvaiable(NearbyBilliardRoomActivity.this)) {
+                    if(Utils.networkAvaiable(NearbyRoomDetailActivity.this)) {
                         addRoomToFavor();
                     }else{
-                        Utils.showToast(NearbyBilliardRoomActivity.this,getString(R.string.network_not_available));
+                        Utils.showToast(NearbyRoomDetailActivity.this,getString(R.string.network_not_available));
                     }
                     break;
             }
@@ -657,8 +591,7 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
     };
 
     @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event)
-    {
+    public boolean onKeyDown(int keyCode, KeyEvent event){
         switch (keyCode) {
             case KeyEvent.KEYCODE_BACK:
                 finish();
@@ -668,38 +601,31 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
         return super.onKeyDown(keyCode, event);
     }
 
-    private static class BaseUiListener implements IUiListener
-    {
+    private static class BaseUiListener implements IUiListener {
 
         @Override
-        public void onComplete(Object response)
-        {
-            if (null == response)
-            {
+        public void onComplete(Object response){
+            if (null == response){
                 return;
             }
             JSONObject jsonResponse = (JSONObject) response;
-            if (null != jsonResponse && jsonResponse.length() == 0)
-            {
+            if (null != jsonResponse && jsonResponse.length() == 0){
                 return;
             }
             doComplete((JSONObject) response);
         }
 
-        protected void doComplete(JSONObject values)
-        {
+        protected void doComplete(JSONObject values){
 
         }
 
         @Override
-        public void onError(UiError uiError)
-        {
+        public void onError(UiError uiError){
 
         }
 
         @Override
-        public void onCancel()
-        {
+        public void onCancel(){
 
         }
     }
@@ -708,110 +634,22 @@ public class NearbyBilliardRoomActivity extends Activity implements IWeiboHandle
      * 以下的三个方法是用于监听腾讯的分享的回调监听方法
      */
     @Override
-    public void onComplete(Object o)
-    {
+    public void onComplete(Object o){
         Log.d(TAG_1, " share complete : " + o.toString());
     }
 
     @Override
-    public void onError(UiError uiError)
-    {
+    public void onError(UiError uiError){
         Log.d(TAG_1, " share error : " + uiError.errorMessage + " error code : " + uiError.errorCode);
 
     }
 
     @Override
-    public void onCancel()
-    {
+    public void onCancel(){
         Log.d(TAG_1, " share cancelled");
 
     }
 
-    // TODO: 以下用于展示球厅详情Activity当中的分享球厅的popupWindow,
-    // TODO: 我们在这里并没有重新创建，而是直接将所有的代码从BilliardsDatingActivity当中复制过来的。在后期的代码优化过程当中，
-    // TODO: 我们需要将展示球厅分享的popupWindow部分单独分拆出来形成一个独立的模块
-//    private PopupWindow mPopupWindow;
-//    private TextView mTvYueqiu, mTvYueqiuFriend, mTvFriendCircle, mTvWeichat, mTvQQZone, mTvTencentWeibo, mTvSinaWeibo, mTvRenren;
-//    private Button mBtnCancel;
-
-    // 弹出约球详情分享的popupWindow
-//    private void popupShareWindow()
-//    {
-//        View popupWindowView = getLayoutInflater().inflate(R.layout.dialog_share, null);
-//        mPopupWindow = new PopupWindow(popupWindowView, RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT, true);
-//        mPopupWindow.setTouchable(true);
-//        mPopupWindow.setOutsideTouchable(true);
-//        mPopupWindow.setFocusable(true);
-//        // 我们是必须要为PopupWindow设置一个Background drawable才能使PopupWindow工作正常
-//        // 当时我们由于已经在layout当中设置了background，所以这里我们使用一个技巧就是设置background的Bitmap为null
-//        // 为popupWindow设置背景是为了使popupWindow在点击popupWindow外部的时候可以自动dismiss掉
-////        mPopupWindow.setBackgroundDrawable(new BitmapDrawable(getResources(), (Bitmap) null));
-//
-//        mPopupWindow.getContentView().setFocusableInTouchMode(true);
-//        mPopupWindow.getContentView().setFocusable(true);
-//
-//        mPopupWindow.setAnimationStyle(R.style.SearchDatingDetailedPopupWindowStyle);
-//
-//        (mTvYueqiu = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_yuqeiufirend)).setOnClickListener(new OnShareIconClickListener());
-//        (mTvYueqiuFriend = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_yueqiucircle)).setOnClickListener(new OnShareIconClickListener());
-//        (mTvFriendCircle = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_friendcircle)).setOnClickListener(new OnShareIconClickListener());
-//        (mTvWeichat = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_weichat)).setOnClickListener(new OnShareIconClickListener());
-//        (mTvQQZone = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_qqzone)).setOnClickListener(new OnShareIconClickListener());
-//        (mTvTencentWeibo = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_qqweibo)).setOnClickListener(new OnShareIconClickListener());
-//        (mTvSinaWeibo = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_sinaweibo)).setOnClickListener(new OnShareIconClickListener());
-//        (mTvRenren = (TextView) popupWindowView.findViewById(R.id.img_search_dating_detail_share_renren)).setOnClickListener(new OnShareIconClickListener());
-//
-//        (mBtnCancel = (Button) popupWindowView.findViewById(R.id.btn_search_dating_detailed_cancel)).setOnClickListener(new View.OnClickListener()
-//        {
-//            @Override
-//            public void onClick(View v)
-//            {
-//                mPopupWindow.dismiss();
-//                // while the popupWindow is dismissed from the current activity, make the background back to the normal state
-////                mWindowRootElem.getForeground().setAlpha(0);
-////                mWindowRootElem.forceLayout();
-//            }
-//        });
-//
-//        // TODO: 当我们在后期代码压缩时，如果需要将popupWindow抽离出来的时候，需要将以下用于设置PopupWindow的显示
-//        // TODO: 位置的时候，我们就需要将popupWindow当前所在的Activity的准确的layout文件的根元素的指定，否则就会发生异常
-//        mPopupWindow.showAtLocation(findViewById(R.id.search_room_detailed_whole_container), Gravity.BOTTOM, 0, 0);
-////        mWindowRootElem.getForeground().setAlpha(160);
-//    }
-//
-//    private class OnShareIconClickListener implements View.OnClickListener
-//    {
-//        @Override
-//        public void onClick(View v)
-//        {
-//            switch (v.getId()) {
-//                case R.id.img_search_dating_detail_share_yuqeiufirend:
-//                    Toast.makeText(NearbyBilliardRoomActivity.this, "sharing to the yueqiu friends", Toast.LENGTH_LONG).show();
-//                    break;
-//                case R.id.img_search_dating_detail_share_yueqiucircle:
-//                    Toast.makeText(NearbyBilliardRoomActivity.this, "sharing to the yueqiu circle", Toast.LENGTH_LONG).show();
-//                    break;
-//                case R.id.img_search_dating_detail_share_friendcircle:
-//                    Toast.makeText(NearbyBilliardRoomActivity.this, "sharing to the friends circle", Toast.LENGTH_LONG).show();
-//                    break;
-//                case R.id.img_search_dating_detail_share_weichat:
-//                    Toast.makeText(NearbyBilliardRoomActivity.this, "sharing to the wechat", Toast.LENGTH_LONG).show();
-//                    break;
-//                case R.id.img_search_dating_detail_share_qqzone:
-//                    Toast.makeText(NearbyBilliardRoomActivity.this, "sharing to the qq zone", Toast.LENGTH_LONG).show();
-//                    break;
-//                case R.id.img_search_dating_detail_share_qqweibo:
-//                    Toast.makeText(NearbyBilliardRoomActivity.this, "sharing to the qq weibo", Toast.LENGTH_LONG).show();
-//                    break;
-//                case R.id.img_search_dating_detail_share_sinaweibo:
-//                    Toast.makeText(NearbyBilliardRoomActivity.this, "sharing to the qq sinaweibo", Toast.LENGTH_LONG).show();
-//                    break;
-//                case R.id.img_search_dating_detail_share_renren:
-//                    Toast.makeText(NearbyBilliardRoomActivity.this, "sharing to the qq renren", Toast.LENGTH_LONG).show();
-//                    break;
-//            }
-//        }
-//    }
 
 
 }
