@@ -274,8 +274,7 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment implements Ada
      * @param startNo
      * @param endNo
      */
-    private void retrieveAllInitialAssistCoauchInfo(final float lati, final float lng, String rangeParam, String priceParam, String clazzParam, String levelParam, final int startNo, final int endNo)
-    {
+    private void retrieveAllInitialAssistCoauchInfo(final float lati, final float lng, String rangeParam, String priceParam, String clazzParam, String levelParam, final int startNo, final int endNo){
         if (!Utils.networkAvaiable(getActivity())) {
             mUIEventsHandler.obtainMessage(STATE_FETCH_DATA_FAILED,
                     mContext.getResources().getString(R.string.network_not_available)).sendToTarget();
@@ -289,27 +288,24 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment implements Ada
         requestParams.put("lat", String.valueOf(lati));
         requestParams.put("lng", String.valueOf(lng));
 
-        if (! TextUtils.isEmpty(rangeParam))
-        {
+        if (! TextUtils.isEmpty(rangeParam)){
             requestParams.put("range", rangeParam);
         }
-        if (! TextUtils.isEmpty(priceParam))
-        {
+        if (! TextUtils.isEmpty(priceParam)){
             requestParams.put("money", priceParam);
         }
 
-        if (! TextUtils.isEmpty("class"))
-        {
+        if (! TextUtils.isEmpty("class")){
             requestParams.put("class", clazzParam);
         }
 
-        if (! TextUtils.isEmpty("level"))
-        {
+        if (! TextUtils.isEmpty("level")){
             requestParams.put("level", levelParam);
         }
 
         requestParams.put("start_no", startNo + "");
         requestParams.put("end_no", endNo + "");
+        Log.d("assistant","assistant param is ->" + requestParams);
 
         mUIEventsHandler.sendEmptyMessage(SET_PULLREFRESH_DISABLE);
         
@@ -317,14 +313,11 @@ public class BilliardsNearbyAssistCoauchFragment extends Fragment implements Ada
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
-                Log.d("wy","assistant response ->" + response);
-                try
-                {
-                    if (! TextUtils.isEmpty(response.get("code").toString()))
-                    {
+                Log.d("assistant","assistant response ->" + response);
+                try{
+                    if (! TextUtils.isEmpty(response.get("code").toString())){
                         final int status = response.getInt("code");
-                        if (status == HttpConstants.ResponseCode.NORMAL)
-                        {
+                        if (status == HttpConstants.ResponseCode.NORMAL){
                             JSONObject resultJsonObj = response.getJSONObject("result");
                             if(resultJsonObj.get("list_data").equals("null")){
                                 mUIEventsHandler.sendEmptyMessage(PublicConstant.NO_RESULT);

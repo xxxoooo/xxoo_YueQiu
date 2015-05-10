@@ -31,7 +31,7 @@ import com.yueqiu.bean.NearbyDatingSubFragmentDatingBean;
 import com.yueqiu.bean.NearbyMateSubFragmentUserBean;
 import com.yueqiu.bean.NearbyPeopleInfo;
 import com.yueqiu.bean.NearbyRoomBean;
-import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
+//import com.yueqiu.bean.NearbyRoomSubFragmentRoomBean;
 import com.yueqiu.bean.PartInInfo;
 import com.yueqiu.bean.PlayInfo;
 import com.yueqiu.bean.PublishedInfo;
@@ -605,44 +605,32 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
 
         mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
 
-        HttpUtil.requestHttp(HttpConstants.NearbyCoauch.URL, mParams, HttpConstants.RequestMethod.GET, new JsonHttpResponseHandler()
-        {
+        HttpUtil.requestHttp(HttpConstants.NearbyCoauch.URL, mParams, HttpConstants.RequestMethod.GET, new JsonHttpResponseHandler(){
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 super.onSuccess(statusCode, headers, response);
                 Log.d(TAG, " search coauch info : " + response);
-                try
-                {
-                    if (!response.isNull("code"))
-                    {
-                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL)
-                        {
-                            if (response.getString("result") != null)
-                            {
+                try{
+                    if (!response.isNull("code")){
+                        if (response.getInt("code") == HttpConstants.ResponseCode.NORMAL){
+                            if (response.getString("result") != null){
                                 List<NearbyCoauchSubFragmentCoauchBean> list = setCoauchInfoByJson(response);
-                                if (list.isEmpty())
-                                {
+                                if (list.isEmpty()){
                                     mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                                } else
-                                {
+                                } else{
                                     mHandler.obtainMessage(PublicConstant.GET_SUCCESS, list).sendToTarget();
                                 }
-                            } else
-                            {
+                            } else{
                                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                             }
-                        } else if (response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT)
-                        {
+                        } else if (response.getInt("code") == HttpConstants.ResponseCode.TIME_OUT){
                             mHandler.sendEmptyMessage(PublicConstant.TIME_OUT);
-                        } else if (response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT)
-                        {
+                        } else if (response.getInt("code") == HttpConstants.ResponseCode.NO_RESULT){
                             mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                        } else
-                        {
+                        } else{
                             mHandler.obtainMessage(PublicConstant.REQUEST_ERROR).sendToTarget();
                         }
-                    } else
-                    {
+                    } else{
                         mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
                     }
                 } catch (JSONException e)
@@ -660,8 +648,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
         });
     }
     private static final String REQUEST_KEYWORD = "台球,桌球室,台球室,桌球";
-    private void searchRoomInfo()
-    {
+    private void searchRoomInfo(){
         // 我们在搜索时，是不需要替用户指定搜索的区，因为用于搜索肯定指的是北京城范围内的
         // 并且搜索时我们也不应该指定搜索的排名规则，所以我们就按默认的排名顺序规则，即sort=1
         // 同时，我们也不应指定当前的距离范围
@@ -670,37 +657,48 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
         mPreProgressBar.setVisibility(View.VISIBLE);
         mPreTextView.setVisibility(View.VISIBLE);
 
-        ConcurrentHashMap<String, String> requestParams = new ConcurrentHashMap<String, String>();
-        Log.d(TAG, " the room search query string are : " + mQueryResult);
-        requestParams.put("keyword", REQUEST_KEYWORD + mQueryResult);
-        requestParams.put("city", "北京");
-
-        // 这里的sort值很特殊，因为sort的值可以决定两个筛选，一个是价格(当值为8和9时)，还有一个就是好评度(例如值为1和2)
-        // 如果用户没有指定，则我们直接将这个值置为1，即默认排序的情况
-        requestParams.put("sort", "1");
-        requestParams.put("limit", "20");
-
-        requestParams.put("format", "json");
-        requestParams.put("has_coupon", 0 + "");
-        requestParams.put("page", "1");
+        Map<String,String> params = new HashMap<String, String>();
+        params.put(HttpConstants.GET_ROOM.START_NO,String.valueOf(mStart));
+        params.put(HttpConstants.GET_ROOM.END_NO,String.valueOf(mEnd));
+        float lng = paramsPreference.getRoomLongi(this);
+        float lat = paramsPreference.getRoomLati(this);
+        params.put(HttpConstants.GET_ROOM.LAT,String.valueOf(lat));
+        params.put(HttpConstants.GET_ROOM.LNG,String.valueOf(lng));
+        params.put(HttpConstants.Play.KEYWORD, mQueryResult);
         mPullToRefreshListView.setMode(PullToRefreshBase.Mode.DISABLED);
 
-        HttpUtil.dpRequestHttp(HttpConstants.DP_BASE_URL, HttpConstants.DP_RELATIVE_URL, HttpConstants.DP_APP_KEY, HttpConstants.DP_APP_SECRET, requestParams, new JsonHttpResponseHandler()
-        {
+        HttpUtil.requestHttp(HttpConstants.GET_ROOM.URL,params,HttpConstants.RequestMethod.GET, new JsonHttpResponseHandler(){
             @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONObject response)
-            {
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response){
                 super.onSuccess(statusCode, headers, response);
                 Log.d(TAG, "room response ->" + response);
                 try {
-                    if (!response.isNull("status")) {
-                        String status = response.getString("status");
-                        if (status.equals("OK")) {
-                            List<NearbyRoomSubFragmentRoomBean> resultRoomList = setRoomInfoByJson(response);
-                            if (resultRoomList.isEmpty()) {
+                    if(!response.isNull("code")){
+                        if(response.getInt("code") == HttpConstants.ResponseCode.NORMAL) {
+                            List<NearbyRoomBean> roomList = new ArrayList<NearbyRoomBean>();
+                            if(response.get("result").equals("null")){
+                                mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
+                            }else{
+                                JSONArray list_data = response.getJSONArray("result");
+                                for (int i = 0; i < list_data.length(); i++) {
+                                    NearbyRoomBean room = new NearbyRoomBean();
+                                    room.setId(list_data.getJSONObject(i).getString("id"));
+                                    room.setName(list_data.getJSONObject(i).getString("name"));
+                                    room.setAddress(list_data.getJSONObject(i).getString("address"));
+                                    room.setTelephone(list_data.getJSONObject(i).getString("telephone"));
+                                    room.setDetail_info(list_data.getJSONObject(i).getString("detail_info"));
+                                    room.setPrice(list_data.getJSONObject(i).getString("price"));
+                                    room.setShop_hours(list_data.getJSONObject(i).getString("shop_hours"));
+                                    room.setRange(list_data.getJSONObject(i).getString("range"));
+                                    room.setOverall_rating(list_data.getJSONObject(i).getString("overall_rating"));
+                                    room.setImg_url(list_data.getJSONObject(i).getString("img_url"));
+                                    roomList.add(room);
+                                }
+                            }
+                            if (roomList.isEmpty()) {
                                 mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
                             } else {
-                                mHandler.obtainMessage(PublicConstant.GET_SUCCESS, resultRoomList).sendToTarget();
+                                mHandler.obtainMessage(PublicConstant.GET_SUCCESS, roomList).sendToTarget();
                             }
                         } else {
                             mHandler.sendEmptyMessage(PublicConstant.REQUEST_ERROR);
@@ -1381,87 +1379,9 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
         return coauchList;
     }
 
-    private List<NearbyRoomSubFragmentRoomBean> setRoomInfoByJson(JSONObject response)
-    {
-        List<NearbyRoomSubFragmentRoomBean> roomList = new ArrayList<NearbyRoomSubFragmentRoomBean>();
-        try
-        {
-            if (!response.isNull("status"))
-            {
-                String status = response.getString("status");
-                if (status.equals("OK"))
-                {
-                    // TODO: 现阶段，由于返回的原始的Json包含了两个int值，一个是total_count,一个是count
-                    // TODO: 但是我们不确定究竟是哪一个代表的是我们获得的数据的条数，我们暂时先使用total_count这个值作为数据的条数
-                    final int count = response.getInt("total_count");
-                    JSONArray businessJsonArr = response.getJSONArray("businesses");
 
-                    final int size = businessJsonArr.length();
-                    Log.d(TAG, " the total json objects we get are : " + size);
-                    if(size < 1)
-                    {
-                        mHandler.sendEmptyMessage(PublicConstant.NO_RESULT);
-                    } else
-                    {
-                        int i;
-                        for (i = 0; i < size; ++i) {
-                            JSONObject businessObj = (JSONObject) businessJsonArr.get(i);
-                            Log.d(TAG, " the sub json object we parsed out are : " + businessObj.toString());
-                            final long businessId = businessObj.getLong("business_id");
-                            String roomName = businessObj.getString("name");
-                            float level = businessObj.getInt("service_score");
-                            double price = businessObj.getDouble("avg_price");
-                            String address = businessObj.getString("address");
-                            String distance = String.valueOf(businessObj.getInt("distance"));
-                            String roomPhoto = businessObj.getString("s_photo_url");
-                            String roomDetailPageUrl = businessObj.getString("business_url");
-                            Log.d(TAG, " the room detailed page url are : " + roomDetailPageUrl);
-                            Log.d(TAG, " inside the room info retrieved part --> the room url we get for the room list are : " + roomPhoto);
-                            // TODO: 我们以下解析的数据全部都是为下一个即RoomDetailedActivity当中的数据(这些数据都是需要传动到球厅详情Activity当中的)
-                            String roomPhoneNum = businessObj.getString("telephone");
 
-                            // 我们从一个jsonArray当中解析出球厅详情Activity当中需要的关于球厅的tag
-                            JSONArray regionJsonArr = businessObj.getJSONArray("regions");
-                            Log.d(TAG, " the sub-sub json object we get are : " + regionJsonArr.toString());
-                            String roomTag = parseRoomTag(regionJsonArr);
-                            Log.d(TAG, " the tag we get for the room are : " + roomTag);
-                            JSONArray roomDetailedInfoArr = businessObj.getJSONArray("deals");
-                            String detailedRoomInfo = parseRoomDetailedInfo(roomDetailedInfoArr);
-                            Log.d(TAG, " the room detailed info we get are : " + detailedRoomInfo);
-
-                            Log.d(TAG, " after totally parsed this json obj : " + businessId + " , " + roomName + " , " + level + " , " + price + " , " + distance + " , " + roomPhoto + " , " + address);
-                            // String roomPhoto, String roomName, float level, double price, String address, String distance
-                            // TODO: 我们在这里最新增加了一个字段就是shop hours(在我们自己提供的接口当中我们已经添加了，但是大众点评的接口当中没有看到这个field的提供信息，先空着，到以后优化时再修改)
-                            NearbyRoomSubFragmentRoomBean roomBean = new NearbyRoomSubFragmentRoomBean(
-                                    String.valueOf(businessId),
-                                    roomPhoto,
-                                    roomName,
-                                    level,
-                                    price,
-                                    address,
-                                    distance,
-                                    roomPhoneNum,
-                                    roomTag,
-                                    detailedRoomInfo,
-                                    "", // 营业时间
-                                    roomDetailPageUrl);
-                            // TODO: 将这条数据加入到roomList当中(现在由于数据不完整，所以暂时不添加，等数据完整性已经比较好的时候再进行添加)
-                            roomList.add(roomBean);
-                        }
-                    }
-                }
-            }
-        } catch (JSONException e)
-        {
-            e.printStackTrace();
-            Log.d(TAG, " Exception happened in parsing the resulted json object we get, and the detailed reason are : " + e.toString());
-        }
-
-        return roomList;
-    }
-
-    private static String parseRoomTag(JSONArray srcArr)
-    {
+    private static String parseRoomTag(JSONArray srcArr){
         StringBuilder tagStr = new StringBuilder();
         final int len = srcArr.length();
         int i;
@@ -1479,8 +1399,7 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
     // TODO: 从我们得到的原始数据当中解析出关于球厅Activity当中的球厅详情字段
     // TODO: 但是现阶段我们是采用json array当中的打折信息(即deals字段)
     // TODO: 在这里我们需要将字段进行一些格式化处理，至少看起来很像ListView
-    private static String parseRoomDetailedInfo(JSONArray srcArr)
-    {
+    private static String parseRoomDetailedInfo(JSONArray srcArr){
         StringBuilder infoStr = new StringBuilder();
         final int len = srcArr.length();
         int i;
@@ -1901,19 +1820,13 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
 
                 break;
             case PublicConstant.SEARCH_NEARBY_ROOM:
-                // TODO: 关于球厅的搜素我们目前可以想到解决办法就是将所有数据缓存下来，然后创建一个Search interface，按照本地
-                // TODO: 定义的关键字进行搜索
                 mIsListEmpty = mNearbyMateList.isEmpty();
                 List<NearbyRoomBean> roomList = (List<NearbyRoomBean>) msg.obj;
-                for (NearbyRoomBean roomBean : roomList)
-                {
-                    if (!mNearbyRoomList.contains(roomBean))
-                    {
-                        if (!mIsListEmpty)
-                        {
+                for (NearbyRoomBean roomBean : roomList){
+                    if (!mNearbyRoomList.contains(roomBean)){
+                        if (!mIsListEmpty){
                             mNearbyRoomList.add(0, roomBean);
-                        } else
-                        {
+                        } else{
                             mNearbyRoomList.add(roomBean);
                         }
                     }
@@ -2099,18 +2012,17 @@ public class SearchResultActivity extends Activity implements SearchView.OnQuery
                 return;
             case PublicConstant.SEARCH_NEARBY_ROOM:
                 NearbyRoomBean bean = mNearbyRoomList.get(position - 1);
-                Bundle bundle = new Bundle();
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getImg_url());
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getName());
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, bean.getOverall_rating());
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, bean.getPrice());
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, bean.getAddress());
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO, bean.getDetail_info());
-                bundle.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, bean.getTelephone());
-                Intent roomIntent = new Intent(SearchResultActivity.this, NearbyRoomDetailActivity.class);
-                roomIntent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, bundle);
+                args.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHOTO, bean.getImg_url());
+                args.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_NAME, bean.getName());
+                args.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, bean.getOverall_rating());
+                args.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, bean.getPrice());
+                args.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_ADDRESS, bean.getAddress());
+                args.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_DETAILED_INFO, bean.getDetail_info());
+                args.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PHONE, bean.getTelephone());
+                args.putString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_SHOP_HOURS,bean.getShop_hours());
+                intent = new Intent(SearchResultActivity.this, NearbyRoomDetailActivity.class);
+//                intent.putExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT, bundle);
 
-                SearchResultActivity.this.startActivity(intent);
                 break;
             case PublicConstant.SEARCH_FAVOR:
                 FavorInfo info = (FavorInfo) mAdapter.getItem(position-1);

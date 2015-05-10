@@ -736,7 +736,6 @@ public class BilliardsNearbyRoomFragment extends Fragment{
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
         super.onCreateOptionsMenu(menu, inflater);
-        super.onCreateOptionsMenu(menu, inflater);
         mSearchView =(SearchView) menu.findItem(R.id.near_nemu_search).getActionView();
         mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

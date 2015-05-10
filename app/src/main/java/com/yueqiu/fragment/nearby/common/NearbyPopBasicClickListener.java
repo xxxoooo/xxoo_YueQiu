@@ -95,8 +95,8 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                 break;
             case R.id.btn_assistcoauch_cost:
                 String[] priceArr = {
-                        mContext.getResources().getString(R.string.search_room_price_popupwindow_lowtohigh), // TODO: ??????从到到低，对应的数字值是????????????
-                        mContext.getResources().getString(R.string.search_room_price_popupwindow_hightolow) // TODO: ??????从到到低，对应的数字值是????????????
+                        mContext.getResources().getString(R.string.search_room_price_popupwindow_lowtohigh),
+                        mContext.getResources().getString(R.string.search_room_price_popupwindow_hightolow)
                 };
                 mPopupTitleView.setText(R.string.search_room_price_popupwindow_no_filter);
                 mPopupListView.setAdapter(new NearbyPopupBaseAdapter(mContext, Arrays.asList(priceArr)));
@@ -104,7 +104,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                        String posVal = String.valueOf(position);
+                        String posVal = String.valueOf(position + 1);
 //                        final String priceStr = String.valueOf(posVal + 1);
                         mParamsPreference.setAScouchPrice(mContext, posVal);
                         mUIEventsHandler.obtainMessage(
@@ -130,7 +130,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                        String posVal = String.valueOf(position);
+                        String posVal = String.valueOf(position + 1);
 //                        final String clazzStr = String.valueOf(posVal + 1);
                         mParamsPreference.setAScouchLevel(mContext, posVal);
                         mUIEventsHandler.obtainMessage(
@@ -160,7 +160,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                        String posVal = String.valueOf(position);
+                        String posVal = String.valueOf(position + 1);
 //                        final String levelStr = String.valueOf(posVal + 1);
                         mParamsPreference.setAScouchLevel(mContext, posVal);
                         mUIEventsHandler.obtainMessage(
@@ -252,7 +252,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                        String posVal = String.valueOf(position);
+                        String posVal = String.valueOf(position + 1);
                         mParamsPreference.setCouchLevel(mContext,posVal);
                         mUIEventsHandler.obtainMessage(
                                 BilliardsNearbyCoachFragment.GET_LOCATION,
@@ -341,7 +341,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                       String posVal = String.valueOf(position);
+                       String posVal = String.valueOf(position + 1);
                         mParamsPreference.setDatingPublishedDate(mContext, posVal);
 
                         mUIEventsHandler.obtainMessage(
@@ -429,8 +429,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                        Log.d("cao","position->" + position);
-                        String priceStr = String.valueOf(position);
+                        String priceStr = String.valueOf(position + 1);
                         mParamsPreference.setRoomPrice(mContext, priceStr);
                         mUIEventsHandler.obtainMessage(
                                 BilliardsNearbyRoomFragment.GET_LOCATION,
@@ -458,7 +457,7 @@ public class NearbyPopBasicClickListener implements View.OnClickListener, Nearby
                 mPopupListView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                        String evaluate = String.valueOf(position);
+                        String evaluate = String.valueOf(position + 1);
                         mParamsPreference.setRoomApprisal(mContext, evaluate);
                         mParamsPreference.setRoomRange(mContext,"");
                         mUIEventsHandler.obtainMessage(

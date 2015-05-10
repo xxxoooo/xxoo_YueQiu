@@ -118,7 +118,8 @@ public class NearbyRoomDetailActivity extends Activity implements IWeiboHandler.
         // then, we need the data that transferred from the previous listView item to inflate
         // the detailed content of these TextView and ImageViews
         Intent receivedIntent = getIntent();
-        Bundle receivedData = receivedIntent.getBundleExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT);
+//        Bundle receivedData = receivedIntent.getBundleExtra(NearbyFragmentsCommonUtils.KEY_BUNDLE_SEARCH_ROOM_FRAGMENT);
+        Bundle receivedData = receivedIntent.getExtras();
         if (null != receivedData) {
             double price = receivedData.getDouble(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_PRICE, 0.0);
             String level = receivedData.getString(NearbyFragmentsCommonUtils.KEY_ROOM_FRAGMENT_LEVEL, "1.0");
@@ -284,9 +285,9 @@ public class NearbyRoomDetailActivity extends Activity implements IWeiboHandler.
         int id = item.getItemId();
 
         switch (id) {
-//            case R.id.search_room_detail_action_collect:
-//                mUIEventsHandler.sendEmptyMessage(ADD_TO_FAVOR);
-//                break;
+            case R.id.search_room_detail_action_collect:
+                mUIEventsHandler.sendEmptyMessage(ADD_TO_FAVOR);
+                break;
             case R.id.search_room_detail_action_share:
                 // 我们需要传入Intent来进行微信分享请求的结果监听
                 // 我们可以在这个Intent当中传递我们需要的分享的具体数据

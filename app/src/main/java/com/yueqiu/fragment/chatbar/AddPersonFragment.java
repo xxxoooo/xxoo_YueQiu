@@ -315,7 +315,7 @@ public class AddPersonFragment extends Fragment {
                                 itemInfo.setSex(list_data.getJSONObject(i).getInt("sex"));
                                 itemInfo.setDistrict(list_data.getJSONObject(i).getString("district"));
                                 //TODO:等加上
-                                itemInfo.setDistance(list_data.getJSONObject(i).getString("region"));
+                                itemInfo.setDistance(list_data.getJSONObject(i).getString("range"));
 //                                itemInfo.setContent(list_data.getJSONObject(i).getString("content"));
 //                                itemInfo.setDatetime(list_data.getJSONObject(i).getString("datetime"));
                                 searchPeople.mList.add(itemInfo);
